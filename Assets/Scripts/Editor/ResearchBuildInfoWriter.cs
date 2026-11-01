@@ -9,8 +9,9 @@ using UnityEditor.Build.Reporting;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// Writes the git short hash into Resources/ResearchBuildInfo.txt before each player build,
-/// so the research log header can tell builds apart (#26). Play mode logs "editor" instead.
+/// Writes the git hash into Resources/ResearchBuildInfo.txt before each player build, so the
+/// research log header can tell builds apart (#26). "git describe --always --dirty" adds
+/// "-dirty" when the build has uncommitted changes. Play mode logs "editor" instead.
 /// The file is git-ignored.
 /// </summary>
 public sealed class ResearchBuildInfoWriter : IPreprocessBuildWithReport
@@ -32,7 +33,7 @@ public sealed class ResearchBuildInfoWriter : IPreprocessBuildWithReport
     {
         try
         {
-            var info = new ProcessStartInfo("git", "rev-parse --short HEAD")
+            var info = new ProcessStartInfo("git", "describe --always --dirty")
             {
                 WorkingDirectory = Directory.GetCurrentDirectory(),
                 RedirectStandardOutput = true,
@@ -60,7 +61,7 @@ public sealed class ResearchBuildInfoWriter : IPreprocessBuildWithReport
             return Unknown;
         }
 
-        Debug.LogWarning("ResearchBuildInfoWriter: git rev-parse returned no hash; build is logged as unknown.");
+        Debug.LogWarning("ResearchBuildInfoWriter: git describe returned no hash; build is logged as unknown.");
         return Unknown;
     }
 }

@@ -18,10 +18,6 @@ public sealed class ResearchLogger : MonoBehaviour
     private const string UtcFormat = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'";
     private const int StackLines = 5;
 
-    private const string CausePause = "pause";
-    private const string CauseFocusLost = "focus_lost";
-    private const string CauseHmdUnmounted = "hmd_unmounted";
-
     private static readonly string[] EndReasons = { "completed", "facilitator", "quit" };
 
     // Errors Unity/OVR print on every Play start without a headset or Link; they say nothing
@@ -34,6 +30,9 @@ public sealed class ResearchLogger : MonoBehaviour
     };
 
     private static ResearchLogger instance;
+
+    // True while the logger prints its own messages: they are developer errors, not the trainee's.
+    private static bool loggingOwnMessage;
 
     // Settings (asset values or defaults when the asset is missing).
     private bool autoStart = true;
@@ -80,13 +79,13 @@ public sealed class ResearchLogger : MonoBehaviour
     {
         if (!ResearchIds.IsValid(participantId))
         {
-            Debug.LogError("ResearchLogger: invalid participant ID, expected P + 3 digits.");
+            LogOwnError("ResearchLogger: invalid participant ID, expected P + 3 digits.");
             return false;
         }
 
         if (IsSessionActive)
         {
-            Debug.LogError("ResearchLogger: a session is already running.");
+            LogOwnError("ResearchLogger: a session is already running.");
             return false;
         }
 
@@ -104,7 +103,7 @@ public sealed class ResearchLogger : MonoBehaviour
 
         if (Array.IndexOf(EndReasons, reason) < 0)
         {
-            Debug.LogError("ResearchLogger: unknown session end reason, expected completed, facilitator or quit.");
+            LogOwnError("ResearchLogger: unknown session end reason, expected completed, facilitator or quit.");
             return;
         }
 
@@ -155,6 +154,19 @@ public sealed class ResearchLogger : MonoBehaviour
         }
     }
 
+    private static void LogOwnError(string message)
+    {
+        loggingOwnMessage = true;
+        try
+        {
+            Debug.LogError(message);
+        }
+        finally
+        {
+            loggingOwnMessage = false;
+        }
+    }
+
     private static ResearchLogger EnsureInstance()
     {
         if (instance == null)
@@ -169,6 +181,13 @@ public sealed class ResearchLogger : MonoBehaviour
 
     private void Awake()
     {
+        if (instance != null && instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+
+        instance = this;
         var settings = Resources.Load<ResearchSettings>(ResearchSettings.ResourcePath);
         if (settings != null)
         {
@@ -195,12 +214,12 @@ public sealed class ResearchLogger : MonoBehaviour
 
     private void OnApplicationPause(bool paused)
     {
-        SetPauseCause(CausePause, paused);
+        SetPauseCause(PauseCauses.AppPause, paused);
     }
 
     private void OnApplicationFocus(bool hasFocus)
     {
-        SetPauseCause(CauseFocusLost, !hasFocus);
+        SetPauseCause(PauseCauses.AppFocus, !hasFocus);
     }
 
     private void OnApplicationQuit()
@@ -217,22 +236,22 @@ public sealed class ResearchLogger : MonoBehaviour
 
     private void HandleHmdUnmounted()
     {
-        SetPauseCause(CauseHmdUnmounted, true);
+        SetPauseCause(PauseCauses.Hmd, true);
     }
 
     private void HandleHmdMounted()
     {
-        SetPauseCause(CauseHmdUnmounted, false);
+        SetPauseCause(PauseCauses.Hmd, false);
     }
 
     private void HandleInputFocusLost()
     {
-        SetPauseCause(CauseFocusLost, true);
+        SetPauseCause(PauseCauses.InputFocus, true);
     }
 
     private void HandleInputFocusAcquired()
     {
-        SetPauseCause(CauseFocusLost, false);
+        SetPauseCause(PauseCauses.InputFocus, false);
     }
 
     private void SubscribeOvr(bool subscribe)
@@ -266,8 +285,7 @@ public sealed class ResearchLogger : MonoBehaviour
         participantId = id;
         sessionId = Guid.NewGuid().ToString("D");
         build = ReadBuild();
-        sessionStartRealtime = Time.realtimeSinceStartupAsDouble;
-        pauses = new PauseTracker();
+        pauses = new PauseTracker(PauseCauses.Hmd);
         errors = new ErrorFolder();
         errorTypes.Clear();
         visitsPerScene.Clear();
@@ -278,6 +296,8 @@ public sealed class ResearchLogger : MonoBehaviour
 
         // Scan before the new header exists, otherwise the new file would be marked as crashed.
         SessionFiles.MarkCrashedSessions(ResearchRoot, sessionId, UtcNow());
+        // Time origin after the scan, so the header's t = 0 matches its utc.
+        sessionStartRealtime = Time.realtimeSinceStartupAsDouble;
         files = new SessionFiles(ResearchRoot, participantId, sessionId);
         sessionActive = true;
 
@@ -302,16 +322,6 @@ public sealed class ResearchLogger : MonoBehaviour
     private void FinishSession(string reason)
     {
         // session_end must stay the last line: the crash scan only reads the last parseable line.
-        foreach (KeyValuePair<string, int> pending in errors.DrainPending())
-        {
-            errorTypes.TryGetValue(pending.Key, out string type);
-            WriteEvent("unity_error", new JsonFields()
-                .Add("type", type)
-                .Add("message", pending.Key)
-                .Add("stack", (string)null)
-                .Add("folded_count", pending.Value));
-        }
-
         CloseVisit();
         WriteEvent("session_end", new JsonFields().Add("reason", reason));
         sessionActive = false;
@@ -359,13 +369,22 @@ public sealed class ResearchLogger : MonoBehaviour
             return;
         }
 
+        // Folded repeats belong to the visit they happened in.
+        DrainFoldedErrors();
+
         double t = Now();
         double pausedS = pauses.PausedSeconds(t) - visitEnterPausedS;
         double durationS = (t - visitEnterT) - pausedS;
+        int visitPauses = pauses.PauseCount - visitEnterPauseCount;
+        int visitHmdRemoved = pauses.HmdRemovedCount - visitEnterHmdCount;
 
+        // Same values as the summary row, so every #26 summary column can be rebuilt from events.
         WriteEvent("scene_exit", new JsonFields()
             .Add("duration_s", Math.Round(durationS, 3))
-            .Add("paused_s", Math.Round(pausedS, 3)));
+            .Add("paused_s", Math.Round(pausedS, 3))
+            .Add("pauses", visitPauses)
+            .Add("hmd_removed_count", visitHmdRemoved)
+            .Add("unity_errors", visitUnityErrors));
 
         var row = new VisitSummary
         {
@@ -378,8 +397,8 @@ public sealed class ResearchLogger : MonoBehaviour
             EnterUtc = visitEnterUtc,
             DurationS = durationS,
             PausedS = pausedS,
-            Pauses = pauses.PauseCount - visitEnterPauseCount,
-            HmdRemovedCount = pauses.HmdRemovedCount - visitEnterHmdCount,
+            Pauses = visitPauses,
+            HmdRemovedCount = visitHmdRemoved,
             UnityErrors = visitUnityErrors
         };
         if (!writeFailed && !files.AppendSummary(SummaryCsv.FormatRow(row)))
@@ -390,7 +409,20 @@ public sealed class ResearchLogger : MonoBehaviour
         visitOpen = false;
     }
 
-    private void SetPauseCause(string cause, bool active)
+    private void DrainFoldedErrors()
+    {
+        foreach (KeyValuePair<string, int> pending in errors.DrainPending())
+        {
+            errorTypes.TryGetValue(pending.Key, out string type);
+            WriteEvent("unity_error", new JsonFields()
+                .Add("type", type)
+                .Add("message", pending.Key)
+                .Add("stack", (string)null)
+                .Add("folded_count", pending.Value));
+        }
+    }
+
+    private void SetPauseCause(string source, bool active)
     {
         if (!sessionActive)
         {
@@ -398,22 +430,25 @@ public sealed class ResearchLogger : MonoBehaviour
         }
 
         double t = Now();
-        PauseTransition transition = pauses.SetCause(cause, active, t);
+        PauseTransition transition = pauses.SetCause(source, active, t);
         if (transition == PauseTransition.Paused)
         {
             pauseStartT = t;
-            WriteEvent("app_pause", new JsonFields().AddStringList("causes", pauses.ActiveCauses));
+            WriteEvent("app_pause", new JsonFields().AddStringList("causes", PauseCauses.Labels(pauses.ActiveCauses)));
         }
         else if (transition == PauseTransition.Resumed)
         {
-            WriteEvent("app_resume", new JsonFields().Add("paused_s", Math.Round(t - pauseStartT, 3)));
+            // Every cause seen during this pause, so hmd_removed_count can be rebuilt from events.
+            WriteEvent("app_resume", new JsonFields()
+                .Add("paused_s", Math.Round(t - pauseStartT, 3))
+                .AddStringList("causes", PauseCauses.Labels(pauses.CausesThisPause)));
         }
     }
 
     private void HandleLogMessage(string message, string stackTrace, LogType type)
     {
-        // The guard drops messages raised while the logger itself is writing.
-        if (!sessionActive || writing)
+        // The guard drops messages raised while the logger itself is writing or reporting.
+        if (!sessionActive || writing || writeFailed || loggingOwnMessage)
         {
             return;
         }
@@ -428,6 +463,20 @@ public sealed class ResearchLogger : MonoBehaviour
             return;
         }
 
+        try
+        {
+            CaptureError(message, stackTrace, type);
+        }
+        catch (Exception e)
+        {
+            // Logging must never break the app; stop writing instead of retrying on every error.
+            writeFailed = true;
+            Debug.LogWarning("ResearchLogger: error capture failed (" + e.GetType().Name + "); logging stops for this session.");
+        }
+    }
+
+    private void CaptureError(string message, string stackTrace, LogType type)
+    {
         string stripped = ErrorFolder.StripPaths(message) ?? string.Empty;
         visitUnityErrors++;
         ErrorDecision decision = errors.Decide(stripped, Now());

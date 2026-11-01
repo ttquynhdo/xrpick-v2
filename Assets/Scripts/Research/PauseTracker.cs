@@ -6,14 +6,28 @@ using System.Collections.Generic;
 /// </summary>
 public sealed class PauseTracker
 {
-    private const string HmdUnmounted = "hmd_unmounted";
+    private const string DefaultHmdCause = "hmd_unmounted";
 
+    private readonly string _hmdCause;
     private readonly List<string> _activeCauses = new List<string>();
+    private readonly List<string> _causesThisPause = new List<string>();
     private double _pauseStart;
     private double _closedSeconds;
     private bool _hmdInCurrentPause;
 
+    /// <param name="hmdCause">The cause that counts as "headset removed" for HmdRemovedCount.</param>
+    public PauseTracker(string hmdCause = DefaultHmdCause)
+    {
+        _hmdCause = hmdCause;
+    }
+
     public IReadOnlyList<string> ActiveCauses => _activeCauses;
+
+    /// <summary>
+    /// Every cause seen during the current pause, or during the last one after it resumed,
+    /// in the order they started. Cleared when the next pause starts.
+    /// </summary>
+    public IReadOnlyList<string> CausesThisPause => _causesThisPause;
 
     public bool IsPaused => _activeCauses.Count > 0;
 
@@ -39,7 +53,17 @@ public sealed class PauseTracker
             return PauseTransition.None;
         }
 
-        if (active && cause == HmdUnmounted && !_hmdInCurrentPause)
+        if (!wasPaused && IsPaused)
+        {
+            _causesThisPause.Clear();
+        }
+
+        if (active && !_causesThisPause.Contains(cause))
+        {
+            _causesThisPause.Add(cause);
+        }
+
+        if (active && cause == _hmdCause && !_hmdInCurrentPause)
         {
             _hmdInCurrentPause = true;
             HmdRemovedCount++;
