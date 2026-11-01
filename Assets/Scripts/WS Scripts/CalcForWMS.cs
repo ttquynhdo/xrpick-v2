@@ -1,5 +1,6 @@
-using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 
 public class CalcForWMS : MonoBehaviour
 {
@@ -9,43 +10,82 @@ public class CalcForWMS : MonoBehaviour
     public TextMeshProUGUI istText;
     public TextMeshProUGUI sollText;
     public TextMeshProUGUI restText;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    // #2: a package counts once, however many of its colliders are inside the trigger.
+    private readonly Dictionary<BoxInfo, int> collidersInside = new();
+
+    private void Start()
     {
+        if (istText == null || sollText == null || restText == null)
+        {
+            Debug.LogError("CalcForWMS: istText, sollText or restText is not assigned.", this);
+        }
+
         currentSize = 0;
-        istText.text = currentSize.ToString();
-        sollText.text = necessarySize.ToString();
-        restText.text = restSize.ToString();
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        istText.text = currentSize.ToString();
-        sollText.text = necessarySize.ToString();
-        restText.text = restSize.ToString();
+        UpdateDisplay();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "GGPackage")
-        {
-            currentSize += other.GetComponent<BoxInfo>().packageSize;
-            restSize -= other.GetComponent<BoxInfo>().packageSize;
+        BoxInfo box = GetPackage(other);
 
+        if (box == null)
+            return;
+
+        collidersInside.TryGetValue(box, out int count);
+        collidersInside[box] = count + 1;
+
+        if (count == 0)
+        {
+            currentSize += box.packageSize;
+            restSize -= box.packageSize;
+            UpdateDisplay();
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag == "GGPackage")
+        BoxInfo box = GetPackage(other);
+
+        if (box == null || !collidersInside.TryGetValue(box, out int count))
+            return;
+
+        if (count > 1)
         {
-            currentSize -= other.GetComponent<BoxInfo>().packageSize;
-            restSize += other.GetComponent<BoxInfo>().packageSize;
+            collidersInside[box] = count - 1;
+            return;
         }
+
+        collidersInside.Remove(box);
+        currentSize -= box.packageSize;
+        restSize += box.packageSize;
+        UpdateDisplay();
     }
 
+    // Hands and other loose colliders have no BoxInfo; only GG packages are counted here.
+    private static BoxInfo GetPackage(Collider other)
+    {
+        BoxInfo box = other.GetComponentInParent<BoxInfo>();
 
+        if (box == null || !box.CompareTag("GGPackage"))
+            return null;
 
+        return box;
+    }
+
+    private void UpdateDisplay()
+    {
+        if (istText != null)
+        {
+            istText.text = currentSize.ToString();
+        }
+        if (sollText != null)
+        {
+            sollText.text = necessarySize.ToString();
+        }
+        if (restText != null)
+        {
+            restText.text = restSize.ToString();
+        }
+    }
 }
