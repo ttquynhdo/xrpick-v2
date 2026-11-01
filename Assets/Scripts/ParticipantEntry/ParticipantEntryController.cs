@@ -7,9 +7,9 @@ using UnityEngine.UI;
 public class ParticipantEntryController : MonoBehaviour
 {
     // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string ConfirmQuestionFormat = "Ist {participant_id} richtig?";                        // entry.confirm.question
+    private const string ConfirmQuestionFormat = "Ist der Code {participant_id} richtig?";                // entry.confirm.question
     private const string ResumeQuestionFormat = "Kurs von {participant_id} fortsetzen?";                 // entry.resume.question
-    private const string ResumeWhereFormat = "Abgebrochen in: {scene_name}";                             // entry.resume.where
+    private const string ResumeWhereFormat = "Unterbrochen in: {scene_name}";                           // entry.resume.where
     private const string WarningFinishedFormat = "Für {participant_id} gibt es bereits eine abgeschlossene Sitzung."; // entry.warning.finished
     private const string StartError = "Die Sitzung konnte nicht gestartet werden. Bitte starten Sie die App neu.";  // entry.error.start
 
@@ -24,6 +24,8 @@ public class ParticipantEntryController : MonoBehaviour
     [SerializeField] private TMP_Text confirmText;
     [SerializeField] private TMP_Text resumeText;
     [SerializeField] private TMP_Text warningText;
+    // Must NOT be a child of the four entry panels: it stays visible after they are hidden.
+    [Tooltip("Must NOT be a child of the four entry panels, or it is hidden together with them.")]
     [SerializeField] private TMP_Text errorText;
 
     [Header("Controls")]
@@ -41,9 +43,15 @@ public class ParticipantEntryController : MonoBehaviour
     private string pendingCode;
     private string resumeScene;
     private bool started;
+    private bool broken;
 
     private void Start()
     {
+        // Fail closed: the course stays hidden unless a session is already running.
+        bool sessionActive = ResearchLogger.IsSessionActive;
+        if (!sessionActive)
+            SetCourseVisible(false);
+
         if (RequiredReference.IsMissing(keypadPanel, nameof(keypadPanel), this)
             | RequiredReference.IsMissing(confirmPanel, nameof(confirmPanel), this)
             | RequiredReference.IsMissing(resumePanel, nameof(resumePanel), this)
@@ -54,15 +62,17 @@ public class ParticipantEntryController : MonoBehaviour
             | RequiredReference.IsMissing(warningText, nameof(warningText), this)
             | RequiredReference.IsMissing(errorText, nameof(errorText), this)
             | RequiredReference.IsMissing(okButton, nameof(okButton), this)
-            | RequiredReference.IsMissing(sceneMenu, nameof(sceneMenu), this))
+            | RequiredReference.IsMissing(sceneMenu, nameof(sceneMenu), this)
+            | !HasCourseRoots())
         {
+            broken = true;
             return;
         }
 
         errorText.text = string.Empty;
 
         // A session started earlier (e.g. Editor auto-start in another scene): never show the keypad.
-        if (ResearchLogger.IsSessionActive)
+        if (sessionActive)
         {
             started = true;
             HideEntryPanels();
@@ -70,13 +80,35 @@ public class ParticipantEntryController : MonoBehaviour
             return;
         }
 
-        SetCourseVisible(false);
         ShowKeypad();
     }
 
+    private bool HasCourseRoots()
+    {
+        if (courseRoots == null || courseRoots.Length == 0)
+        {
+            Debug.LogError($"{nameof(ParticipantEntryController)} on '{gameObject.name}': {nameof(courseRoots)} is empty, nothing would be gated.", this);
+            return false;
+        }
+
+        bool valid = true;
+        for (int i = 0; i < courseRoots.Length; i++)
+        {
+            if (courseRoots[i] != null)
+                continue;
+
+            Debug.LogError($"{nameof(ParticipantEntryController)} on '{gameObject.name}': {nameof(courseRoots)}[{i}] is not assigned.", this);
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    private bool Locked => started || broken;
+
     public void PressDigit(int digit)
     {
-        if (started)
+        if (Locked)
             return;
 
         buffer.AddDigit(digit);
@@ -85,7 +117,7 @@ public class ParticipantEntryController : MonoBehaviour
 
     public void PressDelete()
     {
-        if (started)
+        if (Locked)
             return;
 
         buffer.DeleteLast();
@@ -94,7 +126,7 @@ public class ParticipantEntryController : MonoBehaviour
 
     public void PressOk()
     {
-        if (started || !buffer.IsComplete)
+        if (Locked || !buffer.IsComplete)
             return;
 
         pendingCode = buffer.Code;
@@ -106,15 +138,17 @@ public class ParticipantEntryController : MonoBehaviour
     // Back to the keypad with the typed code kept, so one digit can be fixed.
     public void PressCorrect()
     {
-        if (started)
+        if (Locked)
             return;
 
+        pendingCode = null;
+        resumeScene = null;
         ShowKeypad();
     }
 
     public void PressYes()
     {
-        if (started || pendingCode == null)
+        if (Locked || pendingCode == null)
             return;
 
         string code = pendingCode;
@@ -142,15 +176,23 @@ public class ParticipantEntryController : MonoBehaviour
 
     public void PressResumeContinue()
     {
-        if (started || pendingCode == null || resumeScene == null)
+        if (Locked || pendingCode == null || resumeScene == null)
             return;
+
+        if (!Application.CanStreamedLevelBeLoaded(resumeScene))
+        {
+            // Never log "accepted" when the scene cannot load.
+            Debug.LogWarning($"Resume scene '{resumeScene}' cannot be loaded; starting the course without resuming.", this);
+            Begin(pendingCode, resumeScene, false, null);
+            return;
+        }
 
         Begin(pendingCode, resumeScene, true, resumeScene);
     }
 
     public void PressResumeRestart()
     {
-        if (started || pendingCode == null || resumeScene == null)
+        if (Locked || pendingCode == null || resumeScene == null)
             return;
 
         Begin(pendingCode, resumeScene, false, null);
@@ -158,12 +200,13 @@ public class ParticipantEntryController : MonoBehaviour
 
     public void PressWarningCorrect()
     {
+        // PressCorrect also clears pendingCode and resumeScene.
         PressCorrect();
     }
 
     public void PressWarningContinue()
     {
-        if (started || pendingCode == null)
+        if (Locked || pendingCode == null)
             return;
 
         Begin(pendingCode, null, false, null);
@@ -205,7 +248,6 @@ public class ParticipantEntryController : MonoBehaviour
 
     private void ShowKeypad()
     {
-        SetBadges(buffer.IsComplete && ResearchIds.IsTestId(buffer.Code));
         RefreshKeypad();
         ShowOnly(keypadPanel);
     }

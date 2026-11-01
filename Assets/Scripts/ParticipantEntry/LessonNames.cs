@@ -3,9 +3,9 @@ public static class LessonNames
     // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
     private const string Welcome = "1. Einführung";                        // lesson.welcome
     private const string Concept = "2. Grundlagen";                        // lesson.concept
-    private const string Basic = "3. Einzelpick nach EKZ 3";               // lesson.basic
+    private const string Basic = "3. Kommissionieren nach EKZ 3";          // lesson.basic
     private const string Mixed = "4. Mehrere Positionen";                  // lesson.mixed
-    private const string Complex = "5. Volle Kartons + Einzelteile";       // lesson.complex
+    private const string Complex = "5. Volle Kartons und loses Material";    // lesson.complex
 
     // Unknown scene names return false (no resume point).
     public static bool TryGetDisplayName(string sceneName, out string displayName)
