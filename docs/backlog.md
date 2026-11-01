@@ -18,7 +18,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 
 **Thứ tự đề xuất (cập nhật 2026-11-01: mục không cần kính làm trước).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau). #22 đã bỏ.
 1. **Đợt 1 – không kính, không phụ thuộc** (đa số chỉ sửa script):
-   - ComplexScene: ~~#3 + #15~~ (verified-mcp) → #16 (text trong scene).
+   - ComplexScene: ~~#3 + #15~~ (verified-mcp) → ~~#16~~ (done).
    - BasicPickingScene: #2 (chỉ sửa `CalcForWMS.cs`).
    - Validator: #4 → #7 (cùng các dòng).
    - Inspector nhiều scene: #5 + #9, làm khi không nhánh nào khác đang mở các scene đó.
@@ -154,7 +154,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** câu trả lời A5, A6 (nhóm đã trả lời 2026-11-01: một cỡ gói 25 chiếc cho Ring D; VPEFull trong thùng = đơn sai)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl16.md
+- **Status:** done (commit 5601da9, test 5/5 ✅, theo giả định A5)
 
 ### #17 [P1] Chốt nghĩa GG/VPE rồi làm lại ConceptScene và sửa nhãn lệch logic
 - **Type:** logic
