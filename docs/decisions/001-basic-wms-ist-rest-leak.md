@@ -5,6 +5,7 @@
 - **Ngày:** 2026-11-01
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-01):** chưa làm phương án nào, chờ người hướng dẫn. Khi có câu trả lời thì chạy lại `solution-decision`, bắt đầu từ file này.
+- **Cập nhật 2026-11-01:** nhóm trả lời B6, B7, B7a là **theo tài liệu** (Rest = tồn kho thùng kho; đếm tay thì Ist = Soll, cân thì Ist tăng dần), gần phương án C. Chưa chạy lại `solution-decision`; cần làm sau khi #1 chốt đơn Basic, vì cách lấy (đếm hay cân) phụ thuộc Soll.
 
 ## Bài toán
 Trong BasicPickingScene, trainee phải tự tính số kiện cần lấy (Soll 300 ÷ VPE 50). Họ chỉ được biết đúng hay sai sau khi xác nhận. `CalcForWMS` cập nhật số trên WMS theo từng kiện đặt vào thùng: Rest giảm 50, Ist tăng 50. Vì vậy `Rest: 0` hoặc `Ist = Soll` báo luôn là đã đủ. Ngoài ra, Rest đang mang nghĩa "còn thiếu", trong khi tài liệu yêu cầu định nghĩa Rest là tồn kho còn lại của thùng kho (Kommissionierung, slide 7).

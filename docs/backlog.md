@@ -5,9 +5,10 @@ Mục #14–#23: review thiết kế khóa học (`instructional-design-reviewer
 Mục #24–#25 và các dòng **Bổ sung (ảnh Play mode)**: review lần 2 có ảnh Play mode của 5 góc nhìn chuẩn ở cả 5 scene (`TestEvidence/<Scene>/views/`, chỉ có trên máy, không commit), 2026-11-01. Đã đối chiếu lại với code/scene.
 Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01).
 Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tải nhận thức (`xr-ux-reviewer`, cả 5 scene, ảnh `TestEvidence/<Scene>/views/`, 2026-11-01). Góc/khoảng cách tính từ mắt (0, 1.6, 0). Vị trí nút đỏ là suy ra từ cấu trúc cha–con, chưa đo trong Play mode.
+**Cập nhật 2026-11-01 theo câu trả lời B1–B10, C1–C4, D1–D3** trong file câu hỏi (trả lời của nhóm, chưa phải của người hướng dẫn): mọi scene dùng **dialog mới** (`F6 Bestätigen`); Rest = tồn kho thùng kho, Ist theo cách lấy thật (B6, B7, B7a); dữ liệu giả cùng định dạng thật (B10); #22 ngoài phạm vi (D2); giữ thông tin kiện sau khi thả làm quiz quá dễ (D3). Câu A1–A6 vẫn mở.
 Mỗi mục = 1 phiên làm việc = 1 nhánh. Không đánh số lại; mục xong thì ghi `done (commit …)`.
 
-**Trạng thái:** `todo` → `in progress` → `verified-mcp (x/y ✅, chờ test tay)` → `done (commit …, test x/x ✅)`; hoặc `blocked (lý do)`. Chỉ ghi `done` khi mọi case trong `docs/test-reports/bl<nn>.md` đều ✅, kể cả phần bạn test bằng tay. Các dòng **Bổ sung** được gộp vào **Done when** / **Scene(s)** khi bắt đầu làm mục đó.
+**Trạng thái:** `todo` → `in progress` → `verified-mcp (x/y ✅, chờ test tay)` → `done (commit …, test x/x ✅)`; hoặc `blocked (lý do)`; mục bị bỏ ghi `dropped (lý do)`. Chỉ ghi `done` khi mọi case trong `docs/test-reports/bl<nn>.md` đều ✅, kể cả phần bạn test bằng tay. Các dòng **Bổ sung** được gộp vào **Done when** / **Scene(s)** khi bắt đầu làm mục đó.
 
 Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luyện sai · **P2** bảo trì, mở đường cho việc khác · **P3** dọn dẹp.
 
@@ -19,7 +20,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 2. Đợt 2, feedback: #14 → #33; #32; #6 (phần Mixed/Complex); #38 (chụp ảnh trước). Cuối đợt test kính #32, #33.
 3. Đợt 3, thẻ hướng dẫn và Welcome: #25 → #35 → #40; #39. Cuối đợt test kính.
 4. Song song, không đụng scene: #26 → #28 (sau #14) → #29, #30, #27 → #31; #11. #12 → #13 làm sau khi nội dung ổn định (#4, #6, #14, #25).
-5. Khi người hướng dẫn trả lời: #1 → #24; #18 → #37; #17 → #36, #23; rồi #10, #20, #21, #16, #19, #22, #34.
+5. Đã gỡ chặn (2026-11-01): #10 dựng bố cục panel WMS ở BasicPickingScene (không làm song song với nhánh khác sửa BasicPickingScene, như #2, #5). Việc quyết định (không sửa scene): rà soát tên bài cho cả 5 scene (D1) → mở #18.
+6. Còn chặn: A1 → #1 → #24, chạy lại decision 001 → #34; tên bài + #1 → #18 → #37; A2/A3 → #17 → #36, #23; #10 → #20, #21 (+ A5); A5/A6 → #16 → #19. #22 đã bỏ.
 
 ---
 
@@ -37,7 +39,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Depends on:** —
 - **Ghi chú (2026-11-01):** Tài liệu requirements không nêu con số cụ thể. Về nguyên lý, tài liệu tính Soll và Ist theo **số chiếc**, còn Rest là tồn kho của thùng. Trong scene có 6 GG đang active × 50 = 300 = `necessarySize`, nên có vẻ ý đồ ban đầu là 6 package, còn `requiredGGCount = 2` là phần sót lại. Cần người hướng dẫn chốt con số.
 - **Bổ sung (ảnh Play mode):** Đã kiểm tra trong Editor: cả 3 reference của `PackageCounter` (`packagePlacedText`, `orderFeedbackText`, `instructionText`) trỏ vào `Info Panel/Unity Canvas/*`, mà panel này đang **tắt** (Basic dùng `Info Panel (1)`). Nghĩa là trainee không bao giờ thấy feedback của `PackageCounter`. Chỉ có kết quả của `OrderConfirm` (thẻ `Correct`/`Incorrect` trên bàn) là nhìn thấy được.
-- **Status:** blocked (chờ người hướng dẫn xác nhận)
+- **Bổ sung (2026-11-01, đối chiếu cả tài liệu cũ):** Không tài liệu nào có kịch bản đào tạo kèm số liệu, và không có "300 = 6 × 50". Chỉ có vài ảnh dialog thật (Soll nhỏ, một chữ số hoặc hai chữ số; VPE đều là 1) và chu trình 10 bước chuẩn. Đề xuất cho A1: dựng đơn Basic theo một ảnh dialog thật, đổi sang dữ liệu giả cùng định dạng (B10). Nếu Soll ≥ 8 chiếc thì theo tài liệu là lấy bằng cân (B7a), ảnh hưởng #34.
+- **Status:** blocked (chờ chốt A1)
 
 ### #2 [P0] CalcForWMS: đếm theo package, không theo collider
 - **Type:** bug
@@ -143,6 +146,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (ảnh Play mode):**
   - **Quiz ở Concept ít giá trị kiểm tra:** Khi cầm kiện GG, panel hiện ngay `Rule: GG packages must NOT be opened.` (`[Info Panel]/TXT_Rule`, giá trị `packageRule` của `PackageInfoOnGrab`). Hộp VPE thì đã được mô hình hoá ở trạng thái mở sẵn. Vì vậy câu hỏi "Which package can be opened?" chỉ kiểm tra trainee có nhớ dòng vừa đọc vài giây trước hay không.
   - **Thông tin cho A2:** Tài liệu Detail Description (mục Informationen Kommissionierung) có quy tắc: túi 10 cái gồm hơn 2 thành phần thì không được mở; phải lấy nguyên túi và chỉnh lại Restmenge. Có thể quy tắc "GG không được mở" bắt nguồn từ đây.
+- **Bổ sung (2026-11-01, đối chiếu cả tài liệu cũ):** "GG" không có trong tài liệu nào, cũ hay mới. VPE là một **con số** (ô `Verp.-Einh.` trên dialog). Đề xuất cho A2/A3: bỏ cách chia "loại kiện GG/VPE"; kiện được phân biệt bằng mã vật tư (Mat.-Nr) và ghi VPE; lỗi là bỏ nhầm vật tư khác hoặc sai số lượng. Vẫn cần chốt A2/A3.
 - **Status:** blocked (chờ người hướng dẫn xác nhận)
 
 ### #18 [P1] Đưa BasicPickingScene về cùng chuỗi bài
@@ -154,14 +158,17 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Inspector work expected:** yes (chủ yếu sửa scene)
 - **Công:** M
 - **Test trên kính:** nhanh (bấm menu, xem tổng thể scene)
-- **Depends on:** #1, #5; người hướng dẫn xác nhận có muốn đặt tên bài theo EKZ không
+- **Depends on:** #1, #5; quyết định tên bài cho **cả 5 scene** (D1, xem Bổ sung 2026-11-01)
 - **Ghi chú:** Cần Play mode kiểm tra package cũ có nhìn thấy và cầm được không. Trong ảnh `overview`/`container` không thấy các package này.
 - **Bổ sung (ảnh Play mode):**
   - **Chỉ dẫn bắt làm việc không làm được:** Panel WMS ra lệnh `Bitte Material umpacken!` (`[Info Panel (1)]/Anweisung Visuals/Text (TMP) (1)`) và `EKZ Hinweis: Leerräume auffüllen`, nhưng scene không cho làm hai việc đó. Thẻ hướng dẫn lại bảo "Achte immer auf die Anweisungen", nên trainee học cách bỏ qua chỉ dẫn. Hoặc bỏ hai dòng này, hoặc dạy chúng (#20).
   - **Menu lệch số EKZ:** Mục menu `2. EKZ 2` trong khi WMS hiện `EKZ: 003`.
   - **Gợi ý bài tiếp theo bỏ qua Mixed:** Thẻ `Correct` ghi "nächste Aufgabe (EKZ 8)", tức là Complex, bỏ qua Mixed.
   - **Nhãn nút F12:** Nút đỏ ghi `F12` và thẻ ghi "(F12)". Theo spec dialog, F12 là `Aufkl. korr.` (sửa nhãn), còn xác nhận là `F6 Bestätigen` (suy ra). Cần câu trả lời B8/B9 rồi thống nhất với #10.
-- **Status:** blocked (chờ người hướng dẫn xác nhận)
+- **Bổ sung (2026-11-01, trả lời B8, D1):**
+  - B8: dùng dialog mới → nút xác nhận và thẻ hướng dẫn ghi `F6`, không còn `F12`. Thêm câu Done when: *Nút đỏ và thẻ hướng dẫn ghi `F6`; không còn chữ `F12` nào trong scene.*
+  - D1: mọi scene sẽ có cùng dialog WMS, nên đơn nào cũng có EKZ; đặt tên bài theo EKZ không phân biệt được các bài. Hướng đề xuất: đặt tên theo **kỹ năng** mỗi bài luyện (vd. đọc dialog → một pick → nhiều vị trí lần lượt → carton nguyên + chiếc lẻ). Cần rà soát lại cả 5 scene (`instructional-design-reviewer`), chốt tên, rồi mới sửa menu ở đây và ở #37. Tên tiếng Đức qua `localize-strings`.
+- **Status:** blocked (chờ #1 và quyết định tên bài)
 
 ### #24 [P1] BasicPickingScene: thêm kiện thừa để phép tính có ý nghĩa
 - **Type:** logic
@@ -272,11 +279,11 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** ConceptScene
 - **Files:** ConceptScene.unity:1043 (`PackageQuizController.feedbackText`) và :17204 (`PackageInfoDisplay.descriptionText`) cùng trỏ vào một TMP (`fileID 1358751443`, `[Info Panel]/TXT_Description`); `_whenUnselect → ShowDefaultInfo` ở :5031, :8681, :9679; Assets/Scripts/PackageInfoDisplay.cs:68–72
 - **Problem:** Phản hồi của quiz và thông tin kiện dùng chung một ô chữ. Bấm nút xong mà cầm rồi thả một kiện thì phản hồi bị ghi đè bằng "Look below to read the instructions…". Thông tin kiện cũng biến mất ngay khi thả, nên trainee phải vừa giữ kiện vừa đọc hai panel ở xa (`Info Panel` và `Sample Description`, lệch nhau 29°). Ngoài ra panel `Sample Formula` để trống khi bắt đầu, tiêu đề panel ("Instruction Panel") trùng tên với thẻ trên bàn, `TXT_Feedback` trống nằm chồng lên vùng mô tả, và các ô đáp án không cho thấy ô nào đang được chọn.
-- **Done when:** Chọn VPE và bấm nút → hiện phản hồi đúng. Sau đó cầm rồi thả một kiện → phản hồi vẫn còn. Thả kiện → thông tin của kiện vừa cầm vẫn hiện tới khi cầm kiện khác. Lúc bắt đầu scene, không có panel trống nào. Chọn một đáp án → ô đó được đánh dấu rõ ràng.
-- **Inspector work expected:** yes. Tạo TMP riêng cho phản hồi (đặt cạnh nút, xem #33), gán lại `feedbackText`, bỏ `ShowDefaultInfo` khỏi `_whenUnselect`, ẩn hoặc gộp `Sample Description`, xoá `TXT_Feedback` thừa.
+- **Done when:** Chọn VPE và bấm nút → hiện phản hồi đúng. Sau đó cầm rồi thả một kiện → phản hồi vẫn còn. Thả kiện → thông tin của kiện vừa cầm biến mất (giữ như hiện tại, để quiz không quá dễ), còn phản hồi quiz thì không bị ghi đè. Lúc bắt đầu scene, không có panel trống nào. Chọn một đáp án → ô đó được đánh dấu rõ ràng.
+- **Inspector work expected:** yes. Tạo TMP riêng cho phản hồi (đặt cạnh nút, xem #33), gán lại `feedbackText`, giữ `ShowDefaultInfo` trong `_whenUnselect` (nó chỉ còn ghi vào ô mô tả), ẩn hoặc gộp `Sample Description`, xoá `TXT_Feedback` thừa.
 - **Công:** M
 - **Test trên kính:** nhanh (cầm/thả kiện bằng tay)
-- **Depends on:** — (việc giữ thông tin sau khi thả có làm quiz quá dễ không: hỏi người hướng dẫn cùng #17)
+- **Depends on:** —. Câu D3 (2026-11-01): giữ thông tin kiện sau khi thả làm quiz quá dễ, nên **không** giữ.
 - **Status:** todo
 
 ### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
@@ -301,8 +308,9 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** câu hỏi người hướng dẫn B6, B7, B7a; #2 chỉ cần nếu hiện Ist sau khi xác nhận. Ghi chú (2026-11-01): **Ist cũng làm lộ đáp án** (`Ist = Soll`), không chỉ Rest.
-- **Decision:** docs/decisions/001-basic-wms-ist-rest-leak.md (blocked; khuyến nghị tạm: che Ist/Rest bằng `–` trong lúc nhặt)
-- **Status:** blocked (chờ người hướng dẫn trả lời B6, B7, B7a)
+- **Bổ sung (2026-11-01, trả lời B6, B7, B7a):** Nhóm chọn **theo tài liệu**: Rest = tồn kho còn lại trong thùng kho; đếm tay (≤ 7 chiếc) thì Ist điền sẵn bằng Soll; cân (≥ 8 chiếc) thì Ist tăng dần trong lúc lấy. Hướng này gần phương án C của decision 001, nhưng Ist tăng dần vẫn cho biết lúc nào đủ. Phải chạy lại `solution-decision` từ decision 001 với câu trả lời này (và đơn mới của #1) trước khi làm. Done when sẽ viết lại sau quyết định đó.
+- **Decision:** docs/decisions/001-basic-wms-ist-rest-leak.md (cần chạy lại với câu trả lời B6/B7/B7a)
+- **Status:** blocked (chờ chạy lại decision 001 và #1)
 
 ### #35 [P2] Thẻ hướng dẫn: đọc được mà không phải cúi 60°
 - **Type:** logic
@@ -402,7 +410,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Inspector work expected:** yes (gắn key cho từng TMP text)
 - **Công:** L
 - **Test trên kính:** không (cần người Đức duyệt bản dịch)
-- **Depends on:** #11. Nên làm sau #4, #6 và #25 để không phải dịch các chuỗi sắp bị sửa. Chuỗi của nút xác nhận chờ câu B8 (dialog mới `F6 Bestätigen` hay dialog cũ `F12 Bestätigen`); tên hiển thị của GG chờ câu A2.
+- **Depends on:** #11. Nên làm sau #4, #6 và #25 để không phải dịch các chuỗi sắp bị sửa. Nút xác nhận là `F6 Bestätigen` (B8, dialog mới, 2026-11-01); tên hiển thị của GG chờ câu A2.
 - **Decision:** docs/decisions/002-localization-mechanism.md
 - **Bổ sung (2026-11-01, review thiết kế khóa học):** Khi dịch, thống nhất luôn: một thuật ngữ cho LVS/WMS (tài liệu dùng LVS); một tên cho mỗi vật tư (Mixed đang có "Cable Connector A", "GG Connector A", "GG Screw packages"…); đơn vị `ST` trên panel WMS và `Stück` trong câu; Basic đang xưng *du* và có lỗi chính tả "Vervolsständige" → chuyển sang *Sie*. Chuỗi ghép từng mảnh (`SampleFormulaDisplay.cs:31–36`, `PiecesOrderValidator.cs:40–42`) phải thành câu trọn vẹn có placeholder.
 - **Status:** todo
@@ -422,17 +430,18 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 
 ### #10 [Feature] Dựng panel WMS giống dialog Kommissionierung thật
 - **Type:** feature
-- **Scene(s):** BasicPickingScene trước, sau đó MixedPickingScene và ComplexScene (tuỳ câu trả lời B8)
+- **Scene(s):** BasicPickingScene trước, sau đó MixedPickingScene và ComplexScene (B8: cả ba dùng dialog mới)
 - **Files:** panel WMS hiện có trong scene, `Assets/Scripts/WS Scripts/CalcForWMS.cs`. Spec nằm ở chỗ bảo mật (`docs/requirements/wms-specs/kommissionierung-dialog.md`, không commit)
 - **Problem:** Panel WMS hiện tại không giống màn hình thật mà trainee sẽ dùng ở kho, nên bài tập chưa sát thực tế.
 - **Bổ sung (ảnh Play mode):** Hiện có 3 kiểu panel trong 3 scene thực hành: Basic là dialog xám tiếng Đức (`Soll/Ist/Rest`, `EKZ`, `VPE: 50`), còn Mixed/Complex là panel đen tiếng Anh (`Order quantity`, `Package type`, `Package size`). Cùng một khái niệm có tên khác nhau giữa các bài (`Soll` ↔ `Order quantity`, `VPE: 50` ↔ `50 pcs / package`). Hơn nữa, màn hình giống thật lại xuất hiện *trước* màn hình đơn giản. Khi làm mục này thì dùng **một mẫu** cho cả 3 scene, với tên trường thật.
 - **Bổ sung (review UX):** Ở Mixed, cột giá trị trong `TXT_Description` lệch nhau vì dùng lẫn tab và dấu cách. Khi dựng panel mới, nên dùng TMP riêng cho nhãn và cho giá trị.
-- **Done when:** Trong Play mode, đặt panel cạnh ảnh gốc: bố cục, chữ và trạng thái chỉ báo khớp với spec. Soll/Ist/Rest và `F6 Bestätigen` hoạt động theo quy tắc đã chốt. Không có ảnh hay tài liệu gốc nào nằm trong `Assets/`.
+- **Bổ sung (2026-11-01, trả lời B1–B10):** Dựng theo dialog mới (B8); màu tương đối, dùng cột "Đề xuất cho UI" của spec (B1); không có số khoanh tròn đỏ (B2); không highlight ô Anweisung (B4); chỉ `F6 Bestätigen` có chức năng, các nút F khác chỉ hiển thị (B9); dữ liệu giả theo bảng định dạng trong spec (B10). Còn mở: màu nền ô `Empf Kz` (B3) và khung cửa sổ MdiShell (B5) → làm theo giả định ở Done when.
+- **Done when:** Trong Play mode, đặt panel cạnh ảnh gốc: bố cục, chữ và trạng thái chỉ báo khớp với spec. Panel chỉ có vùng dialog, không có thanh tiêu đề/menu/thanh trạng thái của MdiShell (giả định B5). Ô `Empf Kz` có nền màu như ảnh gốc (giả định B3). Bấm `F6 Bestätigen` thì đơn được kiểm tra; bấm các nút F khác thì không có gì xảy ra. Rest hiện tồn kho còn lại trong thùng kho, Ist theo cách lấy của đơn (đếm tay: bằng Soll; cân: tăng dần), theo quyết định của #34. Mã vật tư, tên hàng và số liệu là dữ liệu giả, cùng định dạng với spec. Không có ảnh hay tài liệu gốc nào nằm trong `Assets/`.
 - **Inspector work expected:** yes (dựng Canvas, gán reference)
 - **Công:** L
 - **Test trên kính:** nhanh (so bố cục, đọc chữ panel trên kính)
-- **Depends on:** #1, câu trả lời của người hướng dẫn (file câu hỏi trong `docs/requirements/`, mục B1–B10)
-- **Status:** blocked (chờ người hướng dẫn xác nhận)
+- **Depends on:** #1 (dữ liệu đơn), #34 (cách hiện Ist/Rest). Có thể dựng bố cục trước khi hai mục này xong.
+- **Status:** todo (dựng bố cục được ngay; số liệu đơn chờ #1, #34)
 
 ### #19 [Feature] ComplexScene: tách thành hai bước, có ví dụ phép chia có dư
 - **Type:** feature
@@ -444,6 +453,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** L
 - **Test trên kính:** bắt buộc (mở VPE lấy hàng lẻ bằng tay)
 - **Depends on:** #3, #16, #17
+- **Bổ sung (2026-11-01):** Chuyển từ #22 (đã bỏ) sang đây tình huống **Anbruchmenge**: theo Detail Description mục 5.12, khi mở một VPE mà còn dư thì phần dư phải cất vào một Modul. Bước (a) của mục này tạo đúng tình huống đó, nên nên có bước cất phần dư (hoặc ít nhất nhắc đến).
 - **Status:** blocked (chờ người hướng dẫn xác nhận)
 
 ### #20 [Feature] Dạy Soll/Ist/Rest, EKZ, Anweisung trước khi dùng
@@ -456,7 +466,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** M
 - **Test trên kính:** nhanh (đọc bước dạy trên kính)
 - **Depends on:** #10; câu trả lời B3, B4, B6
-- **Status:** blocked (chờ người hướng dẫn xác nhận)
+- **Bổ sung (2026-11-01):** B6 đã chốt: Rest = tồn kho còn lại trong thùng kho. B4: ô Anweisung không highlight, nên phần dạy Anweisung chỉ dạy nội dung chữ. B3 (màu ô Empf Kz) còn mở, không chặn phần dạy nghĩa của EKZ.
+- **Status:** blocked (chờ #10)
 
 ### #21 [Feature] MixedPickingScene: nhặt tuần tự từng vị trí như dialog thật
 - **Type:** feature
@@ -467,8 +478,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Inspector work expected:** yes
 - **Công:** L
 - **Test trên kính:** nhanh (làm lần lượt 2 vị trí)
-- **Depends on:** #10; câu trả lời B8
-- **Status:** blocked (chờ người hướng dẫn xác nhận)
+- **Depends on:** #10; câu trả lời B8 (đã có, 2026-11-01: dialog mới). Đơn của Mixed vẫn chờ A5.
+- **Status:** blocked (chờ #10 và A5)
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
@@ -480,8 +491,9 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** M
 - **Test trên kính:** nhanh (chọn đáp án bằng tay)
 - **Depends on:** câu trả lời A4, B7; người hướng dẫn xác nhận phần này nằm trong phạm vi prototype
-- **Bổ sung (ảnh Play mode):** Thêm một tình huống nữa: **Anbruchmenge**. Theo Detail Description mục 5.12, khi mở một VPE mà còn dư thì phần dư phải được cất vào một Modul. ComplexScene tạo đúng tình huống này (lấy 5 chiếc lẻ từ một VPE) nhưng không nhắc gì đến bước đó.
-- **Status:** blocked (chờ người hướng dẫn xác nhận)
+- **Bổ sung (ảnh Play mode):** Thêm một tình huống nữa: **Anbruchmenge**. Theo Detail Description mục 5.12, khi mở một VPE mà còn dư thì phần dư phải được cất vào một Modul. ComplexScene tạo đúng tình huống này (lấy 5 chiếc lẻ từ một VPE) nhưng không nhắc gì đến bước đó. (Đã chuyển sang #19.)
+- **Bổ sung (2026-11-01):** Câu D2: phần này **ngoài phạm vi prototype**. Hệ quả cho A4: Ist < Soll thì app chỉ báo sai, thùng kho luôn đủ hàng; không mô phỏng `Mindermenge bestätigen`.
+- **Status:** dropped (ngoài phạm vi prototype, câu D2 2026-11-01)
 
 ### #23 [Feature] Tổng kết cuối khóa và cập nhật mục tiêu ở WelcomeScene
 - **Type:** feature
