@@ -56,7 +56,7 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
 - Debug and log messages (`Debug.Log*`) are in English. They are for developers.
 
 ## 7. Errors and logging
-- A required Inspector reference that is missing gets `Debug.LogError("<Class>: <field> is not assigned.", this)`, then return. Passing `this` makes a click on the Console line select the GameObject.
+- A required Inspector reference that is missing gets `Debug.LogError("<Class>: <field> is not assigned.", this)`, then return. Passing `this` makes a click on the Console line select the GameObject. In a button method, check all required references with `RequiredReference.IsMissing(field, nameof(field), this)` joined by `|` (not `||`, so every missing one is logged), as the validators do since #7.
 - Optional references: null-check silently.
 - No `Debug.Log` in per-frame code. Remove temporary debug logs before committing.
 - Don't swallow exceptions with an empty `catch`.
