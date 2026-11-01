@@ -25,7 +25,7 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
 - Public methods meant for buttons or UnityEvents are named as actions (`ConfirmOrder`, `ResetOrder`) and take no parameters, or one simple parameter.
 
 ## 3. Packages: identification and counting
-- Identify packages with `PackageData` / `PackageType` via `other.GetComponentInParent<PackageData>()`. **No new tag checks.** Tags (`GGPackage`, `VPEPackage`, `LooseItem`) exist only in old BasicPickingScene code and in the unused `ScaleItemCounter`.
+- Identify packages with `PackageData` / `PackageType` via `other.GetComponentInParent<PackageData>()`. **No new tag checks.** Per `docs/decisions/007-material-labels-and-keys.md`, every package also carries a material key (snake_case, same in every scene, never shown to trainees), its displayed Mat.-Nr and its VPE on `PackageData`; never derive the key from the `PackageType` int, the GameObject name or the label. Never remove or reorder `PackageType` values (serialized as ints). Tags (`GGPackage`, `VPEPackage`, `LooseItem`) exist only in old BasicPickingScene code and in the unused `ScaleItemCounter`.
 - Hands, controllers and loose colliders also enter triggers. Return early when `PackageData` is `null`.
 - Count each package once: keep a `HashSet<PackageData>` and update counts only when `Add`/`Remove` returns `true`.
 - `OnTriggerExit` must mirror `OnTriggerEnter`. A package that is destroyed or disabled inside a trigger gets no exit call. Handle this when a scenario can destroy or disable packages.
@@ -37,11 +37,10 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
 - Unsubscribe events and stop coroutines in `OnDisable` / `OnDestroy`.
 
 ## 5. Order data and validation
-- **(pending decision: single source for order quantities, backlog #6).**
-- **Interim rule:** every required quantity is a serialized field in **one** component. Validators and feedback text read it. Never repeat it as a literal: no `== 2`, `"/ 2"`, `"2 GG"` in code or text.
+- **Single source for order quantities (decided, `docs/decisions/005-order-single-source.md`):** each scene declares its order once, in WMS units: order lines of {`PackageType`, Soll in pieces, VPE in pieces per package} as serialized fields on the scene's counter. Full packages (Soll ÷ VPE) and loose pieces (remainder) are derived, never declared. Validators, feedback and the WMS panel text read the counter. BasicPickingScene keeps `CalcForWMS.necessarySize` (pieces). Never repeat a quantity as a literal: no `== 2`, `"/ 2"`, `"2 GG"` in code or text.
 - Keep the rule itself separate from Unity, so it can be tested. Pass in plain values, e.g. `static bool IsOrderCorrect(int gga, int ggb, int loose, OrderRequirement req)`, and get a plain result back. The MonoBehaviour only collects counts and shows the result. See §10.
 - A validator decides **right/wrong and why** (e.g. too few, too many, wrong type). It doesn't decide **wording**. Feedback text is built from that reason (§6).
-- **(pending decision: validator result format, together with #14 and research logging #26–#31).** Until it is decided, keep the reason as an enum or a small struct, not only as a text string, so logging can use it later.
+- **Validator result format (decided, `docs/decisions/006-validator-result-format.md`):** the order rule lives in the pure C# asmdef `XRPick.Orders` (EditMode-tested) and returns an ordered list of `{Code, Item}` errors plus per-order-line counts; `Correct` means the list is empty. `Item` is a stable, language-independent material key, never an enum name or display text. The screen shows only the first error (reason + what to do) and a generic "more errors" line; the log records the whole list. The result holds no text and no target numbers.
 
 ## 6. Trainee-facing text
 - End users read **German only** (formal *Sie*). WMS labels (`Soll:`, `Ist:`, the confirm key label…) are never translated. See `docs/i18n/README.md` and `docs/i18n/glossary.csv`.
