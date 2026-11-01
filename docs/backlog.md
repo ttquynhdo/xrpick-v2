@@ -19,7 +19,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Thứ tự đề xuất (cập nhật 2026-11-01: mục không cần kính làm trước).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau). #22 đã bỏ.
 1. **Đợt 1 – không kính, không phụ thuộc** (đa số chỉ sửa script):
    - ComplexScene: ~~#3 + #15~~ (verified-mcp) → ~~#16~~ (done).
-   - BasicPickingScene: #2 (chỉ sửa `CalcForWMS.cs`).
+   - BasicPickingScene: ~~#2~~ (verified-mcp).
    - Validator: #4 → #7 (cùng các dòng).
    - Inspector nhiều scene: #5 + #9, làm khi không nhánh nào khác đang mở các scene đó.
    - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
@@ -72,7 +72,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #1 chỉ cho con số đích; sửa đếm trùng và NullReferenceException làm được ngay
-- **Status:** todo
+- **Ghi chú (2026-11-01, khi làm):** Trong scene hiện tại mỗi kiện chỉ có một collider mang tag, nên thả/lấy bình thường không bị đếm trùng. Lỗi chỉ xảy ra khi collider con mang tag (tái hiện bằng tag tạm trong Play mode).
+- **Test report:** docs/test-reports/bl02.md
+- **Status:** verified-mcp (9/9 ✅, chờ test tay D5)
 
 ## P1 – Logic huấn luyện sai
 
