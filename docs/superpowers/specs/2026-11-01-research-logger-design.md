@@ -47,7 +47,7 @@ Each error code is mapped to the skill it tests (e.g. `WRONG_MATERIAL` → check
 
 ## 3. Constraints
 
-- Quest 3, offline, Unity 6000.4, `Assembly-CSharp`, no asmdefs. Follow `docs/coding-conventions.md` (new scripts in `Assets/Scripts/Research/`, one public class per file, English comments, no scene edits).
+- Quest 3, offline, Unity 6000.4. The research code is its own assembly `XRPick.Research` (`Assets/Scripts/Research/XRPick.Research.asmdef`, references `Oculus.VR`, auto-referenced so `Assembly-CSharp` scene scripts can call it; it never references `Assembly-CSharp`), so EditMode tests in `Assets/Tests/EditMode/Research/` (`XRPick.Research.Tests`) can test it; the build-info writer stays in `Assembly-CSharp-Editor`. Follow `docs/coding-conventions.md` (new scripts in `Assets/Scripts/Research/`, one public class per file, English comments, no scene edits).
 - Null-safe static API: `ResearchLogger.Log(...)` is a no-op when no session runs, so scene scripts call it unconditionally.
 - Write each line to disk immediately (flush per line; spec §1).
 - Schema is versioned (`schema_version`); adding fields is fine, renaming/removing bumps the version.
@@ -67,7 +67,7 @@ Consequences: log folder `…/LocalLow/XRISE/xpick/research/` in the Editor and 
 
 **Analysis tool** (user): **R** (user is learning it), SPSS as fallback. Hence:
 - Logs are "long": one event per line (`events.jsonl`), one scene visit per row (`summary.csv`).
-- The R script also writes a **wide** file, one row per participant (`time_<Scene>`, `errors_<Scene>`, …), for SPSS and for joining paper questionnaires by `participant_id`.
+- The R script also writes a **wide** file, one row per participant (`active_s_<Scene>`, `paused_s_<Scene>`, `time_to_correct_s_<Scene>`, `errors_<Scene>`, …; scenes without a confirm or quiz get no outcome columns), for SPSS and for joining paper questionnaires by `participant_id`.
 - CSV: comma separator, dot decimal, UTF-8, header row, UTC timestamps in ISO 8601. (German Excel may mis-split columns; R/SPSS read it correctly.)
 - R script written for a beginner: one `.R` file run top to bottom, commented step by step, packages limited to `tidyverse` and `jsonlite`.
 
@@ -100,7 +100,7 @@ Consequences: log folder `…/LocalLow/XRISE/xpick/research/` in the Editor and 
 ## 5. Data shape
 
 ### events file `<participant_id>_<session_id>_events.jsonl`
-Line 1: header (spec §3: `schema_version`, `app_version`, `build`, `device_model`, `os_version`, `participant_id`, `session_id`, `language`, `input_mode_at_start`, `target_refresh_rate`; `condition`/`run` dropped). Every following line has the common fields from spec §3 (`t`, `utc`, `participant_id`, `session_id`, `scene`, `scene_visit`, `event`, `data`).
+Line 1: header (spec §3: `schema_version`, `app_version`, `build`, `device_model`, `os_version`, `participant_id`, `session_id`, `session_start_mode` (`auto` / `manual`), `language`, `input_mode_at_start` (may be `null`), `target_refresh_rate`; `condition`/`run` dropped; `build` may be `null` (resource missing) or `"unknown"` (git failed)). Every following line has the common fields from spec §3 (`t`, `utc`, `participant_id`, `session_id`, `scene`, `scene_visit`, `event`, `data`).
 
 Events emitted by #26: `session_start`, `session_end` (reason), `scene_enter`, `scene_exit` (`data`: `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`, so every summary column #26 fills can be rebuilt from events), `app_pause`, `app_resume` (`paused_s`, `causes`), `unity_error`, `crash_recovered` (spec §4.1, §4.6).
 
@@ -136,12 +136,12 @@ The fake data in #26 already uses these shapes, so they are fixed here *(designe
 
 **Error codes:** spec §4.3 plus `WRONG_ANSWER`. `EMPTY` is logged alone, without an extra `TOO_FEW`. Every code has a row in `skill_map.csv`, including `EMPTY`, `WRONG_TYPE`, `NO_ANSWER` and `WRONG_ANSWER`.
 
-**`crash_recovered`** is written into the old file with the old `session_id`, `t: null`, `utc` = time of detection, `data: {last_event_t, recovered_by_session_id}`. R doesn't depend on it, because it derives crashes from the missing `session_end`; a copy taken before the next start lacks the line anyway.
+**`crash_recovered`** is written into the old file with the old `session_id`, `t: null`, `scene`/`scene_visit` `null`, `utc` = time of detection, `data: {last_event_t, recovered_by_session_id}`. R doesn't depend on it, because it derives crashes from the missing `session_end`; a copy taken before the next start lacks the line anyway.
 
 ## 7. Logger rules found in review
 
-- **Pauses:** the logger keeps one paused/active state. It writes `app_pause` (`causes`: list of focus_lost / hmd_unmounted / pause) on the change from active to paused, and `app_resume` when every cause has ended. Overlapping OVR/Unity signals therefore never double-count. `pauses` counts these transitions, and `hmd_removed_count` counts the ones whose causes include `hmd_unmounted`. The logger tracks four sources separately (app focus, OVR input focus, `OnApplicationPause`, HMD) and maps them to those three labels; `app_resume` carries `paused_s` and `causes` = the labelled union seen during the pause. A pause that spans a scene change counts in the visit where it started (`paused_s` is split by visit); one still open at a crash ends at the file's last event.
-- **Error spam:** repeated `unity_error` with the same message within 5 s is folded into one line with `folded_count` (the repeats before that line), and errors are capped per session (e.g. 200 lines, then one `unity_error_cap_reached`). File paths in messages are cut to the file name, so no `C:\Users\<name>` reaches the log.
+- **Pauses:** the logger keeps one paused/active state. It writes `app_pause` (`causes`: list of focus_lost / hmd_unmounted / pause) on the change from active to paused, and `app_resume` when every cause has ended. Overlapping OVR/Unity signals therefore never double-count. `pauses` counts these transitions, and `hmd_removed_count` counts the ones whose causes include `hmd_unmounted`. The logger tracks four sources separately (app focus, OVR input focus, `OnApplicationPause`, HMD) and maps them to those three labels; `app_resume` carries `paused_s` and `causes` = the labelled union seen during the pause. A pause that spans a scene change counts in the visit where it started (`paused_s` is split by visit); one still open at a crash ends at the file's last event; on quit during a pause no `app_resume` is written and the open part is in `scene_exit.paused_s`. `analyse.R` builds pause intervals per session and clips them to each visit.
+- **Error spam:** repeated `unity_error` with the same message within 5 s is folded into one line with `folded_count` (the repeats before that line) and `n_errors` (errors the line stands for: 1, `folded_count` + 1 after the window, `folded_count` on the visit-close line; R sums `n_errors`), and errors are capped per session (e.g. 200 lines, then one `unity_error_cap_reached`). File paths in messages are cut to the file name, so no `C:\Users\<name>` reaches the log.
 - **Time:** `t` uses `Time.realtimeSinceStartupAsDouble`. Every time or length field carries its unit (`_s`, `_m`) and is active time unless named `_wall_s`.
 - **Header line** carries `"event":"header"` so R can recognise it.
 - **Language:** in research mode (non-test ID) the language is locked to DE and logged in the header. A `language_change` event exists for test mode.
@@ -152,7 +152,8 @@ The fake data in #26 already uses these shapes, so they are fixed here *(designe
 - **Rates:** per visit first (NA when `confirm_count == 0`, never 0 %), then mean per participant, then per scene. Pooling all presses would let trial-and-error trainees dominate.
 - **Which visit counts for questions 1–2:** the first visit of a scene with at least one confirm. Later visits are flagged `repeat_visit`, and `repeat_after_crash` when a crash came before them. They are kept in the long data but not in the wide file's per-scene columns.
 - **Survivor bias:** time-to-correct plots show the count of visits that never reached correct next to each box.
-- **Data-quality table and wide file:** `end_status`, `course_finished`, `multi_session`, `mixed_build`, `build`, `schema_version`, `gap_h` between sessions (catches two people typed under one ID), `duration_censored` (last visit of a crashed session, ended at its last event).
+- **Data-quality table and wide file:** `end_status`, `course_finished`, `multi_session`, `mixed_build`, `build`, `schema_version`, `gap_h` between sessions (catches two people typed under one ID), `duration_censored` (last visit of a crashed session, ended at its last event). `course_finished` is NA when none of the person's sessions logged outcome events. The data-quality table also counts `exit_disagreements` (visits whose `scene_exit` differs from their events; part of the flagged list), `duplicate_files` (one `session_id` in several files: the longest file is kept, all paths are warned) and `error_cap_reached` (no `unity_errors` cross-check for that session); `paused_s` is in seconds.
+- **Format checks:** warnings for `session_start_mode` `auto` with a real ID, `build` null vs a missing header vs `"unknown"`, and a gap over 1 s between `utc − header utc` and `t` (clock jump or realtime stopped during sleep).
 - **Scene order:** `analysis/scenes.csv` (`scene, build_order`) fixes order and survives scene renames (#18).
 - **Unknown codes:** a code missing from `skill_map.csv` is a warning, not silently dropped.
 - **Validity limits printed with every report:** fixed scene order confounds difficulty with improvement; Concept quiz feedback reveals the answer and has a 33 % guess rate; data before #14 measures trial-and-error.

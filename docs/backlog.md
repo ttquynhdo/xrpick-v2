@@ -600,7 +600,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** —
 - **Bổ sung (2026-11-01):** thiết kế chi tiết và Done when bổ sung ở `docs/superpowers/specs/2026-11-01-research-logger-design.md` (§9), gồm đổi tên app `XRISE` / `xpick` / `com.xrise.xpick`, khung `_summary.csv`, script R trên dữ liệu giả. "Dừng Play giữa chừng → `crash_recovered`" được thay bằng tuỳ chọn dev bỏ `session_end`. Review bắt buộc bởi `data-analyst`.
 - **Test report:** docs/test-reports/bl26.md
-- **Status:** verified-mcp (27/29 ✅, chờ test tay L19 trên Quest và L20 mất focus thật trong Editor)
+- **Status:** verified-mcp (37/39 ✅, chờ test tay L19 trên Quest và L20 mất focus thật trong Editor)
 
 ### #27 [Feature] Bàn phím nhập mã người học ở WelcomeScene
 - **Type:** feature
@@ -613,6 +613,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Test trên kính:** bắt buộc (bấm phím số bằng tay)
 - **Depends on:** #26. Ai nhập mã: **người điều phối**, nhập trước khi đưa kính cho trainee (người dùng chốt 2026-11-01, spec mục 9).
 - **Bổ sung (design #26, 2026-11-01):** thêm nút ẩn cho người điều phối gọi `ResearchLogger.EndSession("facilitator")`. Mã `P900`–`P999` là mã thử (log vào `practice/`); bàn phím báo "chế độ thử" với các mã này. Làm tiếp sau crash (người dùng chốt): nhập lại mã cũ → nếu `ResearchLogger.TryFindResumePoint` thấy phiên trước bị crash thì hỏi người điều phối "Tiếp tục khóa của `P017`?" và báo bài đang dở. Xem `docs/superpowers/specs/2026-11-01-research-logger-design.md` §4, §6.
+- **Bổ sung (review cuối #26, 2026-11-01):** bản build nghiên cứu phải bắt đầu phiên **từ bàn phím**. Hiện `ResearchSettings.autoStart` bật sẵn: app tự mở phiên `P000` lúc khởi động, và `StartSession(realId)` trả `false` khi đang có phiên chạy → cả phiên người học bị ghi dưới `P000` (vào `practice/`, bị loại khỏi phân tích). Chọn một trong hai: tắt `autoStart` trong bản build nghiên cứu, hoặc gọi `EndSession(...)` cho phiên `P000` tự động trước khi `StartSession(realId)`. Header có `session_start_mode` (`auto`/`manual`); `analyse.R` cảnh báo khi mã người học thật có `auto`. Done when nên có ca: nhập `P101` → file `research/P101_…` với `session_start_mode` `manual`.
 - **Status:** todo
 
 ### #28 [Feature] Log kết quả mỗi lần xác nhận + mã lỗi + summary.csv
@@ -626,6 +627,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Test trên kính:** không
 - **Bổ sung (design #26, 2026-11-01):** định dạng `confirm_pressed` / `quiz_answer` / `task_completed` đã chốt ở design §6 (fake data của #26 dùng nó). Bất biến `correct == (error_codes rỗng)`; thêm mã `WRONG_ANSWER` cho quiz. Lần xác nhận đúng đầu tiên ở ComplexScene gọi `EndSession("completed")`. Khung `_summary.csv` do #26 tạo; #28 chỉ điền các cột kết quả.
 - **Bổ sung (2026-11-01, chốt khi làm #26, fake data đang dùng các lựa chọn này):** điểm cần chốt lại khi làm #28: (1) header thêm một trường báo build này có phát sự kiện kết quả, để R không phải đoán NA hay 0 theo từng phiên; (2) `error_codes_all` viết dạng `CODE:n;CODE:n`; (3) `quiz_answer.selected` là `null` khi chưa chọn gì (kèm `NO_ANSWER`); (4) ConceptScene có ghi `task_completed` không, và `confirm_count` của Concept có bằng số `quiz_answer` không. Câu hỏi cho trưởng nhóm nghiên cứu (data-analyst): BasicPickingScene có kiểm tra vật tư (`check_material`) không, vì `WRONG_TYPE` có thể xảy ra ở đó; một lượt scene bị cắt bởi crash có được tính là lượt đếm không (hiện: có, gắn cờ `visit_censored_<Scene>`). Khi #14 xong cần danh sách build để tách dữ liệu trước/sau #14.
+- **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp: `SceneManager.activeSceneChanged` (nơi logger mở lượt scene mới) chạy **sau** các hàm đó, nên sự kiện sẽ rơi vào lượt scene trước. Ghi từ `Start` trở đi hoặc từ thao tác của người học.
 - **Depends on:** #26. Helper mã lỗi dùng lại được cho #14; nếu làm #14 trước thì dùng chung. Định dạng kết quả validator (enum/struct lý do) chốt chung với #14 qua `solution-decision` (`docs/coding-conventions.md`, pending decision).
 - **Status:** todo
 
@@ -639,6 +641,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** L
 - **Test trên kính:** bắt buộc (cầm tay trái/phải, mất tracking)
 - **Depends on:** #26. API sự kiện grab/tracking của Meta SDK phải kiểm tra trong project trước (spec mới ghi theo hiểu biết, chưa xác minh).
+- **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (vd. `input_mode_change` ban đầu, đăng ký `GrabLogger`): `activeSceneChanged` chạy sau các hàm đó nên sự kiện rơi vào lượt scene trước. Ghi từ `Start` trở đi.
 - **Status:** todo
 
 ### #30 [Feature] Hướng nhìn (theo đầu), luồng tư thế và hiệu năng
@@ -651,6 +654,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** L
 - **Test trên kính:** bắt buộc (đo FPS trên Quest 3)
 - **Depends on:** #26. Spec mục 9 (2026-11-01): chỉ ghi hướng đầu, không ghi vị trí tay.
+- **Bổ sung (review cuối #26, 2026-11-01):** dữ liệu 10 Hz (`_pose.csv`) phải ghi qua một stream mở sẵn suốt phiên (đóng/flush khi pause, đổi scene, kết thúc phiên). `SessionFiles` hiện mở file cho mỗi dòng: ổn cho sự kiện thưa, không ổn cho 10 dòng/giây (cấp phát và ghi đĩa liên tục). Không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (sự kiện rơi vào lượt scene trước).
 - **Status:** todo
 
 ### #31 [Feature] Hướng dẫn lấy log về máy + script gộp với phiếu giấy
