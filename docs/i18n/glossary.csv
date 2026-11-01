@@ -42,4 +42,5 @@ GG,,GG,Package type used in the app; meaning not yet confirmed.,yes,app,proposed
 Tüte,die,bag (pre-packed),Bag in which several pieces are pre-packed by the supplier (e.g. 10er Tüte).,no,requirements: Kommissionierung.pptx slide 6; Detail Description,proposed,Documents also write Beutel (10er Beutel).
 Kartonage,die,cardboard packaging,Cardboard packaging of pre-packed material.,no,requirements: Kommissionierung.pptx slide 6/9,proposed,Use Karton for one box.
 Schachtel,die,small box,Product packaging box.,no,requirements: Kommissionierung.pptx slide 17,proposed,
+Material,das,material,"The goods of an order line (identified by Materialnummer), whatever their packaging.",no,requirements,proposed,Used in feedback such as complex.feedback.wrong_package.
 loses Material,das,loose material,Material that is not pre-packed and is picked piece by piece.,no,requirements: Kommissionierung.pptx slide 6/9; Detail Description,proposed,"Use for loose items; the unit is Stück (ST). The documents use neither Paket, Packstück nor Gebinde."
