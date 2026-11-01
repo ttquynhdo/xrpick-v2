@@ -7,7 +7,7 @@ Auftragsbehälter,der,order container,Container that receives the picked materia
 Lagerbehälter,der,storage container,Container the material is taken from (the source).,no,requirements: Kommissionierung.pptx,proposed,
 Sollmenge,die,target quantity,Quantity that has to be picked for the order line.,no,requirements: Kommissionierung.pptx slide 7,proposed,Shown on the WMS screen as the label Soll.
 Soll,,target qty,WMS field label for the target quantity.,yes,WMS screenshot,proposed,Keep the German label in every language mode; EN mode may show the gloss in brackets.
-Istmenge,die,actual quantity,Quantity actually picked; when counting by hand it is pre-filled with the target quantity.,no,requirements: Kommissionierung.pptx slide 7,proposed,
+Istmenge,die,actual quantity,Quantity actually picked; when counting by hand it is pre-filled with the target quantity.,no,requirements: Kommissionierung.pptx slide 7,proposed,"In the app (weighing, B7a) Ist grows while picking; teach it only for weighing (decision 010)."
 Ist,,actual qty,WMS field label for the actual quantity.,yes,WMS screenshot,proposed,
 Restmenge,die,remaining stock,Stock left in the storage container after the pick; NOT the quantity still missing.,no,requirements: Kommissionierung.pptx slide 7,proposed,BasicPickingScene shows Rest as static remaining stock since #34 (B6).
 Rest,,remaining stock,WMS field label for the remaining stock.,yes,WMS screenshot,proposed,Never use 'Rest' for the remainder/loose part or for 'what is missing' in feedback (german-reviewer #14).
@@ -16,8 +16,8 @@ Mindermenge,die,short quantity,Confirmed quantity when actual is less than targe
 Verpackungseinheit,die,packaging unit,Number of pieces in one carton or bag.,no,requirements: Kommissionierung.pptx slide 8,proposed,"Abbreviation VPE. A quantity, not the name of the physical package: for the object use Karton or Tüte."
 VPE,die,packaging unit (VPE),Abbreviation of Verpackungseinheit.,yes,requirements: Kommissionierung.pptx slide 8,proposed,Keep the abbreviation in both languages.
 Verp.-Einh.,,packaging unit,WMS field label (abbreviation of Verpackungseinheit).,yes,WMS screenshot,proposed,
-EKZ,die,handling class (EKZ),"Class (0, 2–6, 8, 9) that states how a material may be picked: loose bulk (0, 2), placed one by one in order (3), touching in one/two/no layer with separators (4/5/6), ESD-protected (8), special packaging (9; 8 and 9 not without instructions).",yes,requirements: Kommissionierung.pptx slide 8 (EKZ-Vorgabe),proposed,Full German form not stated in the documents – ask. Classes 1 and 7 do not exist in the table.
-Empf Kz,,–,WMS field label; meaning not stated in the documents.,yes,WMS screenshot,proposed,Probably shows the EKZ class – question B3.
+EKZ,die,handling class (EKZ),"Class (0, 2–6, 8, 9) that states how a material may be picked: loose bulk (0, 2), placed one by one in order (3), touching in one/two/no layer with separators (4/5/6), ESD-protected (8), special packaging (9; 8 and 9 not without instructions).",yes,requirements: Kommissionierung.pptx slide 8 (EKZ-Vorgabe),proposed,Full form: Empfindlichkeitskennzeichen (Detail Description glossary table). Classes 1 and 7 do not exist in the table.
+Empf Kz,,–,"WMS field label; shows the EKZ class of the material (inferred from the documents, near certain).",yes,WMS screenshot,proposed,"Abbreviation of Empfindlichkeitskennzeichen = EKZ; confirm with B16. Teach as ""003 ist EKZ 3"" (decision 010)."
 Stück,das,piece,Unit of count.,no,requirements,proposed,Abbreviation ST on the WMS screen.
 ST,,pcs,Unit abbreviation for Stück on the WMS screen.,yes,WMS screenshot,proposed,
 Karton,der,carton,Cardboard box.,no,requirements,proposed,Also a WMS field label.
@@ -67,3 +67,9 @@ SCHRAUBE B,,screw B,"Fake material name, key screw_b, Mat.-Nr 738190, VPE 20 (ba
 RING D,,ring D,"Fake material name, key ring_d, Mat.-Nr 264857, VPE 25.",yes,app (#17),proposed,Fake master data.
 SCHLAUCHSCHELLE B,,hose clamp B,"Fake material name, key training_b (BasicPickingScene), Mat.-Nr 443890, VPE 50.",yes,app (#17),proposed,Replaces TRAINING-MATERIAL B.
 Stückzahl,die,piece count,"Number of pieces, e.g. of the full cartons in a calculation (Sollmenge minus Stückzahl der vollen Kartons).",no,german-reviewer (#14),proposed,'Stück' alone only after a number.
+Empfindlichkeitskennzeichen,das,sensitivity code,Full form of EKZ.,no,requirements: Detail Description glossary table,proposed,Abbreviated EKZ; on the WMS dialog as Empf Kz.
+Verpackung,die,package,Generic word for the physical packaging of a material (carton or bag).,no,app (#45),proposed,Use when the object may be a Karton or a Tüte; for the quantity use VPE.
+Teil,das,part,One single item of a material; used in the EKZ explanations (die Teile).,no,requirements: Kommissionierung.pptx slide 8,proposed,
+Feld,das,field,One field of the LVS dialog (e.g. das Feld Anweisung).,no,app (#20),proposed,
+einfüllen,,pour in,Putting parts into the container without order (allowed for EKZ 0).,no,app (#20),proposed,Ask the instructor whether the warehouse says einfüllen or schütten.
+STECKER C,,plug C,"Fake material name for the ConceptScene sample order only, key stecker_c, Mat.-Nr 625417, VPE 40, Empf Kz 003.",yes,"app (#20, decision 010)",proposed,Fake master data; no package of it exists in any scene.
