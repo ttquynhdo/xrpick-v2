@@ -10675,7 +10675,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Lesen Sie im LVS Material, Sollmenge (Soll), VPE und EKZ ab.
+  m_text: "Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge
+    (Soll), VPE (<nobr>Verp.-Einh.</nobr>), EKZ (<nobr>Empf Kz</nobr>). Rest: So
+    viele St\xFCck bleiben nach dem Auftrag im Lagerbeh\xE4lter."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
   m_sharedMaterial: {fileID: 7032093815205813286, guid: dda8d4d183f898241969906ee2a03d81, type: 2}

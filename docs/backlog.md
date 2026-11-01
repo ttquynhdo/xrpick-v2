@@ -380,8 +380,9 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** M–L
 - **Test trên kính:** nhanh (cầm/thả kiện, làm quiz)
 - **Depends on:** #17 (dữ liệu và nhãn 3 kiện Concept). Chạy song song được với #6 (khác scene). Câu hỏi mới cho người hướng dẫn: A9, A10, A11 (không chặn).
-- **Bổ sung (2026-11-01, #10):** Basic/Complex đã dùng màn hình máy tính `WMS_Monitor` thay TV; Concept chỉ có panel trơn 0,57 × 0,43 m không có màn hình. Đề xuất (chưa quyết, chạy `solution-decision` khi bắt đầu mục này): đặt `WMS_Monitor` với dialog ở chế độ chỉ xem (một đơn mẫu), nhãn chú thích nằm ngoài màn hình chỉ vào `Mat.-Nr`, `Verp.-Einh.`, `Soll`; lời giảng và quiz trên một bảng riêng bên cạnh, không đè lên màn hình (theo quy tắc màn hình ở đầu file). Đánh đổi cần cân: làm quen màn hình WMS sớm, bố cục giống các bài sau ↔ thêm thứ phải nhìn trong bài lý thuyết.
-- **Status:** todo (#17 đã verified-mcp)
+- **Bổ sung (2026-11-01, #10):** Basic/Complex đã dùng màn hình máy tính `WMS_Monitor` thay TV; Concept chỉ có panel trơn 0,57 × 0,43 m không có màn hình. **Đã quyết ở decision 010 (#20, 2026-11-01): có đặt `WMS_Monitor` chỉ xem trong Concept; #45 và #20 làm chung một nhánh; không đánh dấu gì trên vùng dialog.** Đề xuất ban đầu: đặt `WMS_Monitor` với dialog ở chế độ chỉ xem (một đơn mẫu), nhãn chú thích nằm ngoài màn hình chỉ vào `Mat.-Nr`, `Verp.-Einh.`, `Soll`; lời giảng và quiz trên một bảng riêng bên cạnh, không đè lên màn hình (theo quy tắc màn hình ở đầu file). Đánh đổi cần cân: làm quen màn hình WMS sớm, bố cục giống các bài sau ↔ thêm thứ phải nhìn trong bài lý thuyết.
+- **Test report:** docs/test-reports/bl20.md (chung với #20)
+- **Status:** done (commit b950df5, test 17/17 ✅, cùng #20)
 
 ### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
 - **Type:** logic
@@ -600,14 +601,16 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** ConceptScene hoặc đầu BasicPickingScene
 - **Files:** BasicPickingScene `[Info Panel (1)]/Panel/*` (Soll, Ist, Rest, EKZ, EKZ Hinweis, Anweisung)
 - **Problem:** Basic hiện Soll/Ist/Rest, EKZ và Anweisung và bảo trainee "Achte immer auf … EKZ-Hinweise!", nhưng không scene nào giải thích chúng, và bài tập không phụ thuộc vào chúng. Ngoài ra app dùng Rest là "còn thiếu", còn tài liệu nói Rest là tồn kho còn lại trong thùng.
-- **Done when:** Có một bước dạy/làm mẫu ngắn cho từng trường trước lần đầu chúng xuất hiện, hoặc trường nào chưa dùng thì ẩn đi. Rest mang đúng nghĩa đã chốt.
+- **Decision:** docs/decisions/010-wms-fields-teaching.md (phương án C: dạy trong Concept trên `WMS_Monitor` chỉ xem, chú thích ngoài viền màn hình; Basic chỉ sửa thẻ 1; làm chung nhánh với #45)
+- **Done when:** theo mục *Done when* của decision 010 (thay câu cũ "…hoặc trường nào chưa dùng thì ẩn đi": ẩn trường đã bị 008 bác).
 - **Inspector work expected:** yes
 - **Công:** M
 - **Test trên kính:** nhanh (đọc bước dạy trên kính)
-- **Depends on:** #10; câu trả lời B3, B4, B6 (đã có)
+- **Depends on:** #10; câu trả lời B3, B4, B6 (đã có); B16 (mới, không chặn). Làm chung nhánh với #45.
 - **Bổ sung (2026-11-01):** B6 đã chốt: Rest = tồn kho còn lại trong thùng kho. B4: ô Anweisung không highlight, nên phần dạy Anweisung chỉ dạy nội dung chữ. B3 (màu ô Empf Kz) còn mở, không chặn phần dạy nghĩa của EKZ.
 - **Bổ sung (2026-11-01):** đèn chỉ báo R2 không dùng trong kịch bản XR training (xem #10) → không dạy nghĩa từng đèn, chỉ nói ngắn "vùng này không dùng trong bài tập".
-- **Status:** todo (sau #10)
+- **Test report:** docs/test-reports/bl20.md
+- **Status:** done (commit b950df5, test 17/17 ✅, theo giả định B16 `Empf Kz` = EKZ; cùng #45)
 
 ### #21 [Feature] MixedPickingScene: nhặt tuần tự từng vị trí như dialog thật
 - **Type:** feature

@@ -1,46 +1,37 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
+/// <summary>
+/// #45, docs/decisions/007 (5): on grab, the label board explains this package's Mat.-Nr and VPE (from its
+/// PackageData); on release the package info disappears (D3). No division result is shown.
+/// </summary>
 public class PackageInfoOnGrab : MonoBehaviour
 {
+    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
+    private const string MatNrFormat = "Mat.-Nr: {0} – die Materialnummer. Dieselbe Nummer steht im LVS.";     // concept.label.matnr
+    private const string VpeFormat = "VPE: {0} ST – so viele Stück sind in dieser Verpackung.";                 // concept.label.vpe
+
     [Header("Panels")]
     [SerializeField] private PackageInfoDisplay packageInfoDisplay;
-    [SerializeField] private SampleFormulaDisplay sampleFormulaDisplay;
 
-    [Header("Instruction Panel Information")]
-    [SerializeField] private string packageTitle;
+    [Header("Package")]
+    [SerializeField] private PackageData package;
 
-    [TextArea(2, 5)]
-    [SerializeField] private string packageDescription;
-
-    [TextArea(2, 4)]
-    [SerializeField] private string packageRule;
-
-    [Header("Sample Formula Information")]
-    [SerializeField] private string formulaPackageType;
-    [SerializeField] private string formulaMaterial;
-    [SerializeField] private int formulaOrderQuantity;
-    [SerializeField] private int formulaPackageSize;
+    [Tooltip("Material name as on the label (Bez.), e.g. KABELVERBINDER A.")]
+    [FormerlySerializedAs("packageTitle")]
+    [SerializeField] private string materialName;
 
     public void ShowInfo()
     {
-        // Update Instruction Panel
-        if (packageInfoDisplay != null)
-        {
-            packageInfoDisplay.ShowPackageInfo(
-                packageTitle,
-                packageDescription,
-                packageRule);
-        }
+        if (RequiredReference.IsMissing(packageInfoDisplay, nameof(packageInfoDisplay), this)
+            | RequiredReference.IsMissing(package, nameof(package), this))
+            return;
 
-        // Update Sample Formula Panel
-        if (sampleFormulaDisplay != null)
-        {
-            sampleFormulaDisplay.ShowFormula(
-                formulaPackageType,
-                formulaMaterial,
-                formulaOrderQuantity,
-                formulaPackageSize);
-        }
+        string description =
+            string.Format(MatNrFormat, package.MaterialNumber) + "\n\n" +
+            string.Format(VpeFormat, package.Vpe);
+
+        packageInfoDisplay.ShowPackageInfo(materialName, description);
     }
 
     public void ShowDefaultInfo()
@@ -48,11 +39,6 @@ public class PackageInfoOnGrab : MonoBehaviour
         if (packageInfoDisplay != null)
         {
             packageInfoDisplay.ShowDefaultInfo();
-        }
-
-        if (sampleFormulaDisplay != null)
-        {
-            sampleFormulaDisplay.ShowDefaultFormula();
         }
     }
 }
