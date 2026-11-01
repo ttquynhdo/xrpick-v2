@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-// Until #11/#12 the scenes are still single-language: Basic is German, Mixed and Complex are English.
+// Until #11/#12 the scenes are single-language German (#25); English is kept for the developer mode.
 public enum FeedbackLanguage
 {
     English,

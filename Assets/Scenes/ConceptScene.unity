@@ -2388,7 +2388,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "W\xE4hlen Sie A, B oder C. Best\xE4tigen Sie mit dem roten Knopf."
+  m_text: "W\xE4hlen Sie A, B oder C. Dr\xFCcken Sie dann den roten Knopf."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
   m_sharedMaterial: {fileID: 7032093815205813286, guid: dda8d4d183f898241969906ee2a03d81, type: 2}

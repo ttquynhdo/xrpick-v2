@@ -22,10 +22,10 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
-- **Buổi test kính tiếp theo:** chưa có mục nào chờ.
+- **Buổi test kính tiếp theo:** #25 T8-tay (đọc thẻ và panel Welcome).
 1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
    - #45 ConceptScene: dạy Mat.-Nr/VPE, quiz vận dụng (decision 007, gồm #32; test nhanh).
-   - #25 mẫu thẻ hướng dẫn chung cho cả 5 scene (Basic đã xong phần Sie ở #18; Mixed/Complex còn "package type").
+   - #25 mẫu thẻ hướng dẫn chung, tiếng Đức ở cả 5 scene: verified-mcp, chờ đọc trên kính.
    - #33 kết quả cạnh nút đỏ (sau #14, #45).
    - #23 tổng kết cuối khoá + mục tiêu Welcome (không kính).
    - #10 panel WMS giống dialog thật (decision 008: Basic + Complex, gồm phần Complex của #33; L) → #21 (Mixed dùng dialog, gồm phần Mixed của #33) → #46 dọn dẹp; #20 sau #10.
@@ -245,7 +245,17 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   - **Bước tính toán:** nằm ở bước 2 trong Mixed ("Calculate how many…"), nhưng ở bước 1 trong Complex ("1. Read WMS – Determine how many full packages and loose items…").
   - **Động từ cho nút đỏ:** Welcome dạy "Touch … fingertip", Concept "click", Mixed/Complex "press", Basic "drücke".
   - Trainee phải đọc lại cấu trúc mỗi bài.
-- **Done when:** Mọi scene picking dùng cùng mẫu: `Aufgabe/Task`, 1. đọc WMS, 2. tính và lấy hàng, 3. kiểm tra và xác nhận. Cả 5 scene dùng một động từ cho thao tác bấm nút. So ảnh `instructions.png` của các scene thấy cùng cấu trúc.
+- **Done when** (người dùng chọn 2026-11-01: tiếng Đức, *Sie*, ở cả 5 scene; bản EN vào `docs/i18n/strings-todo.csv`):
+  - Vào Basic, Mixed, Complex: 4 thẻ trên bàn theo cùng mẫu: `Aufgabe`, `1. Angaben im LVS ablesen`, `2. … kommissionieren` (tính và lấy hàng), `3. Auftrag bestätigen`; bước tính toán nằm ở thẻ 2 trong cả ba scene.
+  - Vào Welcome và Concept: thẻ đầu cũng là `Aufgabe`.
+  - Đọc mọi thẻ của 5 scene: thao tác nút đỏ luôn viết „Drücken Sie … den roten Knopf“, không còn „Touch“, „click“, „press“, „Bestätigen Sie mit …“.
+  - Đọc thẻ Mixed và Complex: không còn chữ tiếng Anh, không còn „package type“.
+  - Đọc thẻ và panel hướng dẫn của 5 scene: không chữ nào tô đỏ hay xanh lá (hai màu này chỉ dành cho kết quả sai/đúng); Welcome `TXT_NextAction` không xanh lá và không nhỏ hơn các chữ khác của panel.
+  - Mixed: 2 GGA + 1 GGB → bấm nút đỏ → feedback tiếng Đức „Nicht richtig“ + „Zu wenig Material SCHRAUBE B. …“; 2 GGA + 2 GGB → bấm → „Richtig! …“ tiếng Đức kèm tên bài tiếp theo.
+  - Complex: thùng rỗng → bấm → thẻ `Result` tiếng Đức „Nicht richtig“ + „Der Auftragsbehälter ist leer. …“; 2 GGB + 5 lẻ → bấm → „Richtig! …“ tiếng Đức, panel chúc mừng có tiêu đề tiếng Đức.
+  - So ảnh `instructions` của 5 scene: cùng cấu trúc, không chữ nào bị cắt hay tràn khỏi thẻ.
+  - (code) Không `Secondary Text` nào của thẻ kết thúc bằng dấu xuống dòng thừa. Mọi chuỗi mới hoặc đổi có key + EN + DE trong `strings-todo.csv` và đã qua `german-reviewer`.
+  - Ngoài phạm vi: panel WMS cũ của Mixed (`WMS / ORDER ID`, các dòng đơn, `PACKAGE PLACED`) vẫn tiếng Anh tới #21; mục tiêu trên panel Welcome có thể được viết lại ở #23.
 - **Inspector work expected:** yes (text trong scene)
 - **Công:** M
 - **Test trên kính:** nhanh (đọc thẻ trên kính)
@@ -255,7 +265,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   - **Mỗi màu một nghĩa:** vàng = việc cần làm, xanh lá = đúng, đỏ = sai. Hiện chữ "red" trên thẻ được tô đỏ, trùng màu với feedback lỗi. Welcome `[Info Panel]/TXT_NextAction` là chữ xanh lá cỡ 16, trùng màu "đúng", và là chữ nhỏ nhất panel.
   - **Xoá ký tự xuống dòng thừa** cuối `Secondary Text` (Welcome có 7, Concept có 6), để layout không bị đẩy khi dịch.
   - Concept có hai thứ cùng gọi là "instructions": panel `Instruction Panel` và các thẻ trên bàn. Nên đặt tên khác cho panel (xem #32).
-- **Status:** todo
+- **Test report:** docs/test-reports/bl25.md
+- **Status:** verified-mcp (15/16 ✅, chờ test tay T8-tay: đọc thẻ và panel Welcome trên kính)
 
 ## P2 – Bảo trì
 

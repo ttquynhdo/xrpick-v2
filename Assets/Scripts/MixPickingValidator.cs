@@ -4,8 +4,9 @@ using UnityEngine;
 public class MixedPickingValidator : MonoBehaviour
 {
     // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get. {0} = next lesson name (menu label).
+    // #25: German (Sie) like the cards; English stays in the csv for the developer mode.
     private const string CorrectFormat =
-        "Correct! All materials and quantities match the order.\nNext, choose “{0}” in the menu."; // mixed.feedback.correct
+        "Richtig! Alle Materialien und Mengen stimmen mit dem Auftrag überein.\nWählen Sie jetzt im Menü „{0}“."; // mixed.feedback.correct
 
     private const string NextScene = "ComplexScene";
 
@@ -87,7 +88,7 @@ public class MixedPickingValidator : MonoBehaviour
         }
 
         feedbackText.text =
-            OrderFeedback.Title(FeedbackLanguage.English) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.English);
+            OrderFeedback.Title(FeedbackLanguage.German) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.German);
         feedbackText.color = Color.red;
     }
 }

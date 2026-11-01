@@ -4,8 +4,8 @@ using UnityEngine;
 public class PiecesOrderValidator : MonoBehaviour
 {
     // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get. Last lesson: the Congratulations panel
-    // tells the trainee what to do next.
-    private const string CorrectText = "Correct! The full cartons and the loose material match the order."; // complex.feedback.correct
+    // tells the trainee what to do next. #25: German (Sie) like the cards.
+    private const string CorrectText = "Richtig! Volle Kartons und loses Material stimmen mit dem Auftrag überein."; // complex.feedback.correct
 
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
@@ -95,7 +95,7 @@ public class PiecesOrderValidator : MonoBehaviour
 
         // #14: the instruction stays visible; the feedback names the first error, never the target numbers.
         feedbackText.text =
-            OrderFeedback.Title(FeedbackLanguage.English) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.English);
+            OrderFeedback.Title(FeedbackLanguage.German) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.German);
         feedbackText.color = Color.red;
         if (instructionText != null)
         {

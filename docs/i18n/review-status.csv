@@ -1,7 +1,32 @@
 key,de_text,status,reviewer,date,comment
 complex.counter.ist,Ist: {placed} ST,proposed,german-reviewer (agent),2026-11-01,WMS labels only
-complex.counter.cartons_placed,Kartons im Auftragsbehälter: {placed},proposed,german-reviewer (agent),2026-11-01,"Agent: OK; ask instructor whether this trainer line should look different from real WMS labels"
-complex.feedback.wrong_package,"Im Auftragsbehälter liegt Material, das nicht zu diesem Auftrag gehört.",proposed,german-reviewer (agent),2026-11-01,"Agent: OK; optional 'Bitte nehmen Sie es heraus.' left to #14"
-end.confirm.question,Sitzung wirklich beenden?,proposed,german-reviewer (agent),2026-11-01,"Agent: OK as written"
-end.confirm.cancel,Fortsetzen,proposed,german-reviewer (agent),2026-11-01,"Agent proposal adopted: 'Fortsetzen' instead of 'Abbrechen' (could be read as aborting the session); EN 'Continue'"
-end.confirm.end,Beenden,proposed,german-reviewer (agent),2026-11-01,"Agent: OK as written"
+complex.counter.cartons_placed,Kartons im Auftragsbehälter: {placed},proposed,german-reviewer (agent),2026-11-01,Agent: OK; ask instructor whether this trainer line should look different from real WMS labels
+complex.feedback.wrong_package,"Im Auftragsbehälter liegt Material, das nicht zu diesem Auftrag gehört.",proposed,german-reviewer (agent),2026-11-01,Agent: OK; optional 'Bitte nehmen Sie es heraus.' left to #14
+end.confirm.question,Sitzung wirklich beenden?,proposed,german-reviewer (agent),2026-11-01,Agent: OK as written
+end.confirm.cancel,Fortsetzen,proposed,german-reviewer (agent),2026-11-01,Agent proposal adopted: 'Fortsetzen' instead of 'Abbrechen' (could be read as aborting the session); EN 'Continue'
+end.confirm.end,Beenden,proposed,german-reviewer (agent),2026-11-01,Agent: OK as written
+common.card.task_title,Aufgabe,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.card.task_body,Üben Sie zwei einfache Handgriffe.,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.card.step1_title,1. Karton greifen,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.card.step1_body,Greifen Sie mit einer Hand nach dem Karton und heben Sie ihn hoch.,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.card.step2_title,2. Knopf drücken,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.card.step2_body,Drücken Sie mit der Fingerspitze den roten Knopf. Später bestätigen Sie damit den Auftrag.,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.title,Willkommen bei XPick!,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.subtitle,Ein VR-Training für die Kommissionierung im Lager,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.panel.title,Das lernen Sie,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.panel.goals,Am Ende des Kurses können Sie:\n• Materialnummer und VPE auf dem Etikett ablesen\n• einen Auftrag im Lagerverwaltungssystem (LVS) ablesen\n• einen Auftrag kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.panel.duration,Dauer: etwa 5 Minuten pro Lektion,proposed,german-reviewer (agent),2026-11-01,#25
+common.panel.see_cards,Ihre Aufgaben stehen auf den Karten auf dem Tisch.,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-01,#25
+mixed.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Der Auftrag hat zwei Positionen.",proposed,german-reviewer (agent),2026-11-01,#25
+mixed.card.step1_body,"Lesen Sie im LVS für jede Position Material, Sollmenge und VPE ab.",proposed,german-reviewer (agent),2026-11-01,#25
+mixed.card.step2_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
+mixed.card.step2_body,"Rechnen Sie für jede Position aus, wie viele Verpackungen Sie brauchen. Legen Sie die Verpackungen in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#25
+mixed.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf.,proposed,german-reviewer (agent),2026-11-01,#25
+complex.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Der Auftrag enthält auch loses Material.",proposed,german-reviewer (agent),2026-11-01,#25
+complex.card.step1_body,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).",proposed,german-reviewer (agent),2026-11-01,#25
+complex.card.step2_body,"Rechnen Sie aus, wie viele volle Kartons und lose Teile Sie brauchen. Legen Sie zuerst die Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#25
+complex.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25
+complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
+basic.step3.text,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25 verb
+concept.card.step3_body,"Wählen Sie A, B oder C. Drücken Sie dann den roten Knopf.",proposed,german-reviewer (agent),2026-11-01,#25 verb

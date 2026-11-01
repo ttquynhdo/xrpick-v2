@@ -1024,10 +1024,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '<color="yellow">Calculate</color> how many packages are needed, then <color="yellow">place
-    </color>them into the container.
-
-'
+  m_text: "Rechnen Sie f\xFCr jede Position aus, wie viele Verpackungen Sie brauchen.
+    Legen Sie die Verpackungen in den Auftragsbeh\xE4lter."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
   m_sharedMaterial: {fileID: 7032093815205813286, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
@@ -3257,10 +3255,16 @@ MonoBehaviour:
     materialName: KABELVERBINDER A
     soll: 100
     vpe: 50
+    materialNumber: 
+    empfKz: 
+    weightKg: 0
   - materialKey: screw_b
     materialName: SCHRAUBE B
     soll: 40
     vpe: 20
+    materialNumber: 
+    empfKz: 
+    weightKg: 0
   packageCountText: {fileID: 631291439}
   orderLineTexts:
   - {fileID: 1418684534}
@@ -3850,7 +3854,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1. Read WMS
+  m_text: 1. Angaben im LVS ablesen
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eb44739c484b1b54bbc1a0d4d9dd1a50, type: 2}
   m_sharedMaterial: {fileID: -5839354330806206608, guid: eb44739c484b1b54bbc1a0d4d9dd1a50, type: 2}
@@ -4494,7 +4498,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 2. Pick packages
+  m_text: 2. Material kommissionieren
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eb44739c484b1b54bbc1a0d4d9dd1a50, type: 2}
   m_sharedMaterial: {fileID: -5839354330806206608, guid: eb44739c484b1b54bbc1a0d4d9dd1a50, type: 2}
@@ -7084,7 +7088,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Complete the order according to the Warehouse Management System (WMS).
+  m_text: Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt
+    wird. Der Auftrag hat zwei Positionen.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
   m_sharedMaterial: {fileID: 7032093815205813286, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
@@ -11137,7 +11142,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 3. Confirm Order
+  m_text: "3. Auftrag best\xE4tigen"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eb44739c484b1b54bbc1a0d4d9dd1a50, type: 2}
   m_sharedMaterial: {fileID: -5839354330806206608, guid: eb44739c484b1b54bbc1a0d4d9dd1a50, type: 2}
@@ -11771,7 +11776,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Task
+  m_text: Aufgabe
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eb44739c484b1b54bbc1a0d4d9dd1a50, type: 2}
   m_sharedMaterial: {fileID: -5839354330806206608, guid: eb44739c484b1b54bbc1a0d4d9dd1a50, type: 2}
@@ -14362,8 +14367,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <color="yellow">Identify</color> the package type, order quantity, and
-    package size shown on the <color="yellow">WMS</color>.
+  m_text: "Lesen Sie im LVS f\xFCr jede Position Material, Sollmenge und VPE ab."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
   m_sharedMaterial: {fileID: 7032093815205813286, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
@@ -15873,8 +15877,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <color="yellow">Review</color> your order, then <color="yellow">press </color>the
-    <color="red"> red </color> button to confirm your picking.
+  m_text: "Pr\xFCfen Sie den Auftrag. Dr\xFCcken Sie dann den roten Knopf."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
   m_sharedMaterial: {fileID: 7032093815205813286, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
@@ -16504,7 +16507,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Look below to read the instructions on the table.
+  m_text: Ihre Aufgaben stehen auf den Karten auf dem Tisch.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
