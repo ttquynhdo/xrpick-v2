@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,6 +16,9 @@ public class CalcForWMS : MonoBehaviour
 
     // #2: a package counts once, however many of its colliders are inside the trigger.
     private readonly Dictionary<BoxInfo, int> collidersInside = new();
+
+    // #4: raised when a package enters or leaves, so an old result can be cleared.
+    public event Action ContentsChanged;
 
     private void Start()
     {
@@ -57,6 +61,7 @@ public class CalcForWMS : MonoBehaviour
         {
             currentSize += box.packageSize;
             UpdateDisplay();
+            ContentsChanged?.Invoke();
         }
     }
 
@@ -76,6 +81,7 @@ public class CalcForWMS : MonoBehaviour
         collidersInside.Remove(box);
         currentSize -= box.packageSize;
         UpdateDisplay();
+        ContentsChanged?.Invoke();
     }
 
     // Hands and other loose colliders have no BoxInfo; only GG packages are counted here.

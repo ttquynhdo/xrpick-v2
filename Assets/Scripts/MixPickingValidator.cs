@@ -6,12 +6,52 @@ public class MixedPickingValidator : MonoBehaviour
     [SerializeField] private MixedPickingContainer container;
     [SerializeField] private TMP_Text feedbackText;
     [SerializeField] private TMP_Text instructionText;
+
+    private string initialInstruction;
+
+    private void Awake()
+    {
+        if (instructionText != null)
+        {
+            initialInstruction = instructionText.text;
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (container != null)
+        {
+            container.ContentsChanged += ClearResult;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (container != null)
+        {
+            container.ContentsChanged -= ClearResult;
+        }
+    }
+
     private void Start()
     {
 
         if (feedbackText != null)
         {
             feedbackText.text = string.Empty;
+        }
+    }
+
+    // #4: an old result must not stay visible once the container content changes.
+    private void ClearResult()
+    {
+        if (feedbackText != null)
+        {
+            feedbackText.text = string.Empty;
+        }
+        if (instructionText != null)
+        {
+            instructionText.text = initialInstruction;
         }
     }
 

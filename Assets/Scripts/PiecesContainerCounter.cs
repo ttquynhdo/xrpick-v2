@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -29,6 +30,9 @@ public class PiecesContainerCounter : MonoBehaviour
     public int TotalPieces =>
         (GGACount * piecesPerGGA) + (GGBCount * piecesPerGGB) + LooseItemCount;
 
+    // #4: raised when a package enters or leaves, so an old result can be cleared.
+    public event Action ContentsChanged;
+
     private void Start()
     {
         Recalculate();
@@ -44,6 +48,7 @@ public class PiecesContainerCounter : MonoBehaviour
         if (objectsInside.Add(item))
         {
             Recalculate();
+            ContentsChanged?.Invoke();
         }
     }
 
@@ -57,6 +62,7 @@ public class PiecesContainerCounter : MonoBehaviour
         if (objectsInside.Remove(item))
         {
             Recalculate();
+            ContentsChanged?.Invoke();
         }
     }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Xml.Schema;
 using TMPro;
@@ -19,6 +20,9 @@ public class MixedPickingContainer : MonoBehaviour
     public int GGBCount { get; private set; }
     public int VPECount { get; private set; }
 
+    // #4: raised when a package enters or leaves, so an old result can be cleared.
+    public event Action ContentsChanged;
+
     private void Start()
     {
         UpdateCounts();
@@ -38,6 +42,7 @@ public class MixedPickingContainer : MonoBehaviour
         if (packagesInside.Add(package))
         {
             UpdateCounts();
+            ContentsChanged?.Invoke();
         }
     }
 
@@ -52,6 +57,7 @@ public class MixedPickingContainer : MonoBehaviour
         if (packagesInside.Remove(package))
         {
             UpdateCounts();
+            ContentsChanged?.Invoke();
         }
     }
 
