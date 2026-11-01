@@ -8,7 +8,7 @@ Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tả
 **Cập nhật 2026-11-01 theo câu trả lời B1–B10, C1–C4, D1–D3** trong file câu hỏi (trả lời của nhóm, chưa phải của người hướng dẫn): mọi scene dùng **dialog mới** (`F6 Bestätigen`); Rest = tồn kho thùng kho, Ist theo cách lấy thật (B6, B7, B7a); dữ liệu giả cùng định dạng thật (B10); #22 ngoài phạm vi (D2); giữ thông tin kiện sau khi thả làm quiz quá dễ (D3). Câu A1–A6 vẫn mở.
 **Cập nhật 2026-11-01 (decision 003):** nhóm trả lời A1 (đơn Basic = tổng 300 chiếc) và D4–D7 (EKZ khi đặt hàng); thêm #41, bỏ chặn #1, #24. Sau đó nhóm trả lời nốt A2, A3, A5, A6, B3, B5, D1, chọn phương án C cho #34 (decision 001) và chốt mục 9 của spec log: không còn mục nào `blocked`.
 **Quy tắc màn hình (người dùng 2026-11-01, #10):** màn hình máy tính `WMS_Monitor` chỉ hiện WMS (dialog `WMS_Kommissionierung`). Hướng dẫn nằm trên thẻ ở bàn, kết quả xác nhận hiện trên thẻ cạnh nút đỏ (#33), không mục nào ghi hướng dẫn hay kết quả lên màn hình. Basic, Complex đã làm (#10); Mixed làm ở #21; Concept quyết định ở #45; Welcome không cần WMS (tuỳ chọn: đặt màn hình tắt để trạm làm việc giống các bài sau).
-**Quy tắc bố cục trạm (người dùng 2026-11-01, so với ảnh trạm thật `old/Orderpicking.png`):** chỉ thêm vào cảnh thứ mà bài tập dùng tới (#35 dời thẻ và Menu khỏi mép bàn, gồm #37; #47 băng lăn, #21 mỗi vị trí một thùng kho, #48 bàn phím). **Không thêm** cân, bàn đóng gói, tacker, băng dính, máy in nhãn, kệ carton: không bài nào dùng chúng, thêm vào chỉ tăng tải nhận thức (cùng lý do decision 009). Nếu muốn trạm trông đầy đủ thì chỉ đặt ở xa, ngoài vùng nhìn chính, không cầm được.
+**Quy tắc bố cục trạm (người dùng 2026-11-01, so với ảnh trạm thật `old/Orderpicking.png`):** chỉ thêm vào cảnh thứ mà bài tập dùng tới (#35 dời thẻ và Menu khỏi mép bàn, gồm #37; #47 băng lăn, #21 mỗi vị trí một thùng kho; #48 bàn phím đã bỏ vì bị thùng che và chắn đường trượt). **Không thêm** cân, bàn đóng gói, tacker, băng dính, máy in nhãn, kệ carton: không bài nào dùng chúng, thêm vào chỉ tăng tải nhận thức (cùng lý do decision 009). Nếu muốn trạm trông đầy đủ thì chỉ đặt ở xa, ngoài vùng nhìn chính, không cầm được.
 
 Mỗi mục = 1 phiên làm việc = 1 nhánh. Không đánh số lại; mục xong thì ghi `done (commit …)`.
 
@@ -19,7 +19,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
-**Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
+**Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
 - **Buổi test kính tiếp theo:** chưa có mục nào chờ.
@@ -29,7 +29,6 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - #33 kết quả cạnh nút đỏ (sau #14, #45).
    - #23 tổng kết cuối khoá + mục tiêu Welcome (không kính).
    - #10 panel WMS giống dialog thật (decision 008: Basic + Complex, gồm phần Complex của #33; L) → #21 (Mixed dùng dialog, gồm phần Mixed của #33) → #46 dọn dẹp; #20 sau #10.
-   - #48 bàn phím tĩnh trong prefab `WMS_Monitor` (S, không kính; sau #10, chỉ sửa prefab nên không đụng file `.unity`).
    - #39 phản hồi ở WelcomeScene.
    - #11 nền tảng DE/EN: phần Editor làm được trong đợt này; thử ConceptScene trên Quest cùng buổi test.
 2. **Đợt 4 – dịch** (không kính, chờ nội dung ổn định): #12 (sau #11, #25, #45) → #13.
@@ -663,7 +662,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #10 (prefab `WMS_Monitor`)
-- **Status:** todo
+- **Ghi chú (2026-11-01, đặt thử trong ComplexScene):** mặt bàn y 0,771, hai thùng cao tới y 0,968, mép dưới màn hình ≈ y 0,98, nên không có chỗ ngay dưới màn hình. Đặt giữa sau hai thùng thì ảnh `overview` chỉ thấy một khe giữa hai thùng, và chỗ đó nằm trên đường trượt của thùng đơn (#47, decision 011). Đặt trước thùng thì vào mép bàn, mà decision 011 giữ mép bàn trống.
+- **Status:** dropped (người dùng 2026-11-01: bàn phím bị thùng che và chắn đường trượt của #47; P3, bài tập không dùng tới)
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
