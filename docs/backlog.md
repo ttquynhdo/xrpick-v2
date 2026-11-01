@@ -25,7 +25,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
    - Song song, không đụng scene: #26.
 2. **Đợt 2 – không kính, có phụ thuộc:**
-   - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → #24 → #34 (decision 001, phương án C).
+   - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → ~~#24~~ (verified-mcp) → #34 (decision 001, phương án C).
    - #14 (sau #4, #1) → #28 (sau #26, dùng chung helper mã lỗi với #14).
    - #6 (sau #1, #3) → #8 (sau #2, #3, #6).
 3. **Đợt 3 – test kính nhanh, gom một buổi test ở cuối đợt:**
@@ -203,12 +203,14 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Scene(s):** BasicPickingScene
 - **Files:** BasicPickingScene `[GG_Package (18)]`…`[GG_Package (23)]` (`BoxInfo.packageSize` 50 ×6), `CalcForWMS.necessarySize` 300
 - **Problem:** Thùng kho chỉ có đúng 6 kiện TRAINING-MATERIAL B, và đơn cần đủ cả 6 (300 ÷ 50). Trainee bỏ hết vào thùng là đúng, không phải chọn hay tính gì (ảnh `TestEvidence/BasicPickingScene/views/container.png`). Tải đọc WMS cao nhất khóa học nhưng việc thực hành lại dễ nhất.
-- **Done when:** Thùng kho có nhiều kiện hơn số đơn cần. Bỏ hết vào thì bị báo sai, bỏ đúng số tính được thì được báo đúng.
+- **Done when:** (giả định: thùng kho 9 carton = 450 chiếc) Thùng kho có nhiều kiện hơn số đơn cần. Bỏ hết vào thì bị báo sai, bỏ đúng số tính được thì được báo đúng.
 - **Inspector work expected:** yes (nhân bản kiện, sửa `necessarySize` nếu cần)
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #1 (chốt đơn đúng là bao nhiêu; giả định A1 = 300 chiếc, 2026-11-01). Làm trước phần Basic của #41 (decision 003).
-- **Status:** todo (sau #1)
+- **Ghi chú (2026-11-01, khi làm):** chọn 9 carton (450 chiếc). Sau khi lấy đủ đơn, tồn kho còn 150: đây là giá trị Rest cho #34. Bỏ hết vào thì Rest hiện −150 cho tới khi #34 xong.
+- **Test report:** docs/test-reports/bl24.md
+- **Status:** verified-mcp (6/6 ✅, chờ test tay S4; theo giả định A1, 9 carton)
 
 ### #25 [P1] Một mẫu thẻ hướng dẫn chung cho cả 5 scene
 - **Type:** logic
