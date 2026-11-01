@@ -55,8 +55,8 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource
         {
             foreach (BoxInfo box in collidersInside.Keys)
             {
-                // A carton destroyed inside the trigger gets no OnTriggerExit and stays as a destroyed key.
-                if (box == null)
+                // A carton destroyed or disabled inside the trigger gets no OnTriggerExit and stays as a key (#41).
+                if (box == null || !box.isActiveAndEnabled)
                     continue;
 
                 PackageData package = box.GetComponent<PackageData>();

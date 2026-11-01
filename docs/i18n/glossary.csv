@@ -76,3 +76,4 @@ STECKER C,,plug C,"Fake material name for the ConceptScene sample order only, ke
 Lektion,die,lesson,One of the five lessons of the course (menu items 1-5).,no,app (#25),proposed,Not Lerneinheit/Kapitel.
 Karte,die,card,"Instruction card lying on the desk (Aufgabe, steps 1-3).",no,app (#25),proposed,Not Kärtchen/Tafel.
 erledigt,,done,A position (order line) that is picked and confirmed: Position 1 ist erledigt.,no,app (#21),proposed,Not 'fertig'.
+einzeln und geordnet einlegen,,put in one by one and in order,How parts (in BasicPickingScene: cartons) are placed for EKZ 3; opposite of einfüllen (EKZ 0).,no,"requirements: Kommissionierung.pptx slide 8; app (#20, #41)",proposed,Used in ConceptScene tour/quiz and Basic feedback (geordnet).

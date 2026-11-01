@@ -38,6 +38,9 @@ public static class OrderFeedback
 
     private const string MoreErrorsEnglish = "There are more errors.";   // order.feedback.more_errors
     private const string MoreErrorsGerman = "Es gibt noch weitere Fehler.";
+    // #41, decision 003: quantity is right but a carton lies loose (EKZ 3). No count, no place.
+    private const string Ekz3PlacementEnglish = "Not all cartons are placed in order. With Empf Kz 003, put the cartons in one by one and in order."; // order.feedback.ekz3_loose
+    private const string Ekz3PlacementGerman = "Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.";
     private const string WrongTitleEnglish = "Not correct";                                // order.feedback.wrong_title
     private const string WrongTitleGerman = "Nicht richtig";
 
@@ -77,6 +80,9 @@ public static class OrderFeedback
         Dictionary<OrderErrorCode, string> table = language == FeedbackLanguage.German ? German : English;
         return table[OrderErrorCode.TooFew].Replace("{name}", line != null ? line.materialName : string.Empty);
     }
+
+    public static string ExplainEkz3Placement(FeedbackLanguage language) =>
+        language == FeedbackLanguage.German ? Ekz3PlacementGerman : Ekz3PlacementEnglish;
 
     private static string NameOf(OrderResult result, string materialKey)
     {

@@ -31,3 +31,5 @@ complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026
 basic.step3.text,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25 verb
 concept.card.step3_body,"Wählen Sie A, B oder C. Drücken Sie dann den roten Knopf.",proposed,german-reviewer (agent),2026-11-01,#25 verb
 mixed.feedback.position_done,Richtig! Position {position} ist erledigt.\nLesen Sie im LVS die Angaben von Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-01,#21
+basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie die Kartons nach der EKZ in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#41
+order.feedback.ekz3_loose,Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.,proposed,german-reviewer (agent),2026-11-01,"#41, ""Nicht alle"" per reviewer"

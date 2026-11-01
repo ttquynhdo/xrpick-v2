@@ -13,11 +13,19 @@ public class OrderConfirm : MonoBehaviour
     [SerializeField]
     private TMP_Text incorrectText;
 
+    // #41, decision 003: EKZ 3 needs every carton in its own snap place. Empty = no placement rule (EKZ 0).
+    [SerializeField]
+    private EkzPlacementCheck placementCheck;
+
     private void OnEnable()
     {
         if (calc != null)
         {
             calc.ContentsChanged += ClearResult;
+        }
+        if (placementCheck != null)
+        {
+            placementCheck.PlacementChanged += ClearResult;
         }
     }
 
@@ -26,6 +34,10 @@ public class OrderConfirm : MonoBehaviour
         if (calc != null)
         {
             calc.ContentsChanged -= ClearResult;
+        }
+        if (placementCheck != null)
+        {
+            placementCheck.PlacementChanged -= ClearResult;
         }
     }
 
@@ -55,17 +67,27 @@ public class OrderConfirm : MonoBehaviour
         // #14: the same rule as Mixed/Complex decides (docs/decisions/006); Soll is still CalcForWMS.necessarySize.
         OrderResult result = OrderRule.Check(new[] { calc.OrderLine }, OrderContents.From(calc.PackagesInside), false);
 
-        if (result.Correct)
+        if (!result.Correct)
+        {
+            ShowIncorrect(OrderFeedback.Explain(result, FeedbackLanguage.German));
+        }
+        // Quantity errors come first; the placement is checked only once the quantity is right (decision 003, D6).
+        else if (placementCheck != null && !placementCheck.AllPlaced(calc.PackagesInside))
+        {
+            ShowIncorrect(OrderFeedback.ExplainEkz3Placement(FeedbackLanguage.German));
+        }
+        else
         {
             correct.SetActive(true);
             incorrect.SetActive(false);
         }
-        else
-        {
-            incorrectText.text = OrderFeedback.Explain(result, FeedbackLanguage.German);
-            correct.SetActive(false);
-            incorrect.SetActive(true);
-        }
+    }
+
+    private void ShowIncorrect(string reason)
+    {
+        incorrectText.text = reason;
+        correct.SetActive(false);
+        incorrect.SetActive(true);
     }
 
     // #4: an old result must not stay visible once the container content changes.
