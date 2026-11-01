@@ -22,7 +22,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - BasicPickingScene: ~~#2~~ (verified-mcp).
    - Validator: ~~#4~~ (verified-mcp) → ~~#7~~ (done).
    - Inspector nhiều scene: ~~#9~~ (verified-mcp), làm khi không nhánh nào khác đang mở các scene đó (#5 đã gộp vào #18).
-   - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
+   - ~~#38~~ (verified-mcp).
    - Song song, không đụng scene: #26.
 2. **Đợt 2 – không kính, có phụ thuộc:**
    - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → ~~#24~~ (verified-mcp) → ~~#34~~ (verified-mcp).
@@ -392,13 +392,15 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** ComplexScene
 - **Files:** `Congratulations` (khoảng (0.00, 1.36, 1.10), scale 0.35, cùng z với `Info Panel`); `[Info Panel]/TXT_Feedback` (rect cao 47.2, font 20); Assets/Scripts/PiecesOrderValidator.cs:50–53 (3 dòng)
 - **Problem (suy ra, cần ảnh):** Panel chúc mừng nằm cùng mặt phẳng với WMS, nên có thể chồng lên hoặc nhấp nháy (z-fighting). Feedback sai có 3 dòng trong ô chỉ đủ cao cho khoảng 2 dòng, nên có thể đè lên `TXT_PiPlaced`.
-- **Done when:** Ảnh `wms` sau một lần bấm sai: các dòng feedback không đè lên bộ đếm. Ảnh sau một lần bấm đúng: panel chúc mừng không chồng và không nhấp nháy với WMS.
+- **Done when:** Ảnh `wms` sau một lần bấm sai: các dòng feedback không đè lên bộ đếm. Feedback dài nhất (có dòng vật tư lạ của #3) hiện đủ mọi dòng bên trong panel (gộp từ Bổ sung). Ảnh sau một lần bấm đúng: panel chúc mừng không chồng và không nhấp nháy với WMS.
 - **Inspector work expected:** yes
 - **Công:** S
 - **Test trên kính:** không
 - **Bổ sung (2026-11-01, ảnh từ #3):** Đã thấy trong ảnh `wms`: `Congratulations` che mép trên panel WMS (`TestEvidence/ComplexScene/bl03/T2_after_wms.png`). Feedback sai có 4 dòng thì dòng cuối bị cắt (`T1_after_wms.png`).
+- **Ghi chú (2026-11-01, khi làm):** đo tọa độ thì `Congratulations` không chồng WMS (chỉ chạm viền TV; ảnh `wms` chụp từ dưới nên trông như chồng). Lỗi thật là feedback 5 dòng tràn xuống sau viền TV. Đã nới ô feedback + auto-size, nâng panel chúc mừng 2 cm.
+- **Test report:** docs/test-reports/bl38.md
 - **Depends on:** chụp ảnh trước để xác nhận. Nếu #33 chuyển feedback xuống cạnh nút thì nửa sau của mục này có thể không còn cần.
-- **Status:** todo
+- **Status:** verified-mcp (5/5 ✅, chờ test tay P4: đọc chữ 16,5 trên kính)
 
 ### #39 [P2] WelcomeScene: có phản hồi khi cầm thùng và chạm nút
 - **Type:** feature
