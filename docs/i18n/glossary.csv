@@ -9,7 +9,7 @@ Sollmenge,die,target quantity,Quantity that has to be picked for the order line.
 Soll,,target qty,WMS field label for the target quantity.,yes,WMS screenshot,proposed,Keep the German label in every language mode; EN mode may show the gloss in brackets.
 Istmenge,die,actual quantity,Quantity actually picked; when counting by hand it is pre-filled with the target quantity.,no,requirements: Kommissionierung.pptx slide 7,proposed,
 Ist,,actual qty,WMS field label for the actual quantity.,yes,WMS screenshot,proposed,
-Restmenge,die,remaining stock,Stock left in the storage container after the pick; NOT the quantity still missing.,no,requirements: Kommissionierung.pptx slide 7,proposed,Current app uses Rest as 'still missing' – see question B6.
+Restmenge,die,remaining stock,Stock left in the storage container after the pick; NOT the quantity still missing.,no,requirements: Kommissionierung.pptx slide 7,proposed,BasicPickingScene shows Rest as static remaining stock since #34 (B6).
 Rest,,remaining stock,WMS field label for the remaining stock.,yes,WMS screenshot,proposed,
 Restmengenzählung,die,remaining-stock count,Counting the stock left in the storage container (F9) to confirm it.,no,requirements: Kommissionierung.pptx slide 2/7,proposed,Also a WMS indicator label.
 Mindermenge,die,short quantity,Confirmed quantity when actual is less than target.,no,requirements: Kommissionierung.pptx slide 7,proposed,

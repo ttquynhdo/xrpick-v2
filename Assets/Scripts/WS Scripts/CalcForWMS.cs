@@ -6,6 +6,8 @@ public class CalcForWMS : MonoBehaviour
 {
     public int currentSize;
     public int necessarySize;
+    // #34, decision 001 option C: Rest is the stock left in the storage box after the
+    // full order is picked. Set in Start from the GG packages in the scene, never changed by picking.
     public int restSize;
     public TextMeshProUGUI istText;
     public TextMeshProUGUI sollText;
@@ -22,7 +24,23 @@ public class CalcForWMS : MonoBehaviour
         }
 
         currentSize = 0;
+        restSize = GetStockInScene() - necessarySize;
         UpdateDisplay();
+    }
+
+    private static int GetStockInScene()
+    {
+        int stock = 0;
+
+        foreach (BoxInfo box in FindObjectsByType<BoxInfo>())
+        {
+            if (box.CompareTag("GGPackage"))
+            {
+                stock += box.packageSize;
+            }
+        }
+
+        return stock;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -38,7 +56,6 @@ public class CalcForWMS : MonoBehaviour
         if (count == 0)
         {
             currentSize += box.packageSize;
-            restSize -= box.packageSize;
             UpdateDisplay();
         }
     }
@@ -58,7 +75,6 @@ public class CalcForWMS : MonoBehaviour
 
         collidersInside.Remove(box);
         currentSize -= box.packageSize;
-        restSize += box.packageSize;
         UpdateDisplay();
     }
 
