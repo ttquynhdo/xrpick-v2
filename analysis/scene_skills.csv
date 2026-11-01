@@ -1,0 +1,8 @@
+scene,skill
+ConceptScene,package_concept
+BasicPickingScene,calculate_quantity
+MixedPickingScene,calculate_quantity
+MixedPickingScene,check_material
+ComplexScene,calculate_quantity
+ComplexScene,check_material
+ComplexScene,calculate_loose
