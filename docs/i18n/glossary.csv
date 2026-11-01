@@ -1,0 +1,41 @@
+term_de,article,term_en,definition_en,do_not_translate,source,status,notes
+Kommissionierung,die,order picking,Taking the ordered quantity of a material from a storage container and putting it into the order container.,no,requirements: Kommissionierung.pptx,proposed,Also the name of the WMS application/mode.
+kommissionieren,,to pick,Verb for performing order picking.,no,requirements: Kommissionierung.pptx,proposed,
+Pickvorgang,der,picking operation,One pick of one order line.,no,requirements: Kommissionierung.pptx slide 2,proposed,
+Auftrag,der,order,A customer or internal request listing materials and quantities.,no,requirements: Kommissionierung.pptx,proposed,
+Auftragsbehälter,der,order container,Container that receives the picked material (the target box in the app).,no,requirements: Kommissionierung.pptx,proposed,The container the trainee fills in VR.
+Lagerbehälter,der,storage container,Container the material is taken from (the source).,no,requirements: Kommissionierung.pptx,proposed,
+Sollmenge,die,target quantity,Quantity that has to be picked for the order line.,no,requirements: Kommissionierung.pptx slide 7,proposed,Shown on the WMS screen as the label Soll.
+Soll,,target qty,WMS field label for the target quantity.,yes,WMS screenshot,proposed,Keep the German label in every language mode; EN mode may show the gloss in brackets.
+Istmenge,die,actual quantity,Quantity actually picked; when counting by hand it is pre-filled with the target quantity.,no,requirements: Kommissionierung.pptx slide 7,proposed,
+Ist,,actual qty,WMS field label for the actual quantity.,yes,WMS screenshot,proposed,
+Restmenge,die,remaining stock,Stock left in the storage container after the pick; NOT the quantity still missing.,no,requirements: Kommissionierung.pptx slide 7,proposed,Current app uses Rest as 'still missing' – see question B6.
+Rest,,remaining stock,WMS field label for the remaining stock.,yes,WMS screenshot,proposed,
+Restmengenzählung,die,remaining-stock count,Counting the stock left in the storage container (F9) to confirm it.,no,requirements: Kommissionierung.pptx slide 2/7,proposed,Also a WMS indicator label.
+Mindermenge,die,short quantity,Confirmed quantity when actual is less than target.,no,requirements: Kommissionierung.pptx slide 7,proposed,
+Verpackungseinheit,die,packaging unit,Number of pieces in one carton or bag.,no,requirements: Kommissionierung.pptx slide 8,proposed,Abbreviation VPE.
+VPE,die,packaging unit (VPE),Abbreviation of Verpackungseinheit.,yes,requirements: Kommissionierung.pptx slide 8,proposed,Keep the abbreviation in both languages.
+Verp.-Einh.,,packaging unit,WMS field label (abbreviation of Verpackungseinheit).,yes,WMS screenshot,proposed,
+EKZ,die,handling class (EKZ),Classification (0–9) that defines how a material may be packed and handled.,yes,requirements: Kommissionierung.pptx slide 8,proposed,Full German form not stated in the documents – ask.
+Empf Kz,,–,WMS field label; meaning not stated in the documents.,yes,WMS screenshot,proposed,Probably shows the EKZ class – question B3.
+Stück,das,piece,Unit of count.,no,requirements,proposed,Abbreviation ST on the WMS screen.
+ST,,pcs,Unit abbreviation for Stück on the WMS screen.,yes,WMS screenshot,proposed,
+Karton,der,carton,Cardboard box.,no,requirements,proposed,Also a WMS field label.
+PU-Beutel,der,plastic bag,Plastic bag used to pack loose material.,no,requirements: Kommissionierung.pptx,proposed,Documents also write PE-Beutel – confirm which term to use.
+Modul,das,module,Insert/container used to pre-pack material inside the order container.,no,requirements: Kommissionierung.pptx slide 4,proposed,
+Schüttgut,das,bulk material,Loose parts that may be poured.,no,requirements: Detail Description,proposed,
+Anbruchmenge,die,broken-case quantity,Quantity left over when a packaging unit is opened for a partial pick.,no,requirements: Detail Description,proposed,
+Lagernachschub,der,stock replenishment,Order that refills stock; marked light blue at the bottom left of the WMS screen.,no,requirements: Kommissionierung.pptx slide 4,proposed,
+Picktrennung,die,pick separation,Separating identical-looking packs (from 8 pieces) with a bag or module.,no,requirements: Kommissionierung.pptx slide 17,proposed,
+Referenzwaage,die,reference scale,Counting scale used from 8 pieces with low weight.,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator label.
+Behälterwaage,die,container scale,Scale used from 700 g.,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator label.
+Zählen,das,counting,Counting by hand (up to 7 pieces).,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator label.
+Tarieren,das,taring,Setting the scale to zero with the container on it.,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator and F7 button.
+Label,das,label,Printed sticker (pick label) for a bag or position.,no,requirements,proposed,
+bestätigen,,to confirm,Confirming a pick or a message.,no,requirements: Kommissionierung.pptx slide 2,proposed,WMS button F6 Bestätigen.
+Teamleiter,der,team leader,Person to inform on deviations.,no,requirements: Kommissionierung.pptx slide 7,proposed,
+Materialnummer,die,material number,Identifier of a material.,no,requirements,proposed,WMS label Mat.-Nr:
+Bezeichnung,die,description,Material description text.,no,WMS screenshot,proposed,WMS label Bez.:
+Gewicht,das,weight,Weight in kg.,no,WMS screenshot,proposed,WMS label Gew.:
+Anweisung,die,instruction,Special handling instruction shown at the bottom right of the WMS screen.,no,requirements: Kommissionierung.pptx slide 4,proposed,
+GG,,GG,Package type used in the app; meaning not yet confirmed.,yes,app,proposed,Question A2.
