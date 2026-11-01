@@ -115,6 +115,7 @@ read_events_file <- function(path) {
   ok <- !map_lgl(records, is.null)
   records <- records[ok]
   tibble(
+    path = path,
     file = basename(path),
     folder = basename(dirname(path)),
     line = line_no[ok],
@@ -129,6 +130,29 @@ read_events_file <- function(path) {
   )
 }
 events_raw <- map(events_files, read_events_file) %>% list_rbind()
+
+# The same session in two files (e.g. a copy in a backup folder) would count
+# every visit and error twice. Keep the longest file per session_id, drop the
+# others, and name all paths. The participant is flagged in data_quality.
+# Returns the paths to drop; `kind` is "events" or "summary" for the message.
+pick_longest_files <- function(rows_per_file, kind) {
+  dup <- rows_per_file %>% group_by(session_id) %>% filter(n_distinct(path) > 1) %>%
+    arrange(desc(n_rows), path, .by_group = TRUE) %>%
+    mutate(keep = row_number() == 1) %>% ungroup()
+  unit <- if (kind == "events") " lines" else " rows"
+  for (sid in unique(dup$session_id)) {
+    d <- dup %>% filter(session_id == sid)
+    warn("duplicate ", kind, " files for session ", sid, " (", d$participant_id[1], "): kept ",
+         d$path[d$keep], " (", d$n_rows[d$keep], unit, "), dropped ",
+         paste0(d$path[!d$keep], " (", d$n_rows[!d$keep], unit, ")", collapse = ", "))
+  }
+  dup %>% filter(!keep) %>% select(participant_id, session_id, path)
+}
+dropped_event_files <- events_raw %>%
+  filter(!is.na(session_id)) %>%
+  count(participant_id, session_id, path, name = "n_rows") %>%
+  pick_longest_files("events")
+events_raw <- events_raw %>% filter(!path %in% dropped_event_files$path)
 
 # ---- 4. Drop test IDs and invalid IDs ------------------------------------------
 
@@ -159,7 +183,7 @@ events <- events_raw %>% filter(is_valid_id(participant_id), !is_test_id(partici
 if (nrow(events) == 0) stop("No events left after dropping test IDs.")
 
 # One file must hold one participant and one session.
-mixed_files <- events %>% group_by(file) %>%
+mixed_files <- events %>% group_by(path, file) %>%
   summarise(n_pid = n_distinct(participant_id), n_sid = n_distinct(session_id), .groups = "drop") %>%
   filter(n_pid > 1 | n_sid > 1)
 if (nrow(mixed_files) > 0) {
@@ -179,10 +203,15 @@ if (length(unknown_events) > 0) {
 # ---- 5. Sessions: build, start, end, how they ended -------------------------------
 
 # Header line: build and schema_version of the app that wrote the file.
+# session_start_mode (added later, NA in older logs): "auto" = started by
+# ResearchSettings.autoStart, "manual" = started by the keypad (#27).
 headers <- events %>% filter(event == "header") %>%
   transmute(session_id,
+            has_header = TRUE,
+            header_utc = parse_utc(utc),
             build = map_chr(data, ~ as_chr(.x$build)),
-            schema_version = map_int(data, ~ as_int(.x$schema_version)))
+            schema_version = map_int(data, ~ as_int(.x$schema_version)),
+            session_start_mode = map_chr(data, ~ as_chr(.x$session_start_mode)))
 if (any(duplicated(headers$session_id))) warn("a session has more than one header line")
 
 # A session ended cleanly only if it has session_end. No session_end = crash
@@ -197,7 +226,8 @@ sessions <- events %>%
             last_t = max(t, na.rm = TRUE), .groups = "drop") %>%
   left_join(headers, by = "session_id") %>%
   left_join(session_ends, by = "session_id") %>%
-  mutate(end_status = if_else(is.na(end_reason), "crash", end_reason)) %>%
+  mutate(has_header = coalesce(has_header, FALSE),
+         end_status = if_else(is.na(end_reason), "crash", end_reason)) %>%
   arrange(participant_id, start_utc) %>%
   group_by(participant_id) %>%
   mutate(session_no = row_number(),
@@ -206,9 +236,42 @@ sessions <- events %>%
          crash_before = lag(cumsum(end_status == "crash"), default = 0) > 0) %>%
   ungroup()
 
-missing_header <- sessions %>% filter(is.na(build))
+missing_header <- sessions %>% filter(!has_header)
 if (nrow(missing_header) > 0) {
   warn("session(s) without header line: ", paste(missing_header$session_id, collapse = ", "))
+}
+# build null = the ResearchBuildInfo resource was missing in the app build;
+# "unknown" = git failed when the app was built. Both: builds can't be told apart.
+null_build <- sessions %>% filter(has_header, is.na(build))
+if (nrow(null_build) > 0) {
+  warn("header with build null (ResearchBuildInfo missing in the app build): ",
+       paste(null_build$session_id, collapse = ", "))
+}
+unknown_build <- sessions %>% filter(build %in% "unknown")
+if (nrow(unknown_build) > 0) {
+  warn("build 'unknown' (git failed when the app was built): ",
+       paste(unknown_build$session_id, collapse = ", "))
+}
+# A real participant's session should be started from the keypad (#27). "auto"
+# means the study build still had autoStart on (backlog #27).
+auto_real <- sessions %>% filter(session_start_mode %in% "auto")
+for (i in seq_len(nrow(auto_real))) {
+  warn("session_start_mode 'auto' for real ID ", auto_real$participant_id[i], " (session ",
+       auto_real$session_id[i], "): started by autoStart, not by the keypad")
+}
+
+# Clock check: utc - header utc should equal t. A gap over 1 s means the wall
+# clock jumped or t stopped (e.g. during headset sleep; check on Quest, L19).
+clock_drift <- events %>%
+  filter(!is.na(t), event != "crash_recovered") %>%
+  inner_join(headers %>% select(session_id, header_utc), by = "session_id") %>%
+  mutate(drift_s = as.numeric(difftime(parse_utc(utc), header_utc, units = "secs")) - t) %>%
+  group_by(participant_id, session_id) %>%
+  summarise(max_drift_s = max(abs(drift_s), na.rm = TRUE), .groups = "drop") %>%
+  filter(is.finite(max_drift_s), max_drift_s > 1)
+for (i in seq_len(nrow(clock_drift))) {
+  warn("clock drift in session ", clock_drift$session_id[i], " (", clock_drift$participant_id[i],
+       "): utc and t differ by up to ", round(clock_drift$max_drift_s[i], 1), " s")
 }
 long_gaps <- sessions %>% filter(!is.na(gap_h), gap_h > gap_warn_h)
 for (i in seq_len(nrow(long_gaps))) {
@@ -237,63 +300,138 @@ exits <- visit_events %>% filter(event == "scene_exit") %>%
             exit_hmd_removed_count = map_int(data, ~ as_int(.x$hmd_removed_count)),
             exit_unity_errors = map_int(data, ~ as_int(.x$unity_errors)))
 
-# Pauses: app_pause starts one, app_resume (with paused_s) ends it. The causes
-# list tells whether the headset was taken off.
+# Pauses as intervals per session: app_pause starts one, the next app_resume
+# ends it. A pause never resumed (crash, or quit while paused: the logger then
+# writes no app_resume) ends at the session's last t. The C# logger splits a
+# pause that spans a scene change by visit, so a visit's paused time is the
+# overlap of these intervals with the visit. The pause itself (and a headset
+# removal in it) counts in the visit where it started.
 has_hmd <- function(d) "hmd_unmounted" %in% unlist(d$causes)
-pause_stats <- visit_events %>%
+session_last_t <- events %>% filter(!is.na(t), event != "crash_recovered") %>%
+  group_by(session_id) %>% summarise(session_last_t = max(t), .groups = "drop")
+pair_pauses <- function(rows) {
+  out <- list()
+  open <- NULL
+  for (i in seq_len(nrow(rows))) {
+    if (rows$event[i] == "app_pause" && is.null(open)) {
+      open <- list(scene = rows$scene[i], scene_visit = rows$scene_visit[i], start_t = rows$t[i],
+                   hmd = has_hmd(rows$data[[i]]))
+    } else if (rows$event[i] == "app_resume" && !is.null(open)) {
+      # The resume lists every cause seen during the pause.
+      open$end_t <- rows$t[i]
+      open$hmd <- open$hmd || has_hmd(rows$data[[i]])
+      open$resumed <- TRUE
+      out[[length(out) + 1]] <- open
+      open <- NULL
+    }
+  }
+  if (!is.null(open)) {
+    open$end_t <- rows$session_last_t[1]
+    open$resumed <- FALSE
+    out[[length(out) + 1]] <- open
+  }
+  bind_rows(lapply(out, as_tibble))
+}
+pause_intervals <- visit_events %>%
   filter(event %in% c("app_pause", "app_resume")) %>%
-  group_by(session_id, scene, scene_visit) %>%
-  summarise(
-    ev_pauses = sum(event == "app_pause"),
-    ev_paused_s = sum(map_dbl(data[event == "app_resume"], ~ as_num(.x$paused_s))),
-    ev_hmd_resumed = sum(map_lgl(data[event == "app_resume"], has_hmd)),
-    # A pause still open at the end (crash while paused): its start time.
-    last_pause_t = suppressWarnings(max(t[event == "app_pause"])),
-    last_resume_t = suppressWarnings(max(t[event == "app_resume"])),
-    last_pause_hmd = if (any(event == "app_pause")) has_hmd(tail(data[event == "app_pause"], 1)[[1]]) else FALSE,
-    .groups = "drop") %>%
-  mutate(open_pause = is.finite(last_pause_t) & last_pause_t > last_resume_t)
+  left_join(session_last_t, by = "session_id") %>%
+  arrange(session_id, t, line) %>%
+  group_by(session_id) %>%
+  group_modify(~ pair_pauses(.x)) %>%
+  ungroup()
+if (nrow(pause_intervals) == 0) {
+  pause_intervals <- tibble(session_id = character(), scene = character(), scene_visit = integer(),
+                            start_t = double(), end_t = double(), hmd = logical(), resumed = logical())
+}
 
-# Unity errors: a line with folded_count > 0 stands for that many repeats,
-# a line with folded_count 0 is one error.
-error_stats <- visit_events %>% filter(event == "unity_error") %>%
-  mutate(n_err = map_dbl(data, ~ { f <- as_num(.x$folded_count); if (is.na(f) || f == 0) 1 else f })) %>%
+# Paused seconds inside [from_t, to_t] of one session (vectorised over rows).
+paused_between <- function(sid, from_t, to_t) {
+  map_dbl(seq_along(sid), function(i) {
+    p <- pause_intervals[pause_intervals$session_id == sid[i], ]
+    if (nrow(p) == 0 || is.na(from_t[i]) || is.na(to_t[i])) return(0)
+    sum(pmax(0, pmin(p$end_t, to_t[i]) - pmax(p$start_t, from_t[i])))
+  })
+}
+
+pause_counts <- pause_intervals %>%
+  group_by(session_id, scene, scene_visit) %>%
+  summarise(ev_pauses = n(), ev_hmd = sum(hmd), .groups = "drop")
+
+# Unity errors: n_errors = how many errors the line stands for. Logs written
+# before n_errors existed: a line with a stack after the 5 s window stands for
+# folded_count + 1, a line without a stack (written at visit close) for
+# folded_count, a first occurrence (folded_count 0) for 1.
+line_n_errors <- function(d) {
+  n <- as_num(d$n_errors)
+  if (!is.na(n)) return(n)
+  f <- as_num(d$folded_count)
+  if (is.na(f) || f == 0) return(1)
+  if (is.null(d$stack)) f else f + 1
+}
+error_lines <- visit_events %>% filter(event == "unity_error") %>%
+  mutate(n_err = map_dbl(data, line_n_errors),
+         legacy = map_lgl(data, ~ is.null(.x$n_errors)))
+if (any(error_lines$legacy)) {
+  warn(sum(error_lines$legacy), " unity_error line(s) without n_errors (older logger): ",
+       "counts inferred from folded_count and stack")
+}
+error_stats <- error_lines %>%
   group_by(session_id, scene, scene_visit) %>%
   summarise(ev_unity_errors = sum(n_err), .groups = "drop")
+
+# After the error cap (unity_error_cap_reached) further errors are only counted
+# in scene_exit.unity_errors, so the events can't rebuild that number.
+cap_sessions <- events %>% filter(event == "unity_error_cap_reached") %>%
+  distinct(participant_id, session_id)
+for (i in seq_len(nrow(cap_sessions))) {
+  warn("unity_error cap reached in session ", cap_sessions$session_id[i], " (",
+       cap_sessions$participant_id[i], "): errors after the cap have no event lines; ",
+       "unity_errors taken from scene_exit, not cross-checked")
+}
 
 last_events <- visit_events %>% group_by(session_id, scene, scene_visit) %>%
   summarise(last_t = max(t), .groups = "drop")
 
 visits_base <- enters %>%
   left_join(exits, by = c("session_id", "scene", "scene_visit")) %>%
-  left_join(pause_stats, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(pause_counts, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(error_stats, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(last_events, by = c("session_id", "scene", "scene_visit")) %>%
-  replace_na(list(ev_pauses = 0L, ev_paused_s = 0, ev_hmd_resumed = 0L,
-                  open_pause = FALSE, last_pause_hmd = FALSE, ev_unity_errors = 0)) %>%
+  replace_na(list(ev_pauses = 0L, ev_hmd = 0L, ev_unity_errors = 0)) %>%
   mutate(
     closed = !is.na(exit_t),
     # A visit without scene_exit is the open visit of a crashed session. Its
-    # active time ends at its last event, or at the start of a pause still open.
-    end_t = case_when(closed ~ exit_t, open_pause ~ last_pause_t, TRUE ~ last_t),
+    # time ends at its last event; a pause still open then covers the rest.
+    end_t = if_else(closed, exit_t, last_t),
+    ev_paused_s = round(paused_between(session_id, enter_t, end_t), 3),
     rebuilt_duration_s = round(end_t - enter_t - ev_paused_s, 3),
     duration_censored = !closed,
     duration_s = if_else(closed, exit_duration_s, rebuilt_duration_s),
     paused_s = if_else(closed, exit_paused_s, ev_paused_s),
     pauses = if_else(closed, exit_pauses, as.integer(ev_pauses)),
-    hmd_removed_count = if_else(closed, exit_hmd_removed_count,
-                                as.integer(ev_hmd_resumed + (open_pause & last_pause_hmd))),
+    hmd_removed_count = if_else(closed, exit_hmd_removed_count, as.integer(ev_hmd)),
+    error_cap = session_id %in% cap_sessions$session_id,
     unity_errors = if_else(closed, exit_unity_errors, as.integer(ev_unity_errors)))
 
-# Cross-check: scene_exit numbers must match what the other events say.
+# Cross-check: scene_exit numbers must match what the other events say. The
+# warning names each field that differs (events value vs scene_exit value).
 exit_checks <- visits_base %>% filter(closed) %>%
-  filter(abs(rebuilt_duration_s - exit_duration_s) > 0.005 |
-           abs(ev_paused_s - exit_paused_s) > time_tolerance_s |
-           ev_pauses != exit_pauses | ev_unity_errors != exit_unity_errors)
+  mutate(
+    bad_duration = abs(rebuilt_duration_s - exit_duration_s) > 0.005,
+    bad_paused = abs(ev_paused_s - exit_paused_s) > time_tolerance_s,
+    bad_pauses = ev_pauses != exit_pauses,
+    bad_errors = !error_cap & ev_unity_errors != exit_unity_errors) %>%
+  filter(bad_duration | bad_paused | bad_pauses | bad_errors) %>%
+  left_join(sessions %>% select(session_id, participant_id), by = "session_id")
 for (i in seq_len(nrow(exit_checks))) {
   r <- exit_checks[i, ]
-  warn("scene_exit disagrees with the visit's events: session ", r$session_id, " ",
-       r$scene, " visit ", r$scene_visit)
+  fields <- c(
+    if (r$bad_duration) paste0("duration_s events=", r$rebuilt_duration_s, " exit=", r$exit_duration_s),
+    if (r$bad_paused) paste0("paused_s events=", r$ev_paused_s, " exit=", r$exit_paused_s),
+    if (r$bad_pauses) paste0("pauses events=", r$ev_pauses, " exit=", r$exit_pauses),
+    if (r$bad_errors) paste0("unity_errors events=", r$ev_unity_errors, " exit=", r$exit_unity_errors))
+  warn("scene_exit disagrees with the visit's events: ", r$participant_id, " session ", r$session_id,
+       " ", r$scene, " visit ", r$scene_visit, ": ", paste(fields, collapse = "; "))
 }
 
 # ---- 7. Outcome events (#28): confirm presses and quiz answers ----------------
@@ -353,18 +491,13 @@ task_completed <- visit_events %>% filter(event == "task_completed") %>%
   distinct(session_id, scene, scene_visit, .keep_all = TRUE)
 
 # Active time at a press, for quiz answers (they carry no time field): wall
-# time since scene enter minus the pauses that ended before the press.
-resumes <- visit_events %>% filter(event == "app_resume") %>%
-  transmute(session_id, scene, scene_visit, resume_t = t,
-            resume_paused_s = map_dbl(data, ~ as_num(.x$paused_s)))
+# time since scene enter minus the paused time between enter and the press.
 press_active <- presses %>%
   select(session_id, scene, scene_visit, attempt_no, t, time_since_scene_enter_s) %>%
   left_join(enters %>% select(session_id, scene, scene_visit, enter_t),
             by = c("session_id", "scene", "scene_visit")) %>%
-  left_join(resumes, by = c("session_id", "scene", "scene_visit"), relationship = "many-to-many") %>%
-  group_by(session_id, scene, scene_visit, attempt_no, t, time_since_scene_enter_s, enter_t) %>%
-  summarise(paused_before = sum(resume_paused_s[!is.na(resume_t) & resume_t <= t]), .groups = "drop") %>%
-  mutate(active_at_s = coalesce(time_since_scene_enter_s, round(t - enter_t - paused_before, 3)))
+  mutate(paused_before = paused_between(session_id, enter_t, t),
+         active_at_s = coalesce(time_since_scene_enter_s, round(t - enter_t - paused_before, 3)))
 
 # Per visit outcome numbers. A press "has an error" when it carries at least one code.
 press_visit <- presses %>%
@@ -447,9 +580,15 @@ read_summary <- function(path) read_csv(path, show_col_types = FALSE, na = "",
                    enter_utc = col_character(), first_attempt_correct = col_logical(),
                    completed = col_logical(), error_codes_all = col_character()))
 summary_rows <- tibble()
+dropped_summary_files <- dropped_event_files[0, ]
 if (length(summary_files) > 0) {
-  summary_rows <- map(summary_files, read_summary) %>% list_rbind() %>%
+  summary_rows <- map(summary_files, ~ read_summary(.x) %>% mutate(path = .x)) %>% list_rbind() %>%
     filter(is_valid_id(participant_id), !is_test_id(participant_id))
+  # Same rule as for events files: one file per session, the longest wins.
+  dropped_summary_files <- summary_rows %>%
+    count(participant_id, session_id, path, name = "n_rows") %>%
+    pick_longest_files("summary")
+  summary_rows <- summary_rows %>% filter(!path %in% dropped_summary_files$path) %>% select(-path)
 }
 
 # Sort "B:1;A:2" -> "A:2;B:1" so the code order never counts as a difference.
@@ -537,7 +676,9 @@ data_quality <- sessions %>%
     .groups = "drop") %>%
   mutate(multi_session = n_sessions > 1,
          mixed_build = str_detect(builds, ";"),
-         course_finished = participant_id %in% finished_ids) %>%
+         # NA = not measured: none of the person's sessions logged outcome events.
+         course_finished = if_else(participant_id %in% presses$participant_id,
+                                   participant_id %in% finished_ids, NA)) %>%
   left_join(visits %>% group_by(participant_id) %>%
               summarise(n_visits = n(),
                         n_repeat_visits = sum(repeat_visit),
@@ -555,12 +696,18 @@ data_quality <- sessions %>%
   left_join(invariant_breaks %>% count(participant_id, name = "invariant_breaks"), by = "participant_id") %>%
   left_join(unknown_codes %>% count(participant_id, name = "unknown_codes"), by = "participant_id") %>%
   left_join(summary_mismatches %>% count(participant_id, name = "summary_mismatches"), by = "participant_id") %>%
-  mutate(across(c(invariant_breaks, unknown_codes, summary_mismatches), ~ coalesce(.x, 0L))) %>%
+  left_join(exit_checks %>% count(participant_id, name = "exit_disagreements"), by = "participant_id") %>%
+  left_join(bind_rows(dropped_event_files, dropped_summary_files) %>%
+              count(participant_id, name = "duplicate_files"), by = "participant_id") %>%
+  mutate(across(c(invariant_breaks, unknown_codes, summary_mismatches, exit_disagreements,
+                  duplicate_files), ~ coalesce(.x, 0L)),
+         error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
          mixed_build, schema_versions, gap_h, n_crashes, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
-         unity_errors, outcome_logged, total_confirms, invariant_breaks, unknown_codes,
-         summary_mismatches, first_start_utc) %>%
+         unity_errors, error_cap_reached, outcome_logged, total_confirms, invariant_breaks,
+         unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
+         first_start_utc) %>%
   arrange(participant_id)
 
 write_csv(data_quality, file.path(output_dir, "data_quality.csv"), na = "")
@@ -568,29 +715,34 @@ write_csv(data_quality, file.path(output_dir, "data_quality.csv"), na = "")
 # Data-quality picture: one row per participant, cells that need a look in orange.
 dq_long <- data_quality %>%
   transmute(participant_id,
-            end_status, course_finished = as.character(course_finished),
+            end_status,
+            # Empty = not measured (no outcome events logged).
+            course_finished = coalesce(as.character(course_finished), ""),
             sessions = as.character(n_sessions), builds = str_replace_all(builds, ";", "\n"),
             gap_h = if_else(is.na(gap_h), "", as.character(gap_h)),
             censored = as.character(duration_censored),
             repeats = as.character(n_repeat_visits),
-            paused_min = as.character(round(paused_s / 60, 1)),
+            paused_s = as.character(paused_s),
             pauses = as.character(pauses), hmd_off = as.character(hmd_removed_count),
             unity_err = as.character(unity_errors),
+            error_cap = as.character(error_cap_reached),
             outcome = as.character(outcome_logged),
             invariant = as.character(invariant_breaks),
             unknown_code = as.character(unknown_codes),
-            summary_diff = as.character(summary_mismatches)) %>%
+            summary_diff = as.character(summary_mismatches),
+            exit_diff = as.character(exit_disagreements),
+            duplicates = as.character(duplicate_files)) %>%
   pivot_longer(-participant_id, names_to = "column", values_to = "value") %>%
-  mutate(attention = case_when(
+  mutate(value = coalesce(value, ""),
+         attention = case_when(
            column == "end_status" ~ value %in% c("crash", "quit", "facilitator"),
            column == "course_finished" ~ value == "FALSE",
            column == "sessions" ~ value != "1",
-           column == "builds" ~ str_detect(value, "\n") | value == "editor",
+           column == "builds" ~ str_detect(value, "\n") | value %in% c("editor", "unknown", "NA"),
            column == "gap_h" ~ value != "",
-           column == "censored" ~ value == "TRUE",
+           column %in% c("censored", "error_cap") ~ value == "TRUE",
            column == "outcome" ~ value == "FALSE",
-           column == "paused_min" ~ value != "0",
-           TRUE ~ value != "0"),
+           TRUE ~ !value %in% c("0", "")),
          column = factor(column, levels = unique(column)),
          participant_id = factor(participant_id, levels = rev(sort(unique(participant_id)))))
 
@@ -767,18 +919,25 @@ ggsave(file.path(output_dir, "time_to_correct_by_scene.png"), p_ttc, width = 10,
 per_scene <- visits %>% filter(counting) %>%
   mutate(scene = as.character(scene)) %>%
   transmute(participant_id, scene,
-            time = duration_s, paused = paused_s, confirms = confirm_count,
+            active_s = duration_s, paused_s = paused_s, confirms = confirm_count,
             errors = presses_with_error, error_rate = error_rate,
             first_correct = first_attempt_correct, attempts_to_correct = attempts_to_correct,
-            time_to_correct = time_to_correct_s, completed = completed,
+            time_to_correct_s = time_to_correct_s, completed = completed,
             visit_censored = duration_censored)
 visit_counts <- visits %>% mutate(scene = as.character(scene)) %>% count(participant_id, scene, name = "visits")
 per_scene <- full_join(visit_counts, per_scene, by = c("participant_id", "scene"))
 
+outcome_measures <- c("confirms", "errors", "error_rate", "first_correct", "attempts_to_correct",
+                      "time_to_correct_s", "completed")
 wide_scene <- per_scene %>%
   pivot_wider(id_cols = participant_id, names_from = scene, names_glue = "{.value}_{scene}",
-              values_from = c(visits, time, paused, confirms, errors, error_rate, first_correct,
-                              attempts_to_correct, time_to_correct, completed, visit_censored))
+              values_from = c(visits, active_s, paused_s, confirms, errors, error_rate, first_correct,
+                              attempts_to_correct, time_to_correct_s, completed, visit_censored))
+# Scenes without a confirm or quiz (WelcomeScene) never have outcome values:
+# drop those always-empty columns.
+no_outcome_cols <- as.vector(outer(outcome_measures, setdiff(unique(per_scene$scene), outcome_scenes),
+                                   paste, sep = "_"))
+wide_scene <- wide_scene %>% select(-any_of(no_outcome_cols))
 
 wide_skill <- skill_rates %>%
   transmute(participant_id, name = paste0("error_rate_", scene, "_", skill), error_rate) %>%
@@ -804,7 +963,7 @@ wide <- data_quality %>%
   left_join(wide_skill, by = "participant_id")
 # A scene nobody had a counting visit for still gets its error-rate column
 # (added before sorting, so it lands in build order).
-for (s in levels(visits$scene)) {
+for (s in intersect(levels(visits$scene), outcome_scenes)) {
   if (!paste0("error_rate_", s) %in% names(wide)) wide[[paste0("error_rate_", s)]] <- NA_real_
 }
 scene_cols <- setdiff(names(wide), participant_cols)
@@ -823,7 +982,8 @@ validity_limits <- c(
 
 flagged <- data_quality %>%
   filter(end_status != "completed" | multi_session | mixed_build | duration_censored |
-           invariant_breaks > 0 | unknown_codes > 0 | summary_mismatches > 0) %>%
+           invariant_breaks > 0 | unknown_codes > 0 | summary_mismatches > 0 |
+           exit_disagreements > 0 | duplicate_files > 0 | error_cap_reached) %>%
   pull(participant_id)
 
 report_lines <- c(

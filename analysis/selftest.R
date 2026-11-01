@@ -72,6 +72,68 @@ local({
   missing_files <- expected_files[!file.exists(file.path(output_dir, expected_files))]
   if (length(missing_files) > 0) stop("missing outputs: ", paste(missing_files, collapse = ", "))
 
+  # 8b. Seam checks: the fake data follow the C# rules exactly, so any
+  #     "scene_exit disagrees" or "summary.csv differs" warning is a bug in
+  #     analyse.R or make_fake_data.R (they stand in for the C# logger).
+  seam <- warn_lines[grepl("disagrees|differs", warn_lines)]
+  if (length(seam) > 0) stop("seam warnings on fake data:\n", paste(seam, collapse = "\n"))
+  stopifnot(all(data_quality$exit_disagreements == 0), all(data_quality$summary_mismatches == 0))
+
+  # 8c. n_errors: P102's 9 s burst in WelcomeScene gives a line after the 5 s
+  #     window (n_errors = folded_count + 1) and a line at the visit close
+  #     without a stack (n_errors = folded_count).
+  p102_err <- error_lines[error_lines$participant_id == "P102" & error_lines$scene == "WelcomeScene", ]
+  folded <- map_dbl(p102_err$data, ~ .x$folded_count)
+  has_stack <- map_lgl(p102_err$data, ~ !is.null(.x$stack))
+  stopifnot(any(has_stack & folded > 0 & p102_err$n_err == folded + 1))
+  stopifnot(any(!has_stack & folded > 0 & p102_err$n_err == folded))
+  stopifnot(!any(error_lines$legacy))
+
+  # 8d. Pauses: P102's pause spans Mixed visit 1 -> Basic visit 2: it counts in
+  #     Mixed 1, its time is split (4.5 s + 7.25 s). P104 quits while paused:
+  #     the open 12.5 s are in ComplexScene's paused_s without an app_resume.
+  b2 <- visits[visits$participant_id == "P102" & visits$scene == "BasicPickingScene" & visits$scene_visit == 2, ]
+  stopifnot(nrow(b2) == 1, b2$pauses == 0, abs(b2$paused_s - 7.25) < 0.002)
+  m1 <- visits[visits$participant_id == "P102" & visits$scene == "MixedPickingScene" & visits$scene_visit == 1, ]
+  stopifnot(nrow(m1) == 1, m1$pauses >= 1, m1$paused_s >= 4.5)
+  c104 <- visits[visits$participant_id == "P104" & visits$scene == "ComplexScene", ]
+  stopifnot(nrow(c104) == 1, c104$paused_s >= 12.5, c104$pauses >= 1)
+
+  # 8e. Error cap: P107 is flagged and named in the warnings.
+  stopifnot(isTRUE(data_quality$error_cap_reached[data_quality$participant_id == "P107"]))
+  stopifnot(sum(data_quality$error_cap_reached) == 1, "P107" %in% flagged)
+  stopifnot(any(grepl("cap reached", warn_lines) & grepl("P107", warn_lines)))
+
+  # 8f. session_start_mode "auto" for a real ID (P108) is warned; the test ID
+  #     P950 (also "auto") is dropped before, so it is not.
+  stopifnot(any(grepl("session_start_mode 'auto'", warn_lines) & grepl("P108", warn_lines)))
+  stopifnot(!any(grepl("session_start_mode 'auto'", warn_lines) & grepl("P950", warn_lines)))
+
+  # 8g. wide.csv: units in the time columns, no WelcomeScene outcome columns.
+  stopifnot(all(c("active_s_ComplexScene", "paused_s_ComplexScene", "time_to_correct_s_ComplexScene",
+                  "active_s_WelcomeScene") %in% names(wide)))
+  stopifnot(!any(c("time_ComplexScene", "confirms_WelcomeScene", "error_rate_WelcomeScene",
+                   "completed_WelcomeScene") %in% names(wide)))
+
+  # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
+  #     (events + summary), named with both paths, and P101 is flagged.
+  stopifnot(data_quality$duplicate_files[data_quality$participant_id == "P101"] == 2)
+  stopifnot("P101" %in% flagged)
+  dup_warn <- warn_lines[grepl("duplicate events files", warn_lines)]
+  stopifnot(length(dup_warn) == 1, grepl("backup/", dup_warn), grepl("research/P101_", dup_warn))
+  # Results must equal a run without the copy.
+  wide_with_copy <- wide
+  visits_with_copy <- visits
+  dq_with_copy <- data_quality
+  flagged_with_copy <- flagged
+  unlink(file.path(data_dir, "research", "backup"), recursive = TRUE)
+  output_dir <- "analysis/output/selftest_nodup"
+  source("analysis/analyse.R", local = TRUE)
+  stopifnot(isTRUE(all.equal(wide_with_copy, wide)))
+  stopifnot(isTRUE(all.equal(visits_with_copy, visits)))
+  stopifnot(isTRUE(all.equal(dq_with_copy %>% select(-duplicate_files), data_quality %>% select(-duplicate_files))))
+  stopifnot(all(data_quality$duplicate_files == 0), !"P101" %in% flagged)
+
   # 9. Without allow_fake, analyse.R must refuse the fake folder.
   # (parent = globalenv(), so it can't see allow_fake from this environment)
   guard <- new.env(parent = globalenv())

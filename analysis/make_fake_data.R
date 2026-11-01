@@ -7,7 +7,8 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/practice/)
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/practice/,
+#                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
 # If the logger format changes, change this script in the same commit.
@@ -220,6 +221,11 @@ error_stack <- list(
   ComplexScene      = "PiecesOrderValidator:ConfirmOrder () (at PiecesOrderValidator.cs:70)")
 error_message <- "NullReferenceException: Object reference not set to an instance of an object"
 
+# Same rules as ErrorFolder.cs: the same message within 5 s of its last
+# written line is folded; at most 200 unity_error lines per session.
+fold_window_s <- 5
+error_cap <- 200
+
 # ---- 5. Session state and event writers ------------------------------------
 
 # The "device" holds every session in start order and the files that are
@@ -247,10 +253,18 @@ emit <- function(s, event, data = NULL) {
   s$last_t <- s$t
 }
 
-# Active time in the current visit: wall time minus paused time.
-active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s, 3)
+# Part of a still-open pause that lies inside the current visit (a pause that
+# spans a scene change is split by visit, like PauseTracker in the logger).
+open_pause_part <- function(s) {
+  if (!s$pause_open) return(0)
+  round(s$t - max(s$pause_start, s$v$enter_t), 3)
+}
 
-start_session <- function(person, build, start_utc) {
+# Active time in the current visit: wall time minus paused time.
+active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s - open_pause_part(s), 3)
+
+# start_mode: "manual" (keypad, #27) or "auto" (ResearchSettings.autoStart).
+start_session <- function(person, build, start_utc, start_mode = "manual") {
   s <- new.env()
   s$pid <- person$pid
   s$sid <- make_uuid()
@@ -264,6 +278,16 @@ start_session <- function(person, build, start_utc) {
   s$scene <- NULL
   s$visit <- NULL
   s$visit_open <- FALSE
+  # Error folding state (session-wide, like ErrorFolder): last written t and
+  # repeats not yet written, per message.
+  s$err_last <- list()
+  s$err_pending <- list()
+  s$err_lines <- 0
+  s$cap_reported <- FALSE
+  # Pause state (session-wide; a pause may span a scene change).
+  s$pause_open <- FALSE
+  s$pause_start <- NA
+  s$pause_causes <- character(0)
 
   # Like SessionFiles.MarkCrashedSessions: before the new header, every open
   # file on the device (any participant) gets a crash_recovered line.
@@ -279,7 +303,8 @@ start_session <- function(person, build, start_utc) {
   s$lines <- event_line(0, fmt_utc(s$start, 0), s$pid, s$sid, NULL, NULL, "header",
     json_obj(schema_version = 1, app_version = "0.1.0", build = build,
              device_model = "Oculus Quest", os_version = "Android OS 14 / API-34",
-             participant_id = s$pid, session_id = s$sid, language = NULL,
+             participant_id = s$pid, session_id = s$sid, session_start_mode = start_mode,
+             language = NULL,
              input_mode_at_start = "controllers", target_refresh_rate = 72))
   s$scene <- "WelcomeScene"
   emit(s, "session_start")
@@ -295,7 +320,7 @@ enter_scene <- function(s, scene, from, via) {
   s$visit <- n
   s$visit_open <- TRUE
   s$v <- list(enter_t = s$t, enter_utc = fmt_utc(s$start, s$t), paused_s = 0,
-              pauses = 0, hmd = 0, errors = 0, folded = 0, attempts = 0,
+              pauses = 0, hmd = 0, errors = 0, attempts = 0,
               codes = character(0), first_correct = NA, correct_at = NA,
               t_first = NA, t_correct = NA)
   emit(s, "scene_enter", json_obj(from_scene = from, via = via))
@@ -310,14 +335,25 @@ codes_tally <- function(codes) {
 
 exit_scene <- function(s) {
   if (!s$visit_open) return(invisible())
-  # Folded repeats of an error are written when the visit closes.
-  if (s$v$folded > 0) {
-    emit(s, "unity_error", json_obj(type = "exception", message = error_message,
-                                    stack = NULL, folded_count = s$v$folded))
-    advance(s, 0.001)
+  # Folded repeats not yet written belong to this visit: one line per message,
+  # no stack, n_errors = folded_count (no new error comes with the line).
+  drained <- FALSE
+  for (msg in names(s$err_pending)) {
+    n <- s$err_pending[[msg]]
+    if (n > 0) {
+      emit(s, "unity_error", json_obj(type = "exception", message = msg, stack = NULL,
+                                      folded_count = n, n_errors = n))
+      s$err_pending[[msg]] <- 0
+      drained <- TRUE
+    }
   }
+  if (drained) advance(s, 0.001)
   duration <- active_s(s)
-  emit(s, "scene_exit", json_obj(duration_s = duration, paused_s = s$v$paused_s,
+  # A pause still open at the exit counts up to now (quit while paused, or a
+  # scene change during a pause).
+  paused <- round(s$v$paused_s + open_pause_part(s), 3)
+  s$v$paused_s <- paused
+  emit(s, "scene_exit", json_obj(duration_s = duration, paused_s = paused,
                                  pauses = s$v$pauses, hmd_removed_count = s$v$hmd,
                                  unity_errors = s$v$errors))
 
@@ -358,15 +394,31 @@ crash_session <- function(s) {
   device$open <- c(device$open, list(s))
 }
 
+# A pause starts: it counts in the current visit (also when it ends in a later
+# one). all_causes = every cause seen until the resume.
+begin_pause <- function(s, causes, all_causes = causes) {
+  emit(s, "app_pause", json_obj(causes = json_arr(causes)))
+  s$pause_open <- TRUE
+  s$pause_start <- s$t
+  s$pause_causes <- all_causes
+  s$v$pauses <- s$v$pauses + 1
+  if ("hmd_unmounted" %in% all_causes) s$v$hmd <- s$v$hmd + 1
+}
+
+# The pause ends: app_resume carries the whole pause; the current visit gets
+# only its own part.
+end_pause <- function(s) {
+  emit(s, "app_resume", json_obj(paused_s = round(s$t - s$pause_start, 3),
+                                 causes = json_arr(s$pause_causes)))
+  s$v$paused_s <- round(s$v$paused_s + open_pause_part(s), 3)
+  s$pause_open <- FALSE
+}
+
 # One pause from start to resume. resume_causes = every cause seen meanwhile.
 pause_app <- function(s, causes, secs, resume_causes = causes) {
-  emit(s, "app_pause", json_obj(causes = json_arr(causes)))
-  secs <- round(secs, 3)
-  advance(s, secs)
-  emit(s, "app_resume", json_obj(paused_s = secs, causes = json_arr(resume_causes)))
-  s$v$paused_s <- round(s$v$paused_s + secs, 3)
-  s$v$pauses <- s$v$pauses + 1
-  if ("hmd_unmounted" %in% resume_causes) s$v$hmd <- s$v$hmd + 1
+  begin_pause(s, causes, resume_causes)
+  advance(s, round(secs, 3))
+  end_pause(s)
 }
 
 maybe_pause <- function(s) {
@@ -382,16 +434,44 @@ maybe_pause <- function(s) {
   }
 }
 
+# One error raised now, decided like ErrorFolder.Decide: after the cap only
+# counted; within 5 s of the message's last line folded; otherwise a line with
+# folded_count = repeats swallowed since that line, n_errors = folded_count + 1.
+raise_error <- function(s, message = error_message, stack = error_stack[[s$scene]]) {
+  s$v$errors <- s$v$errors + 1
+  if (s$err_lines >= error_cap) {
+    if (!s$cap_reported) {
+      s$cap_reported <- TRUE
+      emit(s, "unity_error_cap_reached")
+    }
+    return(invisible())
+  }
+  last <- s$err_last[[message]]
+  if (!is.null(last) && s$t - last < fold_window_s) {
+    s$err_pending[[message]] <- s$err_pending[[message]] + 1
+    return(invisible())
+  }
+  folded <- if (is.null(s$err_pending[[message]])) 0 else s$err_pending[[message]]
+  emit(s, "unity_error", json_obj(type = "exception", message = message, stack = stack,
+                                  folded_count = folded, n_errors = folded + 1))
+  s$err_last[[message]] <- s$t
+  s$err_pending[[message]] <- 0
+  s$err_lines <- s$err_lines + 1
+}
+
+# n repeats of the same error, one every `spacing` seconds. A burst longer
+# than 5 s writes a second line (folded_count + 1 errors) in the middle.
+error_burst <- function(s, n, spacing, message = error_message) {
+  for (i in seq_len(n)) {
+    advance(s, spacing)
+    raise_error(s, message)
+  }
+}
+
 maybe_unity_error <- function(s) {
   if (runif(1) < 0.08) {
-    emit(s, "unity_error", json_obj(type = "exception", message = error_message,
-                                    stack = error_stack[[s$scene]], folded_count = 0))
-    s$v$errors <- s$v$errors + 1
-    if (runif(1) < 0.5) {
-      extra <- sample(3:40, 1)
-      s$v$folded <- extra
-      s$v$errors <- s$v$errors + extra
-    }
+    raise_error(s)
+    if (runif(1) < 0.5) error_burst(s, sample(3:40, 1), round(runif(1, 0.05, 0.3), 3))
     advance(s, runif(1, 1, 5))
   }
 }
@@ -520,8 +600,8 @@ run_visit <- function(s, person, ...) {
 
 # A normal course: every scene in build order, ends "completed" on the first
 # correct confirm in ComplexScene (#28 calls EndSession("completed") there).
-run_full_course <- function(person, build, start_utc, special = list()) {
-  s <- start_session(person, build, start_utc)
+run_full_course <- function(person, build, start_utc, special = list(), start_mode = "manual") {
+  s <- start_session(person, build, start_utc, start_mode)
   run_welcome(s)
   for (scene in scene_order[-1]) {
     go_to_scene(s, scene)
@@ -538,7 +618,7 @@ run_full_course <- function(person, build, start_utc, special = list()) {
 # P950: facilitator's trial run with a test ID. It belongs in practice/, but
 # here it sits in research/ on purpose: analyse.R must drop it anyway.
 p950 <- new_person("P950")
-s <- start_session(p950, "aaa1111", "2026-11-02T09:00:00Z")
+s <- start_session(p950, "aaa1111", "2026-11-02T09:00:00Z", start_mode = "auto")
 run_welcome(s)
 go_to_scene(s, "ConceptScene"); run_quiz(s, p950)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p950)
@@ -548,15 +628,33 @@ end_session(s, "quit")
 run_full_course(new_person("P101"), "aaa1111", "2026-11-03T08:00:00Z")
 
 # P102: goes back from MixedPickingScene to BasicPickingScene once
-# (repeat visits: scene_visit 2 for Basic and Mixed).
+# (repeat visits: scene_visit 2 for Basic and Mixed). In WelcomeScene one error
+# repeats for 9 s (a second line after the 5 s window, the rest written at the
+# visit close). The trainee leaves Mixed visit 1 while the app is paused
+# (focus lost), so that pause is split between Mixed 1 and Basic 2.
 p102 <- new_person("P102")
 s <- start_session(p102, "aaa1111", "2026-11-03T09:30:00Z")
 run_welcome(s)
+raise_error(s)
+error_burst(s, 60, 0.15)
+advance(s, 2)
+mixed_seen <- 0
 for (scene in c("ConceptScene", "BasicPickingScene", "MixedPickingScene",
                 "BasicPickingScene", "MixedPickingScene", "ComplexScene")) {
   go_to_scene(s, scene)
+  if (s$pause_open) {
+    advance(s, 7.25)
+    end_pause(s)
+  }
   if (scene == "ComplexScene") run_picking(s, p102, end_on_correct = TRUE)
   else run_visit(s, p102)
+  if (scene == "MixedPickingScene") {
+    mixed_seen <- mixed_seen + 1
+    if (mixed_seen == 1) {
+      begin_pause(s, "focus_lost")
+      advance(s, 4.5)
+    }
+  }
 }
 end_session(s, "completed")
 
@@ -568,7 +666,7 @@ run_welcome(s)
 go_to_scene(s, "ConceptScene"); run_quiz(s, p103)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p103)
 go_to_scene(s, "MixedPickingScene"); run_picking(s, p103, max_confirms = 1, give_up = TRUE)
-emit(s, "app_pause", json_obj(causes = json_arr("hmd_unmounted")))
+begin_pause(s, "hmd_unmounted")
 crash_session(s)
 crash_epoch <- s$start + s$t
 restart_utc <- format(as.POSIXct(round(crash_epoch + 6 * 60), origin = "1970-01-01", tz = "UTC"),
@@ -581,8 +679,9 @@ go_to_scene(s, "MixedPickingScene"); run_picking(s, p103)
 go_to_scene(s, "ComplexScene"); run_picking(s, p103, end_on_correct = TRUE)
 end_session(s, "completed")
 
-# P104: gives up in ComplexScene after two wrong confirms; the app is closed
-# normally (quit callback runs), so the reason is "quit".
+# P104: gives up in ComplexScene after two wrong confirms, takes the headset
+# off and the app is closed while still paused (quit callback runs: reason
+# "quit", no app_resume; scene_exit.paused_s includes the open pause).
 p104 <- new_person("P104")
 s <- start_session(p104, "aaa1111", "2026-11-03T14:00:00Z")
 run_welcome(s)
@@ -590,6 +689,8 @@ for (scene in c("ConceptScene", "BasicPickingScene", "MixedPickingScene")) {
   go_to_scene(s, scene); run_visit(s, p104)
 }
 go_to_scene(s, "ComplexScene"); run_picking(s, p104, max_confirms = 2, give_up = TRUE)
+begin_pause(s, "hmd_unmounted")
+advance(s, 12.5)
 end_session(s, "quit")
 
 # P105: crashes in BasicPickingScene right after an exception and never comes
@@ -599,8 +700,7 @@ s <- start_session(p105, "aaa1111", "2026-11-04T08:00:00Z")
 run_welcome(s)
 go_to_scene(s, "ConceptScene"); run_quiz(s, p105)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p105, max_confirms = 1, give_up = TRUE)
-emit(s, "unity_error", json_obj(type = "exception", message = error_message,
-                                stack = error_stack[["BasicPickingScene"]], folded_count = 0))
+raise_error(s)
 crash_session(s)
 
 # P106: one pause whose app_pause lists two causes.
@@ -609,17 +709,28 @@ run_full_course(new_person("P106"), "aaa1111", "2026-11-04T09:30:00Z",
 
 # P107: enters ComplexScene but never confirms; the facilitator ends the
 # session (#27 control) -> a visit with 0 confirms (error rate must be NA).
+# In WelcomeScene a broken loop raises 200+ different errors: the error cap is
+# reached, later errors (also in later scenes) are only counted in scene_exit.
+# One repeat folded before the cap is still written at the visit close.
 p107 <- new_person("P107")
 s <- start_session(p107, "aaa1111", "2026-11-04T11:00:00Z")
 run_welcome(s)
+raise_error(s)
+advance(s, 0.5)
+raise_error(s)
+for (k in 1:230) {
+  advance(s, 0.01)
+  raise_error(s, paste0("MissingReferenceException: probe ", k), "Probe:Update () (at Probe.cs:9)")
+}
 for (scene in c("ConceptScene", "BasicPickingScene", "MixedPickingScene")) {
   go_to_scene(s, scene); run_visit(s, p107)
 }
 go_to_scene(s, "ComplexScene"); run_picking(s, p107, max_confirms = 0)
 end_session(s, "facilitator")
 
-# P108: normal course on the newer build bbb2222.
-run_full_course(new_person("P108"), "bbb2222", "2026-11-04T13:00:00Z")
+# P108: normal course on the newer build bbb2222, but the study build still had
+# autoStart on (session_start_mode "auto"): analyse.R must warn.
+run_full_course(new_person("P108"), "bbb2222", "2026-11-04T13:00:00Z", start_mode = "auto")
 
 # P109: one confirm carries FOO_BAR, a code missing from skill_map.csv.
 run_full_course(new_person("P109"), "aaa1111", "2026-11-04T14:30:00Z",
@@ -651,6 +762,18 @@ for (s in device$sessions) {
     write_lf(c(summary_header, s$summary), paste0(stem, "_summary.csv"))
   }
 }
+
+# A partial copy of P101's session in a second sub folder, as if the files
+# had been copied off the headset once mid-session and again at the end.
+# analyse.R must keep the longer (full) files and warn; results must equal a
+# run without the copy (selftest.R checks this).
+fake_backup <- file.path(fake_research, "backup")
+dir.create(fake_backup, showWarnings = FALSE)
+p101_session <- Filter(function(s) s$pid == "P101", device$sessions)[[1]]
+stem_copy <- file.path(fake_backup, paste0(p101_session$pid, "_", p101_session$sid))
+write_lf(head(p101_session$lines, length(p101_session$lines) - 6), paste0(stem_copy, "_events.jsonl"))
+write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summary) - 1)),
+         paste0(stem_copy, "_summary.csv"))
 
 # Short overview so the run can be checked by eye.
 overview <- data.frame(
