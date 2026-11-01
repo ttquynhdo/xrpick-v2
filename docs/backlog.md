@@ -378,6 +378,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** M–L
 - **Test trên kính:** nhanh (cầm/thả kiện, làm quiz)
 - **Depends on:** #17 (dữ liệu và nhãn 3 kiện Concept). Chạy song song được với #6 (khác scene). Câu hỏi mới cho người hướng dẫn: A9, A10, A11 (không chặn).
+- **Bổ sung (2026-11-01, #10):** Basic/Complex đã dùng màn hình máy tính `WMS_Monitor` thay TV; Concept chỉ có panel trơn 0,57 × 0,43 m không có màn hình. Khi làm mục này, quyết định có đặt `WMS_Monitor` (với nội dung Concept) để bố cục giống các bài sau không.
 - **Status:** todo (#17 đã verified-mcp)
 
 ### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
@@ -549,6 +550,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
   - Poke hoặc ray vào bất kỳ phím F nào → không hover, không kết quả, Console không log mới.
   - Đổi Empf Kz của đơn sang `006` → nền đỏ; `000` → nền xám. Đổi Soll hoặc Mat.-Nr của đơn trong Inspector → dialog hiện số mới. Mat.-Nr của đơn khác `PackageData.MaterialNumber` của carton cùng khoá → Console có một lỗi nêu tên object.
   - Panel ~0,87 × 0,55 m ở chỗ cũ, nghiêng về phía mắt; trong view `overview` mép dưới R5 không bị thùng hay bàn che.
+  - (người dùng 2026-11-01) Basic và Complex không còn TV: dialog nằm trong prefab màn hình máy tính `WMS_Monitor` (viền mỏng vừa dialog, cột + đế sau bàn), cùng vị trí (0.06, 1.26, 1.066) và cùng cỡ ở cả hai scene; panel `Congratulations` không chồng lên viền màn hình.
   - ComplexScene lúc vào scene: Soll `55`, Ist `0`, Rest = tồn kho Ring D trong scene − 55; Mat.-Nr `264857`, Bez. `RING D`, Empf Kz `000` nền xám, mọi chỉ báo R2 tắt. Đặt 1 carton → Ist `25`; thêm 1 chiếc lẻ → Ist `26`; Rest không đổi. Panel không còn `Cartons placed`, `Ist: n ST` riêng, câu "Look below…".
   - ComplexScene: 2 carton + 5 chiếc lẻ, bấm nút đỏ → kết quả đúng hiện trên thẻ trong khoảng 0,15 m quanh nút, không hiện trên dialog; 1 carton, bấm → kết quả sai ở cùng chỗ (phần Complex của #33). `Congratulations` không che dialog.
   - Trên Quest, từ chỗ đứng: đọc được Soll, Ist, Rest, Mat.-Nr, Empf Kz và chữ `F6 Bestätigen` ở cả hai scene (test tay).
@@ -561,7 +563,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (2026-11-01, rà backlog sau #6/#14/#17/#18):** dữ liệu đơn đã có một nguồn: `orderLines` (`OrderLine` {materialKey, materialName, soll, vpe}) trên counter Mixed/Complex, text WMS sinh từ đó lúc Start (`orderLineTexts`); Basic dùng `CalcForWMS.OrderLine` (Soll = `necessarySize`). Panel mới phải đọc từ đó, không gõ số tay. Nhãn panel EN Mixed/Complex còn ghi "Order quantity"/"Package size" (german-reviewer #14: đổi "Package size" thành VPE khi dựng panel). Basic: ô Anweisung vẫn hiện ba thanh xanh đậm (B4: không highlight). Mat.-Nr giả và tên vật tư theo #17 (`docs/i18n/glossary.csv`).
 - **Bổ sung (2026-11-01, người dùng):** các đèn chỉ báo R2 (Referenzwaage, Behälterwaage, Zählen, letzter Pick, …) **không dùng trong kịch bản XR training**: không có bài tập nào yêu cầu cân hay đổi cách đếm theo đèn. Thiết kế lại cho hợp lý: giữ bố cục R2 để giống màn hình thật nhưng không để đèn gây chú ý (ví dụ tất cả tắt/xám, bỏ logic `CountingMethod` khỏi hiển thị), và không dạy/chấm theo đèn ở #20. Cần chốt cách làm (solution-decision hoặc sửa decision 008) trước khi đóng #10.
 - **Test report:** docs/test-reports/bl10.md
-- **Status:** verified-mcp (23/23 MCP/code ✅, chờ test tay H1–H3; nhánh `feat/10-wms-dialog`)
+- **Status:** verified-mcp (25/25 MCP/code ✅, chờ test tay H1–H3; nhánh `feat/10-wms-dialog`)
 
 ### #46 [P3] Dọn field text cũ sau khi có dialog WMS chung
 - **Type:** cleanup
@@ -610,7 +612,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** MixedPickingScene
 - **Files:** MixedPickingScene `[Info Panel]/TXT_Description`, `TXT_Description (1)`, Assets/Scripts/MixPickingContainer.cs, Assets/Scripts/MixPickingValidator.cs
 - **Problem:** Dialog thật xử lý từng vị trí một (`Pick 1/2`, `2/2`). Mixed hiện hai dòng đơn cạnh nhau trên một panel, và không có bộ đếm riêng cho từng vật tư, nên lỗi chỉ lộ ra khi xác nhận.
-- **Done when:** Trainee làm vị trí 1, xác nhận, rồi panel chuyển sang vị trí 2. Mỗi vị trí có Ist riêng.
+- **Done when:** Trainee làm vị trí 1, xác nhận, rồi panel chuyển sang vị trí 2. Mỗi vị trí có Ist riêng. Mixed dùng cùng prefab `WMS_Monitor` + dialog như Basic/Complex (bỏ TV), cùng vị trí và cỡ.
 - **Inspector work expected:** yes
 - **Công:** L
 - **Test trên kính:** nhanh (làm lần lượt 2 vị trí)
