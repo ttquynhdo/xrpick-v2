@@ -13,7 +13,7 @@ Restmenge,die,remaining stock,Stock left in the storage container after the pick
 Rest,,remaining stock,WMS field label for the remaining stock.,yes,WMS screenshot,proposed,
 Restmengenzählung,die,remaining-stock count,Counting the stock left in the storage container (F9) to confirm it.,no,requirements: Kommissionierung.pptx slide 2/7,proposed,Also a WMS indicator label.
 Mindermenge,die,short quantity,Confirmed quantity when actual is less than target.,no,requirements: Kommissionierung.pptx slide 7,proposed,
-Verpackungseinheit,die,packaging unit,Number of pieces in one carton or bag.,no,requirements: Kommissionierung.pptx slide 8,proposed,Abbreviation VPE.
+Verpackungseinheit,die,packaging unit,Number of pieces in one carton or bag.,no,requirements: Kommissionierung.pptx slide 8,proposed,"Abbreviation VPE. A quantity, not the name of the physical package: for the object use Karton or Tüte."
 VPE,die,packaging unit (VPE),Abbreviation of Verpackungseinheit.,yes,requirements: Kommissionierung.pptx slide 8,proposed,Keep the abbreviation in both languages.
 Verp.-Einh.,,packaging unit,WMS field label (abbreviation of Verpackungseinheit).,yes,WMS screenshot,proposed,
 EKZ,die,handling class (EKZ),Classification (0–9) that defines how a material may be packed and handled.,yes,requirements: Kommissionierung.pptx slide 8,proposed,Full German form not stated in the documents – ask.
@@ -32,10 +32,14 @@ Behälterwaage,die,container scale,Scale used from 700 g.,no,requirements: Kommi
 Zählen,das,counting,Counting by hand (up to 7 pieces).,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator label.
 Tarieren,das,taring,Setting the scale to zero with the container on it.,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator and F7 button.
 Label,das,label,Printed sticker (pick label) for a bag or position.,no,requirements,proposed,
-bestätigen,,to confirm,Confirming a pick or a message.,no,requirements: Kommissionierung.pptx slide 2,proposed,WMS button F6 Bestätigen.
+bestätigen,,to confirm,Confirming a pick or a message.,no,requirements: Kommissionierung.pptx slide 2/3,proposed,"Confirm key depends on the dialog: new dialog (TMA/CSC4) F6 Bestätigen or foot pedal, old dialog (KOM 1/2) F12 Bestätigen. In the new dialog F12 is Aufkl. korr. Which dialog the app uses: question B8."
 Teamleiter,der,team leader,Person to inform on deviations.,no,requirements: Kommissionierung.pptx slide 7,proposed,
 Materialnummer,die,material number,Identifier of a material.,no,requirements,proposed,WMS label Mat.-Nr:
 Bezeichnung,die,description,Material description text.,no,WMS screenshot,proposed,WMS label Bez.:
 Gewicht,das,weight,Weight in kg.,no,WMS screenshot,proposed,WMS label Gew.:
 Anweisung,die,instruction,Special handling instruction shown at the bottom right of the WMS screen.,no,requirements: Kommissionierung.pptx slide 4,proposed,
-GG,,GG,Package type used in the app; meaning not yet confirmed.,yes,app,proposed,Question A2.
+GG,,GG,Package type used in the app; meaning not yet confirmed.,yes,app,proposed,Question A2. Not found in any requirement document.
+Tüte,die,bag (pre-packed),Bag in which several pieces are pre-packed by the supplier (e.g. 10er Tüte).,no,requirements: Kommissionierung.pptx slide 6; Detail Description,proposed,Documents also write Beutel (10er Beutel).
+Kartonage,die,cardboard packaging,Cardboard packaging of pre-packed material.,no,requirements: Kommissionierung.pptx slide 6/9,proposed,Use Karton for one box.
+Schachtel,die,small box,Product packaging box.,no,requirements: Kommissionierung.pptx slide 17,proposed,
+loses Material,das,loose material,Material that is not pre-packed and is picked piece by piece.,no,requirements: Kommissionierung.pptx slide 6/9; Detail Description,proposed,"Use for loose items; the unit is Stück (ST). The documents use neither Paket, Packstück nor Gebinde."

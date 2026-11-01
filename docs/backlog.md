@@ -385,11 +385,12 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** tất cả (nút chọn ngôn ngữ đặt ở WelcomeScene)
 - **Files:** Packages/manifest.json (`com.unity.localization`), String Table Collection `UI` (locale `de` mặc định, `en`), script lưu lựa chọn ngôn ngữ
 - **Problem:** End user là người Đức bản ngữ và không đọc được tiếng Anh, trong khi toàn bộ app hiện là tiếng Anh. Đội phát triển lại cần tiếng Anh để test.
-- **Done when:** Menu có nút **Deutsch / English**. Chuyển ngôn ngữ thì đổi được ít nhất một text mẫu ở mỗi scene. Khởi động lại app vẫn giữ lựa chọn. Mặc định là Deutsch.
+- **Done when:** WelcomeScene có nút **Deutsch / English** cạnh canvas `Welcome`; Menu của các scene không có nút này. Lần chạy đầu (chưa có lựa chọn đã lưu), text mẫu ở mỗi scene hiện tiếng Đức. Bấm `English` ở WelcomeScene thì scene tải lại và text mẫu hiện tiếng Anh; chọn ConceptScene trong Menu thì text mẫu ở đó cũng là tiếng Anh. Thoát rồi mở lại app vẫn là tiếng Anh. ConceptScene (scene thử) chạy được trên Quest với package Localization; ghi lại thời gian build và có nhấp nháy ở frame đầu hay không. Dùng một key không tồn tại thì Console có `LogError` ghi tên key và TMP hiện tên key, không để trống. Một chuỗi runtime có placeholder (bộ đếm ở Concept) hiện đúng số ở cả `de` và `en`.
 - **Inspector work expected:** yes (cài package, tạo Localization Settings và locale, gắn `LocalizeStringEvent`)
 - **Công:** M
-- **Test trên kính:** không
+- **Test trên kính:** có (ConceptScene thử package Localization trên Quest)
 - **Depends on:** —
+- **Decision:** docs/decisions/002-localization-mechanism.md
 - **Status:** todo
 
 ### #12 [Feature] Chuyển toàn bộ text hiển thị sang bảng dịch (EN + DE)
@@ -397,11 +398,12 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** tất cả
 - **Files:** khoảng 128 TMP text trong 5 scene; các chuỗi feedback trong `PackageCounter`, `MixPickingValidator`, `PiecesOrderValidator`, `PackageQuizController`, `PackageInfoDisplay`, `SampleFormulaDisplay`
 - **Problem:** Text đang viết cứng bằng tiếng Anh trong code và scene, nên không dịch được.
-- **Done when:** Ở chế độ Deutsch không còn chữ tiếng Anh nào, trừ chú thích WMS. Mọi chuỗi tiếng Đức đã qua `german-reviewer`. Có file `docs/i18n/review-status.csv`.
+- **Done when:** Ở chế độ Deutsch không còn chữ tiếng Anh nào, trừ chú thích WMS. Mọi chuỗi tiếng Đức đã qua `german-reviewer`. Có file `docs/i18n/review-status.csv`. Ở `de`, ảnh `wms`, `instructions` và `menu` của cả 5 scene không có chữ tràn khung và không có ô `□`. Nhãn WMS (`do_not_translate=yes`) giống từng ký tự ở cả hai locale. (code) Không còn câu nào ghép từ mảnh (`SampleFormulaDisplay.cs:31–36`, `PiecesOrderValidator.cs:40–42`); số lượng là placeholder.
 - **Inspector work expected:** yes (gắn key cho từng TMP text)
 - **Công:** L
 - **Test trên kính:** không (cần người Đức duyệt bản dịch)
-- **Depends on:** #11. Nên làm sau #4, #6 và #25 để không phải dịch các chuỗi sắp bị sửa.
+- **Depends on:** #11. Nên làm sau #4, #6 và #25 để không phải dịch các chuỗi sắp bị sửa. Chuỗi của nút xác nhận chờ câu B8 (dialog mới `F6 Bestätigen` hay dialog cũ `F12 Bestätigen`); tên hiển thị của GG chờ câu A2.
+- **Decision:** docs/decisions/002-localization-mechanism.md
 - **Bổ sung (2026-11-01, review thiết kế khóa học):** Khi dịch, thống nhất luôn: một thuật ngữ cho LVS/WMS (tài liệu dùng LVS); một tên cho mỗi vật tư (Mixed đang có "Cable Connector A", "GG Connector A", "GG Screw packages"…); đơn vị `ST` trên panel WMS và `Stück` trong câu; Basic đang xưng *du* và có lỗi chính tả "Vervolsständige" → chuyển sang *Sie*. Chuỗi ghép từng mảnh (`SampleFormulaDisplay.cs:31–36`, `PiecesOrderValidator.cs:40–42`) phải thành câu trọn vẹn có placeholder.
 - **Status:** todo
 
@@ -410,11 +412,12 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** —
 - **Files:** `docs/i18n/review/` (CSV UTF-8 BOM + hướng dẫn bằng tiếng Đức), theo skill `localize-strings` mục 4–5
 - **Problem:** Người hướng dẫn hoặc một người Đức bản ngữ cần duyệt toàn bộ bản dịch trong Excel, rồi gửi lại để cập nhật.
-- **Done when:** Tạo được file review mở trong Excel, umlaut hiển thị đúng. Import lại một file mẫu đã điền thì trạng thái chuyển sang `confirmed`.
+- **Done when:** Tạo được file review mở trong Excel, umlaut hiển thị đúng. Import lại một file mẫu đã điền thì trạng thái chuyển sang `confirmed`. File do Excel tiếng Đức lưu lại (dấu `;`) import được. File có ký tự `�` bị từ chối và có báo lỗi. Một dòng có placeholder khác EN bị báo lỗi và trạng thái giữ nguyên.
 - **Inspector work expected:** no
 - **Công:** M
 - **Test trên kính:** không (người duyệt mở file trong Excel)
 - **Depends on:** #12
+- **Decision:** docs/decisions/002-localization-mechanism.md
 - **Status:** todo
 
 ### #10 [Feature] Dựng panel WMS giống dialog Kommissionierung thật

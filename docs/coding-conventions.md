@@ -44,10 +44,14 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
 - **(pending decision: validator result format, together with #14 and research logging #26–#31).** Until it is decided, keep the reason as an enum or a small struct, not only as a text string, so logging can use it later.
 
 ## 6. Trainee-facing text
-- End users read **German only** (formal *Sie*). WMS labels (`Soll:`, `Ist:`, `F6 Bestätigen`…) are never translated. See `docs/i18n/README.md` and `docs/i18n/glossary.csv`.
-- **(pending decision: localization mechanism, backlog #11–#13).**
-- **Interim rule:** no **new** hard-coded English or *du* text shown to the trainee. Every new or changed string goes through the `localize-strings` skill: key + EN + DE, with a row in `docs/i18n/strings-todo.csv` (the skill creates it if missing). Put the strings in one place per script (a `const` block or serialized fields), not scattered through the logic, so they can move to the chosen system later.
+- End users read **German only** (formal *Sie*). WMS labels (`Soll:`, `Ist:`, the confirm key label…) are never translated. See `docs/i18n/README.md` and `docs/i18n/glossary.csv`.
+- **Mechanism (decided, `docs/decisions/002-localization-mechanism.md`):** Unity Localization package, one String Table Collection `UI`, locales `de` (default) and `en`.
+  - Scene texts use `LocalizeStringEvent`.
+  - Code gets strings only through `Loc.Get(key, args)`; don't put `LocalizedString` fields in each script.
+  - The language is chosen once on WelcomeScene and saved in `PlayerPrefs`. Changing it reloads the scene.
+- **Until #11 is done:** no **new** hard-coded English or *du* text shown to the trainee. Every new or changed string goes through the `localize-strings` skill: key + EN + DE, with a row in `docs/i18n/strings-todo.csv` (the skill creates it if missing). Put the strings in one place per script (a `const` block or serialized fields), not scattered through the logic, so they move easily to `Loc.Get`.
 - Don't build sentences by concatenating word pieces (`"Sie haben " + n + " Pakete"`). German word order differs. Use whole sentences with named placeholders (`{count}`).
+- No Smart String plural forms. Write counters as labels instead: `Pakete: {placed} / {required}`. Put rich text (`<color>`, `<b>`) around a whole sentence, never around single words.
 - Colours for feedback: green = correct, red = wrong. Use the same colour values in every scene.
 - Debug and log messages (`Debug.Log*`) are in English. They are for developers.
 
