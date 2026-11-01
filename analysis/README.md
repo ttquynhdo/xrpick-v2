@@ -31,8 +31,10 @@ Copy the headset folder `/sdcard/Android/data/com.xrise.xpick/files/research/`
 (Editor: `%USERPROFILE%/AppData/LocalLow/XRISE/xpick/research/`) into
 `analysis/data/<wave>/`, e.g. `analysis/data/wave1/research/`. Keep the file
 names as they are (`P101_<session_id>_events.jsonl`, `..._summary.csv`).
-Files under `practice/` and test IDs (`P000`, `P900`–`P999`) are dropped by
-the script wherever they are.
+Test IDs (`P000`, `P900`–`P999`) are dropped wherever they are, in
+`practice/` or by mistake in `research/` (the latter with a warning). A real
+ID (`P001`–`P899`) found under `practice/` is **kept**, with a warning, so no
+participant's data is lost silently: check it in `warnings.txt`.
 
 ## Run
 
@@ -43,15 +45,20 @@ Rscript analysis/selftest.R      # expected last line: selftest OK
 Rscript analysis/analyse.R       # all logs under analysis/data/ (fake/ is skipped)
 ```
 
-To analyse one wave only, set `data_dir` first:
+To analyse one wave only, set both folders first (in RStudio always set both,
+so nothing from an earlier run is reused):
 
 ```r
 data_dir <- "analysis/data/wave1"
+output_dir <- "analysis/output"
 source("analysis/analyse.R")
 ```
 
-`output_dir` works the same way (default `analysis/output/`; the self-test uses
-`analysis/output/selftest/`). Without Rscript on PATH use the full path, e.g.
+`analyse.R` prints `data_dir` and `output_dir` first; check them. It refuses
+any `data_dir` whose path contains `fake` unless `allow_fake <- TRUE` is set
+(only `selftest.R` does that). `selftest.R` runs in its own environment and
+writes to `analysis/output/selftest/`, so it leaves no settings behind in
+RStudio. Without Rscript on PATH use the full path, e.g.
 `"C:\Program Files\R\R-4.6.2\bin\Rscript.exe" analysis/analyse.R`.
 
 ## What each output answers
@@ -70,8 +77,13 @@ Rules the script applies (design §8): `events.jsonl` is the source of truth;
 per-visit rates are NA (never 0 %) when a visit has 0 confirms; the counting
 visit of a scene is the first one with ≥ 1 confirm (scenes without confirms, or
 logs without outcome events: the first visit); a participant's sessions are
-merged by time and visits renumbered (`repeat_visit`, `repeat_after_crash`);
-times are active time (pauses removed). A session with no `confirm_pressed` /
+merged by time and visits renumbered: `repeat_visit` means `visit_no > 1`
+for that scene across all sessions (so the counting visit itself can carry it,
+e.g. when the first visit had no confirm), `repeat_after_crash` means a repeat
+visit after a crashed session; times are active time (pauses removed).
+`course_finished` is TRUE when ComplexScene has a `task_completed` **or** a
+confirm with `correct: true` in any session, even if that session later
+crashed or ended without `session_end`. A session with no `confirm_pressed` /
 `quiz_answer` at all counts as "outcome not logged" (NA), because logs from
 before #28 have no outcome events.
 
@@ -100,8 +112,12 @@ removed field bumps `schema_version`.
    thư mục gốc của repo (`xrpick-v2`).
 4. Chạy kiểm tra trước: mở `analysis/selftest.R`, bấm **Source**. Dòng cuối phải là
    `selftest OK`. Nếu báo lỗi, đừng dùng kết quả phân tích; hãy báo lại cho developer.
-5. Chạy phân tích: gõ trong Console
-   `data_dir <- "analysis/data/wave1"` rồi `source("analysis/analyse.R")`.
+5. Chạy phân tích: gõ trong Console, đủ cả ba dòng:
+   `data_dir <- "analysis/data/wave1"`
+   `output_dir <- "analysis/output"`
+   `source("analysis/analyse.R")`
+   Hai dòng đầu script in ra là `data_dir = …` và `output_dir = …`: kiểm tra đúng
+   thư mục. Nếu `data_dir` chứa chữ `fake`, script dừng và báo lỗi (dữ liệu giả).
 6. Kết quả nằm trong `analysis/output/`. Đọc `warnings.txt` trước, rồi
    `data_quality.png` (ai có dữ liệu cần kiểm tra lại), sau đó mới xem các biểu đồ.
 7. Khi trình bày kết quả, luôn ghi kèm các giới hạn ở mục *Validity limits*: chỉ là

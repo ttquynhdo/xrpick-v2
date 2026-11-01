@@ -31,6 +31,16 @@ analysis_folder <- if (file.exists("skill_map.csv")) "." else "analysis"
 # A caller (e.g. selftest.R) may set data_dir / output_dir before sourcing.
 if (!exists("data_dir")) data_dir <- file.path(analysis_folder, "data")
 if (!exists("output_dir")) output_dir <- file.path(analysis_folder, "output")
+message("data_dir   = ", data_dir)
+message("output_dir = ", output_dir)
+
+# Fake data must never end up in a real report by accident (e.g. data_dir
+# left over from selftest.R). Only a caller that sets allow_fake <- TRUE
+# (selftest.R, in its own environment) may analyse a "fake" folder.
+if (grepl("fake", data_dir, ignore.case = TRUE) && !isTRUE(get0("allow_fake"))) {
+  stop("data_dir '", data_dir, "' is FAKE data. Set data_dir to a real wave, e.g. ",
+       "data_dir <- \"analysis/data/wave1\" (or allow_fake <- TRUE for tests only).")
+}
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 # Tolerance for comparing times: events and summary.csv round differently
@@ -784,17 +794,21 @@ scene_col_order <- function(cols) {
   cols[order(factor(measure, levels = unique(measure)), match(scene_of, levels(visits$scene)))]
 }
 
+participant_cols <- c("participant_id", "end_status", "course_finished", "multi_session",
+                      "mixed_build", "builds", "schema_versions", "gap_h", "n_sessions",
+                      "duration_censored", "active_s", "paused_s", "pauses",
+                      "hmd_removed_count", "unity_errors", "total_confirms")
 wide <- data_quality %>%
-  select(participant_id, end_status, course_finished, multi_session, mixed_build, builds,
-         schema_versions, gap_h, n_sessions, duration_censored, active_s, paused_s, pauses,
-         hmd_removed_count, unity_errors, total_confirms) %>%
+  select(all_of(participant_cols)) %>%
   left_join(wide_scene, by = "participant_id") %>%
   left_join(wide_skill, by = "participant_id")
-wide <- wide %>% select(1:16, all_of(scene_col_order(names(wide)[-(1:16)])))
-for (s in unique(as.character(visits$scene))) {
-  # A scene nobody had a counting visit for still gets its error-rate column.
+# A scene nobody had a counting visit for still gets its error-rate column
+# (added before sorting, so it lands in build order).
+for (s in levels(visits$scene)) {
   if (!paste0("error_rate_", s) %in% names(wide)) wide[[paste0("error_rate_", s)]] <- NA_real_
 }
+scene_cols <- setdiff(names(wide), participant_cols)
+wide <- wide %>% select(all_of(participant_cols), all_of(scene_col_order(scene_cols)))
 write_csv(wide, file.path(output_dir, "wide.csv"), na = "")
 
 # ---- 15. Validity limits and warnings file --------------------------------------
