@@ -3252,10 +3252,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23dbd4bfea5cdf944942cd1b645bd60a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MixedPickingContainer
-  requiredGGA: 2
-  requiredGGB: 2
-  requiredVPE: 0
+  orderLines:
+  - materialKey: connector_a
+    materialName: KABELVERBINDER A
+    soll: 100
+    vpe: 50
+  - materialKey: screw_b
+    materialName: SCHRAUBE B
+    soll: 40
+    vpe: 20
   packageCountText: {fileID: 631291439}
+  orderLineTexts:
+  - {fileID: 1418684534}
+  - {fileID: 852427511}
 --- !u!1 &516495938
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,8 +1,19 @@
+using System.Text;
 using TMPro;
 using UnityEngine;
 
 public class MixedPickingValidator : MonoBehaviour
 {
+    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get. #14 rewrites the feedback.
+    private const string CorrectTitle = "Correct!";                                                  // mixed.feedback.correct
+    private const string PlacedLineFormat = "{0}: {1}";                                             // mixed.feedback.placed_line
+    private const string CheckAgain = "Check the order again.";                                     // mixed.feedback.check_again
+    private const string CountLineFormat = "{0}: {1} / {2}";                                        // mixed.feedback.count_line
+    private const string WrongMaterialLine =
+        "The container holds material that does not belong to this order.";                         // mixed.feedback.wrong_package
+    private const string SuccessInstruction =
+        "You have successfully completed the task.\nSelect the next scenario option in the MENU.";  // mixed.instruction.success
+
     [SerializeField] private MixedPickingContainer container;
     [SerializeField] private TMP_Text feedbackText;
     [SerializeField] private TMP_Text instructionText;
@@ -35,7 +46,6 @@ public class MixedPickingValidator : MonoBehaviour
 
     private void Start()
     {
-
         if (feedbackText != null)
         {
             feedbackText.text = string.Empty;
@@ -57,7 +67,6 @@ public class MixedPickingValidator : MonoBehaviour
 
     public void ConfirmOrder()
     {
-        
         // Non-short-circuit | so every missing reference is logged at once.
         bool missing =
             RequiredReference.IsMissing(container, nameof(container), this) |
@@ -67,43 +76,36 @@ public class MixedPickingValidator : MonoBehaviour
         if (missing)
             return;
 
-        int gga = container.GGACount;
-        int ggb = container.GGBCount;
-        int vpe = container.VPECount;
+        // #6: one rule decides right/wrong (docs/decisions/005, 006); numbers come from the order lines.
+        OrderResult result = container.CheckOrder();
+        var text = new StringBuilder();
 
-        if (gga == 2 && vpe == 0 && ggb == 2)
+        if (result.Correct)
         {
-            feedbackText.text =
-                "Correct!\n2 cartons KABELVERBINDER A and 2 bags SCHRAUBE B selected.";
-               
+            text.Append(CorrectTitle);
+            foreach (OrderLineResult line in result.Lines)
+            {
+                text.Append('\n').AppendFormat(PlacedLineFormat, line.Line.materialName, line.PlacedFull);
+            }
+
+            feedbackText.text = text.ToString();
             feedbackText.color = Color.green;
-
-            instructionText.text = "You have successfully completed the task.\n" +
-                "Select the next scenario option in the MENU.";
-
+            instructionText.text = SuccessInstruction;
             return;
         }
 
-        if (gga < 2 || ggb < 2)
+        text.Append(CheckAgain);
+        if (result.Foreign.Count > 0)
         {
-            instructionText.text = string.Empty;
-            feedbackText.text =
-                    $"Check the order again.\n" +
-                    $"KABELVERBINDER A: {gga} / 2\n" +
-                    $"SCHRAUBE B: {ggb} / 2\n" +
-                    $"RING D: {vpe} / 0";
-            feedbackText.color = Color.red;
+            text.Append('\n').Append(WrongMaterialLine);
+        }
+        foreach (OrderLineResult line in result.Lines)
+        {
+            text.Append('\n').AppendFormat(CountLineFormat, line.Line.materialName, line.PlacedFull, line.Line.RequiredFull);
+        }
 
-        }
-        else
-        {
-            instructionText.text = string.Empty;
-            feedbackText.text =
-                   $"Check the order again.\n" +
-                    $"KABELVERBINDER A: {gga} / 2\n" +
-                    $"SCHRAUBE B: {ggb} / 2\n" +
-                    $"RING D: {vpe} / 0";
-            feedbackText.color = Color.red;
-        }
+        instructionText.text = string.Empty;
+        feedbackText.text = text.ToString();
+        feedbackText.color = Color.red;
     }
 }

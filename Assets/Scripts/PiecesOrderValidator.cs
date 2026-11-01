@@ -1,11 +1,16 @@
+using System.Text;
 using TMPro;
 using UnityEngine;
 
 public class PiecesOrderValidator : MonoBehaviour
 {
-    // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get.
+    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get. #14 rewrites the feedback.
     private const string WrongPackageLine =
         "The container holds material that does not belong to this order."; // complex.feedback.wrong_package
+    private const string CorrectFormat = "Correct!\n{0} packages and {1} pieces have been placed.\n"; // complex.feedback.correct
+    private const string CheckAgain = "Check the order again.";                                      // complex.feedback.check_again
+    private const string PackagesLineFormat = "Packages: {0} / {1}";                                 // complex.feedback.packages_line
+    private const string LooseLineFormat = "Loose pieces: {0} / {1}";                                // complex.feedback.loose_line
 
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
@@ -63,31 +68,37 @@ public class PiecesOrderValidator : MonoBehaviour
         if (missing)
             return;
 
-        int GGACount = containerCounter.GGACount;
-        int GGBCount = containerCounter.GGBCount;
-        int looseItemCount = containerCounter.LooseItemCount;
+        // #6: one rule decides right/wrong (docs/decisions/005, 006); numbers come from the order lines.
+        OrderResult result = containerCounter.CheckOrder();
+        int placedLoose = 0;
+        int requiredFull = 0;
+        int requiredLoose = 0;
 
-        if (containerCounter.IsCorrect())
+        foreach (OrderLineResult line in result.Lines)
         {
-            feedbackText.text =
-                    $"Correct!\n" +
-                     $"{GGBCount} packages and "+
-                    $"{looseItemCount} pieces have been placed.\n";
+            placedLoose += line.PlacedLoose ?? 0;
+            requiredFull += line.Line.RequiredFull;
+            requiredLoose += line.Line.RequiredLoose;
+        }
 
+        if (result.Correct)
+        {
+            feedbackText.text = string.Format(CorrectFormat, containerCounter.CartonCount, placedLoose);
             feedbackText.color = Color.green;
             congratulationsPanel.SetActive(true);
             instructionText.text = string.Empty;
             return;
         }
 
-        string wrongPackage = containerCounter.OtherCount > 0 ? WrongPackageLine + "\n" : string.Empty;
+        var text = new StringBuilder(CheckAgain);
+        if (result.Foreign.Count > 0)
+        {
+            text.Append('\n').Append(WrongPackageLine);
+        }
+        text.Append('\n').AppendFormat(PackagesLineFormat, containerCounter.CartonCount, requiredFull);
+        text.Append('\n').AppendFormat(LooseLineFormat, placedLoose, requiredLoose);
 
-        feedbackText.text =
-            $"Check the order again.\n" +
-            wrongPackage +
-            $"Packages: {GGBCount + GGACount} / 2\n" +
-            $"Loose pieces: {looseItemCount} / 5";
-
+        feedbackText.text = text.ToString();
         feedbackText.color = Color.red;
         instructionText.text = string.Empty;
 

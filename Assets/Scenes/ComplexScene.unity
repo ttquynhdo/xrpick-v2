@@ -207,7 +207,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.15
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -7407,7 +7407,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.060000002
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -8792,10 +8792,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fdb9f586efd4ef47a191e1d52014959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PiecesContainerCounter
-  piecesPerGGA: 50
-  piecesPerGGB: 25
+  orderLines:
+  - materialKey: ring_d
+    materialName: RING D
+    soll: 55
+    vpe: 25
   piecesPlacedText: {fileID: 2022653031}
   packagesPlacedText: {fileID: 2022648927}
+  orderLineTexts:
+  - {fileID: 1187673589}
 --- !u!1 &1022127615
 GameObject:
   m_ObjectHideFlags: 0
@@ -8884,7 +8889,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -9069,7 +9074,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -11632,7 +11637,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -13844,7 +13849,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -16228,7 +16233,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -16413,7 +16418,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.060000002
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -17397,7 +17402,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -19756,7 +19761,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 1.5
+  m_fontSize: 1.3
   m_fontSizeBase: 1.5
   m_fontWeight: 400
   m_enableAutoSizing: 1

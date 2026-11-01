@@ -1,42 +1,45 @@
 using System;
 using System.Collections.Generic;
-using System.Xml.Schema;
 using TMPro;
 using UnityEngine;
 
 public class MixedPickingContainer : MonoBehaviour
 {
-    [Header("Required quantities")]
-    [SerializeField] private int requiredGGA = 2;
-    [SerializeField] private int requiredGGB = 2;
-    [SerializeField] private int requiredVPE = 0;
+    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
+    private const string PackagesPlacedFormat = "PACKAGE PLACED: {0}"; // mixed.counter.package_placed
+    private const string OrderLineFormat =                            // mixed.wms.order_line
+        "───────────────────\n{0}.\nMaterial          {1}\nOrder quantity    {2} pcs\nPackage size      {3} pcs / package\n\n───────────────────";
+
+    // #6, docs/decisions/005: the order is declared once, in WMS units (Soll pieces + VPE).
+    [Header("Order")]
+    [SerializeField] private List<OrderLine> orderLines = new();
 
     [Header("WMS texts")]
     [SerializeField] private TMP_Text packageCountText;
 
+    [Tooltip("One WMS text per order line, in the same order as Order Lines.")]
+    [SerializeField] private TMP_Text[] orderLineTexts;
+
+    // Every package counts, also foreign material: it must show up in PACKAGE PLACED and make the order wrong.
     private readonly HashSet<PackageData> packagesInside = new();
 
-    public int GGACount { get; private set; }
-    public int GGBCount { get; private set; }
-    public int VPECount { get; private set; }
+    public IReadOnlyList<OrderLine> OrderLines => orderLines;
 
     // #4: raised when a package enters or leaves, so an old result can be cleared.
     public event Action ContentsChanged;
 
     private void Start()
     {
+        OrderContents.LogSetupProblems(orderLines, false, orderLineTexts, this);
         UpdateCounts();
+        UpdateOrderTexts();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        PackageData package =
-            other.GetComponentInParent<PackageData>();
+        PackageData package = other.GetComponentInParent<PackageData>();
 
         if (package == null)
-            return;
-
-        if (!IsCountablePackage(package.packageType))
             return;
 
         if (packagesInside.Add(package))
@@ -48,8 +51,7 @@ public class MixedPickingContainer : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        PackageData package =
-            other.GetComponentInParent<PackageData>();
+        PackageData package = other.GetComponentInParent<PackageData>();
 
         if (package == null)
             return;
@@ -61,44 +63,32 @@ public class MixedPickingContainer : MonoBehaviour
         }
     }
 
-    private bool IsCountablePackage(PackageType type)
+    public OrderResult CheckOrder()
     {
-        return type == PackageType.GGA || type == PackageType.GGB ||
-               type == PackageType.VPEFull;
+        return OrderRule.Check(orderLines, OrderContents.From(packagesInside), false);
     }
 
     private void UpdateCounts()
     {
-        GGACount = 0;
-        GGBCount = 0;
-        VPECount = 0;
-
-        foreach (PackageData package in packagesInside)
-        {
-            if (package.packageType == PackageType.GGA)
-            {
-                GGACount++;
-            }
-            else if (package.packageType == PackageType.GGB)
-            {
-                GGBCount++;
-            }
-            else if (package.packageType == PackageType.VPEFull)
-            {
-                VPECount++;
-            }
-        }
-
         if (packageCountText != null)
         {
-            packageCountText.text =
-                $"PACKAGE PLACED: {GGACount + GGBCount + VPECount}";
+            packageCountText.text = string.Format(PackagesPlacedFormat, packagesInside.Count);
         }
     }
 
-    public bool IsOrderCorrect()
+    private void UpdateOrderTexts()
     {
-        return GGACount == requiredGGA && GGBCount == requiredGGB &&
-               VPECount == requiredVPE;
+        if (orderLineTexts == null)
+            return;
+
+        for (int i = 0; i < orderLineTexts.Length && i < orderLines.Count; i++)
+        {
+            OrderLine line = orderLines[i];
+
+            if (orderLineTexts[i] != null)
+            {
+                orderLineTexts[i].text = string.Format(OrderLineFormat, i + 1, line.materialName, line.soll, line.vpe);
+            }
+        }
     }
 }

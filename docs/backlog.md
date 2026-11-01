@@ -284,7 +284,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Test trên kính:** không
 - **Depends on:** #1, #3 (cả hai verified-mcp), #17 (khoá vật tư trên carton, decision 006 §6; người dùng chọn làm #17 trước, 2026-11-01). Làm trước #14 (cùng sửa hai validator). Rule đơn và object kết quả đặt trong asmdef `XRPick.Orders` có test EditMode (decision 006). A7, A5, A3/A6 (người hướng dẫn) không chặn: nếu trả lời khác thì chỉ đổi số trong Inspector hoặc rule ở một chỗ.
 - **Ghi chú (2026-11-01, rà backlog):** Basic không còn số viết cứng trong logic: `OrderConfirm` so `CalcForWMS.currentSize` với `necessarySize`. `PackageCounter.cs:115` ("selected 2 GG") là code chết sau #1, xoá ở #8/#18.
-- **Status:** todo
+- **Ghi chú (2026-11-01, khi làm):** dòng đơn có thêm `materialName` (tên vật tư trên nhãn/WMS) để sinh chữ WMS. Carton Ring D đã mở được tính là carton Ring D (TOO_MANY ở Complex, vật tư lạ ở Mixed). Basic chưa đi qua `OrderRule`: việc này chuyển sang đầu #28 (review data-analyst).
+- **Test report:** docs/test-reports/bl06.md
+- **Status:** verified-mcp (13/14 ✅, chờ test tay H1)
 
 ## P3 – Dọn dẹp
 
@@ -313,7 +315,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #2, #3, #6 (làm sau để tránh xung đột)
-- **Ghi chú (2026-11-01, #18):** component `PackageCounter` đã được gỡ khỏi BasicPickingScene, nên `PackageCounter.cs` không còn scene nào dùng: xoá cả file (`.cs` + `.meta`) ở đây. Phần `MixPickingValidator.cs:87–107` và `using System.Xml.Schema` ở `MixPickingContainer.cs:3` sẽ được sửa luôn trong #6.
+- **Ghi chú (2026-11-01, #18):** component `PackageCounter` đã được gỡ khỏi BasicPickingScene, nên `PackageCounter.cs` không còn scene nào dùng: xoá cả file (`.cs` + `.meta`) ở đây. Phần `MixPickingValidator.cs:87–107` và `using System.Xml.Schema` ở `MixPickingContainer.cs:3` đã sửa trong #6 (2026-11-01).
 - **Status:** todo
 
 ### #9 [P3] Xoá các UnityEvent call trỏ vào "None"
@@ -730,6 +732,12 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Decision:** docs/decisions/006-validator-result-format.md
 - **Depends on:** #26, #6 (rule và kết quả trong `XRPick.Orders`). Dùng chung object kết quả với #14.
 - **Bổ sung (2026-11-01, decision 007):** `quiz_answer` theo quiz mới của #45: thêm `question_id`, `selected` là khoá đáp án ngắn (thay `gg/vpe/both`); cách nối câu hỏi với kỹ năng do data-analyst quyết (có thể cho `calculate_quantity` một điểm đo từ Concept). Xoá `WRONG_TYPE` khỏi enum và `skill_map.csv` nếu A2 đã được người hướng dẫn chốt. Chỉ thêm `BasicPickingScene,check_material` nếu #18 giữ vật gây nhiễu ở Basic. Trường `package_type` của #29 (spec §4.4) đổi thành khoá vật tư ở #29.
+- **Bổ sung (2026-11-01, review data-analyst của #6):**
+  - **Chặn:** BasicPickingScene chưa đi qua `OrderRule` (`OrderConfirm` vẫn so `currentSize == necessarySize`). Đầu #28: cho `OrderConfirm` gọi `OrderRule.Check` với một dòng `{training_b, SCHLAUCHSCHELLE B, soll = necessarySize, vpe = 50}`, `countsLoose = false`, đầu vào `OrderContents.From(...)` (9 carton Basic đã có `PackageData`). Ist trên WMS (`CalcForWMS` cộng theo tag) và rule (theo `PackageData`) phải đếm cùng một tập vật thể. Basic không có vật gây nhiễu (#18 đã xoá), nên **không** thêm `BasicPickingScene,check_material`.
+  - Trong scene không đếm chiếc lẻ, ghi `required_loose` là `null` (cùng với `placed_loose`). `materialName` là chữ hiển thị, không ghi vào log.
+  - `analyse.R`: loại lần bấm chỉ có `EMPTY` khỏi mẫu số của các kỹ năng khác `calculate_quantity`.
+  - Feedback đỏ vẫn in số đích (cầu nối tới #14): không thu dữ liệu thật trước #14; R tách dữ liệu trước/sau #14 theo build.
+  - Mô tả `WRONG_TYPE` / `WRONG_MATERIAL` trong `analysis/skill_map.csv` còn theo mô hình GG/VPE: sửa cùng spec.
 - **Status:** todo
 
 ### #29 [Feature] Log thao tác: cầm/thả, thùng, nút, kiểu điều khiển
