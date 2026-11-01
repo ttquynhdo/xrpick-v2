@@ -31,6 +31,49 @@ namespace XRPick.Research.Tests
             Assert.IsFalse(f.Decide("d", 0).CapReachedNow);
         }
 
+        [TestCase(@"C:\Users\Anna Maria\proj\Foo.cs:12", "Foo.cs:12")]
+        [TestCase(@"C:\Program Files\Unity\Editor\x.dll", "x.dll")]
+        [TestCase("/Users/Anna Maria/x/Foo.cs:3", "Foo.cs:3")]
+        public void StripPaths_HandlesSpacesInSegments(string input, string expected)
+        {
+            Assert.AreEqual(expected, ErrorFolder.StripPaths(input));
+        }
+
+        [Test]
+        public void StripPaths_LeavesPlainTextAndUrlsUnchanged()
+        {
+            Assert.AreEqual("use and/or Soll/Ist 3/5", ErrorFolder.StripPaths("use and/or Soll/Ist 3/5"));
+            Assert.AreEqual("see https://h/x now", ErrorFolder.StripPaths("see https://h/x now"));
+        }
+
+        [Test]
+        public void DrainPending_ReturnsFoldedCountsOnce()
+        {
+            var f = new ErrorFolder(5, 200);
+            f.Decide("boom", 0);
+            f.Decide("boom", 1);
+            f.Decide("boom", 2);
+            f.Decide("boom", 3);
+            var first = f.DrainPending();
+            Assert.AreEqual(1, first.Count);
+            Assert.AreEqual("boom", first[0].Key);
+            Assert.AreEqual(3, first[0].Value);
+            Assert.AreEqual(0, f.DrainPending().Count);
+        }
+
+        [Test]
+        public void DrainPending_WorksAfterCapReached()
+        {
+            var f = new ErrorFolder(5, 2);
+            f.Decide("a", 0);
+            f.Decide("a", 1);
+            f.Decide("b", 1);
+            Assert.IsTrue(f.Decide("c", 1).CapReachedNow);
+            var pending = f.DrainPending();
+            Assert.AreEqual(1, pending.Count);
+            Assert.AreEqual("a", pending[0].Key);
+        }
+
         [Test]
         public void StripPaths_KeepsOnlyFileNames()
         {

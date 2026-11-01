@@ -7,7 +7,18 @@ using System.Text.RegularExpressions;
 /// </summary>
 public sealed class ErrorFolder
 {
-    private static readonly Regex DirectoryPrefix = new Regex(@"[\\/]?(?:[^\\/\s]+[\\/])+", RegexOptions.Compiled);
+    // A path segment may contain spaces ("Anna Maria"), but never swallows a file name:
+    // a ".ext" followed by ':', whitespace or the end of the text stops the segment.
+    private const string FileEnd = @"(?!\.\w+(?:[:\s]|$))";
+
+    // Only rooted paths are stripped (drive letter, \\server, /Users, /home, leading /),
+    // so "and/or", "Soll/Ist", "3/5" and URLs keep their meaning.
+    private static readonly Regex DirectoryPrefix = new Regex(
+        @"(?<![A-Za-z])[A-Za-z]:[\\/](?:(?:" + FileEnd + @"[^\\/:*?""<>|\r\n])+[\\/])*"
+        + @"|\\\\(?:(?:" + FileEnd + @"[^\\/:*?""<>|\r\n])+[\\/])+"
+        + @"|(?<![^\s""'(=])/(?:Users|home)/(?:(?:" + FileEnd + @"[^/\r\n])+/)+"
+        + @"|(?<![^\s""'(=])/(?:[^/\s]+/)+",
+        RegexOptions.Compiled);
 
     private sealed class Entry
     {
@@ -55,6 +66,25 @@ public sealed class ErrorFolder
         entry.Folded = 0;
         _written++;
         return new ErrorDecision(true, folded, false);
+    }
+
+    /// <summary>
+    /// Returns every message with swallowed repeats not yet written, with its count, and
+    /// resets those counts. Works after the cap was reached.
+    /// </summary>
+    public IReadOnlyList<KeyValuePair<string, int>> DrainPending()
+    {
+        var pending = new List<KeyValuePair<string, int>>();
+        foreach (KeyValuePair<string, Entry> pair in _entries)
+        {
+            if (pair.Value.Folded > 0)
+            {
+                pending.Add(new KeyValuePair<string, int>(pair.Key, pair.Value.Folded));
+                pair.Value.Folded = 0;
+            }
+        }
+
+        return pending;
     }
 
     /// <summary>Cuts file paths (Windows or POSIX) down to the file name.</summary>
