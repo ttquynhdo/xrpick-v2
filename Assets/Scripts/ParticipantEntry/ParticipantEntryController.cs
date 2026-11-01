@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // #27: participant keypad in WelcomeScene. The course content stays hidden until a
@@ -163,7 +164,9 @@ public class ParticipantEntryController : MonoBehaviour
 
         string code = pendingCode;
 
+        // The entry scene is never a resume point: a crash there restarts the course normally.
         if (ResearchLogger.TryFindResumePoint(code, out string scene)
+            && !IsEntryScene(scene)
             && LessonNames.TryGetDisplayName(scene, out string lessonName)
             && Application.CanStreamedLevelBeLoaded(scene))
         {
@@ -182,6 +185,17 @@ public class ParticipantEntryController : MonoBehaviour
         }
 
         Begin(code, null, false, null);
+    }
+
+    // This scene (WelcomeScene) or the first scene of the build order.
+    private bool IsEntryScene(string sceneName)
+    {
+        if (sceneName == gameObject.scene.name)
+            return true;
+
+        string firstScenePath = SceneUtility.GetScenePathByBuildIndex(0);
+        return !string.IsNullOrEmpty(firstScenePath)
+            && System.IO.Path.GetFileNameWithoutExtension(firstScenePath) == sceneName;
     }
 
     public void PressResumeContinue()
@@ -219,17 +233,17 @@ public class ParticipantEntryController : MonoBehaviour
         if (Locked || pendingCode == null)
             return;
 
-        Begin(pendingCode, null, false, null);
+        // Logged as session_start.ended_session_warning = true.
+        Begin(pendingCode, null, false, null, true);
     }
 
-    private void Begin(string code, string offeredScene, bool accepted, string loadScene)
+    private void Begin(string code, string offeredScene, bool accepted, string loadScene,
+        bool endedSessionWarning = false)
     {
         // Set first so a second press cannot start another session.
         started = true;
 
-        bool ok = offeredScene == null
-            ? ResearchLogger.StartSession(code)
-            : ResearchLogger.StartSession(code, offeredScene, accepted);
+        bool ok = ResearchLogger.StartSession(code, offeredScene, accepted, endedSessionWarning);
 
         // Course content opens only for a started session that carries the typed code.
         ok = ok && ResearchLogger.ParticipantId == code;

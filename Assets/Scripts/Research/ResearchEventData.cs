@@ -36,9 +36,19 @@ public static class ResearchEventData
     /// </summary>
     public static JsonFields SessionStart(string resumeOfferedScene, bool resumeAccepted)
     {
+        return SessionStart(resumeOfferedScene, resumeAccepted, false);
+    }
+
+    /// <summary>
+    /// Same, plus ended_session_warning: true when the "already finished" warning was shown and the
+    /// facilitator started anyway, false otherwise.
+    /// </summary>
+    public static JsonFields SessionStart(string resumeOfferedScene, bool resumeAccepted, bool endedSessionWarning)
+    {
         return new JsonFields()
             .Add("resume_offered_scene", resumeOfferedScene)
-            .Add("resume_accepted", resumeOfferedScene != null ? resumeAccepted : (bool?)null);
+            .Add("resume_accepted", resumeOfferedScene != null ? resumeAccepted : (bool?)null)
+            .Add("ended_session_warning", endedSessionWarning);
     }
 
     /// <summary>
