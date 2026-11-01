@@ -1,0 +1,10 @@
+error_code,skill,description
+WRONG_TYPE,check_material,A package type that is not in the order is in the container
+WRONG_MATERIAL,check_material,Right package form but wrong material (e.g. GGA instead of GGB)
+TOO_FEW,calculate_quantity,Fewer of an ordered item than required
+TOO_MANY,calculate_quantity,More of an ordered item than required
+EMPTY,calculate_quantity,Confirm pressed with an empty container
+MISSING_LOOSE,calculate_loose,Fewer loose pieces than required
+EXTRA_LOOSE,calculate_loose,More loose pieces than required
+NO_ANSWER,package_concept,Quiz confirmed without selecting an answer
+WRONG_ANSWER,package_concept,Wrong quiz answer selected
