@@ -16,15 +16,31 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
-**Thứ tự đề xuất (2026-11-01).** Hai nhánh không được cùng sửa một file `.unity` một lúc.
-1. Đợt 1, không cần kính: #3 + #15 → #2 → #4 → #7; #5 + #9.
-2. Đợt 2, feedback: #14 → #33; #32; #6 (phần Mixed/Complex); #38 (chụp ảnh trước). Cuối đợt test kính #32, #33.
-3. Đợt 3, thẻ hướng dẫn và Welcome: #25 → #35 → #40; #39. Cuối đợt test kính.
-4. Song song, không đụng scene: #26 → #28 (sau #14) → #29, #30, #27 → #31; #11. #12 → #13 làm sau khi nội dung ổn định (#4, #6, #14, #25).
-5. Đã gỡ chặn (2026-11-01): #10 dựng bố cục panel WMS ở BasicPickingScene (không làm song song với nhánh khác sửa BasicPickingScene, như #2, #5). Việc quyết định (không sửa scene): rà soát tên bài cho cả 5 scene (D1) → mở #18.
-6. Basic theo giả định A1 (300 chiếc, 2026-11-01): #1 (sau #2) → #24 → #34 (decision 001, phương án C) → #41 (decision 003; phần `Empf Kz` sau #10). Cả chuỗi sửa BasicPickingScene, không chạy song song với #5, #10.
-7. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết, 2026-11-01; người hướng dẫn xác nhận sau). Chuỗi phụ thuộc còn lại: #1, #5 → #18 → #37; #1 → #17 (chạy `solution-decision` trước) → #36, #23; #10 → #20, #21; #3 + #16 + #17 → #19. #22 đã bỏ.
-8. Cuối cùng: #8 dọn code chết, sau khi #2, #3, #6 xong (tránh xung đột cùng file).
+**Thứ tự đề xuất (cập nhật 2026-11-01: mục không cần kính làm trước).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau). #22 đã bỏ.
+1. **Đợt 1 – không kính, không phụ thuộc** (đa số chỉ sửa script):
+   - ComplexScene: ~~#3 + #15~~ (verified-mcp) → #16 (text trong scene).
+   - BasicPickingScene: #2 (chỉ sửa `CalcForWMS.cs`).
+   - Validator: #4 → #7 (cùng các dòng).
+   - Inspector nhiều scene: #5 + #9, làm khi không nhánh nào khác đang mở các scene đó.
+   - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
+   - Song song, không đụng scene: #26.
+2. **Đợt 2 – không kính, có phụ thuộc:**
+   - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: #1 (sau #2) → #24 → #34 (decision 001, phương án C).
+   - #14 (sau #4, #1) → #28 (sau #26, dùng chung helper mã lỗi với #14).
+   - #6 (sau #1, #3) → #8 (sau #2, #3, #6).
+3. **Đợt 3 – test kính nhanh, gom một buổi test ở cuối đợt:**
+   - #32 (Concept) và #33 (sau #14, #32): kết quả cạnh nút đỏ.
+   - #18 (sau #1, #5) → #25 (sau #18).
+   - #17 (chạy `solution-decision` trước, L) → #36, #23 (#23 không cần kính).
+   - #10 (L; bố cục trước, số liệu theo #1, #34) → #20, #21.
+   - #39 (sau #9). #31 (sau #28; chỉ cắm kính vào máy).
+   - #11: phần Editor làm được trong đợt này; thử ConceptScene trên Quest trong cùng buổi test.
+4. **Đợt 4 – dịch** (không kính, nhưng chờ nội dung ổn định): #12 (sau #11, #4, #6, #14, #25) → #13.
+5. **Đợt 5 – bắt buộc test kính** (tay thật, tầm với, FPS), gom thành các buổi test riêng:
+   - #41 (sau #1, #2, #24; phần `Empf Kz` sau #10).
+   - #35 (sau #25) → #40; #37 (sau #18).
+   - #19 (sau #3, #16, #17).
+   - #27, #29, #30 (sau #26).
 
 ---
 
@@ -65,12 +81,14 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Scene(s):** ComplexScene
 - **Files:** Assets/Scripts/PiecesContainerCounter.cs:37, :59, :71–85, :104
 - **Problem:** Bộ lọc loại đang bị comment out. Mọi `PackageData` được thêm vào set, nhưng chỉ GGA, GGB và LooseItemDisplay được đếm. Scene có một package `VPEFull`: bỏ nó vào thùng cùng 2 GGB và 5 chiếc lẻ thì vẫn được báo "Correct!". Hàm `IsAcceptedType` còn sót lại cũng liệt kê sai loại.
-- **Done when:** Có 2 GGB + 5 chiếc lẻ + 1 VPEFull trong thùng thì bị báo sai, và feedback nói rõ có package sai loại. Bỏ VPEFull ra thì được báo đúng.
+- **Done when:** Có 2 GGB + 5 chiếc lẻ + 1 VPEFull trong thùng (MCP: tạm gắn collider cho `VPE_OpenedPackage`, xem ghi chú) → bấm xác nhận → bị báo sai, feedback có dòng báo vật tư không thuộc đơn. Bỏ VPEFull ra → bấm xác nhận → báo đúng. (code) Mọi kiện có loại khác GGA/GGB/LooseItemDisplay trong thùng đều làm `IsCorrect()` trả về false; không còn bộ lọc bị comment và `IsAcceptedType`.
+- **Ghi chú (2026-11-01, khi làm):** `VPE_OpenedPackage` (VPEFull duy nhất) không có collider và `Grabbable`; 13 chiếc lẻ là con của nó. Trainee hiện không bỏ được nó vào thùng, nên lỗi chỉ nằm ở code. Cho cầm VPE thuộc #19.
 - **Inspector work expected:** no
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl03.md
+- **Status:** verified-mcp (8/8 ✅, chờ test tay T5)
 
 ### #4 [P1] Xoá trạng thái "thành công" khi kiểm tra lại mà đơn sai
 - **Type:** logic
@@ -123,7 +141,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** — (nếu làm #6 trước thì sửa luôn ở đó)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl15.md
+- **Status:** verified-mcp (3/3 ✅, chờ test tay T5)
 
 ### #16 [P1] ComplexScene: sửa thông tin Ring D bị mâu thuẫn
 - **Type:** logic
@@ -363,6 +382,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Inspector work expected:** yes
 - **Công:** S
 - **Test trên kính:** không
+- **Bổ sung (2026-11-01, ảnh từ #3):** Đã thấy trong ảnh `wms`: `Congratulations` che mép trên panel WMS (`TestEvidence/ComplexScene/bl03/T2_after_wms.png`). Feedback sai có 4 dòng thì dòng cuối bị cắt (`T1_after_wms.png`).
 - **Depends on:** chụp ảnh trước để xác nhận. Nếu #33 chuyển feedback xuống cạnh nút thì nửa sau của mục này có thể không còn cần.
 - **Status:** todo
 

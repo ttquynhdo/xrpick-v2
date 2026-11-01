@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class PiecesContainerCounter : MonoBehaviour
 {
+    // #15: counters show only what is placed, never the required amount.
+    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
+    private const string PiecesPlacedFormat = "Ist: {0} ST";            // complex.counter.ist
+    private const string PackagesPlacedFormat = "Cartons placed: {0}"; // complex.counter.cartons_placed
+
     [Header("Order settings")]
     [SerializeField] private int piecesPerGGA = 50;
     [SerializeField] private int piecesPerGGB = 25;
-    [SerializeField] private int requiredPieces = 55;
 
     [Header("Display")]
     [SerializeField] private TMP_Text piecesPlacedText;
@@ -18,6 +22,9 @@ public class PiecesContainerCounter : MonoBehaviour
     public int GGACount { get; private set; }
     public int GGBCount { get; private set; }
     public int LooseItemCount { get; private set; }
+
+    // #3: any other package type in the container makes the order wrong.
+    public int OtherCount { get; private set; }
 
     public int TotalPieces =>
         (GGACount * piecesPerGGA) + (GGBCount * piecesPerGGB) + LooseItemCount;
@@ -33,9 +40,6 @@ public class PiecesContainerCounter : MonoBehaviour
 
         if (item == null)
             return;
-
-        //if (!IsAcceptedType(item.packageType))
-        //    return;
 
         if (objectsInside.Add(item))
         {
@@ -56,17 +60,12 @@ public class PiecesContainerCounter : MonoBehaviour
         }
     }
 
-    private bool IsAcceptedType(PackageType type)
-    {
-        return type == PackageType.VPEFull ||
-               type == PackageType.LooseItemDisplay;
-    }
-
     private void Recalculate()
     {
         GGACount = 0;
         GGBCount = 0;
         LooseItemCount = 0;
+        OtherCount = 0;
 
         foreach (PackageData item in objectsInside)
         {
@@ -82,6 +81,10 @@ public class PiecesContainerCounter : MonoBehaviour
             {
                 LooseItemCount++;
             }
+            else
+            {
+                OtherCount++;
+            }
         }
 
         UpdateDisplay();
@@ -91,18 +94,17 @@ public class PiecesContainerCounter : MonoBehaviour
     {
         if (piecesPlacedText != null)
         {
-            piecesPlacedText.text =
-                $"PIECES PLACED: {TotalPieces} / {requiredPieces}";
+            piecesPlacedText.text = string.Format(PiecesPlacedFormat, TotalPieces);
         }
         if (packagesPlacedText != null)
         {
             packagesPlacedText.text =
-                $"PACKAGES PLACED: {GGACount+ GGBCount} / 2";
+                string.Format(PackagesPlacedFormat, GGACount + GGBCount + OtherCount);
         }
     }
 
     public bool IsCorrect()
     {
-        return GGBCount == 2 && GGACount == 0 && LooseItemCount == 5;
+        return GGBCount == 2 && GGACount == 0 && LooseItemCount == 5 && OtherCount == 0;
     }
 }
