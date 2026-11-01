@@ -654,7 +654,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** #27 (bàn phím để quay về)
 - **Decision:** docs/decisions/004-participant-keypad.md
 - **Bổ sung (review cuối #27, 2026-11-01):** sau `EndSession("facilitator")` mã đó có `session_end`, nên lần gõ lại sẽ hiện cảnh báo "đã có phiên hoàn tất" của #27 (hôm nay mọi `session_end` đều tính là hoàn tất, cả `quit`/`facilitator`). Chốt cùng #28 lý do nào được tính là "abgeschlossen".
-- **Status:** todo
+- **Status:** in progress (nhánh `feat/44-facilitator-end-session`)
 
 ### #28 [Feature] Log kết quả mỗi lần xác nhận + mã lỗi + summary.csv
 - **Type:** feature
