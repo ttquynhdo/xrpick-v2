@@ -253,6 +253,44 @@ public sealed class SessionFiles
         return lastScene != null;
     }
 
+    /// <summary>
+    /// True when any earlier events file of the participant (not the excluded session) has a
+    /// parseable session_end line.
+    /// </summary>
+    public static bool HasEndedSession(string researchRoot, string participantId, string excludeSessionId)
+    {
+        string participantFolder = ResearchIds.FolderFor(researchRoot, participantId);
+        string excluded = participantId + "_" + excludeSessionId + EventsSuffix;
+        foreach (var path in ListEventFiles(participantFolder, participantId + "_*" + EventsSuffix))
+        {
+            if (Path.GetFileName(path) == excluded)
+            {
+                continue;
+            }
+
+            try
+            {
+                foreach (var l in ParseLines(File.ReadAllText(path, Utf8NoBom).Split('\n')))
+                {
+                    if (l.Event == "session_end")
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (IOException)
+            {
+                continue;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                continue;
+            }
+        }
+
+        return false;
+    }
+
     private static string[] ListEventFiles(string dir, string pattern)
     {
         try
