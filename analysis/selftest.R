@@ -49,6 +49,8 @@ local({
   stopifnot(is.na(p107$error_rate), !is.nan(p107$error_rate))
   p107_wide <- wide$error_rate_ComplexScene[wide$participant_id == "P107"]
   stopifnot(is.na(p107_wide), !is.nan(p107_wide))
+  # P107 was ended by the facilitator (#44).
+  stopifnot(wide$end_status[wide$participant_id == "P107"] == "facilitator")
 
   # 5b. A tested skill without errors in a visit gives 0, not NA.
   stopifnot(!anyNA(skill_rates$error_rate))

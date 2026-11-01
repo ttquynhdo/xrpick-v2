@@ -157,7 +157,7 @@ These shapes are fixed now; the fake data in `analysis/` already uses them. The 
 
 **Error codes:** section 4.3 including `WRONG_ANSWER`. `EMPTY` is logged alone, without an extra `TOO_FEW`. Every code has a row in `analysis/skill_map.csv` (`error_code, skill, description`), which maps it to the skill it tests (e.g. `WRONG_MATERIAL` to check material, `TOO_FEW`/`TOO_MANY` to calculate quantity); the study lead can edit it without a rebuild. `analysis/scene_skills.csv` lists which scene tests which skill.
 
-**Session end:** #28 calls `ResearchLogger.EndSession("completed")` on the first correct confirm in ComplexScene; #27 adds a hidden facilitator control for `EndSession("facilitator")`. `analyse.R` derives `end_status` (completed / facilitator / quit / crash) and `course_finished` (a `task_completed` in ComplexScene) itself.
+**Session end:** #28 calls `ResearchLogger.EndSession("completed")` on the first correct confirm in ComplexScene; #44 adds a hidden facilitator control (decision 004 §9) for `EndSession("facilitator")`. `analyse.R` derives `end_status` (completed / facilitator / quit / crash) and `course_finished` (a `task_completed` in ComplexScene) itself.
 
 **Derived measures (computed later, not logged):** task time, error rate per skill across scenes (share of confirm presses per visit with at least one code of that skill; also first attempts only), attempts to correct, error profile per scene, hesitation (enter to exit of the same object), re-grabs, time spent reading WMS before first grab, head movement per minute, frame drops vs SSQ change, NASA-TLX vs attempts and active time. Which visit counts: the first visit of a scene with at least one confirm; later visits are flagged `repeat_visit`.
 
