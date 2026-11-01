@@ -20,8 +20,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
-- **Đã xong (verified-mcp hoặc done):** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, và chuỗi validator #18 → #17 → #6 → #14 → #8.
-- **Buổi test kính tiếp theo (gom một lần, để chuyển các mục sang `done`):** #1 E4, #2 D5, #3/#15 T5, #4 K5, #9 E6, #24 S4, #34 R5, #38 P4, #26 L19 (Quest) + L20 (Editor), #27 M1–M5, #44 Q1–Q5, #18 M1–M3, #17 H1–H2 (đọc nhãn mới, cả nhãn túi nhỏ), #6 H1, #14 H1. #17 chỉ thành `done` khi người hướng dẫn chốt A2.
+- **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
+- **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
+- **Buổi test kính tiếp theo:** chưa có mục nào chờ.
 1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
    - #45 ConceptScene: dạy Mat.-Nr/VPE, quiz vận dụng (decision 007, gồm #32; test nhanh).
    - #25 mẫu thẻ hướng dẫn chung cho cả 5 scene (Basic đã xong phần Sie ở #18; Mixed/Complex còn "package type").
@@ -63,7 +64,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (2026-11-01, nhóm trả lời A1):** lấy **tổng số chiếc** làm quy tắc đúng (300 = 6 × 50), bỏ quy tắc "2 GG". Chờ người hướng dẫn xác nhận; nếu khác thì chỉ đổi con số. Xem `docs/decisions/003-ekz-placement.md`.
 - **Ghi chú (2026-11-01, khi làm):** Đã bỏ `CheckOrder` khỏi nút (sửa trong Editor, không sửa script). `PackageCounter` vẫn nằm trên `PlasticBox_Order`, vẫn đếm theo tag và ghi vào panel đang tắt; xoá hẳn thuộc #8/#18.
 - **Test report:** docs/test-reports/bl01.md
-- **Status:** verified-mcp (8/8 ✅, chờ test tay E4; theo giả định A1)
+- **Status:** done (commit a866e31, test 9/9 ✅, theo giả định A1)
 
 ### #2 [P0] CalcForWMS: đếm theo package, không theo collider
 - **Type:** bug
@@ -77,7 +78,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Depends on:** #1 chỉ cho con số đích; sửa đếm trùng và NullReferenceException làm được ngay
 - **Ghi chú (2026-11-01, khi làm):** Trong scene hiện tại mỗi kiện chỉ có một collider mang tag, nên thả/lấy bình thường không bị đếm trùng. Lỗi chỉ xảy ra khi collider con mang tag (tái hiện bằng tag tạm trong Play mode).
 - **Test report:** docs/test-reports/bl02.md
-- **Status:** verified-mcp (9/9 ✅, chờ test tay D5)
+- **Status:** done (commit f496719, test 10/10 ✅)
 
 ## P1 – Logic huấn luyện sai
 
@@ -93,7 +94,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Test trên kính:** không
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl03.md
-- **Status:** verified-mcp (8/8 ✅, chờ test tay T5)
+- **Status:** done (commit 785e04f, test 9/9 ✅)
 
 ### #4 [P1] Xoá trạng thái "thành công" khi kiểm tra lại mà đơn sai
 - **Type:** logic
@@ -109,7 +110,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   - Ở Basic, trainee chỉ **thấy** thẻ `Correct`/`Incorrect` của `OrderConfirm` (feedback của `PackageCounter` nằm trên panel đang tắt, xem #1). Phần Basic của mục này phải xét cả hai thẻ đó.
   - Kết quả cũ còn hiện khi nội dung thùng đã đổi, tới lúc bấm lại mới cập nhật. Điều này đúng ở Basic (thẻ `Correct` vẫn bật khi Ist đã khác, Assets/Scripts/WS Scripts/OrderConfirm.cs:22–33), Mixed và Complex (`TXT_Feedback`, `Congratulations`). Thêm câu Done when: *Sau một lần xác nhận (đúng hoặc sai), đặt thêm hoặc lấy ra 1 kiện → kết quả cũ biến mất, chỉ hiện lại khi bấm nút.* Scene: thêm MixedPickingScene.
 - **Test report:** docs/test-reports/bl04.md
-- **Status:** verified-mcp (tất cả case MCP ✅ ở 3 scene, chờ test tay K5)
+- **Status:** done (commit 837d4b7, test 15/15 ✅)
 
 ### #5 [P1] Menu ở BasicPickingScene thiếu nút sang ConceptScene
 - **Type:** bug
@@ -144,7 +145,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (review UX):** "Cùng một chỗ" nên là **cạnh nút đỏ**, vì đó là chỗ trainee đang nhìn lúc xác nhận. Basic đã làm vậy (thẻ cách nút khoảng 0.11 m). Concept, Mixed và Complex thì ghi lên panel WMS, lệch 42–51° so với nút. Vị trí do #33 xử lý, mục này chỉ lo nội dung.
 - **Ghi chú (2026-11-01, khi làm):** câu feedback (EN cho Mixed/Complex tới #12, DE cho Basic) đã qua german-reviewer, nằm trong `Assets/Scripts/OrderFeedback.cs`, key `order.feedback.*`. Basic giờ cũng chấm bằng `OrderRule` (dòng đơn dựng từ `CalcForWMS`: `materialKey`, `materialName`, `vpe`, Soll = `necessarySize`); điểm chặn #28 ở Basic đã gỡ. Mixed khi đúng chỉ sang „5. Volle Kartons und loses Material“ (lấy từ `LessonNames`); Complex khi đúng để panel Congratulations nói bước tiếp.
 - **Test report:** docs/test-reports/bl14.md
-- **Status:** verified-mcp (16/17 ✅, chờ test tay H1)
+- **Status:** done (commit f61133a, test 17/17 ✅)
 
 ### #15 [P1] ComplexScene: bộ đếm không được lộ đáp án
 - **Type:** logic
@@ -157,7 +158,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Test trên kính:** không
 - **Depends on:** — (nếu làm #6 trước thì sửa luôn ở đó)
 - **Test report:** docs/test-reports/bl15.md
-- **Status:** verified-mcp (3/3 ✅, chờ test tay T5)
+- **Status:** done (commit 785e04f, test 4/4 ✅)
 
 ### #16 [P1] ComplexScene: sửa thông tin Ring D bị mâu thuẫn
 - **Type:** logic
@@ -196,7 +197,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (2026-11-01, đối chiếu cả tài liệu cũ):** "GG" không có trong tài liệu nào, cũ hay mới. VPE là một **con số** (ô `Verp.-Einh.` trên dialog). Đề xuất cho A2/A3: bỏ cách chia "loại kiện GG/VPE"; kiện được phân biệt bằng mã vật tư (Mat.-Nr) và ghi VPE; lỗi là bỏ nhầm vật tư khác hoặc sai số lượng. Vẫn cần chốt A2/A3.
 - **Ghi chú (2026-11-01, khi làm):** tên vật tư giả (german-reviewer): KABELVERBINDER A (`connector_a`, 512304, VPE 50), SCHRAUBE B (`screw_b`, 738190, 20), RING D (`ring_d`, 264857, 25), SCHLAUCHSCHELLE B (`training_b`, 443890, 50), in hoa như trên WMS. Nhãn: không tự xuống dòng, tự thu nhỏ. Feedback Mixed đổi tên vật tư (`RING D: x / 0` thay `VPE: x / 0`). Quiz/panel Concept còn chữ GG/VPE: thuộc #45. Thẻ hướng dẫn Mixed/Complex vẫn ghi "package type" (EN): thuộc #25.
 - **Test report:** docs/test-reports/bl17.md
-- **Status:** verified-mcp (10/12 ✅, chờ test tay H1–H2; theo giả định A2)
+- **Status:** verified-mcp (12/12 ✅ kể cả test tay H1–H2 báo 2026-11-01; chỉ còn chờ người hướng dẫn chốt A2, commit 82a60fb)
 
 ### #18 [P1] Đưa BasicPickingScene về cùng chuỗi bài
 - **Type:** logic
@@ -220,7 +221,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (2026-11-01, decision 007):** làm **trước #17**. Mục Menu "GG vs VPE" / "2. Package Types" đổi thành `2. Grundlagen` ở cả 5 scene (D1), không còn chữ "GG" trên Menu. Quyết rõ object sót lại ở Basic (7 carton Connector A, 2 Ring D): xoá, hay giữ có chủ ý làm vật gây nhiễu. Nếu giữ, ghi vào backlog #17 (gắn khoá) và #28 (thêm `BasicPickingScene,check_material`); nếu xoá, #28 không thêm dòng đó.
 - **Ghi chú (2026-11-01, khi làm):** người dùng chọn **xoá** các kiện cũ (đang tắt) ở Basic, cùng `PacketTests`, panel WMS cũ `Info Panel` và component `PackageCounter` (code chết trỏ vào panel đó). Tên Menu dùng đúng chuỗi của `LessonNames` (#27: `3. Kommissionieren nach EKZ 3`, `5. Volle Kartons und loses Material`), cỡ chữ 12 ở cả 5 scene để mục dài nhất không bị cắt. D7: ẩn `EKZ Hinweis`, xoá chữ "Bitte Material umpacken!". Chữ hướng dẫn và kết quả của Basic viết lại bằng *Sie* (german-reviewer, key `basic.*`). Mục #25 vẫn lo mẫu thẻ chung cho cả 5 scene.
 - **Test report:** docs/test-reports/bl18.md
-- **Status:** verified-mcp (21/24 ✅, chờ test tay M1–M3)
+- **Status:** done (commit 4dad03e, test 24/24 ✅)
 
 ### #24 [P1] BasicPickingScene: thêm kiện thừa để phép tính có ý nghĩa
 - **Type:** logic
@@ -234,7 +235,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Depends on:** #1 (chốt đơn đúng là bao nhiêu; giả định A1 = 300 chiếc, 2026-11-01). Làm trước phần Basic của #41 (decision 003).
 - **Ghi chú (2026-11-01, khi làm):** chọn 9 carton (450 chiếc). Sau khi lấy đủ đơn, tồn kho còn 150: đây là giá trị Rest cho #34. Bỏ hết vào thì Rest hiện −150 cho tới khi #34 xong.
 - **Test report:** docs/test-reports/bl24.md
-- **Status:** verified-mcp (6/6 ✅, chờ test tay S4; theo giả định A1, 9 carton)
+- **Status:** done (commit f8410b4, test 7/7 ✅, theo giả định A1, 9 carton)
 
 ### #25 [P1] Một mẫu thẻ hướng dẫn chung cho cả 5 scene
 - **Type:** logic
@@ -282,7 +283,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Ghi chú (2026-11-01, rà backlog):** Basic không còn số viết cứng trong logic: `OrderConfirm` so `CalcForWMS.currentSize` với `necessarySize`. `PackageCounter.cs:115` ("selected 2 GG") là code chết sau #1, xoá ở #8/#18.
 - **Ghi chú (2026-11-01, khi làm):** dòng đơn có thêm `materialName` (tên vật tư trên nhãn/WMS) để sinh chữ WMS. Carton Ring D đã mở được tính là carton Ring D (TOO_MANY ở Complex, vật tư lạ ở Mixed). Basic chưa đi qua `OrderRule`: việc này chuyển sang đầu #28 (review data-analyst).
 - **Test report:** docs/test-reports/bl06.md
-- **Status:** verified-mcp (13/14 ✅, chờ test tay H1)
+- **Status:** done (commit 20ce9e1, test 14/14 ✅)
 
 ## P3 – Dọn dẹp
 
@@ -330,7 +331,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Depends on:** —
 - **Ghi chú (2026-11-01, khi làm):** quét bằng script trong Editor, xoá 68 call (target None hoặc method rỗng) ở cả 5 scene, kể cả ConceptScene.
 - **Test report:** docs/test-reports/bl09.md
-- **Status:** verified-mcp (7/7 ✅, chờ test tay E6)
+- **Status:** done (commit 68e2e15, test 8/8 ✅)
 
 ---
 
@@ -413,7 +414,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Decision:** docs/decisions/001-basic-wms-ist-rest-leak.md (accepted, phương án C)
 - **Bổ sung (2026-11-01, giả định A1 = 300 chiếc):** 300 chiếc thuộc nhóm "từ 8 chiếc thì cân" (B7a), nên theo tài liệu Ist tăng dần trong lúc lấy. Người dùng chọn phương án C (theo tài liệu), decision 001 đã ghi lại.
 - **Test report:** docs/test-reports/bl34.md
-- **Status:** verified-mcp (7/7 ✅, chờ test tay R5; theo giả định A1, tồn kho 9 carton)
+- **Status:** done (commit b7ee6d0, test 8/8 ✅, theo giả định A1, tồn kho 9 carton)
 
 ### #35 [P2] Bố cục trạm: thẻ hướng dẫn và Menu lên một giá riêng, mép bàn chỉ còn thùng và nút đỏ (gồm #37)
 - **Type:** logic
@@ -477,7 +478,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Ghi chú (2026-11-01, khi làm):** đo tọa độ thì `Congratulations` không chồng WMS (chỉ chạm viền TV; ảnh `wms` chụp từ dưới nên trông như chồng). Lỗi thật là feedback 5 dòng tràn xuống sau viền TV. Đã nới ô feedback + auto-size, nâng panel chúc mừng 2 cm.
 - **Test report:** docs/test-reports/bl38.md
 - **Depends on:** chụp ảnh trước để xác nhận. Nếu #33 chuyển feedback xuống cạnh nút thì nửa sau của mục này có thể không còn cần.
-- **Status:** verified-mcp (5/5 ✅, chờ test tay P4: đọc chữ 16,5 trên kính)
+- **Status:** done (commit 7cd7369, test 6/6 ✅)
 
 ### #39 [P2] WelcomeScene: có phản hồi khi cầm thùng và chạm nút
 - **Type:** feature
@@ -578,7 +579,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (2026-11-01, rà backlog sau #6/#14/#17/#18):** dữ liệu đơn đã có một nguồn: `orderLines` (`OrderLine` {materialKey, materialName, soll, vpe}) trên counter Mixed/Complex, text WMS sinh từ đó lúc Start (`orderLineTexts`); Basic dùng `CalcForWMS.OrderLine` (Soll = `necessarySize`). Panel mới phải đọc từ đó, không gõ số tay. Nhãn panel EN Mixed/Complex còn ghi "Order quantity"/"Package size" (german-reviewer #14: đổi "Package size" thành VPE khi dựng panel). Basic: ô Anweisung vẫn hiện ba thanh xanh đậm (B4: không highlight). Mat.-Nr giả và tên vật tư theo #17 (`docs/i18n/glossary.csv`).
 - **Bổ sung (2026-11-01, người dùng):** các đèn chỉ báo R2 (Referenzwaage, Behälterwaage, Zählen, letzter Pick, …) **không dùng trong kịch bản XR training**: không có bài tập nào yêu cầu cân hay đổi cách đếm theo đèn. Thiết kế lại cho hợp lý: giữ bố cục R2 để giống màn hình thật nhưng không để đèn gây chú ý (ví dụ tất cả tắt/xám, bỏ logic `CountingMethod` khỏi hiển thị), và không dạy/chấm theo đèn ở #20. Cần chốt cách làm (solution-decision hoặc sửa decision 008) trước khi đóng #10.
 - **Test report:** docs/test-reports/bl10.md
-- **Status:** verified-mcp (25/25 MCP/code ✅, chờ test tay H1–H3; nhánh `feat/10-wms-dialog`)
+- **Status:** done (commit 0957d2f, test 28/28 ✅)
 
 ### #46 [P3] Dọn field text cũ sau khi có dialog WMS chung
 - **Type:** cleanup
@@ -735,7 +736,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** —
 - **Bổ sung (2026-11-01):** thiết kế chi tiết và Done when bổ sung ở `docs/superpowers/specs/2026-11-01-research-logger-design.md` (§9), gồm đổi tên app `XRISE` / `xpick` / `com.xrise.xpick`, khung `_summary.csv`, script R trên dữ liệu giả. "Dừng Play giữa chừng → `crash_recovered`" được thay bằng tuỳ chọn dev bỏ `session_end`. Review bắt buộc bởi `data-analyst`.
 - **Test report:** docs/test-reports/bl26.md
-- **Status:** verified-mcp (37/39 ✅, chờ test tay L19 trên Quest và L20 mất focus thật trong Editor)
+- **Status:** done (commit 7533874, test 39/39 ✅)
 
 ### #27 [Feature] Bàn phím nhập mã người học ở WelcomeScene
 - **Type:** feature
@@ -766,7 +767,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Bổ sung (review cuối #26, 2026-11-01):** bản build nghiên cứu phải bắt đầu phiên **từ bàn phím**. Hiện `ResearchSettings.autoStart` bật sẵn: app tự mở phiên `P000` lúc khởi động, và `StartSession(realId)` trả `false` khi đang có phiên chạy → cả phiên người học bị ghi dưới `P000` (vào `practice/`, bị loại khỏi phân tích). Chọn một trong hai: tắt `autoStart` trong bản build nghiên cứu, hoặc gọi `EndSession(...)` cho phiên `P000` tự động trước khi `StartSession(realId)`. Header có `session_start_mode` (`auto`/`manual`); `analyse.R` cảnh báo khi mã người học thật có `auto`. Done when nên có ca: nhập `P101` → file `research/P101_…` với `session_start_mode` `manual`.
 - **Bổ sung (review cuối #27, 2026-11-01, đã làm trên nhánh):** không nút không đảo ngược nào nằm dưới vùng của `Ja` (panel cảnh báo: `Korrigieren` thế chỗ `Ja`; panel tiếp tục: cả hai nút ở hàng dưới); crash ở WelcomeScene không hỏi tiếp tục; log ghi `session_start.ended_session_warning` khi người điều phối bấm `Trotzdem starten`; màn cuối lưu sẵn `Code: –` thay vì `Code: P000`.
 - **Test report:** docs/test-reports/bl27.md
-- **Status:** verified-mcp (48/53 ✅, chờ test tay M1–M5 trên Quest)
+- **Status:** done (commit 20373ef, test 53/53 ✅)
 
 ### #44 [Feature] Nút kết thúc phiên cho người điều phối
 - **Type:** feature
@@ -786,7 +787,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Decision:** docs/decisions/004-participant-keypad.md
 - **Bổ sung (review cuối #27, 2026-11-01):** sau `EndSession("facilitator")` mã đó có `session_end`, nên lần gõ lại sẽ hiện cảnh báo "đã có phiên hoàn tất" của #27 (hôm nay mọi `session_end` đều tính là hoàn tất, cả `quit`/`facilitator`). Chốt cùng #28 lý do nào được tính là "abgeschlossen".
 - **Test report:** docs/test-reports/bl44.md
-- **Status:** verified-mcp (33/38 ✅, chờ test tay Q1–Q5 trên Quest)
+- **Status:** done (commit fe56f11, test 38/38 ✅)
 
 ### #28 [Feature] Log kết quả mỗi lần xác nhận + mã lỗi + summary.csv
 - **Type:** feature
