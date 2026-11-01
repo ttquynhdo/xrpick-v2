@@ -3,6 +3,7 @@
 Nguồn: `/code-review` toàn bộ `Assets/Scripts` (2026-11-01), đã đối chiếu với code và scene (commit `db4160f`).
 Mục #14–#23: review thiết kế khóa học (`instructional-design-reviewer`, cả 5 scene, 2026-11-01, chưa có ảnh Play mode). Các mã A2, B8… là câu hỏi trong `docs/requirements/questions-for-instructor.md`.
 Mục #24–#25 và các dòng **Bổ sung (ảnh Play mode)**: review lần 2 có ảnh Play mode của 5 góc nhìn chuẩn ở cả 5 scene (`TestEvidence/<Scene>/views/`, chỉ có trên máy, không commit), 2026-11-01. Đã đối chiếu lại với code/scene.
+Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01).
 Mỗi mục = 1 phiên làm việc = 1 nhánh. Không đánh số lại; mục xong thì ghi `done (commit …)`.
 
 Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luyện sai · **P2** bảo trì, mở đường cho việc khác · **P3** dọn dẹp.
@@ -289,4 +290,68 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Done when:** Welcome liệt kê đúng những gì khóa học dạy. Panel cuối tóm tắt các quy tắc chính (nếu có #10 thì kèm so sánh với dialog thật).
 - **Inspector work expected:** yes (text trong scene)
 - **Depends on:** #17 (để tóm tắt đúng quy tắc)
+- **Status:** todo
+
+## Feature – Log dữ liệu nghiên cứu
+
+Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu: ghi log theo từng người học, gắn mã ẩn danh `participant_id` để nối với phiếu khảo sát giấy. Làm theo thứ tự #26 → #31. Các câu hỏi mở ở mục 9 của spec cần người phụ trách nghiên cứu trả lời trước khi bắt đầu thu dữ liệu thật, nhưng không chặn #26.
+
+### #26 [Feature] ResearchLogger: lõi ghi log theo phiên
+- **Type:** feature
+- **Scene(s):** — (chưa đụng scene; logger tự tạo khi chạy)
+- **Files:** script mới `Assets/Scripts/Research/ResearchLogger.cs` (+ kiểu dữ liệu sự kiện); spec mục 1, 3, 4.1 (`session_*`, `scene_enter/exit`, `app_pause/resume`), 4.6 (`unity_error`, `crash_recovered`)
+- **Problem:** App chưa ghi lại gì về người học, nên không có dữ liệu cho nghiên cứu và không biết lỗi kỹ thuật xảy ra với ai.
+- **Done when:** Chạy Play mode với một mã thử (đặt tạm trong Inspector) thì có file `<id>_<session>_events.jsonl` trong `Application.persistentDataPath/research/`: dòng đầu là header (schema_version, app/build, máy, mã), có `session_start`, `scene_enter`/`scene_exit` khi chuyển scene, `unity_error` khi cố tình gây một lỗi. Dừng Play giữa chừng rồi chạy lại thì có `crash_recovered`. Mã `P000` ghi vào thư mục riêng. Scene vẫn chạy bình thường khi không có logger (API tĩnh an toàn với null).
+- **Inspector work expected:** no (logger dùng DontDestroyOnLoad, tự khởi tạo)
+- **Depends on:** —
+- **Status:** todo
+
+### #27 [Feature] Bàn phím nhập mã người học ở WelcomeScene
+- **Type:** feature
+- **Scene(s):** WelcomeScene
+- **Files:** WelcomeScene (panel bàn phím số + panel xác nhận), script mới gọi `ResearchLogger` bắt đầu phiên; spec mục 2
+- **Problem:** Cần nhập `participant_id` trong VR mà không gõ nhầm, và trên kính không được lưu tên người học.
+- **Done when:** Mở app: chỉ thấy bàn phím số (`P` cố định + 3 chữ số, xoá, xác nhận). Xác nhận → hỏi lại "`P017` – đúng chưa?" → *Yes* mới mở phần còn lại của WelcomeScene và bắt đầu phiên; *Back* quay lại nhập. Màn hình cuối khóa hiện lại mã. Thử bằng poke tay trên Quest (MCP không bấm được).
+- **Inspector work expected:** yes (dựng Canvas, gán nút, ẩn phần Welcome cho tới khi xác nhận)
+- **Depends on:** #26; quyết định "ai nhập mã" (spec mục 9)
+- **Status:** todo
+
+### #28 [Feature] Log kết quả mỗi lần xác nhận + mã lỗi + summary.csv
+- **Type:** feature
+- **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Scripts/PackageQuizController.cs:25, Assets/Scripts/PackageCounter.cs:104, Assets/Scripts/WS Scripts/OrderConfirm.cs:22, Assets/Scripts/MixPickingValidator.cs:18, Assets/Scripts/PiecesOrderValidator.cs:24; helper mới tính mã lỗi; spec mục 4.2, 4.3, 5
+- **Problem:** Validator chỉ có đúng/sai và chữ hiển thị, không ghi lại số lần thử, thời gian, trong thùng có gì hay loại lỗi.
+- **Done when:** Mỗi lần bấm xác nhận có một `confirm_pressed` (số lần thử, số đếm từng loại so với yêu cầu, `correct`, `error_codes`), quiz có `quiz_answer`, lần đúng đầu tiên có `task_completed`. Rời scene thì có thêm một dòng trong `_summary.csv`. Thử các trường hợp: thùng trống, thiếu, thừa, sai loại, sai vật tư, đủ → mã lỗi đúng. Chữ phản hồi trên màn hình **không đổi**. Basic ghi cả hai kết quả (`rule_package_counter`, `rule_calc_for_wms`) cho tới khi xong #1.
+- **Inspector work expected:** no
+- **Depends on:** #26. Helper mã lỗi dùng lại được cho #14; nếu làm #14 trước thì dùng chung.
+- **Status:** todo
+
+### #29 [Feature] Log thao tác: cầm/thả, thùng, nút, kiểu điều khiển
+- **Type:** feature
+- **Scene(s):** cả 5 scene
+- **Files:** component mới `GrabLogger` gắn vào prefab/package (sự kiện grab của Interaction SDK), Assets/Scripts/PackageCounter.cs:29, :61, Assets/Scripts/MixPickingContainer.cs:27, :44, Assets/Scripts/PiecesContainerCounter.cs:30, :46, Assets/Scripts/PackageInfoOnGrab.cs:24, Assets/Scripts/SceneMenuController.cs:6–44; spec mục 4.1 (`menu_select`), 4.4
+- **Problem:** Không biết học viên thao tác ra sao: cầm nhầm, đặt vào rồi lấy ra, làm rơi, mất tracking tay.
+- **Done when:** Trong Play mode (đặt kiện bằng code qua MCP) thấy `container_enter`/`container_exit` chỉ khi HashSet thật sự đổi; trên Quest thấy `grab_start`/`grab_end` có tay L/R và thời gian cầm, `object_dropped_floor`, `button_touch`, `menu_select`, `input_mode_change`, `tracking_lost`. `object_id` ổn định giữa các lần chạy.
+- **Inspector work expected:** yes (gắn `GrabLogger` vào các package, gán layer/tag sàn)
+- **Depends on:** #26. API sự kiện grab/tracking của Meta SDK phải kiểm tra trong project trước (spec mới ghi theo hiểu biết, chưa xác minh).
+- **Status:** todo
+
+### #30 [Feature] Hướng nhìn (theo đầu), luồng tư thế và hiệu năng
+- **Type:** feature
+- **Scene(s):** cả 5 scene
+- **Files:** script mới (gaze proxy + pose sampler + perf sampler), collider/tag cho bảng WMS, thẻ hướng dẫn, thùng, menu; spec mục 4.5, 4.6 (`perf_sample`), 4.7
+- **Problem:** Cần dữ liệu về chú ý (đọc WMS bao lâu), độ thoải mái (rớt khung hình, cử động đầu) để đối chiếu với SSQ/NASA-TLX trên giấy.
+- **Done when:** Có `_pose.csv` 10 Hz; `gaze_target_enter/exit` khi đầu hướng vào bảng WMS ≥ 200 ms; `perf_sample` mỗi 5 s (FPS, khung hình rớt, pin). Trên Quest 3, FPS khi bật logger không thấp hơn khi tắt (so bằng chính `perf_sample`). Ghi rõ trong spec/báo cáo: đây là hướng đầu, không phải eye tracking.
+- **Inspector work expected:** yes (gắn tag/collider cho các vùng nhìn)
+- **Depends on:** #26; quyết định có cần vị trí tay không (spec mục 9)
+- **Status:** todo
+
+### #31 [Feature] Hướng dẫn lấy log về máy + script gộp với phiếu giấy
+- **Type:** feature
+- **Scene(s):** —
+- **Files:** `docs/research-data-guide.md` (mới, cho người điều phối), script nhỏ R hoặc Python gộp các `_summary.csv` theo `participant_id`
+- **Problem:** Người điều phối cần quy trình rõ ràng để chép log từ Quest (Meta Quest Developer Hub / `adb pull`), kiểm tra đủ file, xoá trên kính sau khi chép, và nối với dữ liệu phiếu giấy.
+- **Done when:** Một người chưa làm bao giờ làm theo hướng dẫn chép được log của 2 phiên thử về máy; script gộp ra một bảng mỗi người một dòng (hoặc mỗi scene một dòng) kèm cột từ file phiếu giấy mẫu.
+- **Inspector work expected:** no
+- **Depends on:** #28 (cần `summary.csv`); quyết định thời hạn lưu/xoá (spec mục 9)
 - **Status:** todo
