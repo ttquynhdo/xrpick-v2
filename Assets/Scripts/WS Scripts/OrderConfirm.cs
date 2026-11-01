@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class OrderConfirm : MonoBehaviour
@@ -7,6 +8,10 @@ public class OrderConfirm : MonoBehaviour
     private GameObject correct;
     [SerializeField]
     private GameObject incorrect;
+
+    // #14: the Incorrect card's text shows the reason of the first error (German, Sie).
+    [SerializeField]
+    private TMP_Text incorrectText;
 
     private void OnEnable()
     {
@@ -24,23 +29,40 @@ public class OrderConfirm : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (calc == null)
+            return;
+
+        foreach (string problem in OrderRule.FindLineProblems(new[] { calc.OrderLine }, false))
+        {
+            Debug.LogError($"OrderConfirm: {problem}", calc);
+        }
+    }
+
     public void OrderConfirmation()
     {
         // Non-short-circuit | so every missing reference is logged at once.
         bool missing =
             RequiredReference.IsMissing(calc, nameof(calc), this) |
             RequiredReference.IsMissing(correct, nameof(correct), this) |
-            RequiredReference.IsMissing(incorrect, nameof(incorrect), this);
+            RequiredReference.IsMissing(incorrect, nameof(incorrect), this) |
+            RequiredReference.IsMissing(incorrectText, nameof(incorrectText), this);
 
         if (missing)
             return;
 
-        if (calc.currentSize == calc.necessarySize)
+        // #14: the same rule as Mixed/Complex decides (docs/decisions/006); Soll is still CalcForWMS.necessarySize.
+        OrderResult result = OrderRule.Check(new[] { calc.OrderLine }, OrderContents.From(calc.PackagesInside), false);
+
+        if (result.Correct)
         {
             correct.SetActive(true);
             incorrect.SetActive(false);
-        } else
+        }
+        else
         {
+            incorrectText.text = OrderFeedback.Explain(result, FeedbackLanguage.German);
             correct.SetActive(false);
             incorrect.SetActive(true);
         }

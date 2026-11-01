@@ -142,14 +142,17 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Done when:** Ở cả 3 scene: làm sai thì hướng dẫn vẫn còn, feedback nêu **loại lỗi** (sai vật tư, thừa, thiếu, thiếu hoặc thừa hàng lẻ; theo A2/A3 không còn "sai loại kiện") và lý do, nhưng **không in số đích**. Làm đúng thì feedback nói đúng ở đâu và tên mục tiếp theo trong menu (Basic → Mixed → Complex → kết thúc). Feedback hiện ở cùng một chỗ trong mọi scene. Thêm (decision 006):
   - Có nhiều lỗi cùng lúc thì màn hình chỉ nêu lỗi đầu tiên theo thứ tự `EMPTY > WRONG_MATERIAL > TOO_FEW/TOO_MANY > hàng lẻ` (lý do + việc cần làm), kèm một dòng chung "còn lỗi khác".
   - ComplexScene: đặt 2 carton GGA thay cho 2 carton Ring D thì màn hình chỉ nêu lý do sai vật tư và việc cần làm, kèm dòng "còn lỗi khác"; không có số đích.
-  - BasicPickingScene: thùng có 6 carton TRAINING-MATERIAL B và carton mở Ring D thì bị báo sai vật tư.
+  - ~~BasicPickingScene: thùng có 6 carton TRAINING-MATERIAL B và carton mở Ring D thì bị báo sai vật tư.~~ Không còn làm được: #18 đã xoá Ring D khỏi Basic (người dùng chọn). Thay bằng: BasicPickingScene, 5 carton SCHLAUCHSCHELLE B → thẻ „Nicht richtig“ nêu thiếu và cách tính; 7 carton → nêu thừa; không có số đích.
   - Feedback dùng tên vật tư trên WMS/nhãn, không dùng khoá log hay tên enum.
+  - "Feedback hiện ở cùng một chỗ": vị trí thuộc #33 (xem Bổ sung review UX); #14 chỉ lo nội dung.
 - **Inspector work expected:** yes, với Basic (text nằm trong scene, không trong code)
 - **Công:** M
 - **Test trên kính:** không
 - **Depends on:** #4 (sửa cùng các dòng), #1 cho phần Basic, #6 (cùng sửa hai validator, làm sau #6), #17 (thuật ngữ cuối cùng cho câu feedback). Định dạng kết quả đã chốt ở decision 006.
 - **Bổ sung (review UX):** "Cùng một chỗ" nên là **cạnh nút đỏ**, vì đó là chỗ trainee đang nhìn lúc xác nhận. Basic đã làm vậy (thẻ cách nút khoảng 0.11 m). Concept, Mixed và Complex thì ghi lên panel WMS, lệch 42–51° so với nút. Vị trí do #33 xử lý, mục này chỉ lo nội dung.
-- **Status:** todo
+- **Ghi chú (2026-11-01, khi làm):** câu feedback (EN cho Mixed/Complex tới #12, DE cho Basic) đã qua german-reviewer, nằm trong `Assets/Scripts/OrderFeedback.cs`, key `order.feedback.*`. Basic giờ cũng chấm bằng `OrderRule` (dòng đơn dựng từ `CalcForWMS`: `materialKey`, `materialName`, `vpe`, Soll = `necessarySize`); điểm chặn #28 ở Basic đã gỡ. Mixed khi đúng chỉ sang „5. Volle Kartons und loses Material“ (lấy từ `LessonNames`); Complex khi đúng để panel Congratulations nói bước tiếp.
+- **Test report:** docs/test-reports/bl14.md
+- **Status:** verified-mcp (16/17 ✅, chờ test tay H1)
 
 ### #15 [P1] ComplexScene: bộ đếm không được lộ đáp án
 - **Type:** logic
@@ -733,7 +736,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** #26, #6 (rule và kết quả trong `XRPick.Orders`). Dùng chung object kết quả với #14.
 - **Bổ sung (2026-11-01, decision 007):** `quiz_answer` theo quiz mới của #45: thêm `question_id`, `selected` là khoá đáp án ngắn (thay `gg/vpe/both`); cách nối câu hỏi với kỹ năng do data-analyst quyết (có thể cho `calculate_quantity` một điểm đo từ Concept). Xoá `WRONG_TYPE` khỏi enum và `skill_map.csv` nếu A2 đã được người hướng dẫn chốt. Chỉ thêm `BasicPickingScene,check_material` nếu #18 giữ vật gây nhiễu ở Basic. Trường `package_type` của #29 (spec §4.4) đổi thành khoá vật tư ở #29.
 - **Bổ sung (2026-11-01, review data-analyst của #6):**
-  - **Chặn:** BasicPickingScene chưa đi qua `OrderRule` (`OrderConfirm` vẫn so `currentSize == necessarySize`). Đầu #28: cho `OrderConfirm` gọi `OrderRule.Check` với một dòng `{training_b, SCHLAUCHSCHELLE B, soll = necessarySize, vpe = 50}`, `countsLoose = false`, đầu vào `OrderContents.From(...)` (9 carton Basic đã có `PackageData`). Ist trên WMS (`CalcForWMS` cộng theo tag) và rule (theo `PackageData`) phải đếm cùng một tập vật thể. Basic không có vật gây nhiễu (#18 đã xoá), nên **không** thêm `BasicPickingScene,check_material`.
+  - ~~**Chặn:**~~ **Đã gỡ ở #14 (2026-11-01):** `OrderConfirm` giờ gọi `OrderRule.Check` (dòng đơn từ `CalcForWMS.OrderLine`, đầu vào `CalcForWMS.PackagesInside`). Ghi chú gốc: BasicPickingScene chưa đi qua `OrderRule` (`OrderConfirm` vẫn so `currentSize == necessarySize`). Đầu #28: cho `OrderConfirm` gọi `OrderRule.Check` với một dòng `{training_b, SCHLAUCHSCHELLE B, soll = necessarySize, vpe = 50}`, `countsLoose = false`, đầu vào `OrderContents.From(...)` (9 carton Basic đã có `PackageData`). Ist trên WMS (`CalcForWMS` cộng theo tag) và rule (theo `PackageData`) phải đếm cùng một tập vật thể. Basic không có vật gây nhiễu (#18 đã xoá), nên **không** thêm `BasicPickingScene,check_material`.
   - Trong scene không đếm chiếc lẻ, ghi `required_loose` là `null` (cùng với `placed_loose`). `materialName` là chữ hiển thị, không ghi vào log.
   - `analyse.R`: loại lần bấm chỉ có `EMPTY` khỏi mẫu số của các kỹ năng khác `calculate_quantity`.
   - Feedback đỏ vẫn in số đích (cầu nối tới #14): không thu dữ liệu thật trước #14; R tách dữ liệu trước/sau #14 theo build.

@@ -10,7 +10,7 @@ Soll,,target qty,WMS field label for the target quantity.,yes,WMS screenshot,pro
 Istmenge,die,actual quantity,Quantity actually picked; when counting by hand it is pre-filled with the target quantity.,no,requirements: Kommissionierung.pptx slide 7,proposed,
 Ist,,actual qty,WMS field label for the actual quantity.,yes,WMS screenshot,proposed,
 Restmenge,die,remaining stock,Stock left in the storage container after the pick; NOT the quantity still missing.,no,requirements: Kommissionierung.pptx slide 7,proposed,BasicPickingScene shows Rest as static remaining stock since #34 (B6).
-Rest,,remaining stock,WMS field label for the remaining stock.,yes,WMS screenshot,proposed,
+Rest,,remaining stock,WMS field label for the remaining stock.,yes,WMS screenshot,proposed,Never use 'Rest' for the remainder/loose part or for 'what is missing' in feedback (german-reviewer #14).
 Restmengenzählung,die,remaining-stock count,Counting the stock left in the storage container (F9) to confirm it.,no,requirements: Kommissionierung.pptx slide 2/7,proposed,Also a WMS indicator label.
 Mindermenge,die,short quantity,Confirmed quantity when actual is less than target.,no,requirements: Kommissionierung.pptx slide 7,proposed,
 Verpackungseinheit,die,packaging unit,Number of pieces in one carton or bag.,no,requirements: Kommissionierung.pptx slide 8,proposed,"Abbreviation VPE. A quantity, not the name of the physical package: for the object use Karton or Tüte."
@@ -66,3 +66,4 @@ KABELVERBINDER A,,cable connector A,"Fake material name (B10, decision 007), key
 SCHRAUBE B,,screw B,"Fake material name, key screw_b, Mat.-Nr 738190, VPE 20 (bag).",yes,app (#17),proposed,Fake master data.
 RING D,,ring D,"Fake material name, key ring_d, Mat.-Nr 264857, VPE 25.",yes,app (#17),proposed,Fake master data.
 SCHLAUCHSCHELLE B,,hose clamp B,"Fake material name, key training_b (BasicPickingScene), Mat.-Nr 443890, VPE 50.",yes,app (#17),proposed,Replaces TRAINING-MATERIAL B.
+Stückzahl,die,piece count,"Number of pieces, e.g. of the full cartons in a calculation (Sollmenge minus Stückzahl der vollen Kartons).",no,german-reviewer (#14),proposed,'Stück' alone only after a number.

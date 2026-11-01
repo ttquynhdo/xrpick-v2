@@ -8760,6 +8760,9 @@ MonoBehaviour:
   istText: {fileID: 1753759843}
   sollText: {fileID: 1601378646}
   restText: {fileID: 1695009059}
+  materialKey: training_b
+  materialName: SCHLAUCHSCHELLE B
+  vpe: 50
 --- !u!114 &786606224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8775,6 +8778,7 @@ MonoBehaviour:
   calc: {fileID: 786606220}
   correct: {fileID: 1362811788}
   incorrect: {fileID: 453148328}
+  incorrectText: {fileID: 1677863043}
 --- !u!1 &803397806
 GameObject:
   m_ObjectHideFlags: 0

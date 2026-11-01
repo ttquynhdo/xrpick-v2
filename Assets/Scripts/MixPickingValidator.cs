@@ -1,18 +1,13 @@
-using System.Text;
 using TMPro;
 using UnityEngine;
 
 public class MixedPickingValidator : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get. #14 rewrites the feedback.
-    private const string CorrectTitle = "Correct!";                                                  // mixed.feedback.correct
-    private const string PlacedLineFormat = "{0}: {1}";                                             // mixed.feedback.placed_line
-    private const string CheckAgain = "Check the order again.";                                     // mixed.feedback.check_again
-    private const string CountLineFormat = "{0}: {1} / {2}";                                        // mixed.feedback.count_line
-    private const string WrongMaterialLine =
-        "The container holds material that does not belong to this order.";                         // mixed.feedback.wrong_package
-    private const string SuccessInstruction =
-        "You have successfully completed the task.\nSelect the next scenario option in the MENU.";  // mixed.instruction.success
+    // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get. {0} = next lesson name (menu label).
+    private const string CorrectFormat =
+        "Correct! All materials and quantities match the order.\nNext, choose “{0}” in the menu."; // mixed.feedback.correct
+
+    private const string NextScene = "ComplexScene";
 
     [SerializeField] private MixedPickingContainer container;
     [SerializeField] private TMP_Text feedbackText;
@@ -76,36 +71,23 @@ public class MixedPickingValidator : MonoBehaviour
         if (missing)
             return;
 
-        // #6: one rule decides right/wrong (docs/decisions/005, 006); numbers come from the order lines.
+        // #6: one rule decides right/wrong (docs/decisions/005, 006).
         OrderResult result = container.CheckOrder();
-        var text = new StringBuilder();
 
+        // #14: the instruction stays visible in both cases; the feedback never prints target numbers.
         if (result.Correct)
         {
-            text.Append(CorrectTitle);
-            foreach (OrderLineResult line in result.Lines)
+            if (!LessonNames.TryGetDisplayName(NextScene, out string nextLesson))
             {
-                text.Append('\n').AppendFormat(PlacedLineFormat, line.Line.materialName, line.PlacedFull);
+                Debug.LogError($"MixedPickingValidator: no lesson name for {NextScene}.", this);
             }
-
-            feedbackText.text = text.ToString();
+            feedbackText.text = string.Format(CorrectFormat, nextLesson);
             feedbackText.color = Color.green;
-            instructionText.text = SuccessInstruction;
             return;
         }
 
-        text.Append(CheckAgain);
-        if (result.Foreign.Count > 0)
-        {
-            text.Append('\n').Append(WrongMaterialLine);
-        }
-        foreach (OrderLineResult line in result.Lines)
-        {
-            text.Append('\n').AppendFormat(CountLineFormat, line.Line.materialName, line.PlacedFull, line.Line.RequiredFull);
-        }
-
-        instructionText.text = string.Empty;
-        feedbackText.text = text.ToString();
+        feedbackText.text =
+            OrderFeedback.Title(FeedbackLanguage.English) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.English);
         feedbackText.color = Color.red;
     }
 }

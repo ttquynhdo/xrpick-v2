@@ -1,16 +1,11 @@
-using System.Text;
 using TMPro;
 using UnityEngine;
 
 public class PiecesOrderValidator : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get. #14 rewrites the feedback.
-    private const string WrongPackageLine =
-        "The container holds material that does not belong to this order."; // complex.feedback.wrong_package
-    private const string CorrectFormat = "Correct!\n{0} packages and {1} pieces have been placed.\n"; // complex.feedback.correct
-    private const string CheckAgain = "Check the order again.";                                      // complex.feedback.check_again
-    private const string PackagesLineFormat = "Packages: {0} / {1}";                                 // complex.feedback.packages_line
-    private const string LooseLineFormat = "Loose pieces: {0} / {1}";                                // complex.feedback.loose_line
+    // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get. Last lesson: the Congratulations panel
+    // tells the trainee what to do next.
+    private const string CorrectText = "Correct! The full cartons and the loose material match the order."; // complex.feedback.correct
 
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
@@ -68,39 +63,23 @@ public class PiecesOrderValidator : MonoBehaviour
         if (missing)
             return;
 
-        // #6: one rule decides right/wrong (docs/decisions/005, 006); numbers come from the order lines.
+        // #6: one rule decides right/wrong (docs/decisions/005, 006).
         OrderResult result = containerCounter.CheckOrder();
-        int placedLoose = 0;
-        int requiredFull = 0;
-        int requiredLoose = 0;
-
-        foreach (OrderLineResult line in result.Lines)
-        {
-            placedLoose += line.PlacedLoose ?? 0;
-            requiredFull += line.Line.RequiredFull;
-            requiredLoose += line.Line.RequiredLoose;
-        }
 
         if (result.Correct)
         {
-            feedbackText.text = string.Format(CorrectFormat, containerCounter.CartonCount, placedLoose);
+            feedbackText.text = CorrectText;
             feedbackText.color = Color.green;
             congratulationsPanel.SetActive(true);
             instructionText.text = string.Empty;
             return;
         }
 
-        var text = new StringBuilder(CheckAgain);
-        if (result.Foreign.Count > 0)
-        {
-            text.Append('\n').Append(WrongPackageLine);
-        }
-        text.Append('\n').AppendFormat(PackagesLineFormat, containerCounter.CartonCount, requiredFull);
-        text.Append('\n').AppendFormat(LooseLineFormat, placedLoose, requiredLoose);
-
-        feedbackText.text = text.ToString();
+        // #14: the instruction stays visible; the feedback names the first error, never the target numbers.
+        feedbackText.text =
+            OrderFeedback.Title(FeedbackLanguage.English) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.English);
         feedbackText.color = Color.red;
-        instructionText.text = string.Empty;
+        instructionText.text = initialInstruction;
 
         // #4: a wrong order after a correct one must not leave the panel visible.
         if (congratulationsPanel != null)
