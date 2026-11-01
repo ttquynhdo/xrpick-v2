@@ -25,7 +25,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
    - Song song, không đụng scene: #26.
 2. **Đợt 2 – không kính, có phụ thuộc:**
-   - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: #1 (sau #2) → #24 → #34 (decision 001, phương án C).
+   - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → #24 → #34 (decision 001, phương án C).
    - #14 (sau #4, #1) → #28 (sau #26, dùng chung helper mã lỗi với #14).
    - #6 (sau #1, #3) → #8 (sau #2, #3, #6).
 3. **Đợt 3 – test kính nhanh, gom một buổi test ở cuối đợt:**
@@ -60,7 +60,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (ảnh Play mode):** Đã kiểm tra trong Editor: cả 3 reference của `PackageCounter` (`packagePlacedText`, `orderFeedbackText`, `instructionText`) trỏ vào `Info Panel/Unity Canvas/*`, mà panel này đang **tắt** (Basic dùng `Info Panel (1)`). Nghĩa là trainee không bao giờ thấy feedback của `PackageCounter`. Chỉ có kết quả của `OrderConfirm` (thẻ `Correct`/`Incorrect` trên bàn) là nhìn thấy được.
 - **Bổ sung (2026-11-01, đối chiếu cả tài liệu cũ):** Không tài liệu nào có kịch bản đào tạo kèm số liệu, và không có "300 = 6 × 50". Chỉ có vài ảnh dialog thật (Soll nhỏ, một chữ số hoặc hai chữ số; VPE đều là 1) và chu trình 10 bước chuẩn. Đề xuất cho A1: dựng đơn Basic theo một ảnh dialog thật, đổi sang dữ liệu giả cùng định dạng (B10). Nếu Soll ≥ 8 chiếc thì theo tài liệu là lấy bằng cân (B7a), ảnh hưởng #34.
 - **Bổ sung (2026-11-01, nhóm trả lời A1):** lấy **tổng số chiếc** làm quy tắc đúng (300 = 6 × 50), bỏ quy tắc "2 GG". Chờ người hướng dẫn xác nhận; nếu khác thì chỉ đổi con số. Xem `docs/decisions/003-ekz-placement.md`.
-- **Status:** todo (theo giả định A1)
+- **Ghi chú (2026-11-01, khi làm):** Đã bỏ `CheckOrder` khỏi nút (sửa trong Editor, không sửa script). `PackageCounter` vẫn nằm trên `PlasticBox_Order`, vẫn đếm theo tag và ghi vào panel đang tắt; xoá hẳn thuộc #8/#18.
+- **Test report:** docs/test-reports/bl01.md
+- **Status:** verified-mcp (8/8 ✅, chờ test tay E4; theo giả định A1)
 
 ### #2 [P0] CalcForWMS: đếm theo package, không theo collider
 - **Type:** bug
