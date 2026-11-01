@@ -90,9 +90,6 @@ crashlytics-build.properties
 /[Aa]ssets/_Recovery/
 /[Aa]ssets/_Recovery.meta
 
-# Per-user Claude Code settings
-.claude/settings.local.json
-
 # OS files
 .DS_Store
 Thumbs.db
