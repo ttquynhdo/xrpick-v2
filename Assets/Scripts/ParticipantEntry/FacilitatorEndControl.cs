@@ -8,7 +8,7 @@ public class FacilitatorEndControl : MonoBehaviour
 {
     // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
     private const string QuestionText = "Sitzung wirklich beenden?"; // end.confirm.question
-    private const string CancelText = "Abbrechen";                   // end.confirm.cancel
+    private const string CancelText = "Fortsetzen";                  // end.confirm.cancel
     private const string EndText = "Beenden";                        // end.confirm.end
     private const string EndReason = "facilitator";
 
@@ -16,7 +16,7 @@ public class FacilitatorEndControl : MonoBehaviour
     private const double ShowProgressAfterSeconds = 0.5;
 
     [SerializeField] private GameObject confirmPanel;
-    [Tooltip("Filled radial/horizontal Image; hidden until the hold has lasted 0.5 s.")]
+    [Tooltip("Filled-type Image on a child of the disc; never the disc itself (SetActive hides it). Hidden until the hold has lasted 0.5 s.")]
     [SerializeField] private Image progressIndicator;
     [SerializeField] private SceneMenuController sceneMenu;
 

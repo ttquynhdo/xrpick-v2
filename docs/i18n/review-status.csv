@@ -3,5 +3,5 @@ complex.counter.ist,Ist: {placed} ST,proposed,german-reviewer (agent),2026-11-01
 complex.counter.cartons_placed,Kartons im Auftragsbehälter: {placed},proposed,german-reviewer (agent),2026-11-01,"Agent: OK; ask instructor whether this trainer line should look different from real WMS labels"
 complex.feedback.wrong_package,"Im Auftragsbehälter liegt Material, das nicht zu diesem Auftrag gehört.",proposed,german-reviewer (agent),2026-11-01,"Agent: OK; optional 'Bitte nehmen Sie es heraus.' left to #14"
 end.confirm.question,Sitzung wirklich beenden?,proposed,,2026-11-01,awaiting german-reviewer
-end.confirm.cancel,Abbrechen,proposed,,2026-11-01,awaiting german-reviewer
+end.confirm.cancel,Fortsetzen,proposed,german-reviewer (agent),2026-11-01,"Agent: 'Fortsetzen' instead of 'Abbrechen' (could be read as aborting the session); EN 'Continue'"
 end.confirm.end,Beenden,proposed,,2026-11-01,awaiting german-reviewer
