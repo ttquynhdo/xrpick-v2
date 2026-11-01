@@ -214,6 +214,17 @@ headers <- events %>% filter(event == "header") %>%
             session_start_mode = map_chr(data, ~ as_chr(.x$session_start_mode)))
 if (any(duplicated(headers$session_id))) warn("a session has more than one header line")
 
+# session_start: the resume offer after a crash (#27). resume_offered_scene =
+# the scene the keypad offered (null = nothing offered), resume_accepted =
+# the answer (null when nothing was offered). Logs written before #27 lack
+# both keys: resume_logged FALSE, and the values stay NA (not measured).
+session_starts <- events %>% filter(event == "session_start") %>%
+  transmute(session_id,
+            resume_logged = map_lgl(data, ~ "resume_offered_scene" %in% names(.x)),
+            resume_offered_scene = map_chr(data, ~ as_chr(.x$resume_offered_scene)),
+            resume_accepted = map_lgl(data, ~ as_lgl(.x$resume_accepted))) %>%
+  distinct(session_id, .keep_all = TRUE)
+
 # A session ended cleanly only if it has session_end. No session_end = crash
 # (Quest often skips the quit callback, design section 4).
 session_ends <- events %>% filter(event == "session_end") %>%
@@ -225,8 +236,10 @@ sessions <- events %>%
   summarise(start_utc = min(parse_utc(utc)), last_utc = max(parse_utc(utc)),
             last_t = max(t, na.rm = TRUE), .groups = "drop") %>%
   left_join(headers, by = "session_id") %>%
+  left_join(session_starts, by = "session_id") %>%
   left_join(session_ends, by = "session_id") %>%
   mutate(has_header = coalesce(has_header, FALSE),
+         resume_logged = coalesce(resume_logged, FALSE),
          end_status = if_else(is.na(end_reason), "crash", end_reason)) %>%
   arrange(participant_id, start_utc) %>%
   group_by(participant_id) %>%
@@ -258,6 +271,29 @@ auto_real <- sessions %>% filter(session_start_mode %in% "auto")
 for (i in seq_len(nrow(auto_real))) {
   warn("session_start_mode 'auto' for real ID ", auto_real$participant_id[i], " (session ",
        auto_real$session_id[i], "): started by autoStart, not by the keypad")
+}
+
+# Resume offers (#27). A declined offer means the trainee started again at
+# WelcomeScene and repeated lessons already seen: their later visits are
+# second exposures (repeat_after_crash), not first attempts.
+declined <- sessions %>% filter(resume_accepted %in% FALSE)
+for (i in seq_len(nrow(declined))) {
+  warn("resume declined by ", declined$participant_id[i], " (session ", declined$session_id[i],
+       ", offered ", declined$resume_offered_scene[i], "): the trainee repeated lessons already seen")
+}
+# Contract: resume_accepted is null exactly when resume_offered_scene is null.
+bad_resume <- sessions %>% filter(resume_logged, is.na(resume_offered_scene) != is.na(resume_accepted))
+for (i in seq_len(nrow(bad_resume))) {
+  warn("session_start resume fields inconsistent for ", bad_resume$participant_id[i], " (session ",
+       bad_resume$session_id[i], "): resume_offered_scene = ", bad_resume$resume_offered_scene[i],
+       ", resume_accepted = ", bad_resume$resume_accepted[i])
+}
+# An offer follows a crashed session of the same ID; if none is in the data,
+# the crashed session's files are probably missing from this copy.
+orphan_offer <- sessions %>% filter(!is.na(resume_offered_scene), !crash_before)
+for (i in seq_len(nrow(orphan_offer))) {
+  warn("resume offered to ", orphan_offer$participant_id[i], " (session ", orphan_offer$session_id[i],
+       ") but no earlier crashed session of that ID is in the data (files missing?)")
 }
 
 # Clock check: utc - header utc should equal t. A gap over 1 s means the wall
@@ -673,6 +709,10 @@ data_quality <- sessions %>%
     # end_status of the participant = how their last session ended.
     end_status = last(end_status),
     gap_h = if (n() > 1) round(max(gap_h, na.rm = TRUE), 2) else NA_real_,
+    # Resume (#27): NA when no session of the person logged the resume fields
+    # (pre-#27 logs); otherwise FALSE = measured, never offered / never declined.
+    resume_offered = if (any(resume_logged)) any(!is.na(resume_offered_scene[resume_logged])) else NA,
+    resume_declined = if (any(resume_logged)) any(resume_accepted[resume_logged] %in% FALSE) else NA,
     .groups = "drop") %>%
   mutate(multi_session = n_sessions > 1,
          mixed_build = str_detect(builds, ";"),
@@ -703,7 +743,8 @@ data_quality <- sessions %>%
                   duplicate_files), ~ coalesce(.x, 0L)),
          error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
-         mixed_build, schema_versions, gap_h, n_crashes, duration_censored, n_visits,
+         mixed_build, schema_versions, gap_h, n_crashes, resume_offered, resume_declined,
+         duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, invariant_breaks,
          unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
@@ -720,6 +761,8 @@ dq_long <- data_quality %>%
             course_finished = coalesce(as.character(course_finished), ""),
             sessions = as.character(n_sessions), builds = str_replace_all(builds, ";", "\n"),
             gap_h = if_else(is.na(gap_h), "", as.character(gap_h)),
+            # Empty = not measured (log from before #27).
+            resume_declined = coalesce(as.character(resume_declined), ""),
             censored = as.character(duration_censored),
             repeats = as.character(n_repeat_visits),
             paused_s = as.character(paused_s),
@@ -740,7 +783,7 @@ dq_long <- data_quality %>%
            column == "sessions" ~ value != "1",
            column == "builds" ~ str_detect(value, "\n") | value %in% c("editor", "unknown", "NA"),
            column == "gap_h" ~ value != "",
-           column %in% c("censored", "error_cap") ~ value == "TRUE",
+           column %in% c("censored", "error_cap", "resume_declined") ~ value == "TRUE",
            column == "outcome" ~ value == "FALSE",
            TRUE ~ !value %in% c("0", "")),
          column = factor(column, levels = unique(column)),
@@ -955,7 +998,7 @@ scene_col_order <- function(cols) {
 
 participant_cols <- c("participant_id", "end_status", "course_finished", "multi_session",
                       "mixed_build", "builds", "schema_versions", "gap_h", "n_sessions",
-                      "duration_censored", "active_s", "paused_s", "pauses",
+                      "resume_offered", "resume_declined", "duration_censored", "active_s", "paused_s", "pauses",
                       "hmd_removed_count", "unity_errors", "total_confirms")
 wide <- data_quality %>%
   select(all_of(participant_cols)) %>%
@@ -983,7 +1026,8 @@ validity_limits <- c(
 flagged <- data_quality %>%
   filter(end_status != "completed" | multi_session | mixed_build | duration_censored |
            invariant_breaks > 0 | unknown_codes > 0 | summary_mismatches > 0 |
-           exit_disagreements > 0 | duplicate_files > 0 | error_cap_reached) %>%
+           exit_disagreements > 0 | duplicate_files > 0 | error_cap_reached |
+           resume_declined %in% TRUE) %>%
   pull(participant_id)
 
 report_lines <- c(

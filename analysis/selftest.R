@@ -27,14 +27,15 @@ local({
   source("analysis/make_fake_data.R", local = TRUE)
   source("analysis/analyse.R", local = TRUE)
 
-  # 2. One row per real participant: P101-P110; the test ID P950 is dropped.
-  stopifnot(nrow(wide) == 10)
+  # 2. One row per real participant: P101-P111; the test ID P950 is dropped.
+  stopifnot(nrow(wide) == 11)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
 
-  # 3. P103 crashed and came back in a second session.
+  # 3. P103 crashed and came back in a second session (and so did P111, the
+  #    declined resume in 8i).
   stopifnot(isTRUE(wide$multi_session[wide$participant_id == "P103"]))
-  stopifnot(sum(wide$multi_session) == 1)
+  stopifnot(identical(sort(wide$participant_id[wide$multi_session]), c("P103", "P111")))
 
   # 4. P105 crashed and never came back.
   stopifnot(wide$end_status[wide$participant_id == "P105"] == "crash")
@@ -114,6 +115,19 @@ local({
                   "active_s_WelcomeScene") %in% names(wide)))
   stopifnot(!any(c("time_ComplexScene", "confirms_WelcomeScene", "error_rate_WelcomeScene",
                    "completed_WelcomeScene") %in% names(wide)))
+
+  # 8i. Resume (#27): P103 accepted the offer after the crash, P111 declined
+  #     it and repeated the lessons from WelcomeScene (warned). Everyone else
+  #     was never offered one: FALSE (measured), not NA.
+  rw <- function(col, pid) wide[[col]][wide$participant_id == pid]
+  stopifnot(isTRUE(rw("resume_offered", "P103")), isFALSE(rw("resume_declined", "P103")))
+  stopifnot(isTRUE(rw("resume_offered", "P111")), isTRUE(rw("resume_declined", "P111")))
+  stopifnot(identical(wide$participant_id[wide$resume_declined], "P111"))
+  stopifnot(isFALSE(rw("resume_offered", "P101")), isFALSE(rw("resume_declined", "P101")))
+  stopifnot(identical(data_quality$resume_declined, wide$resume_declined))
+  stopifnot(any(grepl("resume", warn_lines) & grepl("declined", warn_lines) & grepl("P111", warn_lines)))
+  stopifnot(!any(grepl("declined", warn_lines) & grepl("P103", warn_lines)))
+  stopifnot("P111" %in% flagged)
 
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.

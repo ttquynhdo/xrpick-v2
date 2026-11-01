@@ -58,7 +58,7 @@ Emitted by #26 unless noted.
 
 | Event | Data | Source |
 |---|---|---|
-| `session_start` / `session_end` | `session_end`: `reason` completed / facilitator / quit. `scene_visit` is `null` on both | logger |
+| `session_start` / `session_end` | `session_start` (#27): `resume_offered_scene` = build scene name the keypad offered to resume at (from `TryFindResumePoint`, i.e. the newest earlier session of this ID crashed in that scene), `null` when nothing was offered; `resume_accepted` = `true` / `false` for the answer, `null` exactly when `resume_offered_scene` is `null` (so "declined" and "never asked" stay apart). Logs from before #27 lack both keys (R: NA, not measured). Additive, `schema_version` stays 1. `session_end`: `reason` completed / facilitator / quit. `scene_visit` is `null` on both | logger |
 | `scene_enter` | `from_scene` (`null` on first entry), `via`: `"start"` on the first entry, otherwise `null` until #29 knows menu / auto | `SceneManager.activeSceneChanged` |
 | `scene_exit` | `duration_s` (active), `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors` (all `unity_error` lines of the visit incl. folded and post-cap), so every summary column #26 fills can be rebuilt from events | logger |
 | `menu_select` | `target_scene`, `item_label` (#29) | `SceneMenuController.Open*` |
