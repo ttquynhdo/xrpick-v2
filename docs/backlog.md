@@ -11,6 +11,16 @@ Mỗi mục = 1 phiên làm việc = 1 nhánh. Không đánh số lại; mục x
 
 Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luyện sai · **P2** bảo trì, mở đường cho việc khác · **P3** dọn dẹp.
 
+**Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
+**Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
+
+**Thứ tự đề xuất (2026-11-01).** Hai nhánh không được cùng sửa một file `.unity` một lúc.
+1. Đợt 1, không cần kính: #3 + #15 → #2 → #4 → #7; #5 + #9.
+2. Đợt 2, feedback: #14 → #33; #32; #6 (phần Mixed/Complex); #38 (chụp ảnh trước). Cuối đợt test kính #32, #33.
+3. Đợt 3, thẻ hướng dẫn và Welcome: #25 → #35 → #40; #39. Cuối đợt test kính.
+4. Song song, không đụng scene: #26 → #28 (sau #14) → #29, #30, #27 → #31; #11. #12 → #13 làm sau khi nội dung ổn định (#4, #6, #14, #25).
+5. Khi người hướng dẫn trả lời: #1 → #24; #18 → #37; #17 → #36, #23; rồi #10, #20, #21, #16, #19, #22, #34.
+
 ---
 
 ## P0 – Lỗi khi chạy / đếm sai
@@ -22,6 +32,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Nút xác nhận gọi **cả hai** `PackageCounter.CheckOrder()` (đúng khi có 2 package GG) và `OrderConfirm.OrderConfirmation()` (đúng khi `currentSize == necessarySize`; trong scene `necessarySize = 300`, mỗi `BoxInfo.packageSize = 50`, tức là 6 package). Hai quy tắc này không khớp nhau, nên trainee có thể thấy chữ "Correct!" cùng lúc với object "incorrect" hiện lên. Có thể nó chỉ "trùng khớp" nhờ lỗi đếm trùng ở #2.
 - **Done when:** Bạn quyết định đơn đúng là gì (số package hay số chiếc). Sau đó chỉ còn một quy tắc, và với đúng đơn đó thì cả text lẫn panel WMS đều báo đúng; với đơn sai thì đều báo sai.
 - **Inspector work expected:** yes. Có thể phải bỏ một call khỏi `_whenSelect` của nút, hoặc sửa `necessarySize`/`requiredGGCount`.
+- **Công:** M
+- **Test trên kính:** không
 - **Depends on:** —
 - **Ghi chú (2026-11-01):** Tài liệu requirements không nêu con số cụ thể. Về nguyên lý, tài liệu tính Soll và Ist theo **số chiếc**, còn Rest là tồn kho của thùng. Trong scene có 6 GG đang active × 50 = 300 = `necessarySize`, nên có vẻ ý đồ ban đầu là 6 package, còn `requiredGGCount = 2` là phần sót lại. Cần người hướng dẫn chốt con số.
 - **Bổ sung (ảnh Play mode):** Đã kiểm tra trong Editor: cả 3 reference của `PackageCounter` (`packagePlacedText`, `orderFeedbackText`, `instructionText`) trỏ vào `Info Panel/Unity Canvas/*`, mà panel này đang **tắt** (Basic dùng `Info Panel (1)`). Nghĩa là trainee không bao giờ thấy feedback của `PackageCounter`. Chỉ có kết quả của `OrderConfirm` (thẻ `Correct`/`Incorrect` trên bàn) là nhìn thấy được.
@@ -34,7 +46,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Mỗi lần một collider vào hoặc ra, script cộng hoặc trừ `packageSize` một lần mà không có HashSet. Vì vậy package có nhiều collider bị cộng nhiều lần. `other.GetComponent<BoxInfo>()` chỉ tìm trên chính collider và không kiểm tra null, nên collider con sẽ gây NullReferenceException. Ngoài ra `Update` ghi lại 3 text mỗi frame dù giá trị không đổi, gây lãng phí trên Quest.
 - **Done when:** Thả 1 package GG vào thùng thì IST tăng đúng 50, lấy ra thì giảm đúng 50. Thả và lấy nhiều lần, giá trị vẫn khớp. Console không có lỗi. (code) Text chỉ được cập nhật khi có thay đổi.
 - **Inspector work expected:** no (chỉ cần test)
-- **Depends on:** #1
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** #1 chỉ cho con số đích; sửa đếm trùng và NullReferenceException làm được ngay
 - **Status:** todo
 
 ## P1 – Logic huấn luyện sai
@@ -46,6 +60,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Bộ lọc loại đang bị comment out. Mọi `PackageData` được thêm vào set, nhưng chỉ GGA, GGB và LooseItemDisplay được đếm. Scene có một package `VPEFull`: bỏ nó vào thùng cùng 2 GGB và 5 chiếc lẻ thì vẫn được báo "Correct!". Hàm `IsAcceptedType` còn sót lại cũng liệt kê sai loại.
 - **Done when:** Có 2 GGB + 5 chiếc lẻ + 1 VPEFull trong thùng thì bị báo sai, và feedback nói rõ có package sai loại. Bỏ VPEFull ra thì được báo đúng.
 - **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** —
 - **Status:** todo
 
@@ -56,6 +72,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Trainee làm đúng một lần, sau đó lấy bớt package ra rồi bấm kiểm tra lại. Lúc này feedback chuyển sang đỏ, nhưng `instructionText` vẫn ghi "successfully completed" (BasicPicking), hoặc `congratulationsPanel` vẫn hiện (Complex).
 - **Done when:** Trong cả hai scene, sau chuỗi đúng → lấy bớt → kiểm tra, màn hình chỉ còn thông báo sai: không còn chữ thành công và không còn panel chúc mừng.
 - **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** —
 - **Bổ sung (review UX):**
   - Ở Basic, trainee chỉ **thấy** thẻ `Correct`/`Incorrect` của `OrderConfirm` (feedback của `PackageCounter` nằm trên panel đang tắt, xem #1). Phần Basic của mục này phải xét cả hai thẻ đó.
@@ -69,6 +87,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Các scene khác đều có toggle gọi `OpenConcept`. Trong BasicPickingScene chỉ có `OpenWelcome`, `OpenBasicPicking`, `OpenMixedPicking`, `OpenComplex`. Nếu menu có nút Concept thì nút đó không làm gì.
 - **Done when:** Bấm Concept trong menu của BasicPickingScene thì ConceptScene được mở.
 - **Inspector work expected:** yes. Thêm call `SceneMenuController.OpenConcept` vào `onValueChanged` của toggle Concept (đây là việc trong Editor, không phải sửa code).
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** —
 - **Status:** todo
 
@@ -80,6 +100,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (ảnh Play mode):** Feedback sai hiện tại **lộ đáp án**: Mixed in `GG Connector A: x / 2`, `GG Screw B: x / 2`, `VPE: x / 0` (Assets/Scripts/MixPickingValidator.cs:47–51, :58–62). Complex in `Packages: x / 2`, `Loose pieces: x / 5` (Assets/Scripts/PiecesOrderValidator.cs:50–53). Trainee sai một lần là biết số đúng, không cần tự tính. Ngoài ra chỗ hiện feedback mỗi scene một kiểu: Mixed/Complex/Concept ghi lên panel, Basic dùng thẻ riêng trên bàn.
 - **Done when:** Ở cả 3 scene: làm sai thì hướng dẫn vẫn còn, feedback nêu **loại lỗi** (sai loại kiện, sai vật tư, thừa, thiếu, thiếu hàng lẻ) và lý do, nhưng **không in số đích**. Làm đúng thì feedback nói đúng ở đâu và tên mục tiếp theo trong menu (Basic → Mixed → Complex → kết thúc). Feedback hiện ở cùng một chỗ trong mọi scene.
 - **Inspector work expected:** yes, với Basic (text nằm trong scene, không trong code)
+- **Công:** M
+- **Test trên kính:** không
 - **Depends on:** #4 (sửa cùng các dòng), #1 cho phần Basic
 - **Bổ sung (review UX):** "Cùng một chỗ" nên là **cạnh nút đỏ**, vì đó là chỗ trainee đang nhìn lúc xác nhận. Basic đã làm vậy (thẻ cách nút khoảng 0.11 m). Concept, Mixed và Complex thì ghi lên panel WMS, lệch 42–51° so với nút. Vị trí do #33 xử lý, mục này chỉ lo nội dung.
 - **Status:** todo
@@ -91,6 +113,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Bộ đếm hiện `PACKAGES PLACED: x / 2` và `PIECES PLACED: x / 55`. Trainee không cần tự tính 55 = 2×25 + 5, vì màn hình đã nói cần 2 package. Đây là scene khó nhất nhưng lại được hỗ trợ nhiều hơn Mixed.
 - **Done when:** Trong Play mode bộ đếm chỉ hiện số đã đặt (vd. `Ist: 30 ST`), không hiện số package cần. Kết quả đúng/sai không đổi.
 - **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** — (nếu làm #6 trước thì sửa luôn ở đó)
 - **Status:** todo
 
@@ -101,6 +125,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Panel WMS ghi `Package type VPE & GG`, `Package size 25 pcs / package`, nhưng VPE trên kệ ghi 20 pcs, GG ghi 25 pcs. Một dòng đơn mà có hai cỡ gói, trainee không biết dùng số nào để tính.
 - **Done when:** Mọi nhãn và panel WMS của Ring D thống nhất (một dòng cho mỗi dạng gói, hoặc chỉ một dạng), và phép tính của đơn khớp với nhãn.
 - **Inspector work expected:** yes (sửa text trong scene)
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** câu trả lời A5, A6
 - **Status:** blocked (chờ người hướng dẫn xác nhận)
 
@@ -111,6 +137,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** ConceptScene dạy GG và VPE là hai *loại kiện*, chỉ VPE được mở. Tài liệu yêu cầu định nghĩa VPE là *số cái trong một thùng/túi* và không nhắc "GG". Ngoài ra tên object, nhãn và cách code đếm không khớp nhau, nên trainee học một quy tắc rồi gặp ngược lại ở bài sau.
 - **Done when:** Nghĩa GG/VPE đã được người hướng dẫn chốt và ghi vào `docs/i18n/glossary.csv`. ConceptScene dạy đúng nghĩa đó. Ở mọi scene, nhãn trên package khớp với cách validator đếm nó.
 - **Inspector work expected:** yes (nhãn, tag, `PackageData`)
+- **Công:** L
+- **Test trên kính:** nhanh (cầm kiện đọc nhãn, làm quiz Concept)
 - **Depends on:** câu trả lời A2, A3; #1
 - **Bổ sung (ảnh Play mode):**
   - **Quiz ở Concept ít giá trị kiểm tra:** Khi cầm kiện GG, panel hiện ngay `Rule: GG packages must NOT be opened.` (`[Info Panel]/TXT_Rule`, giá trị `packageRule` của `PackageInfoOnGrab`). Hộp VPE thì đã được mô hình hoá ở trạng thái mở sẵn. Vì vậy câu hỏi "Which package can be opened?" chỉ kiểm tra trainee có nhớ dòng vừa đọc vài giây trước hay không.
@@ -124,6 +152,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Basic được làm lại riêng thành bài "EKZ 3": menu đặt tên theo EKZ, mẫu hướng dẫn khác các scene còn lại, bước 3 ghi "versenden" (gửi đi) thay vì xác nhận, còn sót package và panel của kịch bản cũ. Trainee đi từ Concept sang Basic gặp một giao diện hoàn toàn khác.
 - **Done when:** Menu giống hệt các scene khác (tên bài, thứ tự, có Concept). Hướng dẫn theo cùng mẫu tiêu đề + 3 bước. Không còn package/panel nào không thuộc đơn hiện tại, trừ khi được đặt có chủ ý làm vật gây nhiễu.
 - **Inspector work expected:** yes (chủ yếu sửa scene)
+- **Công:** M
+- **Test trên kính:** nhanh (bấm menu, xem tổng thể scene)
 - **Depends on:** #1, #5; người hướng dẫn xác nhận có muốn đặt tên bài theo EKZ không
 - **Ghi chú:** Cần Play mode kiểm tra package cũ có nhìn thấy và cầm được không. Trong ảnh `overview`/`container` không thấy các package này.
 - **Bổ sung (ảnh Play mode):**
@@ -140,6 +170,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Thùng kho chỉ có đúng 6 kiện TRAINING-MATERIAL B, và đơn cần đủ cả 6 (300 ÷ 50). Trainee bỏ hết vào thùng là đúng, không phải chọn hay tính gì (ảnh `TestEvidence/BasicPickingScene/views/container.png`). Tải đọc WMS cao nhất khóa học nhưng việc thực hành lại dễ nhất.
 - **Done when:** Thùng kho có nhiều kiện hơn số đơn cần. Bỏ hết vào thì bị báo sai, bỏ đúng số tính được thì được báo đúng.
 - **Inspector work expected:** yes (nhân bản kiện, sửa `necessarySize` nếu cần)
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** #1 (chốt đơn đúng là bao nhiêu)
 - **Status:** blocked (chờ #1)
 
@@ -154,6 +186,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   - Trainee phải đọc lại cấu trúc mỗi bài.
 - **Done when:** Mọi scene picking dùng cùng mẫu: `Aufgabe/Task`, 1. đọc WMS, 2. tính và lấy hàng, 3. kiểm tra và xác nhận. Cả 5 scene dùng một động từ cho thao tác bấm nút. So ảnh `instructions.png` của các scene thấy cùng cấu trúc.
 - **Inspector work expected:** yes (text trong scene)
+- **Công:** M
+- **Test trên kính:** nhanh (đọc thẻ trên kính)
 - **Depends on:** #18 cho phần Basic. Nên làm **trước** #12 để chỉ phải dịch một lần.
 - **Bổ sung (review UX):**
   - **Mỗi màu một nghĩa:** vàng = việc cần làm, xanh lá = đúng, đỏ = sai. Hiện chữ "red" trên thẻ được tô đỏ, trùng màu với feedback lỗi. Welcome `[Info Panel]/TXT_NextAction` là chữ xanh lá cỡ 16, trùng màu "đúng", và là chữ nhỏ nhất panel.
@@ -170,6 +204,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Validator viết cứng các số `2 / 2 / 0`, `GGB==2 && GGA==0 && Loose==5`, "selected 2 GG", và không gọi `IsOrderCorrect()` / `IsCorrect()`. Ai đổi số trong Inspector thì text PACKAGE và validator sẽ lệch nhau.
 - **Done when:** Đổi một số yêu cầu trong Inspector (ví dụ `requiredGGA = 3`) thì cả text đếm, feedback và kết quả đúng/sai đều theo số mới mà không cần sửa code. Số chỉ khai báo ở một chỗ cho mỗi scene, có thể là field của counter hoặc một ScriptableObject `OrderDefinition`.
 - **Inspector work expected:** có thể. Nếu dùng ScriptableObject thì phải tạo asset và gán vào. Field cũ cần `[FormerlySerializedAs]`.
+- **Công:** M
+- **Test trên kính:** không
 - **Depends on:** #1, #3
 - **Status:** todo
 
@@ -182,6 +218,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** `feedbackText`, `instructionText` và `congratulationsPanel` được dùng mà không kiểm tra null. Hiện tại trong scene chúng **đều đã được gán**, nên chưa gây lỗi. Nhưng nếu sau này quên gán thì lỗi chỉ hiện ra đúng lúc trainee làm đúng.
 - **Done when:** Xoá tạm một reference trong Inspector rồi bấm xác nhận: Console báo `LogError` có tên GameObject, không có NullReferenceException. Sau đó gán lại.
 - **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** #4 (sửa cùng các dòng đó)
 - **Status:** todo
 
@@ -192,6 +230,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Problem:** Có các khối code bị comment out, `using System.Xml.Schema` không dùng, hai nhánh if/else giống hệt nhau, và các `Start`/`Update` rỗng. Chúng làm code khó đọc. Còn `MenuSelectionController.cs` đã bị comment toàn bộ và `ScaleItemCounter.cs` không được scene nào dùng: phải quyết định giữ hay xoá cả `.cs` lẫn `.meta`. Trước khi xoá, chạy `scene-ref-auditor`.
 - **Done when:** Code compile không lỗi, cả 5 scene chạy như trước, và không có khối code bị comment dài nào.
 - **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** #2, #3, #6 (làm sau để tránh xung đột)
 - **Status:** todo
 
@@ -204,6 +244,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (review UX):** Ở WelcomeScene, nút đỏ chỉ có call trống này. Thẻ 2 bảo "Touch the button", nhưng chạm vào thì không có gì xảy ra. Xoá call thôi chưa đủ, phần phản hồi thuộc #39.
 - **Done when:** Trong Inspector không còn dòng event nào có target "None (Object)". Các nút vẫn chạy như trước.
 - **Inspector work expected:** yes. Xoá từng dòng event trong Editor.
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** —
 - **Status:** todo
 
@@ -232,6 +274,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Phản hồi của quiz và thông tin kiện dùng chung một ô chữ. Bấm nút xong mà cầm rồi thả một kiện thì phản hồi bị ghi đè bằng "Look below to read the instructions…". Thông tin kiện cũng biến mất ngay khi thả, nên trainee phải vừa giữ kiện vừa đọc hai panel ở xa (`Info Panel` và `Sample Description`, lệch nhau 29°). Ngoài ra panel `Sample Formula` để trống khi bắt đầu, tiêu đề panel ("Instruction Panel") trùng tên với thẻ trên bàn, `TXT_Feedback` trống nằm chồng lên vùng mô tả, và các ô đáp án không cho thấy ô nào đang được chọn.
 - **Done when:** Chọn VPE và bấm nút → hiện phản hồi đúng. Sau đó cầm rồi thả một kiện → phản hồi vẫn còn. Thả kiện → thông tin của kiện vừa cầm vẫn hiện tới khi cầm kiện khác. Lúc bắt đầu scene, không có panel trống nào. Chọn một đáp án → ô đó được đánh dấu rõ ràng.
 - **Inspector work expected:** yes. Tạo TMP riêng cho phản hồi (đặt cạnh nút, xem #33), gán lại `feedbackText`, bỏ `ShowDefaultInfo` khỏi `_whenUnselect`, ẩn hoặc gộp `Sample Description`, xoá `TXT_Feedback` thừa.
+- **Công:** M
+- **Test trên kính:** nhanh (cầm/thả kiện bằng tay)
 - **Depends on:** — (việc giữ thông tin sau khi thả có làm quiz quá dễ không: hỏi người hướng dẫn cùng #17)
 - **Status:** todo
 
@@ -242,6 +286,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Lúc bấm nút, mắt trainee đang nhìn xuống bàn (nút ở khoảng 40° phải, 60° xuống). Kết quả lại hiện trên panel WMS (16° xuống), lệch 42° (Mixed), 43° dọc + 34° ngang (Concept) hoặc 51° (Complex). Trainee phải ngẩng đầu để biết mình đúng hay sai, và có thể không thấy kết quả. Đây là split attention.
 - **Done when:** Bấm nút với đơn sai → trong vòng khoảng 0.15 m quanh nút hiện một dòng ngắn (sai + loại lỗi), nhìn thấy được trong ảnh `confirm`. Bấm với đơn đúng → dòng đó báo đúng. Chi tiết (nếu cần) vẫn nằm trên WMS. Cả ba scene dùng cùng kiểu thẻ với Basic.
 - **Inspector work expected:** yes (tạo thẻ hoặc Canvas nhỏ cạnh nút trong từng scene, gán reference)
+- **Công:** M
+- **Test trên kính:** nhanh (thấy dòng kết quả khi bấm nút)
 - **Depends on:** #14 (nội dung feedback), #32 cho Concept. Có thể tách mỗi scene một nhánh.
 - **Status:** todo
 
@@ -252,6 +298,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Rest bắt đầu bằng Soll (300) và giảm 50 mỗi khi đặt một kiện, nên `Rest: 0` báo luôn "đủ rồi". Trainee không phải tự tính 300 ÷ 50, chỉ cần bỏ kiện vào tới khi Rest về 0. Như vậy tải nội tại bị mất, và con số 300 hiện hai lần. Theo tài liệu yêu cầu, Rest là tồn kho còn lại trong thùng (#20), không phải "còn thiếu".
 - **Done when:** Đặt từng kiện vào thùng thì không có số nào trên WMS cho biết còn thiếu bao nhiêu kiện. Trainee chỉ biết đủ hay chưa sau khi bấm xác nhận. Nếu đã chốt nghĩa của Rest thì Rest hiện đúng nghĩa đó.
 - **Inspector work expected:** có thể (giá trị `restSize`, hoặc ẩn text Rest)
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** câu hỏi người hướng dẫn B6, B7, B7a; #2 chỉ cần nếu hiện Ist sau khi xác nhận. Ghi chú (2026-11-01): **Ist cũng làm lộ đáp án** (`Ist = Soll`), không chỉ Rest.
 - **Decision:** docs/decisions/001-basic-wms-ist-rest-leak.md (blocked; khuyến nghị tạm: che Ist/Rest bằng `–` trong lúc nhặt)
 - **Status:** blocked (chờ người hướng dẫn trả lời B6, B7, B7a)
@@ -263,6 +311,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Các thẻ nằm phẳng trên bàn, cách mắt khoảng 0.9 m, góc cúi 59–60°. Chữ phụ cỡ 11, khoảng 6.7 mm (Basic, suy ra). Trong ảnh `overview` gần như không đọc được. Mỗi bước, trainee phải cúi xuống đọc thẻ rồi ngẩng lên WMS (khoảng 43°).
 - **Done when:** Từ vị trí đứng, ảnh `overview` đọc được chữ phụ của mọi thẻ. Góc cúi tới thẻ nhỏ hơn hiện tại; con số mục tiêu lấy theo khuyến nghị mà `xr-lit-scout` tìm được. Nút đỏ vẫn nằm sát thẻ 3. Năm scene giống nhau.
 - **Inspector work expected:** yes. Nên biến `Instruction Table` thành prefab trước, rồi sửa một lần.
+- **Công:** L
+- **Test trên kính:** bắt buộc (đọc được chữ, độ cúi đầu, thoải mái)
 - **Depends on:** đo world scale của canvas; #25 (nội dung thẻ)
 - **Status:** todo
 
@@ -273,6 +323,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Trong ảnh `container`, nhãn chỉ là những ô hoặc chấm trắng. GGA và GGB cùng một mô hình, nên nhãn là cách duy nhất để phân biệt vật tư. Ở Concept, nhãn GG là chữ xám mảnh, trong khi nhiệm vụ yêu cầu "Look for … labels". Trainee phải nhấc từng kiện lên mới đọc được.
 - **Done when:** Ảnh `shelf` đọc được tên vật tư và số lượng trên mọi kiện trong thùng kho. Nhãn quay về phía trainee, chữ đen đậm. Màu kiện **không** đổi theo vật tư.
 - **Inspector work expected:** yes (prefab kiện, TMP nhãn)
+- **Công:** M
+- **Test trên kính:** nhanh (đọc nhãn từ chỗ đứng)
 - **Depends on:** #17 (nội dung nhãn đúng)
 - **Status:** todo
 
@@ -283,6 +335,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Menu nằm lệch phải 56°, cúi 43°, cách 1.09 m. Ở Welcome, Menu bị cắt ở mép ảnh `overview`. Không có mục nào được đánh dấu là bài đang làm. Feedback bảo "Select the next scenario option in the MENU" mà không nói mục nào. Ở Complex, Menu chỉ cách nút đỏ khoảng 0.33 m, chạm nhầm là đổi scene ngay.
 - **Done when:** Đứng tại chỗ (không bước) chạm được mọi mục, thử trên Quest. Mục của bài hiện tại được làm nổi. Khoảng cách từ nút đỏ tới Menu lớn hơn hiện tại, hoặc chuyển scene cần xác nhận.
 - **Inspector work expected:** yes
+- **Công:** M
+- **Test trên kính:** bắt buộc (chạm mọi mục mà không bước)
 - **Depends on:** #18 (tên mục ở Basic)
 - **Status:** todo
 
@@ -293,6 +347,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem (suy ra, cần ảnh):** Panel chúc mừng nằm cùng mặt phẳng với WMS, nên có thể chồng lên hoặc nhấp nháy (z-fighting). Feedback sai có 3 dòng trong ô chỉ đủ cao cho khoảng 2 dòng, nên có thể đè lên `TXT_PiPlaced`.
 - **Done when:** Ảnh `wms` sau một lần bấm sai: các dòng feedback không đè lên bộ đếm. Ảnh sau một lần bấm đúng: panel chúc mừng không chồng và không nhấp nháy với WMS.
 - **Inspector work expected:** yes
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** chụp ảnh trước để xác nhận. Nếu #33 chuyển feedback xuống cạnh nút thì nửa sau của mục này có thể không còn cần.
 - **Status:** todo
 
@@ -303,6 +359,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Welcome dạy hai thao tác (cầm, chạm nút) nhưng cả hai đều không có phản hồi. Trainee không biết mình đã làm đúng chưa, cũng không biết lúc nào "xong" để sang Menu. Mọi chữ hiện ra cùng lúc ngay từ đầu (4 khối).
 - **Done when:** Cầm thùng → thẻ 1 có dấu ✓. Chạm nút đỏ → thẻ 2 có dấu ✓ kèm âm thanh. Xong cả hai → Menu (mục tiếp theo) được làm nổi. Nếu prefab nút đã có âm thanh hoặc animation thì giữ nguyên, chỉ thêm dấu ✓.
 - **Inspector work expected:** yes
+- **Công:** M
+- **Test trên kính:** nhanh (cầm thùng, chạm nút, nghe âm thanh)
 - **Depends on:** #9; nên làm cùng hoặc sau #27 (bàn phím nhập mã cũng nằm ở Welcome)
 - **Status:** todo
 
@@ -313,6 +371,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Cả 3–4 thẻ (khoảng 55 từ) hiện cùng lúc với cùng độ nổi bật, nên trainee không biết mình đang ở bước nào (segmenting/signalling).
 - **Done when:** Lúc bắt đầu, thẻ 1 nổi bật. Cầm kiện đầu tiên → thẻ 2 nổi bật. Thùng đơn có ít nhất 1 kiện → thẻ 3 nổi bật. Việc chuyển bước **chỉ** dựa vào thao tác, không bao giờ dựa vào đúng hay sai, để không lộ đáp án.
 - **Inspector work expected:** yes
+- **Công:** L
+- **Test trên kính:** bắt buộc (chuyển bước theo thao tác cầm thật)
 - **Depends on:** #25, #35
 - **Status:** todo
 
@@ -327,6 +387,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** End user là người Đức bản ngữ và không đọc được tiếng Anh, trong khi toàn bộ app hiện là tiếng Anh. Đội phát triển lại cần tiếng Anh để test.
 - **Done when:** Menu có nút **Deutsch / English**. Chuyển ngôn ngữ thì đổi được ít nhất một text mẫu ở mỗi scene. Khởi động lại app vẫn giữ lựa chọn. Mặc định là Deutsch.
 - **Inspector work expected:** yes (cài package, tạo Localization Settings và locale, gắn `LocalizeStringEvent`)
+- **Công:** M
+- **Test trên kính:** không
 - **Depends on:** —
 - **Status:** todo
 
@@ -337,6 +399,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Text đang viết cứng bằng tiếng Anh trong code và scene, nên không dịch được.
 - **Done when:** Ở chế độ Deutsch không còn chữ tiếng Anh nào, trừ chú thích WMS. Mọi chuỗi tiếng Đức đã qua `german-reviewer`. Có file `docs/i18n/review-status.csv`.
 - **Inspector work expected:** yes (gắn key cho từng TMP text)
+- **Công:** L
+- **Test trên kính:** không (cần người Đức duyệt bản dịch)
 - **Depends on:** #11. Nên làm sau #4, #6 và #25 để không phải dịch các chuỗi sắp bị sửa.
 - **Bổ sung (2026-11-01, review thiết kế khóa học):** Khi dịch, thống nhất luôn: một thuật ngữ cho LVS/WMS (tài liệu dùng LVS); một tên cho mỗi vật tư (Mixed đang có "Cable Connector A", "GG Connector A", "GG Screw packages"…); đơn vị `ST` trên panel WMS và `Stück` trong câu; Basic đang xưng *du* và có lỗi chính tả "Vervolsständige" → chuyển sang *Sie*. Chuỗi ghép từng mảnh (`SampleFormulaDisplay.cs:31–36`, `PiecesOrderValidator.cs:40–42`) phải thành câu trọn vẹn có placeholder.
 - **Status:** todo
@@ -348,6 +412,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Người hướng dẫn hoặc một người Đức bản ngữ cần duyệt toàn bộ bản dịch trong Excel, rồi gửi lại để cập nhật.
 - **Done when:** Tạo được file review mở trong Excel, umlaut hiển thị đúng. Import lại một file mẫu đã điền thì trạng thái chuyển sang `confirmed`.
 - **Inspector work expected:** no
+- **Công:** M
+- **Test trên kính:** không (người duyệt mở file trong Excel)
 - **Depends on:** #12
 - **Status:** todo
 
@@ -360,6 +426,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (review UX):** Ở Mixed, cột giá trị trong `TXT_Description` lệch nhau vì dùng lẫn tab và dấu cách. Khi dựng panel mới, nên dùng TMP riêng cho nhãn và cho giá trị.
 - **Done when:** Trong Play mode, đặt panel cạnh ảnh gốc: bố cục, chữ và trạng thái chỉ báo khớp với spec. Soll/Ist/Rest và `F6 Bestätigen` hoạt động theo quy tắc đã chốt. Không có ảnh hay tài liệu gốc nào nằm trong `Assets/`.
 - **Inspector work expected:** yes (dựng Canvas, gán reference)
+- **Công:** L
+- **Test trên kính:** nhanh (so bố cục, đọc chữ panel trên kính)
 - **Depends on:** #1, câu trả lời của người hướng dẫn (file câu hỏi trong `docs/requirements/`, mục B1–B10)
 - **Status:** blocked (chờ người hướng dẫn xác nhận)
 
@@ -370,6 +438,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Complex thêm 4 thứ mới cùng lúc: phép chia có dư, hàng lẻ, hai dạng gói của một vật tư, cỡ gói không rõ. Chưa scene nào làm mẫu phép chia có dư. Việc mở VPE được dạy ở Concept nhưng chưa bao giờ được thực hành (hàng lẻ đã nằm sẵn).
 - **Done when:** Bước (a): package nguyên + hàng lẻ của **một** dạng gói, có ví dụ mẫu trước. Bước (b): thêm dạng gói thứ hai. Trainee tự lấy hàng lẻ từ một VPE (nếu A3 cho phép mở).
 - **Inspector work expected:** yes
+- **Công:** L
+- **Test trên kính:** bắt buộc (mở VPE lấy hàng lẻ bằng tay)
 - **Depends on:** #3, #16, #17
 - **Status:** blocked (chờ người hướng dẫn xác nhận)
 
@@ -380,6 +450,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Basic hiện Soll/Ist/Rest, EKZ và Anweisung và bảo trainee "Achte immer auf … EKZ-Hinweise!", nhưng không scene nào giải thích chúng, và bài tập không phụ thuộc vào chúng. Ngoài ra app dùng Rest là "còn thiếu", còn tài liệu nói Rest là tồn kho còn lại trong thùng.
 - **Done when:** Có một bước dạy/làm mẫu ngắn cho từng trường trước lần đầu chúng xuất hiện, hoặc trường nào chưa dùng thì ẩn đi. Rest mang đúng nghĩa đã chốt.
 - **Inspector work expected:** yes
+- **Công:** M
+- **Test trên kính:** nhanh (đọc bước dạy trên kính)
 - **Depends on:** #10; câu trả lời B3, B4, B6
 - **Status:** blocked (chờ người hướng dẫn xác nhận)
 
@@ -390,6 +462,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Dialog thật xử lý từng vị trí một (`Pick 1/2`, `2/2`). Mixed hiện hai dòng đơn cạnh nhau trên một panel, và không có bộ đếm riêng cho từng vật tư, nên lỗi chỉ lộ ra khi xác nhận.
 - **Done when:** Trainee làm vị trí 1, xác nhận, rồi panel chuyển sang vị trí 2. Mỗi vị trí có Ist riêng.
 - **Inspector work expected:** yes
+- **Công:** L
+- **Test trên kính:** nhanh (làm lần lượt 2 vị trí)
 - **Depends on:** #10; câu trả lời B8
 - **Status:** blocked (chờ người hướng dẫn xác nhận)
 
@@ -400,6 +474,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Phần quan trọng của quy trình thật chưa có trong khóa học: chọn cách đếm theo số lượng/khối lượng (Zählen / Referenzwaage / Behälterwaage) và báo Mindermenge khi Ist ≠ Soll. Cả hai có thể dạy rẻ bằng câu hỏi chọn đáp án, không cần mô phỏng cân.
 - **Done when:** Có ít nhất một tình huống chọn cách đếm và một tình huống thiếu hàng, mỗi cái có feedback giải thích.
 - **Inspector work expected:** yes
+- **Công:** M
+- **Test trên kính:** nhanh (chọn đáp án bằng tay)
 - **Depends on:** câu trả lời A4, B7; người hướng dẫn xác nhận phần này nằm trong phạm vi prototype
 - **Bổ sung (ảnh Play mode):** Thêm một tình huống nữa: **Anbruchmenge**. Theo Detail Description mục 5.12, khi mở một VPE mà còn dư thì phần dư phải được cất vào một Modul. ComplexScene tạo đúng tình huống này (lấy 5 chiếc lẻ từ một VPE) nhưng không nhắc gì đến bước đó.
 - **Status:** blocked (chờ người hướng dẫn xác nhận)
@@ -411,6 +487,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Mục tiêu ở Welcome không nhắc phép tính, hàng lẻ hay đơn nhiều vật tư. Cuối khóa chỉ có "Congratulations!", không tóm tắt các quy tắc đã học.
 - **Done when:** Welcome liệt kê đúng những gì khóa học dạy. Panel cuối tóm tắt các quy tắc chính (nếu có #10 thì kèm so sánh với dialog thật).
 - **Inspector work expected:** yes (text trong scene)
+- **Công:** S
+- **Test trên kính:** không
 - **Depends on:** #17 (để tóm tắt đúng quy tắc)
 - **Status:** todo
 
@@ -425,6 +503,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Problem:** App chưa ghi lại gì về người học, nên không có dữ liệu cho nghiên cứu và không biết lỗi kỹ thuật xảy ra với ai.
 - **Done when:** Chạy Play mode với một mã thử (đặt tạm trong Inspector) thì có file `<id>_<session>_events.jsonl` trong `Application.persistentDataPath/research/`: dòng đầu là header (schema_version, app/build, máy, mã), có `session_start`, `scene_enter`/`scene_exit` khi chuyển scene, `unity_error` khi cố tình gây một lỗi. Dừng Play giữa chừng rồi chạy lại thì có `crash_recovered`. Mã `P000` ghi vào thư mục riêng. Scene vẫn chạy bình thường khi không có logger (API tĩnh an toàn với null).
 - **Inspector work expected:** no (logger dùng DontDestroyOnLoad, tự khởi tạo)
+- **Công:** M
+- **Test trên kính:** không
 - **Depends on:** —
 - **Status:** todo
 
@@ -435,6 +515,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Problem:** Cần nhập `participant_id` trong VR mà không gõ nhầm, và trên kính không được lưu tên người học.
 - **Done when:** Mở app: chỉ thấy bàn phím số (`P` cố định + 3 chữ số, xoá, xác nhận). Xác nhận → hỏi lại "`P017` – đúng chưa?" → *Yes* mới mở phần còn lại của WelcomeScene và bắt đầu phiên; *Back* quay lại nhập. Màn hình cuối khóa hiện lại mã. Thử bằng poke tay trên Quest (MCP không bấm được).
 - **Inspector work expected:** yes (dựng Canvas, gán nút, ẩn phần Welcome cho tới khi xác nhận)
+- **Công:** M
+- **Test trên kính:** bắt buộc (bấm phím số bằng tay)
 - **Depends on:** #26; quyết định "ai nhập mã" (spec mục 9)
 - **Status:** todo
 
@@ -445,6 +527,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Problem:** Validator chỉ có đúng/sai và chữ hiển thị, không ghi lại số lần thử, thời gian, trong thùng có gì hay loại lỗi.
 - **Done when:** Mỗi lần bấm xác nhận có một `confirm_pressed` (số lần thử, số đếm từng loại so với yêu cầu, `correct`, `error_codes`), quiz có `quiz_answer`, lần đúng đầu tiên có `task_completed`. Rời scene thì có thêm một dòng trong `_summary.csv`. Thử các trường hợp: thùng trống, thiếu, thừa, sai loại, sai vật tư, đủ → mã lỗi đúng. Chữ phản hồi trên màn hình **không đổi**. Basic ghi cả hai kết quả (`rule_package_counter`, `rule_calc_for_wms`) cho tới khi xong #1.
 - **Inspector work expected:** no
+- **Công:** M
+- **Test trên kính:** không
 - **Depends on:** #26. Helper mã lỗi dùng lại được cho #14; nếu làm #14 trước thì dùng chung.
 - **Status:** todo
 
@@ -455,6 +539,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Problem:** Không biết học viên thao tác ra sao: cầm nhầm, đặt vào rồi lấy ra, làm rơi, mất tracking tay.
 - **Done when:** Trong Play mode (đặt kiện bằng code qua MCP) thấy `container_enter`/`container_exit` chỉ khi HashSet thật sự đổi; trên Quest thấy `grab_start`/`grab_end` có tay L/R và thời gian cầm, `object_dropped_floor`, `button_touch`, `menu_select`, `input_mode_change`, `tracking_lost`. `object_id` ổn định giữa các lần chạy.
 - **Inspector work expected:** yes (gắn `GrabLogger` vào các package, gán layer/tag sàn)
+- **Công:** L
+- **Test trên kính:** bắt buộc (cầm tay trái/phải, mất tracking)
 - **Depends on:** #26. API sự kiện grab/tracking của Meta SDK phải kiểm tra trong project trước (spec mới ghi theo hiểu biết, chưa xác minh).
 - **Status:** todo
 
@@ -465,6 +551,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Problem:** Cần dữ liệu về chú ý (đọc WMS bao lâu), độ thoải mái (rớt khung hình, cử động đầu) để đối chiếu với SSQ/NASA-TLX trên giấy.
 - **Done when:** Có `_pose.csv` 10 Hz; `gaze_target_enter/exit` khi đầu hướng vào bảng WMS ≥ 200 ms; `perf_sample` mỗi 5 s (FPS, khung hình rớt, pin). Trên Quest 3, FPS khi bật logger không thấp hơn khi tắt (so bằng chính `perf_sample`). Ghi rõ trong spec/báo cáo: đây là hướng đầu, không phải eye tracking.
 - **Inspector work expected:** yes (gắn tag/collider cho các vùng nhìn)
+- **Công:** L
+- **Test trên kính:** bắt buộc (đo FPS trên Quest 3)
 - **Depends on:** #26; quyết định có cần vị trí tay không (spec mục 9)
 - **Status:** todo
 
@@ -475,5 +563,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Problem:** Người điều phối cần quy trình rõ ràng để chép log từ Quest (Meta Quest Developer Hub / `adb pull`), kiểm tra đủ file, xoá trên kính sau khi chép, và nối với dữ liệu phiếu giấy.
 - **Done when:** Một người chưa làm bao giờ làm theo hướng dẫn chép được log của 2 phiên thử về máy; script gộp ra một bảng mỗi người một dòng (hoặc mỗi scene một dòng) kèm cột từ file phiếu giấy mẫu.
 - **Inspector work expected:** no
+- **Công:** M
+- **Test trên kính:** nhanh (cắm kính vào máy để chép log, không cần đeo)
 - **Depends on:** #28 (cần `summary.csv`); quyết định thời hạn lưu/xoá (spec mục 9)
 - **Status:** todo
