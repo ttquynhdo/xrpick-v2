@@ -58,11 +58,14 @@ public class MixedPickingValidator : MonoBehaviour
     public void ConfirmOrder()
     {
         
-        if (container == null)
-        {
-            Debug.LogError("MixedPickingContainer is not assigned.");
+        // Non-short-circuit | so every missing reference is logged at once.
+        bool missing =
+            RequiredReference.IsMissing(container, nameof(container), this) |
+            RequiredReference.IsMissing(feedbackText, nameof(feedbackText), this) |
+            RequiredReference.IsMissing(instructionText, nameof(instructionText), this);
+
+        if (missing)
             return;
-        }
 
         int gga = container.GGACount;
         int ggb = container.GGBCount;

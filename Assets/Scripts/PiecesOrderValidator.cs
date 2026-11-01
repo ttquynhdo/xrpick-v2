@@ -53,11 +53,15 @@ public class PiecesOrderValidator : MonoBehaviour
 
     public void ConfirmOrder()
     {
-        if (containerCounter == null)
-        {
-            Debug.LogError("PiecesContainerCounter has not been assigned.");
+        // Non-short-circuit | so every missing reference is logged at once.
+        bool missing =
+            RequiredReference.IsMissing(containerCounter, nameof(containerCounter), this) |
+            RequiredReference.IsMissing(feedbackText, nameof(feedbackText), this) |
+            RequiredReference.IsMissing(congratulationsPanel, nameof(congratulationsPanel), this) |
+            RequiredReference.IsMissing(instructionText, nameof(instructionText), this);
+
+        if (missing)
             return;
-        }
 
         int GGACount = containerCounter.GGACount;
         int GGBCount = containerCounter.GGBCount;

@@ -26,6 +26,15 @@ public class OrderConfirm : MonoBehaviour
 
     public void OrderConfirmation()
     {
+        // Non-short-circuit | so every missing reference is logged at once.
+        bool missing =
+            RequiredReference.IsMissing(calc, nameof(calc), this) |
+            RequiredReference.IsMissing(correct, nameof(correct), this) |
+            RequiredReference.IsMissing(incorrect, nameof(incorrect), this);
+
+        if (missing)
+            return;
+
         if (calc.currentSize == calc.necessarySize)
         {
             correct.SetActive(true);

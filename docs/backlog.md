@@ -20,7 +20,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 1. **Đợt 1 – không kính, không phụ thuộc** (đa số chỉ sửa script):
    - ComplexScene: ~~#3 + #15~~ (verified-mcp) → ~~#16~~ (done).
    - BasicPickingScene: ~~#2~~ (verified-mcp).
-   - Validator: ~~#4~~ (verified-mcp) → #7 (cùng các dòng).
+   - Validator: ~~#4~~ (verified-mcp) → ~~#7~~ (done).
    - Inspector nhiều scene: #5 + #9, làm khi không nhánh nào khác đang mở các scene đó.
    - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
    - Song song, không đụng scene: #26.
@@ -259,7 +259,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #4 (sửa cùng các dòng đó)
-- **Status:** todo
+- **Ghi chú (2026-11-01, khi làm):** Basic giờ dùng `OrderConfirm` (sau #1), nên sửa ở đó thay cho `PackageCounter`. MCP gán null qua code trong Play mode, tương đương xoá ô trong Inspector.
+- **Test report:** docs/test-reports/bl07.md
+- **Status:** done (commit c0c41bd, test 9/9 ✅)
 
 ### #8 [P3] Xoá code chết trong scripts
 - **Type:** cleanup
