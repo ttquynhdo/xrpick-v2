@@ -1,13 +1,5 @@
 using System;
 
-/// <summary>How the picker gets the quantity (Kommissionierung.pptx slide 6; threshold 0.7 kg, question C2).</summary>
-public enum CountingMethod
-{
-    Zaehlen,
-    Referenzwaage,
-    Behaelterwaage
-}
-
 /// <summary>
 /// One order line in WMS units (docs/decisions/005): material, Soll in pieces, VPE (pieces per carton or bag).
 /// Full cartons and loose pieces are derived, never declared. Public fields because this assembly has no
@@ -16,10 +8,6 @@ public enum CountingMethod
 [Serializable]
 public class OrderLine
 {
-    // Up to 7 pieces are counted by hand; from 0.7 kg the container scale is used (decision 008, C2).
-    public const int MaxCountedPieces = 7;
-    public const float ContainerScaleFromKg = 0.7f;
-
     // Stable, language-independent key (snake_case), equal to PackageData.MaterialKey (#17).
     public string materialKey;
 
@@ -54,15 +42,4 @@ public class OrderLine
     public int RequiredFull => vpe > 0 ? soll / vpe : 0;
 
     public int RequiredLoose => vpe > 0 ? soll % vpe : soll;
-
-    public CountingMethod CountingMethod
-    {
-        get
-        {
-            if (soll <= MaxCountedPieces)
-                return CountingMethod.Zaehlen;
-
-            return weightKg >= ContainerScaleFromKg ? CountingMethod.Behaelterwaage : CountingMethod.Referenzwaage;
-        }
-    }
 }

@@ -1,7 +1,7 @@
 # Quyết định 008: Dialog `Kommissionierung` chung cho Basic và Complex; Mixed làm cùng #21; nút đỏ đóng vai bàn đạp F6
 
 - **Backlog:** #10 (tách: #10 = prefab + Basic + Complex; dọn dẹp sau #21 = #46; Mixed = #21; phần Complex của #33 gộp vào #10)
-- **Trạng thái:** accepted (phương án C, 2026-11-01)
+- **Trạng thái:** accepted (phương án C, 2026-11-01); mục 4 phần chỉ báo thay bởi 009
 - **Ngày:** 2026-11-01
 - **Ý kiến đã xét:** requirements-analyst, unity-reviewer, instructional-design-reviewer, xr-ux-reviewer → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-01):** chấp nhận C; nút đỏ = bàn đạp (F6 trên màn hình không bấm được, chỉ nháy); Mixed làm cùng #21 (giữ panel đen tới lúc đó); kết quả Complex chuyển ra thẻ cạnh nút đỏ (phần Complex của #33) ngay trong #10.
@@ -20,7 +20,7 @@ Basic, Mixed và Complex dùng ba kiểu panel WMS khác nhau. Basic là dialog 
 1. **Một prefab phẳng** (canvas mới, tỉ lệ 1,59:1, child đặt tên theo vùng R1–R6) + một view script đọc nguồn đơn qua một interface nhỏ (dòng đơn, Ist, Rest, `ContentsChanged`), cập nhật theo event, không ghi text trong `Update`. Nhãn đúng từng ký tự theo spec (`Empf Kz:`, `Verp.-Einh.:`, `Mat.-Nr:`, `Bez.:`, `Karton:`, `Gew.:`, `Anweisung`), 12 chỉ báo, 14 phím F đúng thứ tự R6. Không có chrome MdiShell (B5).
 2. **Xác nhận:** nút đỏ vật lý vẫn gọi `OrderConfirm.OrderConfirmation` / `ConfirmOrder` (validator, UnityEvent không đổi). 14 phím F là hình tĩnh, không hover, không nhận poke/ray; khi bấm nút đỏ, `F6 Bestätigen` hiện trạng thái *pressed* ~0,3 s.
 3. **Dữ liệu hiển thị nằm cùng dòng đơn:** `OrderLine` có thêm Mat.-Nr, Empf Kz, Gew. và kiểu cân (Referenzwaage / Behälterwaage). Basic giữ các trường này trên `CalcForWMS` (cạnh `necessarySize`, `vpe`). Lúc Start, Mat.-Nr của dòng đơn phải bằng `PackageData.MaterialNumber` của carton cùng khoá, lệch thì `Debug.LogError`. `OrderRule` và định dạng kết quả 006 không đổi.
-4. **Chỉ báo:** `Modus` = `Kommissionierung`; đúng một chỉ báo cân bật (theo Gew. giả và ngưỡng 0,7 kg), `Zählen` tắt; `letzter Pick` bật đỏ ở Basic và Complex (một pick); `Mehrfachpick`, `Vollbehälterausl. möglich` tắt; Empf Kz Basic `003` vàng, Complex `000` xám (003, D5); Karton và Anweisung trống, không tô (B4).
+4. **Chỉ báo** (phần đèn thay bởi decision 009: mọi đèn R2 tắt): `Modus` = `Kommissionierung`; đúng một chỉ báo cân bật (theo Gew. giả và ngưỡng 0,7 kg), `Zählen` tắt; `letzter Pick` bật đỏ ở Basic và Complex (một pick); `Mehrfachpick`, `Vollbehälterausl. möglich` tắt; Empf Kz Basic `003` vàng, Complex `000` xám (003, D5); Karton và Anweisung trống, không tô (B4).
 5. **Ist / Rest:** Ist tăng dần khi cân (cả hai scene), Complex dùng `TotalPieces`. Rest là tồn kho thùng kho, không đổi khi nhặt; Complex tính từ tồn kho Ring D trong scene trừ Soll, như `CalcForWMS` ở Basic.
 6. **Gỡ:** Basic: `Auftrags-Nr`, `Pick: 1/1`, `EKZ Hinweis`, 3 thanh xanh `Anweisungen`, nhãn `EKZ:`. Complex: `Cartons placed` / `Ist: n ST` riêng (đã có Ist trong dialog), câu "Look below…"; hướng dẫn chỉ còn trên `Instruction Table`.
 7. **Kết quả Complex** chuyển ra thẻ `Correct`/`Incorrect` cạnh nút đỏ, cùng kiểu Basic (phần Complex của #33), luôn có chữ, không chỉ màu.

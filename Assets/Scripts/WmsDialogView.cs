@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Globalization;
 using TMPro;
@@ -12,29 +11,13 @@ using UnityEngine.UI;
 /// </summary>
 public class WmsDialogView : MonoBehaviour
 {
-    [Serializable]
-    private class Indicator
-    {
-        public Image background;
-        public TMP_Text label;
-    }
-
-    private enum IndicatorState
-    {
-        Off,
-        Cyan,
-        Red
-    }
-
     private const string Modus = "Kommissionierung";
     private const float ConfirmFlashSeconds = 0.3f;
 
     // Colours: relative to the screenshots (B1); proposals from the spec's colour table.
-    private static readonly Color Cyan = new(0.125f, 0.769f, 0.769f);         // #20C4C4
     private static readonly Color Red = new(0.878f, 0.208f, 0.169f);           // #E0352B
     private static readonly Color Yellow = new(0.949f, 0.824f, 0.235f);        // #F2D23C, EKZ 003 (B3)
     private static readonly Color Grey = new(0.651f, 0.651f, 0.651f);          // #A6A6A6, EKZ 000
-    private static readonly Color InactiveText = new(0.69f, 0.69f, 0.69f);     // #B0B0B0
     private static readonly Color KeyEnabled = new(0.745f, 0.745f, 0.745f);    // #BEBEBE
     private static readonly Color KeyPressed = new(0.478f, 0.478f, 0.478f);    // #7A7A7A
 
@@ -42,19 +25,11 @@ public class WmsDialogView : MonoBehaviour
     [Tooltip("Component implementing IWmsOrderSource (CalcForWMS, PiecesContainerCounter).")]
     [SerializeField] private MonoBehaviour orderSource;
 
-    [Tooltip("letzter Pick: this pick is the last position of the order (question B13).")]
-    [SerializeField] private bool lastPick = true;
-
     [Header("R1 Modus")]
     [SerializeField] private TMP_Text modusValue;
 
-    [Header("R2 Hinweise / Infos")]
-    [SerializeField] private Indicator referenzwaage;
-    [SerializeField] private Indicator behaelterwaage;
-    [SerializeField] private Indicator zaehlen;
-    [SerializeField] private Indicator letzterPick;
-    [Tooltip("Indicators that stay off in the current scenarios (Tarieren, Restmengenzählung, …).")]
-    [SerializeField] private Indicator[] alwaysOff;
+    // R2 Hinweise / Infos: all indicators stay off, as built in the prefab; the training uses none of them
+    // (docs/decisions/009).
 
     [Header("R3 Mengen")]
     [SerializeField] private TMP_Text soll;
@@ -165,20 +140,6 @@ public class WmsDialogView : MonoBehaviour
         SetText(bez, line.materialName);
         SetText(gew, line.weightKg.ToString("0.##", CultureInfo.GetCultureInfo("de-DE")));
         SetEmpfKz(line.empfKz);
-
-        CountingMethod method = line.CountingMethod;
-        SetIndicator(zaehlen, method == CountingMethod.Zaehlen ? IndicatorState.Cyan : IndicatorState.Off);
-        SetIndicator(referenzwaage, method == CountingMethod.Referenzwaage ? IndicatorState.Cyan : IndicatorState.Off);
-        SetIndicator(behaelterwaage, method == CountingMethod.Behaelterwaage ? IndicatorState.Cyan : IndicatorState.Off);
-        SetIndicator(letzterPick, lastPick ? IndicatorState.Red : IndicatorState.Off);
-
-        if (alwaysOff != null)
-        {
-            foreach (Indicator indicator in alwaysOff)
-            {
-                SetIndicator(indicator, IndicatorState.Off);
-            }
-        }
     }
 
     private void SetEmpfKz(string code)
@@ -204,16 +165,6 @@ public class WmsDialogView : MonoBehaviour
                 empfKz.color = Color.black;
                 break;
         }
-    }
-
-    private static void SetIndicator(Indicator indicator, IndicatorState state)
-    {
-        if (indicator == null || indicator.background == null || indicator.label == null)
-            return;
-
-        indicator.background.enabled = state != IndicatorState.Off;
-        indicator.background.color = state == IndicatorState.Red ? Red : Cyan;
-        indicator.label.color = state == IndicatorState.Off ? InactiveText : Color.black;
     }
 
     private static void SetText(TMP_Text text, string value)
