@@ -74,7 +74,7 @@ public class MixedPickingValidator : MonoBehaviour
         if (gga == 2 && vpe == 0 && ggb == 2)
         {
             feedbackText.text =
-                "Correct!\n2 GG Connector A packages and 2 GG Screw packages selected.";
+                "Correct!\n2 cartons KABELVERBINDER A and 2 bags SCHRAUBE B selected.";
                
             feedbackText.color = Color.green;
 
@@ -89,20 +89,20 @@ public class MixedPickingValidator : MonoBehaviour
             instructionText.text = string.Empty;
             feedbackText.text =
                     $"Check the order again.\n" +
-                    $"GG Connector A: {gga} / 2\n" +
-                    $"GG Screw B: {ggb} / 2\n" +
-                    $"VPE: {vpe} / 0";
+                    $"KABELVERBINDER A: {gga} / 2\n" +
+                    $"SCHRAUBE B: {ggb} / 2\n" +
+                    $"RING D: {vpe} / 0";
             feedbackText.color = Color.red;
-            
+
         }
         else
         {
             instructionText.text = string.Empty;
             feedbackText.text =
                    $"Check the order again.\n" +
-                    $"GG Connector A: {gga} / 2\n" +
-                    $"GG Screw B: {ggb} / 2\n" +
-                    $"VPE: {vpe} / 0";
+                    $"KABELVERBINDER A: {gga} / 2\n" +
+                    $"SCHRAUBE B: {ggb} / 2\n" +
+                    $"RING D: {vpe} / 0";
             feedbackText.color = Color.red;
         }
     }

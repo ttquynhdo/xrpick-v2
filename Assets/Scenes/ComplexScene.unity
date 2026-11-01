@@ -176,13 +176,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'RING D
 
+    Mat.-Nr: 264857
 
-    Ring D
-
-
-    25 pcs'
+    VPE: 25 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -212,9 +210,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -226,7 +224,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1035,6 +1033,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &103549801
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1226,6 +1227,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &119252181
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2660,6 +2664,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &295484946
 GameObject:
   m_ObjectHideFlags: 0
@@ -3552,6 +3559,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &353471556
 GameObject:
   m_ObjectHideFlags: 0
@@ -3939,6 +3949,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &378960987
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4444,6 +4457,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &437739413
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4614,6 +4630,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &439897094
 GameObject:
   m_ObjectHideFlags: 0
@@ -5260,6 +5279,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &494859635
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5776,6 +5798,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &574278049
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6199,6 +6224,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &604148638
 GameObject:
   m_ObjectHideFlags: 0
@@ -6464,6 +6492,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &641316929
 GameObject:
   m_ObjectHideFlags: 0
@@ -7345,13 +7376,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'RING D
 
+    Mat.-Nr: 264857
 
-    Ring D
-
-
-    25 pcs'
+    VPE: 25 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7381,9 +7410,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -7395,7 +7424,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -8288,6 +8317,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 1
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &961653024
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8457,6 +8489,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &961653031
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8818,13 +8853,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8854,9 +8887,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -8868,7 +8901,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -9005,13 +9038,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9041,9 +9072,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -9055,7 +9086,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -9305,6 +9336,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1050511854
 GameObject:
   m_ObjectHideFlags: 0
@@ -9506,6 +9540,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 4
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1094388756
 GameObject:
   m_ObjectHideFlags: 0
@@ -9775,6 +9812,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 4
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &1124580455
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10588,8 +10628,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nProduct
-    Material  RING D\n\nOrder quantity     55 pcs\n\nPackage type       VPE & GG\n\nPackage
-    size       25 pcs / package\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    Material  RING D\n\nOrder quantity     55 pcs\n\nPackage size       25 pcs /
+    package\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -10839,6 +10879,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1224394516
 GameObject:
   m_ObjectHideFlags: 0
@@ -11558,13 +11601,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11594,9 +11635,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -11608,7 +11649,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -13404,6 +13445,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &1507618039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13769,13 +13813,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -13805,9 +13847,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -13819,7 +13861,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -14339,6 +14381,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &1602768511
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14571,6 +14616,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1653778649
 GameObject:
   m_ObjectHideFlags: 0
@@ -14841,6 +14889,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 4
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1669023831
 GameObject:
   m_ObjectHideFlags: 0
@@ -16146,13 +16197,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -16182,9 +16231,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -16196,7 +16245,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -16333,13 +16382,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'RING D
 
+    Mat.-Nr: 264857
 
-    Ring D
-
-
-    25 pcs'
+    VPE: 25 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -16369,9 +16416,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -16383,7 +16430,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -17319,15 +17366,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-
-    Cable Connector A
-
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -17357,9 +17400,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -17371,7 +17414,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -17620,6 +17663,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &1879507718
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18358,6 +18404,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1986815417
 GameObject:
   m_ObjectHideFlags: 0
@@ -19676,13 +19725,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'VPE
+  m_text: 'RING D
 
+    Mat.-Nr: 264857
 
-    Ring D
-
-
-    25 pcs'
+    VPE: 25 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -19712,9 +19759,9 @@ MonoBehaviour:
   m_fontSize: 1.5
   m_fontSizeBase: 1.5
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.45000002
+  m_fontSizeMax: 1.5
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -19726,7 +19773,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}

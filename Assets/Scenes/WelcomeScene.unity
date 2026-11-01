@@ -14448,8 +14448,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "By the end of this training, you will be able to:\r\n\r\n\u2022 Identify
-    GG and VPE package types\r\n\r\n\u2022 Read a simple WMS order\r\n\r\n\u2022
+  m_text: "By the end of this training, you will be able to:\r\n\r\n\u2022 Read the
+    material number and VPE on the label\r\n\r\n\u2022 Read a simple WMS order\r\n\r\n\u2022
     Complete an order picking task"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

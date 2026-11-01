@@ -798,7 +798,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -825,12 +829,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -842,7 +846,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1823,7 +1827,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1850,12 +1858,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -1867,7 +1875,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -2004,7 +2012,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2031,12 +2043,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -2048,7 +2060,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -2681,7 +2693,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2708,12 +2724,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -2725,7 +2741,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -2957,6 +2973,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 262136667}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 262136669}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &262136663 stripped
 Transform:
@@ -3052,6 +3071,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5941802, y: 0.3036887, z: 0.30368868}
   m_Center: {x: 0, y: 0.15184435, z: 0}
+--- !u!114 &262136669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262136664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1 &273594240
 GameObject:
   m_ObjectHideFlags: 0
@@ -6453,6 +6488,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 662356098}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 662356100}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &662356094 stripped
 Transform:
@@ -6548,6 +6586,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5941802, y: 0.3036887, z: 0.30368868}
   m_Center: {x: 0, y: 0.15184435, z: 0}
+--- !u!114 &662356100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 662356095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1 &665689277
 GameObject:
   m_ObjectHideFlags: 0
@@ -7078,6 +7132,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 674701222}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 674701223}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &674701217 stripped
 Transform:
@@ -7173,6 +7230,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxInfo
   packageSize: 50
+--- !u!114 &674701223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674701218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1 &705605703
 GameObject:
   m_ObjectHideFlags: 0
@@ -9174,7 +9247,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9201,12 +9278,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -9218,7 +9295,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -9972,7 +10049,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9999,12 +10080,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -10016,7 +10097,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -11912,7 +11993,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11939,12 +12024,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -11956,7 +12041,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -14465,6 +14550,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1483224858}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1483224859}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &1483224853 stripped
 Transform:
@@ -14560,6 +14648,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxInfo
   packageSize: 50
+--- !u!114 &1483224859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1483224854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1001 &1486858359
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14681,6 +14785,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1486858365}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1486858366}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &1486858360 stripped
 Transform:
@@ -14776,6 +14883,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxInfo
   packageSize: 50
+--- !u!114 &1486858366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486858361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1001 &1532215341
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15321,6 +15444,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1600047856}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1600047857}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &1600047851 stripped
 Transform:
@@ -15416,6 +15542,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxInfo
   packageSize: 50
+--- !u!114 &1600047857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1600047852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1 &1601378643
 GameObject:
   m_ObjectHideFlags: 0
@@ -15973,7 +16115,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -16000,12 +16146,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -16017,7 +16163,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -16763,6 +16909,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1710701620}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1710701621}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &1710701615 stripped
 Transform:
@@ -16858,6 +17007,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxInfo
   packageSize: 50
+--- !u!114 &1710701621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1710701616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1 &1712359860
 GameObject:
   m_ObjectHideFlags: 0
@@ -18091,6 +18256,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1807249900}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1807249901}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &1807249895 stripped
 Transform:
@@ -18186,6 +18354,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxInfo
   packageSize: 50
+--- !u!114 &1807249901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807249896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1 &1820196247
 GameObject:
   m_ObjectHideFlags: 0
@@ -18670,6 +18854,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1881017431}
+    - targetCorrespondingSourceObject: {fileID: 6637122191763708657, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1881017433}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!4 &1881017427 stripped
 Transform:
@@ -18765,6 +18952,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5941802, y: 0.3036887, z: 0.30368868}
   m_Center: {x: 0, y: 0.15184435, z: 0}
+--- !u!114 &1881017433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881017428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 0
+  materialKey: training_b
+  materialNumber: 443890
+  vpe: 50
 --- !u!1 &1888890478
 GameObject:
   m_ObjectHideFlags: 0
@@ -19120,7 +19323,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Material-Nr:'
+  m_text: 'Mat.-Nr:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -19313,7 +19516,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "VPE\n\nTRAINING-MATERIAL B\n\n50 St\xFCck"
+  m_text: 'SCHLAUCHSCHELLE B
+
+    Mat.-Nr: 443890
+
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -19340,12 +19547,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
+  m_fontSize: 0.1
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -19357,7 +19564,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -20062,7 +20269,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Bezeichnung: TRAINING-MATERIAL B'
+  m_text: 'Bez.: SCHLAUCHSCHELLE B'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

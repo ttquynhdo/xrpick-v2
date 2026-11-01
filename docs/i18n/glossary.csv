@@ -59,3 +59,10 @@ Lagerverwaltungssystem,das,warehouse management system (WMS),The warehouse softw
 LVS,das,WMS,Abbreviation of Lagerverwaltungssystem.,no,requirements: Detail Description,proposed,
 Knopf,der,button,The big red physical button in VR that confirms the order. Not 'Taste' (keyboard key) or 'Schalter'.,no,app (#18),proposed,
 F6 Bestätigen,,F6 Confirm,Confirm key of the new WMS dialog (B8). The red button shows only 'F6'.,yes,WMS spec (B8),proposed,In the new dialog F12 is Aufkl. korr.
+Etikett,das,label (on the carton),"Label printed by the supplier on a carton or bag (material name, Mat.-Nr, VPE). Not 'Label', which is the pick label printed in the warehouse (F5).",no,german-reviewer (#17),proposed,
+Mat.-Nr:,,Mat. no.:,WMS field label and carton label line for the material number. No dot after 'Nr'.,yes,WMS spec E29,proposed,Basic WMS shows 'Mat.-Nr:' since #17.
+Bez.:,,Descr.:,WMS field label for the material description (Bezeichnung).,yes,WMS spec E31,proposed,Basic WMS shows 'Bez.:' since #17.
+KABELVERBINDER A,,cable connector A,"Fake material name (B10, decision 007), key connector_a, Mat.-Nr 512304, VPE 50.",yes,app (#17),proposed,Fake master data; capitals as in the WMS.
+SCHRAUBE B,,screw B,"Fake material name, key screw_b, Mat.-Nr 738190, VPE 20 (bag).",yes,app (#17),proposed,Fake master data.
+RING D,,ring D,"Fake material name, key ring_d, Mat.-Nr 264857, VPE 25.",yes,app (#17),proposed,Fake master data.
+SCHLAUCHSCHELLE B,,hose clamp B,"Fake material name, key training_b (BasicPickingScene), Mat.-Nr 443890, VPE 50.",yes,app (#17),proposed,Replaces TRAINING-MATERIAL B.
