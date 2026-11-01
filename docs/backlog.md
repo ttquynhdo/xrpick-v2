@@ -25,7 +25,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
    - Song song, không đụng scene: #26.
 2. **Đợt 2 – không kính, có phụ thuộc:**
-   - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → ~~#24~~ (verified-mcp) → #34 (decision 001, phương án C).
+   - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → ~~#24~~ (verified-mcp) → ~~#34~~ (verified-mcp).
    - #14 (sau #4, #1) → #28 (sau #26, dùng chung helper mã lỗi với #14).
    - #6 (sau #1, #3) → #8 (sau #2, #3, #6).
 3. **Đợt 3 – test kính nhanh, gom một buổi test ở cuối đợt:**
@@ -342,7 +342,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (2026-11-01, trả lời B6, B7, B7a):** Nhóm chọn **theo tài liệu**: Rest = tồn kho còn lại trong thùng kho; đếm tay (≤ 7 chiếc) thì Ist điền sẵn bằng Soll; cân (≥ 8 chiếc) thì Ist tăng dần trong lúc lấy. Hướng này gần phương án C của decision 001, nhưng Ist tăng dần vẫn cho biết lúc nào đủ. Phải chạy lại `solution-decision` từ decision 001 với câu trả lời này (và đơn mới của #1) trước khi làm. Done when sẽ viết lại sau quyết định đó.
 - **Decision:** docs/decisions/001-basic-wms-ist-rest-leak.md (cần chạy lại với câu trả lời B6/B7/B7a)
 - **Bổ sung (2026-11-01, giả định A1 = 300 chiếc):** 300 chiếc thuộc nhóm "từ 8 chiếc thì cân" (B7a), nên theo tài liệu Ist tăng dần trong lúc lấy. Người dùng chọn phương án C (theo tài liệu), decision 001 đã ghi lại.
-- **Status:** todo (sau #2, #1, #24)
+- **Test report:** docs/test-reports/bl34.md
+- **Status:** verified-mcp (7/7 ✅, chờ test tay R5; theo giả định A1, tồn kho 9 carton)
 
 ### #35 [P2] Thẻ hướng dẫn: đọc được mà không phải cúi 60°
 - **Type:** logic

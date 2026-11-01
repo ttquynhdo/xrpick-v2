@@ -33,7 +33,7 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
 ## 4. Updating the UI (Quest performance)
 - Don't write `TMP_Text.text` in `Update`. Write it only when the value changes, e.g. in a `Recalculate()` / `UpdateDisplay()` called from trigger events.
 - No `GetComponent`, `Find*`, LINQ or string building in `Update` / `FixedUpdate`. Cache references in `Awake` or the Inspector.
-- Use `FindFirstObjectByType` / `FindAnyObjectByType`. `FindObjectOfType` is deprecated in Unity 6.
+- Use `FindFirstObjectByType` / `FindAnyObjectByType`. `FindObjectOfType` is deprecated in Unity 6. In Unity 6.4 the `FindObjectsByType` overloads with `FindObjectsSortMode` are deprecated too: use `FindObjectsByType<T>()` or `FindObjectsByType<T>(FindObjectsInactive)`.
 - Unsubscribe events and stop coroutines in `OnDisable` / `OnDestroy`.
 
 ## 5. Order data and validation
