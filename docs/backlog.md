@@ -4,6 +4,7 @@ Nguồn: `/code-review` toàn bộ `Assets/Scripts` (2026-11-01), đã đối ch
 Mục #14–#23: review thiết kế khóa học (`instructional-design-reviewer`, cả 5 scene, 2026-11-01, chưa có ảnh Play mode). Các mã A2, B8… là câu hỏi trong `docs/requirements/questions-for-instructor.md`.
 Mục #24–#25 và các dòng **Bổ sung (ảnh Play mode)**: review lần 2 có ảnh Play mode của 5 góc nhìn chuẩn ở cả 5 scene (`TestEvidence/<Scene>/views/`, chỉ có trên máy, không commit), 2026-11-01. Đã đối chiếu lại với code/scene.
 Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01).
+Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tải nhận thức (`xr-ux-reviewer`, cả 5 scene, ảnh `TestEvidence/<Scene>/views/`, 2026-11-01). Góc/khoảng cách tính từ mắt (0, 1.6, 0). Vị trí nút đỏ là suy ra từ cấu trúc cha–con, chưa đo trong Play mode.
 Mỗi mục = 1 phiên làm việc = 1 nhánh. Không đánh số lại; mục xong thì ghi `done (commit …)`.
 
 Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luyện sai · **P2** bảo trì, mở đường cho việc khác · **P3** dọn dẹp.
@@ -54,6 +55,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Done when:** Trong cả hai scene, sau chuỗi đúng → lấy bớt → kiểm tra, màn hình chỉ còn thông báo sai: không còn chữ thành công và không còn panel chúc mừng.
 - **Inspector work expected:** no
 - **Depends on:** —
+- **Bổ sung (review UX):**
+  - Ở Basic, trainee chỉ **thấy** thẻ `Correct`/`Incorrect` của `OrderConfirm` (feedback của `PackageCounter` nằm trên panel đang tắt, xem #1). Phần Basic của mục này phải xét cả hai thẻ đó.
+  - Kết quả cũ còn hiện khi nội dung thùng đã đổi, tới lúc bấm lại mới cập nhật. Điều này đúng ở Basic (thẻ `Correct` vẫn bật khi Ist đã khác, Assets/Scripts/WS Scripts/OrderConfirm.cs:22–33), Mixed và Complex (`TXT_Feedback`, `Congratulations`). Thêm câu Done when: *Sau một lần xác nhận (đúng hoặc sai), đặt thêm hoặc lấy ra 1 kiện → kết quả cũ biến mất, chỉ hiện lại khi bấm nút.* Scene: thêm MixedPickingScene.
 - **Status:** todo
 
 ### #5 [P1] Menu ở BasicPickingScene thiếu nút sang ConceptScene
@@ -75,6 +79,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Done when:** Ở cả 3 scene: làm sai thì hướng dẫn vẫn còn, feedback nêu **loại lỗi** (sai loại kiện, sai vật tư, thừa, thiếu, thiếu hàng lẻ) và lý do, nhưng **không in số đích**. Làm đúng thì feedback nói đúng ở đâu và tên mục tiếp theo trong menu (Basic → Mixed → Complex → kết thúc). Feedback hiện ở cùng một chỗ trong mọi scene.
 - **Inspector work expected:** yes, với Basic (text nằm trong scene, không trong code)
 - **Depends on:** #4 (sửa cùng các dòng), #1 cho phần Basic
+- **Bổ sung (review UX):** "Cùng một chỗ" nên là **cạnh nút đỏ**, vì đó là chỗ trainee đang nhìn lúc xác nhận. Basic đã làm vậy (thẻ cách nút khoảng 0.11 m). Concept, Mixed và Complex thì ghi lên panel WMS, lệch 42–51° so với nút. Vị trí do #33 xử lý, mục này chỉ lo nội dung.
 - **Status:** todo
 
 ### #15 [P1] ComplexScene: bộ đếm không được lộ đáp án
@@ -148,6 +153,10 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Done when:** Mọi scene picking dùng cùng mẫu: `Aufgabe/Task`, 1. đọc WMS, 2. tính và lấy hàng, 3. kiểm tra và xác nhận. Cả 5 scene dùng một động từ cho thao tác bấm nút. So ảnh `instructions.png` của các scene thấy cùng cấu trúc.
 - **Inspector work expected:** yes (text trong scene)
 - **Depends on:** #18 cho phần Basic. Nên làm **trước** #12 để chỉ phải dịch một lần.
+- **Bổ sung (review UX):**
+  - **Mỗi màu một nghĩa:** vàng = việc cần làm, xanh lá = đúng, đỏ = sai. Hiện chữ "red" trên thẻ được tô đỏ, trùng màu với feedback lỗi. Welcome `[Info Panel]/TXT_NextAction` là chữ xanh lá cỡ 16, trùng màu "đúng", và là chữ nhỏ nhất panel.
+  - **Xoá ký tự xuống dòng thừa** cuối `Secondary Text` (Welcome có 7, Concept có 6), để layout không bị đẩy khi dịch.
+  - Concept có hai thứ cùng gọi là "instructions": panel `Instruction Panel` và các thẻ trên bàn. Nên đặt tên khác cho panel (xem #32).
 - **Status:** todo
 
 ## P2 – Bảo trì
@@ -190,9 +199,118 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Files:** WelcomeScene.unity:556–575 (`MixedPickingValidator.ConfirmOrder`, target trống), các call `PackageInfoDisplay.ShowDefaultInfo` có `m_Target: {fileID: 0}` trong Basic/Mixed/Complex
 - **Bổ sung (2026-11-01, từ scene inventory):** Sự kiện cầm package (`ISDK_HandGrabInteraction`) trong MixedPickingScene còn gọi `PackageInfoDisplay.ShowGGInfo` / `ShowVPEInfo`. Hai method này đã bị comment out trong code, và target cũng đang trống. Cần kiểm tra BasicPickingScene và ComplexScene xem có tình trạng tương tự không.
 - **Problem:** Các call còn sót lại khi copy prefab. Chúng không làm gì nhưng gây nhầm lẫn khi đọc Inspector.
+- **Bổ sung (review UX):** Ở WelcomeScene, nút đỏ chỉ có call trống này. Thẻ 2 bảo "Touch the button", nhưng chạm vào thì không có gì xảy ra. Xoá call thôi chưa đủ, phần phản hồi thuộc #39.
 - **Done when:** Trong Inspector không còn dòng event nào có target "None (Object)". Các nút vẫn chạy như trước.
 - **Inspector work expected:** yes. Xoá từng dòng event trong Editor.
 - **Depends on:** —
+- **Status:** todo
+
+---
+
+## UX – Giảm tải ngoại lai (review `xr-ux-reviewer`)
+
+Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lại hoặc đoán (tải ngoại lai). **Giữ nguyên** phần việc chính (tải nội tại), và hỗ trợ trainee hiểu vì sao (tải germane).
+
+**Không nên đổi (tải nội tại / giống hệ thống thật):**
+- Kiện gây nhiễu có chủ ý: VPE trong Mixed, 6 GGA trong Complex. GGA và GGB trông giống nhau, chỉ khác ở nhãn; đó chính là bước kiểm tra vật tư. **Không** tô màu theo vật tư.
+- Trainee tự tính số kiện và hàng lẻ (55 = 2×25 + 5). Không hiện sẵn kết quả.
+- Bố cục dialog xám của Basic (Auftrags-Nr, Material-Nr, `Pick: 1/1`) và nhãn `50 Stück` trên kiện: giữ vì giống hệ thống thật.
+- Câu phản hồi có lý do ở Concept ("GG packages must remain closed…"): giữ nội dung, chỉ đổi chỗ hiển thị.
+
+**Cần chụp thêm** (thêm view vào CLAUDE.md khi chụp lần đầu):
+- `confirm`: nhìn từ trên xuống vùng nút đỏ và thẻ 3, chụp sau khi bấm đúng và sau khi bấm sai.
+- `shelf`: nhìn thùng kho để đọc nhãn kiện, gợi ý (−0.2, 1.4, 0.3) → (−0.2, 0.8, 0.75).
+- `welcome`: canvas `Welcome` ở y 1.63.
+- Ngoài ra cần đo world scale của các canvas để tính chiều cao chữ theo độ. Hỏi `xr-lit-scout` về khuyến nghị cỡ chữ và khoảng cách UI của Meta.
+
+### #32 [P1] ConceptScene: phản hồi quiz bị xoá khi cầm/thả kiện
+- **Type:** bug
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene.unity:1043 (`PackageQuizController.feedbackText`) và :17204 (`PackageInfoDisplay.descriptionText`) cùng trỏ vào một TMP (`fileID 1358751443`, `[Info Panel]/TXT_Description`); `_whenUnselect → ShowDefaultInfo` ở :5031, :8681, :9679; Assets/Scripts/PackageInfoDisplay.cs:68–72
+- **Problem:** Phản hồi của quiz và thông tin kiện dùng chung một ô chữ. Bấm nút xong mà cầm rồi thả một kiện thì phản hồi bị ghi đè bằng "Look below to read the instructions…". Thông tin kiện cũng biến mất ngay khi thả, nên trainee phải vừa giữ kiện vừa đọc hai panel ở xa (`Info Panel` và `Sample Description`, lệch nhau 29°). Ngoài ra panel `Sample Formula` để trống khi bắt đầu, tiêu đề panel ("Instruction Panel") trùng tên với thẻ trên bàn, `TXT_Feedback` trống nằm chồng lên vùng mô tả, và các ô đáp án không cho thấy ô nào đang được chọn.
+- **Done when:** Chọn VPE và bấm nút → hiện phản hồi đúng. Sau đó cầm rồi thả một kiện → phản hồi vẫn còn. Thả kiện → thông tin của kiện vừa cầm vẫn hiện tới khi cầm kiện khác. Lúc bắt đầu scene, không có panel trống nào. Chọn một đáp án → ô đó được đánh dấu rõ ràng.
+- **Inspector work expected:** yes. Tạo TMP riêng cho phản hồi (đặt cạnh nút, xem #33), gán lại `feedbackText`, bỏ `ShowDefaultInfo` khỏi `_whenUnselect`, ẩn hoặc gộp `Sample Description`, xoá `TXT_Feedback` thừa.
+- **Depends on:** — (việc giữ thông tin sau khi thả có làm quiz quá dễ không: hỏi người hướng dẫn cùng #17)
+- **Status:** todo
+
+### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
+- **Type:** logic
+- **Scene(s):** ConceptScene, MixedPickingScene, ComplexScene (Basic đã đúng mẫu: thẻ kết quả cách nút khoảng 0.11 m)
+- **Files:** `[Info Panel]/TXT_Feedback` (Mixed, Complex), `[Info Panel]/TXT_Description` (Concept, xem #32); Assets/Scripts/MixPickingValidator.cs, Assets/Scripts/PiecesOrderValidator.cs, Assets/Scripts/PackageQuizController.cs (thêm reference cho dòng kết quả ngắn)
+- **Problem:** Lúc bấm nút, mắt trainee đang nhìn xuống bàn (nút ở khoảng 40° phải, 60° xuống). Kết quả lại hiện trên panel WMS (16° xuống), lệch 42° (Mixed), 43° dọc + 34° ngang (Concept) hoặc 51° (Complex). Trainee phải ngẩng đầu để biết mình đúng hay sai, và có thể không thấy kết quả. Đây là split attention.
+- **Done when:** Bấm nút với đơn sai → trong vòng khoảng 0.15 m quanh nút hiện một dòng ngắn (sai + loại lỗi), nhìn thấy được trong ảnh `confirm`. Bấm với đơn đúng → dòng đó báo đúng. Chi tiết (nếu cần) vẫn nằm trên WMS. Cả ba scene dùng cùng kiểu thẻ với Basic.
+- **Inspector work expected:** yes (tạo thẻ hoặc Canvas nhỏ cạnh nút trong từng scene, gán reference)
+- **Depends on:** #14 (nội dung feedback), #32 cho Concept. Có thể tách mỗi scene một nhánh.
+- **Status:** todo
+
+### #34 [P1] BasicPickingScene: Rest đếm ngược làm lộ đáp án
+- **Type:** logic
+- **Scene(s):** BasicPickingScene
+- **Files:** Assets/Scripts/WS Scripts/CalcForWMS.cs:35, :45; BasicPickingScene.unity:11092–11093 (`necessarySize: 300`, `restSize: 300`)
+- **Problem:** Rest bắt đầu bằng Soll (300) và giảm 50 mỗi khi đặt một kiện, nên `Rest: 0` báo luôn "đủ rồi". Trainee không phải tự tính 300 ÷ 50, chỉ cần bỏ kiện vào tới khi Rest về 0. Như vậy tải nội tại bị mất, và con số 300 hiện hai lần. Theo tài liệu yêu cầu, Rest là tồn kho còn lại trong thùng (#20), không phải "còn thiếu".
+- **Done when:** Đặt từng kiện vào thùng thì không có số nào trên WMS cho biết còn thiếu bao nhiêu kiện. Trainee chỉ biết đủ hay chưa sau khi bấm xác nhận. Nếu đã chốt nghĩa của Rest thì Rest hiện đúng nghĩa đó.
+- **Inspector work expected:** có thể (giá trị `restSize`, hoặc ẩn text Rest)
+- **Depends on:** #2 (sửa cùng file); câu hỏi người hướng dẫn: Rest nghĩa là gì, Ist ở hệ thống thật có tự cập nhật không (#20). Có thể làm tạm bằng cách ẩn số Rest trước khi có câu trả lời.
+- **Status:** todo
+
+### #35 [P2] Thẻ hướng dẫn: đọc được mà không phải cúi 60°
+- **Type:** logic
+- **Scene(s):** cả 5 scene (`Instruction Table` ở (0, 0.85, 0.45) giống nhau trong mọi scene, nhưng **không** phải prefab)
+- **Files:** `Instruction Table` trong từng scene
+- **Problem:** Các thẻ nằm phẳng trên bàn, cách mắt khoảng 0.9 m, góc cúi 59–60°. Chữ phụ cỡ 11, khoảng 6.7 mm (Basic, suy ra). Trong ảnh `overview` gần như không đọc được. Mỗi bước, trainee phải cúi xuống đọc thẻ rồi ngẩng lên WMS (khoảng 43°).
+- **Done when:** Từ vị trí đứng, ảnh `overview` đọc được chữ phụ của mọi thẻ. Góc cúi tới thẻ nhỏ hơn hiện tại; con số mục tiêu lấy theo khuyến nghị mà `xr-lit-scout` tìm được. Nút đỏ vẫn nằm sát thẻ 3. Năm scene giống nhau.
+- **Inspector work expected:** yes. Nên biến `Instruction Table` thành prefab trước, rồi sửa một lần.
+- **Depends on:** đo world scale của canvas; #25 (nội dung thẻ)
+- **Status:** todo
+
+### #36 [P2] Nhãn kiện đọc được từ chỗ đứng
+- **Type:** logic
+- **Scene(s):** ConceptScene, MixedPickingScene, ComplexScene
+- **Files:** `…/Cube/Text (TMP)` của các kiện GG/GGA/GGB (font 0.2), nhãn túi `[PlasticBag_VPE_3]` (rect 0.07×0.13), `GGB/[VPE_n]/Cube/Text (TMP)`
+- **Problem:** Trong ảnh `container`, nhãn chỉ là những ô hoặc chấm trắng. GGA và GGB cùng một mô hình, nên nhãn là cách duy nhất để phân biệt vật tư. Ở Concept, nhãn GG là chữ xám mảnh, trong khi nhiệm vụ yêu cầu "Look for … labels". Trainee phải nhấc từng kiện lên mới đọc được.
+- **Done when:** Ảnh `shelf` đọc được tên vật tư và số lượng trên mọi kiện trong thùng kho. Nhãn quay về phía trainee, chữ đen đậm. Màu kiện **không** đổi theo vật tư.
+- **Inspector work expected:** yes (prefab kiện, TMP nhãn)
+- **Depends on:** #17 (nội dung nhãn đúng)
+- **Status:** todo
+
+### #37 [P2] Menu: trong tầm với, đánh dấu bài đang làm, khó chạm nhầm
+- **Type:** logic
+- **Scene(s):** cả 5 scene
+- **Files:** `Menu` (local (0.34, −0.06, 0.20), world khoảng (0.66, 0.86, 0.45)) trong từng scene
+- **Problem:** Menu nằm lệch phải 56°, cúi 43°, cách 1.09 m. Ở Welcome, Menu bị cắt ở mép ảnh `overview`. Không có mục nào được đánh dấu là bài đang làm. Feedback bảo "Select the next scenario option in the MENU" mà không nói mục nào. Ở Complex, Menu chỉ cách nút đỏ khoảng 0.33 m, chạm nhầm là đổi scene ngay.
+- **Done when:** Đứng tại chỗ (không bước) chạm được mọi mục, thử trên Quest. Mục của bài hiện tại được làm nổi. Khoảng cách từ nút đỏ tới Menu lớn hơn hiện tại, hoặc chuyển scene cần xác nhận.
+- **Inspector work expected:** yes
+- **Depends on:** #18 (tên mục ở Basic)
+- **Status:** todo
+
+### #38 [P2] ComplexScene: panel chúc mừng chồng lên WMS, ô feedback quá thấp
+- **Type:** bug
+- **Scene(s):** ComplexScene
+- **Files:** `Congratulations` (khoảng (0.00, 1.36, 1.10), scale 0.35, cùng z với `Info Panel`); `[Info Panel]/TXT_Feedback` (rect cao 47.2, font 20); Assets/Scripts/PiecesOrderValidator.cs:50–53 (3 dòng)
+- **Problem (suy ra, cần ảnh):** Panel chúc mừng nằm cùng mặt phẳng với WMS, nên có thể chồng lên hoặc nhấp nháy (z-fighting). Feedback sai có 3 dòng trong ô chỉ đủ cao cho khoảng 2 dòng, nên có thể đè lên `TXT_PiPlaced`.
+- **Done when:** Ảnh `wms` sau một lần bấm sai: các dòng feedback không đè lên bộ đếm. Ảnh sau một lần bấm đúng: panel chúc mừng không chồng và không nhấp nháy với WMS.
+- **Inspector work expected:** yes
+- **Depends on:** chụp ảnh trước để xác nhận. Nếu #33 chuyển feedback xuống cạnh nút thì nửa sau của mục này có thể không còn cần.
+- **Status:** todo
+
+### #39 [P2] WelcomeScene: có phản hồi khi cầm thùng và chạm nút
+- **Type:** feature
+- **Scene(s):** WelcomeScene
+- **Files:** WelcomeScene `BigRedButton` (`_whenSelect`, đang trống, xem #9), thùng trong `Interactables Obj`, `Instruction Table` thẻ 1–2, `Menu`
+- **Problem:** Welcome dạy hai thao tác (cầm, chạm nút) nhưng cả hai đều không có phản hồi. Trainee không biết mình đã làm đúng chưa, cũng không biết lúc nào "xong" để sang Menu. Mọi chữ hiện ra cùng lúc ngay từ đầu (4 khối).
+- **Done when:** Cầm thùng → thẻ 1 có dấu ✓. Chạm nút đỏ → thẻ 2 có dấu ✓ kèm âm thanh. Xong cả hai → Menu (mục tiếp theo) được làm nổi. Nếu prefab nút đã có âm thanh hoặc animation thì giữ nguyên, chỉ thêm dấu ✓.
+- **Inspector work expected:** yes
+- **Depends on:** #9; nên làm cùng hoặc sau #27 (bàn phím nhập mã cũng nằm ở Welcome)
+- **Status:** todo
+
+### #40 [Feature] Làm nổi bước hiện tại trên thẻ hướng dẫn
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** `Instruction Table` (thẻ 1–3); script mới theo dõi **thao tác** (đã cầm kiện, thùng có kiện)
+- **Problem:** Cả 3–4 thẻ (khoảng 55 từ) hiện cùng lúc với cùng độ nổi bật, nên trainee không biết mình đang ở bước nào (segmenting/signalling).
+- **Done when:** Lúc bắt đầu, thẻ 1 nổi bật. Cầm kiện đầu tiên → thẻ 2 nổi bật. Thùng đơn có ít nhất 1 kiện → thẻ 3 nổi bật. Việc chuyển bước **chỉ** dựa vào thao tác, không bao giờ dựa vào đúng hay sai, để không lộ đáp án.
+- **Inspector work expected:** yes
+- **Depends on:** #25, #35
 - **Status:** todo
 
 ---
@@ -236,6 +354,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Files:** panel WMS hiện có trong scene, `Assets/Scripts/WS Scripts/CalcForWMS.cs`. Spec nằm ở chỗ bảo mật (`docs/requirements/wms-specs/kommissionierung-dialog.md`, không commit)
 - **Problem:** Panel WMS hiện tại không giống màn hình thật mà trainee sẽ dùng ở kho, nên bài tập chưa sát thực tế.
 - **Bổ sung (ảnh Play mode):** Hiện có 3 kiểu panel trong 3 scene thực hành: Basic là dialog xám tiếng Đức (`Soll/Ist/Rest`, `EKZ`, `VPE: 50`), còn Mixed/Complex là panel đen tiếng Anh (`Order quantity`, `Package type`, `Package size`). Cùng một khái niệm có tên khác nhau giữa các bài (`Soll` ↔ `Order quantity`, `VPE: 50` ↔ `50 pcs / package`). Hơn nữa, màn hình giống thật lại xuất hiện *trước* màn hình đơn giản. Khi làm mục này thì dùng **một mẫu** cho cả 3 scene, với tên trường thật.
+- **Bổ sung (review UX):** Ở Mixed, cột giá trị trong `TXT_Description` lệch nhau vì dùng lẫn tab và dấu cách. Khi dựng panel mới, nên dùng TMP riêng cho nhãn và cho giá trị.
 - **Done when:** Trong Play mode, đặt panel cạnh ảnh gốc: bố cục, chữ và trạng thái chỉ báo khớp với spec. Soll/Ist/Rest và `F6 Bestätigen` hoạt động theo quy tắc đã chốt. Không có ảnh hay tài liệu gốc nào nằm trong `Assets/`.
 - **Inspector work expected:** yes (dựng Canvas, gán reference)
 - **Depends on:** #1, câu trả lời của người hướng dẫn (file câu hỏi trong `docs/requirements/`, mục B1–B10)
