@@ -105,5 +105,7 @@ desktop.ini
 
 /analysis/data/
 /analysis/output/
+# Real research logs copied from the Quest (participant data)
+/actual log/
 /Assets/Resources/ResearchBuildInfo.txt
 /Assets/Resources/ResearchBuildInfo.txt.meta
