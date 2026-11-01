@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class PiecesOrderValidator : MonoBehaviour
 {
-    // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get.
-    private const string WrongPackageLine =
-        "The container holds material that does not belong to this order."; // complex.feedback.wrong_package
+    // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get. Last lesson: the Congratulations panel
+    // tells the trainee what to do next.
+    private const string CorrectText = "Correct! The full cartons and the loose material match the order."; // complex.feedback.correct
 
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
@@ -63,33 +63,23 @@ public class PiecesOrderValidator : MonoBehaviour
         if (missing)
             return;
 
-        int GGACount = containerCounter.GGACount;
-        int GGBCount = containerCounter.GGBCount;
-        int looseItemCount = containerCounter.LooseItemCount;
+        // #6: one rule decides right/wrong (docs/decisions/005, 006).
+        OrderResult result = containerCounter.CheckOrder();
 
-        if (containerCounter.IsCorrect())
+        if (result.Correct)
         {
-            feedbackText.text =
-                    $"Correct!\n" +
-                     $"{GGBCount} packages and "+
-                    $"{looseItemCount} pieces have been placed.\n";
-
+            feedbackText.text = CorrectText;
             feedbackText.color = Color.green;
             congratulationsPanel.SetActive(true);
             instructionText.text = string.Empty;
             return;
         }
 
-        string wrongPackage = containerCounter.OtherCount > 0 ? WrongPackageLine + "\n" : string.Empty;
-
+        // #14: the instruction stays visible; the feedback names the first error, never the target numbers.
         feedbackText.text =
-            $"Check the order again.\n" +
-            wrongPackage +
-            $"Packages: {GGBCount + GGACount} / 2\n" +
-            $"Loose pieces: {looseItemCount} / 5";
-
+            OrderFeedback.Title(FeedbackLanguage.English) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.English);
         feedbackText.color = Color.red;
-        instructionText.text = string.Empty;
+        instructionText.text = initialInstruction;
 
         // #4: a wrong order after a correct one must not leave the panel visible.
         if (congratulationsPanel != null)

@@ -16,7 +16,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
-**Thứ tự đề xuất (cập nhật 2026-11-01: mục không cần kính làm trước).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau). #22 đã bỏ.
+**Thứ tự đề xuất (cập nhật 2026-11-01: mục không cần kính làm trước).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau). #22 đã bỏ. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) dời xuống đợt cuối (Đợt 6).
 1. **Đợt 1 – không kính, không phụ thuộc** (đa số chỉ sửa script):
    - ComplexScene: ~~#3 + #15~~ (verified-mcp) → ~~#16~~ (done).
    - BasicPickingScene: ~~#2~~ (verified-mcp).
@@ -26,29 +26,30 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - Song song, không đụng scene: ~~#26~~ (verified-mcp, merge `7533874`).
    - **Đóng đợt 1:** 10 mục `verified-mcp` đang chờ case test tay (#1 E4, #2 D5, #3/#15 T5, #4 K5, #9 E6, #24 S4, #34 R5, #38 P4, #26 L19 trên Quest + L20 trong Editor): gom vào buổi test kính kế tiếp để chuyển sang `done`.
 **Đợt kế tiếp (người dùng chọn 2026-11-01: "cả hai, gọn"), xong thì một buổi test kính:**
-   - Làm tuần tự trong cùng checkout, vì Unity Editor và UnityMCP chỉ mở được một project một lúc: ~~#27~~ (verified-mcp; WelcomeScene + màn cuối ComplexScene, decision 004) → ~~#44~~ (verified-mcp; nút kết thúc phiên, 5 scene) → #32 (ConceptScene) → #18 (BasicPickingScene, nhưng phần Menu đụng cả 5 scene nên làm sau cùng).
-   - Xen kẽ, không đụng scene: `solution-decision` cho nguồn số lượng đơn (#6) và định dạng kết quả validator (#14, #28).
-   - **Buổi test kính:** 10 ca của "Đóng đợt 1" + #27 + #44 + #32 + #18.
+   - Làm tuần tự trong cùng checkout, vì Unity Editor và UnityMCP chỉ mở được một project một lúc: ~~#27~~ (verified-mcp; WelcomeScene + màn cuối ComplexScene, decision 004) → ~~#44~~ (verified-mcp; nút kết thúc phiên, 5 scene) → ~~#32~~ (gộp vào #45, decision 007) → #18 (BasicPickingScene, nhưng phần Menu đụng cả 5 scene nên làm sau cùng).
+   - Xen kẽ, không đụng scene: `solution-decision` cho nguồn số lượng đơn (#6) và định dạng kết quả validator (#14; giữ chỗ cho mã lỗi mà #28 sẽ dùng lại ở Đợt 6).
+   - **Buổi test kính:** 10 ca của "Đóng đợt 1" + #27 + #44 + #18 (+ #17, #45 nếu đã xong).
 2. **Đợt 2 – không kính, có phụ thuộc:**
    - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → ~~#24~~ (verified-mcp) → ~~#34~~ (verified-mcp).
-   - Trước khi code: chạy `solution-decision` cho hai quyết định còn mở trong `docs/coding-conventions.md`: nguồn số lượng đơn (#6) và định dạng kết quả validator (#14, #28).
-   - Chuỗi validator, làm **tuần tự** vì cùng sửa `MixPickingValidator.cs` / `PiecesOrderValidator.cs`: #6 (sau #1, #3) → #14 (sau #4, #1) → #8 (sau #2, #3, #6).
-   - #28 (sau #26, dùng chung helper mã lỗi với #14).
+   - Hai quyết định trong `docs/coding-conventions.md` đã chốt: nguồn số lượng đơn (decision 005, #6) và định dạng kết quả validator (decision 006, #14/#28).
+   - Chuỗi validator, làm **tuần tự** vì cùng sửa scene Mixed/Complex và `MixPickingValidator.cs` / `PiecesOrderValidator.cs` (người dùng chọn 2026-11-01): #18 → #17 (decision 007) → #6 (sau #1, #3, #17) → #14 (sau #4, #1, #6) → #8 (sau #2, #3, #6). #45 (Concept, gồm #32) chạy song song với #6 sau #17. Rule và kết quả trong `XRPick.Orders` (decision 006) để #28 dùng lại.
 3. **Đợt 3 – test kính nhanh, gom một buổi test ở cuối đợt:**
-   - #32 (Concept) và #33 (sau #14, #32): kết quả cạnh nút đỏ.
-   - #18 (sau #1; gồm cả #5) → #25 (sau #18).
-   - #17 (chạy `solution-decision` trước, L) → #36, #23 (#23 không cần kính).
+   - #33 (sau #14, #45): kết quả cạnh nút đỏ.
+   - #18 đã chuyển lên Đợt 2 (trước #17). Sau #18: #25.
+   - #17 đã chuyển lên Đợt 2 (trước #6). Sau #17: #36, #23 (#23 không cần kính).
    - #10 (L; bố cục trước, số liệu theo #1, #34) → #20, #21.
-   - #39 (sau #9). #31 (sau #28; chỉ cắm kính vào máy).
+   - #39 (sau #9).
    - #11: phần Editor làm được trong đợt này; thử ConceptScene trên Quest trong cùng buổi test.
 4. **Đợt 4 – dịch** (không kính, nhưng chờ nội dung ổn định): #12 (sau #11, #4, #6, #14, #25) → #13.
 5. **Đợt 5 – bắt buộc test kính** (tay thật, tầm với, FPS), gom thành các buổi test riêng:
    - #41 (sau #1, #2, #24; phần `Empf Kz` sau #10).
    - #35 (sau #25) → #40; #37 (sau #18).
    - #19 (sau #3, #16, #17).
-   - #27, #29, #30 (sau #26).
+6. **Đợt 6 – log nghiên cứu (cuối cùng, người dùng chọn 2026-11-01).** Ca test tay còn lại của #26, #27, #44 vẫn nằm trong buổi test kính của đợt đang làm.
+   - #28 (sau #26, #14; dùng lại helper mã lỗi của #14) → #31 (sau #28; chỉ cắm kính vào máy).
+   - #29, #30 (sau #26; bắt buộc test kính: FPS khi bật logger).
    - #42 khoá Menu khi nghiên cứu (sau #26, #27, #18, #37).
-6. **Chờ quyết định:** #43 bài kiểm tra ngắn trong VR (để sau).
+   - Chờ quyết định: #43 bài kiểm tra ngắn trong VR (để sau).
 
 ---
 
@@ -137,13 +138,21 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Files:** Assets/Scripts/MixPickingValidator.cs:38–39, :44–64, Assets/Scripts/PiecesOrderValidator.cs:39–56, BasicPickingScene `Instruction Table/Correct|Incorrect/Secondary Text`
 - **Problem:** Khi làm sai, Mixed và Complex xoá `instructionText`, nên trainee mất luôn đề bài. Feedback chỉ liệt kê số đếm, không nói *vì sao* sai (sai loại, thừa, cần hàng lẻ). Basic chỉ ghi "Deine Auswahl war inkorrekt!", không có số nào. Khi đúng, mỗi scene chỉ sang bài tiếp theo một kiểu: Basic ghi "EKZ 8" (không có trong menu), Complex không nói gì.
 - **Bổ sung (ảnh Play mode):** Feedback sai hiện tại **lộ đáp án**: Mixed in `GG Connector A: x / 2`, `GG Screw B: x / 2`, `VPE: x / 0` (Assets/Scripts/MixPickingValidator.cs:47–51, :58–62). Complex in `Packages: x / 2`, `Loose pieces: x / 5` (Assets/Scripts/PiecesOrderValidator.cs:50–53). Trainee sai một lần là biết số đúng, không cần tự tính. Ngoài ra chỗ hiện feedback mỗi scene một kiểu: Mixed/Complex/Concept ghi lên panel, Basic dùng thẻ riêng trên bàn.
-- **Done when:** Ở cả 3 scene: làm sai thì hướng dẫn vẫn còn, feedback nêu **loại lỗi** (sai loại kiện, sai vật tư, thừa, thiếu, thiếu hàng lẻ) và lý do, nhưng **không in số đích**. Làm đúng thì feedback nói đúng ở đâu và tên mục tiếp theo trong menu (Basic → Mixed → Complex → kết thúc). Feedback hiện ở cùng một chỗ trong mọi scene.
+- **Decision:** docs/decisions/006-validator-result-format.md
+- **Done when:** Ở cả 3 scene: làm sai thì hướng dẫn vẫn còn, feedback nêu **loại lỗi** (sai vật tư, thừa, thiếu, thiếu hoặc thừa hàng lẻ; theo A2/A3 không còn "sai loại kiện") và lý do, nhưng **không in số đích**. Làm đúng thì feedback nói đúng ở đâu và tên mục tiếp theo trong menu (Basic → Mixed → Complex → kết thúc). Feedback hiện ở cùng một chỗ trong mọi scene. Thêm (decision 006):
+  - Có nhiều lỗi cùng lúc thì màn hình chỉ nêu lỗi đầu tiên theo thứ tự `EMPTY > WRONG_MATERIAL > TOO_FEW/TOO_MANY > hàng lẻ` (lý do + việc cần làm), kèm một dòng chung "còn lỗi khác".
+  - ComplexScene: đặt 2 carton GGA thay cho 2 carton Ring D thì màn hình chỉ nêu lý do sai vật tư và việc cần làm, kèm dòng "còn lỗi khác"; không có số đích.
+  - ~~BasicPickingScene: thùng có 6 carton TRAINING-MATERIAL B và carton mở Ring D thì bị báo sai vật tư.~~ Không còn làm được: #18 đã xoá Ring D khỏi Basic (người dùng chọn). Thay bằng: BasicPickingScene, 5 carton SCHLAUCHSCHELLE B → thẻ „Nicht richtig“ nêu thiếu và cách tính; 7 carton → nêu thừa; không có số đích.
+  - Feedback dùng tên vật tư trên WMS/nhãn, không dùng khoá log hay tên enum.
+  - "Feedback hiện ở cùng một chỗ": vị trí thuộc #33 (xem Bổ sung review UX); #14 chỉ lo nội dung.
 - **Inspector work expected:** yes, với Basic (text nằm trong scene, không trong code)
 - **Công:** M
 - **Test trên kính:** không
-- **Depends on:** #4 (sửa cùng các dòng), #1 cho phần Basic, #6 (cùng sửa hai validator, làm sau #6). Quyết định "định dạng kết quả validator" (`docs/coding-conventions.md`, chung với #28) phải chốt bằng `solution-decision` trước.
+- **Depends on:** #4 (sửa cùng các dòng), #1 cho phần Basic, #6 (cùng sửa hai validator, làm sau #6), #17 (thuật ngữ cuối cùng cho câu feedback). Định dạng kết quả đã chốt ở decision 006.
 - **Bổ sung (review UX):** "Cùng một chỗ" nên là **cạnh nút đỏ**, vì đó là chỗ trainee đang nhìn lúc xác nhận. Basic đã làm vậy (thẻ cách nút khoảng 0.11 m). Concept, Mixed và Complex thì ghi lên panel WMS, lệch 42–51° so với nút. Vị trí do #33 xử lý, mục này chỉ lo nội dung.
-- **Status:** todo
+- **Ghi chú (2026-11-01, khi làm):** câu feedback (EN cho Mixed/Complex tới #12, DE cho Basic) đã qua german-reviewer, nằm trong `Assets/Scripts/OrderFeedback.cs`, key `order.feedback.*`. Basic giờ cũng chấm bằng `OrderRule` (dòng đơn dựng từ `CalcForWMS`: `materialKey`, `materialName`, `vpe`, Soll = `necessarySize`); điểm chặn #28 ở Basic đã gỡ. Mixed khi đúng chỉ sang „5. Volle Kartons und loses Material“ (lấy từ `LessonNames`); Complex khi đúng để panel Congratulations nói bước tiếp.
+- **Test report:** docs/test-reports/bl14.md
+- **Status:** verified-mcp (16/17 ✅, chờ test tay H1)
 
 ### #15 [P1] ComplexScene: bộ đếm không được lộ đáp án
 - **Type:** logic
@@ -171,21 +180,31 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Test report:** docs/test-reports/bl16.md
 - **Status:** done (commit 5601da9, test 5/5 ✅, theo giả định A5)
 
-### #17 [P1] Chốt nghĩa GG/VPE rồi làm lại ConceptScene và sửa nhãn lệch logic
+### #17 [P1] Bỏ GG/VPE như "loại kiện": khoá vật tư và một mẫu nhãn trên mọi kiện
 - **Type:** logic
-- **Scene(s):** ConceptScene, BasicPickingScene (nhãn), MixedPickingScene, ComplexScene
-- **Files:** Assets/Scripts/PackageQuizController.cs, Assets/Scripts/PackageInfoOnGrab.cs, ConceptScene `[PlasticBag_VPE_3]` (nhãn ghi "GG Screw B"), BasicPickingScene các package nhãn `VPE … 50 Stück` nhưng đếm theo tag `GGPackage` (Assets/Scripts/WS Scripts/CalcForWMS.cs:32)
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene, ConceptScene (chỉ 3 kiện), WelcomeScene (câu mục tiêu)
+- **Files:** Assets/Scripts/PackageData.cs, Assets/Scripts/PackageType.cs (không xoá giá trị), nhãn TMP trên mọi kiện, BasicPickingScene các package nhãn `VPE … 50 Stück` nhưng đếm theo tag `GGPackage` (Assets/Scripts/WS Scripts/CalcForWMS.cs:41, :92), WelcomeScene "Identify GG and VPE package types"
 - **Problem:** ConceptScene dạy GG và VPE là hai *loại kiện*, chỉ VPE được mở. Tài liệu yêu cầu định nghĩa VPE là *số cái trong một thùng/túi* và không nhắc "GG". Ngoài ra tên object, nhãn và cách code đếm không khớp nhau, nên trainee học một quy tắc rồi gặp ngược lại ở bài sau.
-- **Done when:** Nghĩa GG/VPE đã được người hướng dẫn chốt và ghi vào `docs/i18n/glossary.csv`. ConceptScene dạy đúng nghĩa đó. Ở mọi scene, nhãn trên package khớp với cách validator đếm nó.
-- **Inspector work expected:** yes (nhãn, tag, `PackageData`)
+- **Decision:** docs/decisions/007-material-labels-and-keys.md (phần quiz/panel ConceptScene tách sang #45; mục Menu sang #18)
+- **Done when** (decision 007):
+  - Nghĩa GG/VPE đã được người hướng dẫn chốt và ghi vào `docs/i18n/glossary.csv` (dòng `GG` đánh dấu bỏ, thêm dòng `Mat.-Nr` với `do_not_translate=yes`). Trước đó mục này tối đa là `verified-mcp` theo giả định A2.
+  - Ở cả 4 scene, mọi carton, túi và chiếc lẻ có `PackageData` với khoá vật tư không rỗng; Console không có lỗi thiếu khoá.
+  - Mọi nhãn kiện có ba dòng theo cùng mẫu (tên tiếng Đức, `Mat.-Nr: …`, `VPE: …`); số VPE trên nhãn bằng VPE trong `PackageData` (so bằng scene inventory).
+  - Cùng một vật tư có cùng khoá, Mat.-Nr, tên và VPE ở mọi scene; Ring D ghi VPE 25 ở mọi nơi.
+  - Không TMP nào trainee nhìn thấy (nhãn, panel, WelcomeScene) còn chữ `GG`, hoặc `VPE` dùng như tên một loại kiện.
+  - Cách đếm không đổi: Mixed đơn đúng hiện tại → `Correct`, có carton Ring D trong thùng → sai (như trước); Complex 2 carton Ring D + 5 chiếc lẻ → `Correct`; Basic 6 carton → Ist `300`, `Correct`, Rest không đổi.
+- **Inspector work expected:** yes (nhãn, `PackageData` trên mọi kiện)
 - **Công:** L
-- **Test trên kính:** nhanh (cầm kiện đọc nhãn, làm quiz Concept)
-- **Depends on:** #1. A2, A3 (nhóm đã trả lời 2026-11-01): bỏ GG/VPE như "loại kiện", kiện là carton của một mã vật tư ghi Mat.-Nr và VPE; bỏ nhầm vật tư khác = đơn sai. Nên chạy `solution-decision` trước khi làm (mục L, đụng 4 scene).
+- **Test trên kính:** nhanh (cầm kiện đọc nhãn)
+- **Depends on:** #1, #18 (quyết object sót lại ở Basic; thứ tự người dùng chọn 2026-11-01: #18 → #17 → #6). A2, A3 (nhóm đã trả lời 2026-11-01): bỏ GG/VPE như "loại kiện", kiện là carton của một mã vật tư ghi Mat.-Nr và VPE; bỏ nhầm vật tư khác = đơn sai. Nên chạy `solution-decision` trước khi làm (mục L, đụng 4 scene).
+- **Bổ sung (2026-11-01, decision 006):** làm **trước #6**. Mỗi carton mang một **khoá vật tư** ngắn do dự án đặt (ví dụ `connector_a`, `screw_b`, `ring_d`, `training_b`), ổn định, không phụ thuộc ngôn ngữ, không hiện cho trainee, tách khỏi Mat.-Nr giả hiển thị trên nhãn. #6 dùng khoá này cho dòng đơn và vật tư lạ, nên không cần bảng tạm `PackageType` → khoá. Không thiết kế tình huống đặt nguyên carton đã mở vào thùng. Nếu người hướng dẫn xác nhận A2 thì xoá mã giữ chỗ `WRONG_TYPE` khỏi enum và `skill_map.csv`. Có thể làm theo giả định A2 (như #1 theo A1); chỉ thành `done` khi người hướng dẫn chốt.
 - **Bổ sung (ảnh Play mode):**
   - **Quiz ở Concept ít giá trị kiểm tra:** Khi cầm kiện GG, panel hiện ngay `Rule: GG packages must NOT be opened.` (`[Info Panel]/TXT_Rule`, giá trị `packageRule` của `PackageInfoOnGrab`). Hộp VPE thì đã được mô hình hoá ở trạng thái mở sẵn. Vì vậy câu hỏi "Which package can be opened?" chỉ kiểm tra trainee có nhớ dòng vừa đọc vài giây trước hay không.
   - **Thông tin cho A2:** Tài liệu Detail Description (mục Informationen Kommissionierung) có quy tắc: túi 10 cái gồm hơn 2 thành phần thì không được mở; phải lấy nguyên túi và chỉnh lại Restmenge. Có thể quy tắc "GG không được mở" bắt nguồn từ đây.
 - **Bổ sung (2026-11-01, đối chiếu cả tài liệu cũ):** "GG" không có trong tài liệu nào, cũ hay mới. VPE là một **con số** (ô `Verp.-Einh.` trên dialog). Đề xuất cho A2/A3: bỏ cách chia "loại kiện GG/VPE"; kiện được phân biệt bằng mã vật tư (Mat.-Nr) và ghi VPE; lỗi là bỏ nhầm vật tư khác hoặc sai số lượng. Vẫn cần chốt A2/A3.
-- **Status:** todo (sau #1)
+- **Ghi chú (2026-11-01, khi làm):** tên vật tư giả (german-reviewer): KABELVERBINDER A (`connector_a`, 512304, VPE 50), SCHRAUBE B (`screw_b`, 738190, 20), RING D (`ring_d`, 264857, 25), SCHLAUCHSCHELLE B (`training_b`, 443890, 50), in hoa như trên WMS. Nhãn: không tự xuống dòng, tự thu nhỏ. Feedback Mixed đổi tên vật tư (`RING D: x / 0` thay `VPE: x / 0`). Quiz/panel Concept còn chữ GG/VPE: thuộc #45. Thẻ hướng dẫn Mixed/Complex vẫn ghi "package type" (EN): thuộc #25.
+- **Test report:** docs/test-reports/bl17.md
+- **Status:** verified-mcp (10/12 ✅, chờ test tay H1–H2; theo giả định A2)
 
 ### #18 [P1] Đưa BasicPickingScene về cùng chuỗi bài
 - **Type:** logic
@@ -206,7 +225,10 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (2026-11-01, trả lời B8, D1):**
   - B8: dùng dialog mới → nút xác nhận và thẻ hướng dẫn ghi `F6`, không còn `F12`. Thêm câu Done when: *Nút đỏ và thẻ hướng dẫn ghi `F6`; không còn chữ `F12` nào trong scene.*
   - D1: mọi scene sẽ có cùng dialog WMS, nên đơn nào cũng có EKZ; đặt tên bài theo EKZ không phân biệt được các bài. Hướng đề xuất: đặt tên theo **kỹ năng** mỗi bài luyện (vd. đọc dialog → một pick → nhiều vị trí lần lượt → carton nguyên + chiếc lẻ). Cần rà soát lại cả 5 scene (`instructional-design-reviewer`), chốt tên, rồi mới sửa menu ở đây và ở #37. Tên tiếng Đức qua `localize-strings`.
-- **Status:** todo (#1 đã verified-mcp)
+- **Bổ sung (2026-11-01, decision 007):** làm **trước #17**. Mục Menu "GG vs VPE" / "2. Package Types" đổi thành `2. Grundlagen` ở cả 5 scene (D1), không còn chữ "GG" trên Menu. Quyết rõ object sót lại ở Basic (7 carton Connector A, 2 Ring D): xoá, hay giữ có chủ ý làm vật gây nhiễu. Nếu giữ, ghi vào backlog #17 (gắn khoá) và #28 (thêm `BasicPickingScene,check_material`); nếu xoá, #28 không thêm dòng đó.
+- **Ghi chú (2026-11-01, khi làm):** người dùng chọn **xoá** các kiện cũ (đang tắt) ở Basic, cùng `PacketTests`, panel WMS cũ `Info Panel` và component `PackageCounter` (code chết trỏ vào panel đó). Tên Menu dùng đúng chuỗi của `LessonNames` (#27: `3. Kommissionieren nach EKZ 3`, `5. Volle Kartons und loses Material`), cỡ chữ 12 ở cả 5 scene để mục dài nhất không bị cắt. D7: ẩn `EKZ Hinweis`, xoá chữ "Bitte Material umpacken!". Chữ hướng dẫn và kết quả của Basic viết lại bằng *Sie* (german-reviewer, key `basic.*`). Mục #25 vẫn lo mẫu thẻ chung cho cả 5 scene.
+- **Test report:** docs/test-reports/bl18.md
+- **Status:** verified-mcp (21/24 ✅, chờ test tay M1–M3)
 
 ### #24 [P1] BasicPickingScene: thêm kiện thừa để phép tính có ý nghĩa
 - **Type:** logic
@@ -249,13 +271,25 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** Assets/Scripts/MixPickingValidator.cs:31–64, Assets/Scripts/PiecesContainerCounter.cs:100, :106, Assets/Scripts/PiecesOrderValidator.cs:37, :52–53, Assets/Scripts/PackageCounter.cs:115
 - **Problem:** Validator viết cứng các số `2 / 2 / 0`, `GGB==2 && GGA==0 && Loose==5`, "selected 2 GG", và không gọi `IsOrderCorrect()` / `IsCorrect()`. Ai đổi số trong Inspector thì text PACKAGE và validator sẽ lệch nhau.
-- **Done when:** Đổi một số yêu cầu trong Inspector (ví dụ `requiredGGA = 3`) thì cả text đếm, feedback và kết quả đúng/sai đều theo số mới mà không cần sửa code. Số chỉ khai báo ở một chỗ cho mỗi scene, có thể là field của counter hoặc một ScriptableObject `OrderDefinition`.
-- **Inspector work expected:** có thể. Nếu dùng ScriptableObject thì phải tạo asset và gán vào. Field cũ cần `[FormerlySerializedAs]`.
+- **Decision:** docs/decisions/005-order-single-source.md
+- **Done when** (theo decision 005):
+  - MixedPickingScene: đổi Soll của Cable Connector A từ 100 thành 150 trong Inspector rồi vào Play. Panel WMS hiện `150 pcs`. 3 carton Connector + 2 Screw B thì đúng; 2 + 2 thì sai.
+  - MixedPickingScene với đơn mặc định: 2 + 2 thì đúng; 2 + 2 + 1 VPEFull thì sai.
+  - ComplexScene: đổi Soll Ring D từ 55 thành 80. Panel WMS hiện `80 pcs`. 3 carton + 5 chiếc lẻ thì đúng; 2 carton + 5 chiếc lẻ thì sai.
+  - ComplexScene với đơn mặc định: 2 carton + 5 chiếc lẻ thì đúng; thêm 1 carton GGA thì sai.
+  - BasicPickingScene: đổi `necessarySize` từ 300 thành 250 thì Soll hiện `250`, Rest hiện `200`; 5 carton thì đúng, 6 carton thì sai.
+  - Grep 4 script Mixed/Complex: không còn literal của đơn (`== 2`, `== 5`, `"/ 2"`, `"/ 5"`, `"2 GG"`).
+  - Bộ đếm trong thùng vẫn chỉ hiện số đã đặt (#15); feedback không thêm số đích mới, các số `x / N` đang có lấy N từ nguồn.
+  - Mỗi chuỗi mới hoặc đã đổi cho trainee có dòng key + EN + DE trong `docs/i18n/strings-todo.csv`.
+  - Console không có lỗi mới.
+- **Inspector work expected:** yes. Field mới (Soll chiếc + VPE), không dùng `[FormerlySerializedAs]` cho field kiện cũ vì đổi nghĩa; nhập lại Mixed 100/50, 40/20 và Complex 55/25 rồi lưu scene.
 - **Công:** M
 - **Test trên kính:** không
-- **Depends on:** #1, #3. Quyết định "nguồn duy nhất cho số lượng đơn" (`docs/coding-conventions.md`) phải chốt bằng `solution-decision` trước. Làm trước #14 (cùng sửa hai validator).
+- **Depends on:** #1, #3 (cả hai verified-mcp), #17 (khoá vật tư trên carton, decision 006 §6; người dùng chọn làm #17 trước, 2026-11-01). Làm trước #14 (cùng sửa hai validator). Rule đơn và object kết quả đặt trong asmdef `XRPick.Orders` có test EditMode (decision 006). A7, A5, A3/A6 (người hướng dẫn) không chặn: nếu trả lời khác thì chỉ đổi số trong Inspector hoặc rule ở một chỗ.
 - **Ghi chú (2026-11-01, rà backlog):** Basic không còn số viết cứng trong logic: `OrderConfirm` so `CalcForWMS.currentSize` với `necessarySize`. `PackageCounter.cs:115` ("selected 2 GG") là code chết sau #1, xoá ở #8/#18.
-- **Status:** todo
+- **Ghi chú (2026-11-01, khi làm):** dòng đơn có thêm `materialName` (tên vật tư trên nhãn/WMS) để sinh chữ WMS. Carton Ring D đã mở được tính là carton Ring D (TOO_MANY ở Complex, vật tư lạ ở Mixed). Basic chưa đi qua `OrderRule`: việc này chuyển sang đầu #28 (review data-analyst).
+- **Test report:** docs/test-reports/bl06.md
+- **Status:** verified-mcp (13/14 ✅, chờ test tay H1)
 
 ## P3 – Dọn dẹp
 
@@ -284,7 +318,10 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #2, #3, #6 (làm sau để tránh xung đột)
-- **Status:** todo
+- **Ghi chú (2026-11-01, #18):** component `PackageCounter` đã được gỡ khỏi BasicPickingScene, nên `PackageCounter.cs` không còn scene nào dùng: xoá cả file (`.cs` + `.meta`) ở đây. Phần `MixPickingValidator.cs:87–107` và `using System.Xml.Schema` ở `MixPickingContainer.cs:3` đã sửa trong #6 (2026-11-01).
+- **Ghi chú (2026-11-01, khi làm):** xoá `PackageCounter.cs` và `MenuSelectionController.cs` (kèm `.meta`); giữ `ScaleItemCounter.cs` (code chạy được, để cho kịch bản cân sau này).
+- **Test report:** docs/test-reports/bl08.md
+- **Status:** done (nhánh `fix/8-dead-code`, test 7/7 ✅, không có case test tay)
 
 ### #9 [P3] Xoá các UnityEvent call trỏ vào "None"
 - **Type:** cleanup
@@ -330,18 +367,39 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** M
 - **Test trên kính:** nhanh (cầm/thả kiện bằng tay)
 - **Depends on:** —. Câu D3 (2026-11-01): giữ thông tin kiện sau khi thả làm quiz quá dễ, nên **không** giữ.
-- **Status:** todo
+- **Bổ sung (2026-11-01, decision 007):** gộp vào **#45** (quiz cũ "Chọn VPE" bị bỏ, nên *Done when* ở trên mất nghĩa). Các ý về ô phản hồi riêng, panel trống, đánh dấu đáp án được chuyển sang #45.
+- **Status:** dropped (gộp vào #45, 2026-11-01)
+
+### #45 [P1] ConceptScene: dạy Mat.-Nr và VPE, quiz vận dụng (gồm #32)
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** Assets/Scripts/PackageQuizController.cs, Assets/Scripts/PackageInfoOnGrab.cs, Assets/Scripts/PackageInfoDisplay.cs, Assets/Scripts/SampleFormulaDisplay.cs; ConceptScene `[Info Panel]` (`TXT_Title`, `TXT_Description`, `TXT_Rule`), `Sample Description`, `TXT_Feedback`, `Interactables/AnswerOption`; các tham chiếu trùng TMP của #32 (ConceptScene.unity:1043, :17204)
+- **Problem:** Concept dạy GG/VPE như hai loại kiện và hỏi "Which package can be opened?" với đáp án VPE. Tài liệu nói việc mở carton phụ thuộc số lượng (Anbruch, Detail Description 5.12), quy tắc cấm mở chỉ cho túi 10 cái hơn 2 thành phần (4.1). Panel hiện sẵn đáp án (`TXT_Rule`) và kết quả phép chia (`SampleFormulaDisplay`), nên quiz chỉ kiểm tra trí nhớ vài giây. Thêm các lỗi của #32: phản hồi quiz và thông tin kiện dùng chung một TMP, panel trống lúc đầu, không thấy đáp án nào đang chọn.
+- **Decision:** docs/decisions/007-material-labels-and-keys.md (mục 5)
+- **Done when:**
+  - Cầm kiện → panel giải thích Mat.-Nr/VPE của kiện đó, không in kết quả phép chia. Thả → thông tin kiện biến mất (D3), phản hồi quiz vẫn còn.
+  - Lúc bắt đầu scene, không có panel trống nào; không còn `TXT_Rule` hiện sẵn đáp án.
+  - Quiz có ít nhất 2 câu vận dụng: một câu "Soll X, VPE Y: wie viele Kartons?" (chia hết), một câu "welcher Karton gehört zu Mat.-Nr …"; số trong câu hỏi khác số trong ví dụ. Không câu nào hỏi kiện nào được mở.
+  - Mỗi câu có ID ổn định, mỗi đáp án có khoá ngắn không phụ thuộc ngôn ngữ (cho #28).
+  - Trả lời sai → phản hồi nêu lý do. Chọn một đáp án → ô đó được đánh dấu bằng chữ/viền, không chỉ bằng màu.
+  - Mọi chuỗi mới qua `localize-strings` (key + EN + DE, *Sie*); không chữ `GG` nào.
+  - Không ghi log mới (để #28).
+- **Inspector work expected:** yes (TMP phản hồi riêng, UI câu hỏi mới, gán reference)
+- **Công:** M–L
+- **Test trên kính:** nhanh (cầm/thả kiện, làm quiz)
+- **Depends on:** #17 (dữ liệu và nhãn 3 kiện Concept). Chạy song song được với #6 (khác scene). Câu hỏi mới cho người hướng dẫn: A9, A10, A11 (không chặn).
+- **Status:** todo (sau #17)
 
 ### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
 - **Type:** logic
 - **Scene(s):** ConceptScene, MixedPickingScene, ComplexScene (Basic đã đúng mẫu: thẻ kết quả cách nút khoảng 0.11 m)
-- **Files:** `[Info Panel]/TXT_Feedback` (Mixed, Complex), `[Info Panel]/TXT_Description` (Concept, xem #32); Assets/Scripts/MixPickingValidator.cs, Assets/Scripts/PiecesOrderValidator.cs, Assets/Scripts/PackageQuizController.cs (thêm reference cho dòng kết quả ngắn)
+- **Files:** `[Info Panel]/TXT_Feedback` (Mixed, Complex), `[Info Panel]/TXT_Description` (Concept, xem #45); Assets/Scripts/MixPickingValidator.cs, Assets/Scripts/PiecesOrderValidator.cs, Assets/Scripts/PackageQuizController.cs (thêm reference cho dòng kết quả ngắn)
 - **Problem:** Lúc bấm nút, mắt trainee đang nhìn xuống bàn (nút ở khoảng 40° phải, 60° xuống). Kết quả lại hiện trên panel WMS (16° xuống), lệch 42° (Mixed), 43° dọc + 34° ngang (Concept) hoặc 51° (Complex). Trainee phải ngẩng đầu để biết mình đúng hay sai, và có thể không thấy kết quả. Đây là split attention.
 - **Done when:** Bấm nút với đơn sai → trong vòng khoảng 0.15 m quanh nút hiện một dòng ngắn (sai + loại lỗi), nhìn thấy được trong ảnh `confirm`. Bấm với đơn đúng → dòng đó báo đúng. Chi tiết (nếu cần) vẫn nằm trên WMS. Cả ba scene dùng cùng kiểu thẻ với Basic.
 - **Inspector work expected:** yes (tạo thẻ hoặc Canvas nhỏ cạnh nút trong từng scene, gán reference)
 - **Công:** M
 - **Test trên kính:** nhanh (thấy dòng kết quả khi bấm nút)
-- **Depends on:** #14 (nội dung feedback), #32 cho Concept. Có thể tách mỗi scene một nhánh.
+- **Depends on:** #14 (nội dung feedback), #45 cho Concept (đã gộp #32). Có thể tách mỗi scene một nhánh.
 - **Status:** todo
 
 ### #34 [P1] BasicPickingScene: Rest đếm ngược làm lộ đáp án
@@ -662,7 +720,11 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** Assets/Scripts/PackageQuizController.cs:25, Assets/Scripts/WS Scripts/OrderConfirm.cs:27, Assets/Scripts/MixPickingValidator.cs:18, Assets/Scripts/PiecesOrderValidator.cs:24; helper mới tính mã lỗi; spec mục 4.2, 4.3, 5
 - **Problem:** Validator chỉ có đúng/sai và chữ hiển thị, không ghi lại số lần thử, thời gian, trong thùng có gì hay loại lỗi.
-- **Done when:** Mỗi lần bấm xác nhận có một `confirm_pressed` (số lần thử, số đếm từng loại so với yêu cầu, `correct`, `error_codes`), quiz có `quiz_answer`, lần đúng đầu tiên có `task_completed`. Rời scene thì có thêm một dòng trong `_summary.csv`. Thử các trường hợp: thùng trống, thiếu, thừa, sai loại, sai vật tư, đủ → mã lỗi đúng. Chữ phản hồi trên màn hình **không đổi**. Basic chỉ ghi kết quả của `OrderConfirm` (quy tắc tổng số chiếc); `PackageCounter.CheckOrder` không còn được gọi sau #1 nên không log.
+- **Done when:** Mỗi lần bấm xác nhận có một `confirm_pressed` (số lần thử, số đếm từng loại so với yêu cầu, `correct`, `error_codes`), quiz có `quiz_answer`, lần đúng đầu tiên có `task_completed`. Rời scene thì có thêm một dòng trong `_summary.csv`. Thử các trường hợp: thùng trống, thiếu, thừa, vật tư không thuộc đơn, thiếu hoặc thừa hàng lẻ, đủ → mã lỗi đúng. Chữ phản hồi trên màn hình **không đổi** (nếu #14 chưa làm). `PackageCounter.CheckOrder` không còn được gọi sau #1 nên không log. Thêm (decision 006):
+  - `confirm_pressed` theo dạng dòng đơn (`{item, soll, vpe, required_full, required_loose, placed_full, placed_loose}` + danh sách vật tư lạ `{item, count}`), `error_codes.item` là khoá vật tư; spec, `make_fake_data.R`, `schema_version` và `scene_skills.csv` (`BasicPickingScene,check_material`) đổi trong cùng commit, data-analyst duyệt, `selftest.R` xanh.
+  - ComplexScene: đặt 2 carton GGA thay cho 2 carton Ring D thì `error_codes` gồm `WRONG_MATERIAL` (khoá của vật tư lạ) rồi `TOO_FEW` (khoá Ring D), đúng thứ tự.
+  - Thùng trống chỉ cho đúng một mã `EMPTY`. Không `confirm_pressed` nào chứa `WRONG_TYPE`.
+  - Ở mọi scene, `correct` là true khi và chỉ khi `error_codes` rỗng.
 - **Inspector work expected:** no
 - **Công:** M
 - **Test trên kính:** không
@@ -672,7 +734,15 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp: `SceneManager.activeSceneChanged` (nơi logger mở lượt scene mới) chạy **sau** các hàm đó, nên sự kiện sẽ rơi vào lượt scene trước. Ghi từ `Start` trở đi hoặc từ thao tác của người học.
 - **Bổ sung (review cuối #27, 2026-11-01):** chốt lý do kết thúc nào được tính là "abgeschlossen" cho cảnh báo của bàn phím #27. Hôm nay `ResearchLogger.HasEndedSession` coi mọi `session_end` là hoàn tất, kể cả `quit`: người học thoát app sạch giữa khoá rồi quay lại sẽ thấy cảnh báo, không được hỏi tiếp tục (fake P112 trong `make_fake_data.R` là ca này). Cân nhắc chỉ tính `completed` (và có thể `facilitator`), hoặc hiện lý do kết thúc trong cảnh báo; nếu đổi thì sửa chuỗi `entry.warning.finished`, spec 4.1 và `analyse.R` cùng lúc.
 - **Bổ sung (review cuối #44, 2026-11-01):** (a) `analyse.R` mất lần kết thúc `facilitator` nếu cùng mã được nhập lại, vì `end_status` chỉ lấy phiên cuối. Thêm `n_facilitator_ends` (hoặc chuỗi `end_status` theo phiên) vào `data_quality`/file rộng, kèm ca selftest "facilitator rồi nhập lại". (b) Ý kiến data-analyst cho câu "lý do kết thúc nào được tính là abgeschlossen": ràng buộc cứng là mọi lần kết thúc giữa khóa phải còn thấy được trong phân tích; ưu tiên là chỉ `completed` tính là xong, còn `facilitator`/`quit` được hỏi tiếp tục như sau crash (`TryFindResumePoint` theo lý do). Việc kèm theo: R (`prev_crash` thành "lần kết thúc trước không phải completed", `repeat_after_crash` thành `repeat_after_interrupt`), spec 4.1, trường cộng thêm `session_start.previous_end_reason`, chuỗi `entry.warning.finished`, các ca trong `make_fake_data.R`. Cho đến khi sửa, chữ cảnh báo "đã hoàn tất" là sai sự thật sau `facilitator`/`quit`.
-- **Depends on:** #26. Helper mã lỗi dùng lại được cho #14; nếu làm #14 trước thì dùng chung. Định dạng kết quả validator (enum/struct lý do) chốt chung với #14 qua `solution-decision` (`docs/coding-conventions.md`, pending decision).
+- **Decision:** docs/decisions/006-validator-result-format.md
+- **Depends on:** #26, #6 (rule và kết quả trong `XRPick.Orders`). Dùng chung object kết quả với #14.
+- **Bổ sung (2026-11-01, decision 007):** `quiz_answer` theo quiz mới của #45: thêm `question_id`, `selected` là khoá đáp án ngắn (thay `gg/vpe/both`); cách nối câu hỏi với kỹ năng do data-analyst quyết (có thể cho `calculate_quantity` một điểm đo từ Concept). Xoá `WRONG_TYPE` khỏi enum và `skill_map.csv` nếu A2 đã được người hướng dẫn chốt. Chỉ thêm `BasicPickingScene,check_material` nếu #18 giữ vật gây nhiễu ở Basic. Trường `package_type` của #29 (spec §4.4) đổi thành khoá vật tư ở #29.
+- **Bổ sung (2026-11-01, review data-analyst của #6):**
+  - ~~**Chặn:**~~ **Đã gỡ ở #14 (2026-11-01):** `OrderConfirm` giờ gọi `OrderRule.Check` (dòng đơn từ `CalcForWMS.OrderLine`, đầu vào `CalcForWMS.PackagesInside`). Ghi chú gốc: BasicPickingScene chưa đi qua `OrderRule` (`OrderConfirm` vẫn so `currentSize == necessarySize`). Đầu #28: cho `OrderConfirm` gọi `OrderRule.Check` với một dòng `{training_b, SCHLAUCHSCHELLE B, soll = necessarySize, vpe = 50}`, `countsLoose = false`, đầu vào `OrderContents.From(...)` (9 carton Basic đã có `PackageData`). Ist trên WMS (`CalcForWMS` cộng theo tag) và rule (theo `PackageData`) phải đếm cùng một tập vật thể. Basic không có vật gây nhiễu (#18 đã xoá), nên **không** thêm `BasicPickingScene,check_material`.
+  - Trong scene không đếm chiếc lẻ, ghi `required_loose` là `null` (cùng với `placed_loose`). `materialName` là chữ hiển thị, không ghi vào log.
+  - `analyse.R`: loại lần bấm chỉ có `EMPTY` khỏi mẫu số của các kỹ năng khác `calculate_quantity`.
+  - Feedback đỏ vẫn in số đích (cầu nối tới #14): không thu dữ liệu thật trước #14; R tách dữ liệu trước/sau #14 theo build.
+  - Mô tả `WRONG_TYPE` / `WRONG_MATERIAL` trong `analysis/skill_map.csv` còn theo mô hình GG/VPE: sửa cùng spec.
 - **Status:** todo
 
 ### #29 [Feature] Log thao tác: cầm/thả, thùng, nút, kiểu điều khiển

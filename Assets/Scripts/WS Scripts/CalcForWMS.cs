@@ -14,6 +14,38 @@ public class CalcForWMS : MonoBehaviour
     public TextMeshProUGUI sollText;
     public TextMeshProUGUI restText;
 
+    // #14: the material of the order, so OrderConfirm can use OrderRule (docs/decisions/006). Soll stays necessarySize.
+    [Header("Order material")]
+    [Tooltip("Same key as PackageData.MaterialKey on the order cartons (#17).")]
+    [SerializeField] private string materialKey = "training_b";
+
+    [Tooltip("Material name as on the label and in the WMS (Bez.).")]
+    [SerializeField] private string materialName = "SCHLAUCHSCHELLE B";
+
+    [Tooltip("Pieces per carton (VPE).")]
+    [SerializeField] private int vpe = 50;
+
+    public OrderLine OrderLine => new(materialKey, materialName, necessarySize, vpe);
+
+    // Packages counted in Ist, as PackageData for OrderRule.
+    public IEnumerable<PackageData> PackagesInside
+    {
+        get
+        {
+            foreach (BoxInfo box in collidersInside.Keys)
+            {
+                // A carton destroyed inside the trigger gets no OnTriggerExit and stays as a destroyed key.
+                if (box == null)
+                    continue;
+
+                PackageData package = box.GetComponent<PackageData>();
+
+                if (package != null)
+                    yield return package;
+            }
+        }
+    }
+
     // #2: a package counts once, however many of its colliders are inside the trigger.
     private readonly Dictionary<BoxInfo, int> collidersInside = new();
 

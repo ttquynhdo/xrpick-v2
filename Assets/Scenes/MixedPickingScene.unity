@@ -1970,7 +1970,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 3. Basic Picking
+      value: "3.\_Kommissionieren nach EKZ 3"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -1987,6 +1991,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -2416,15 +2424,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-
-    Cable Connector A
-
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2454,9 +2458,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -2468,7 +2472,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -3248,10 +3252,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23dbd4bfea5cdf944942cd1b645bd60a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MixedPickingContainer
-  requiredGGA: 2
-  requiredGGB: 2
-  requiredVPE: 0
+  orderLines:
+  - materialKey: connector_a
+    materialName: KABELVERBINDER A
+    soll: 100
+    vpe: 50
+  - materialKey: screw_b
+    materialName: SCHRAUBE B
+    soll: 40
+    vpe: 20
   packageCountText: {fileID: 631291439}
+  orderLineTexts:
+  - {fileID: 1418684534}
+  - {fileID: 852427511}
 --- !u!1 &516495938
 GameObject:
   m_ObjectHideFlags: 0
@@ -3454,7 +3467,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 2. Package Types
+      value: "2.\_Grundlagen"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -3471,6 +3488,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -4764,7 +4785,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 1. Introduction
+      value: "1.\_Einf\xFChrung"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -4781,6 +4806,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -5077,13 +5106,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5113,9 +5140,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -5127,7 +5154,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -5986,8 +6013,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n2.\nMaterial\t        
-    SCREW B\nOrder quantity     40 pcs\nPackage type       GG\nPackage size      
-    20 pcs / package\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    SCHRAUBE B\nOrder quantity     40 pcs\nPackage size       20 pcs / package\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6340,6 +6366,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &893102332
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6418,13 +6447,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6454,9 +6481,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -6468,7 +6495,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -6605,11 +6632,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'SCHRAUBE B
 
-    Screw B
+    Mat.-Nr: 738190
 
-    20 pcs'
+    VPE: 20 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6639,9 +6666,9 @@ MonoBehaviour:
   m_fontSize: 0.3
   m_fontSizeBase: 0.3
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.09
+  m_fontSizeMax: 0.3
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -6653,7 +6680,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -7692,6 +7719,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &1023735630
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7936,13 +7966,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7972,9 +8000,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -7986,7 +8014,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -8236,11 +8264,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'SCHRAUBE B
 
-    Screw B
+    Mat.-Nr: 738190
 
-    20 pcs'
+    VPE: 20 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8270,9 +8298,9 @@ MonoBehaviour:
   m_fontSize: 0.3
   m_fontSizeBase: 0.3
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.09
+  m_fontSizeMax: 0.3
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -8284,7 +8312,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -8495,7 +8523,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 4. Mixed Picking
+      value: "4.\_Mehrere Positionen"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -8512,6 +8544,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -9249,6 +9285,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 4
+  materialKey: screw_b
+  materialNumber: 738190
+  vpe: 20
 --- !u!114 &1216224048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9592,6 +9631,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &1298809677
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9960,6 +10002,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 1
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &1379697621
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10224,8 +10269,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1.
-    \nMaterial \t       CABLE CONNECTOR A\nOrder quantity     100 pcs\nPackage type      
-    GG\nPackage size       50 pcs / package\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    \nMaterial \t       KABELVERBINDER A\nOrder quantity     100 pcs\nPackage size      
+    50 pcs / package\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -10971,6 +11016,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &1464743982
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11226,13 +11274,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11262,9 +11308,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -11276,7 +11322,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -11491,6 +11537,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 4
+  materialKey: screw_b
+  materialNumber: 738190
+  vpe: 20
 --- !u!114 &1520216104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12221,11 +12270,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'SCHRAUBE B
 
-    Screw B
+    Mat.-Nr: 738190
 
-    20 pcs'
+    VPE: 20 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -12255,9 +12304,9 @@ MonoBehaviour:
   m_fontSize: 0.3
   m_fontSizeBase: 0.3
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.09
+  m_fontSizeMax: 0.3
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -12269,7 +12318,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -12509,7 +12558,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 5. Complex Picking
+      value: "5.\_Volle Kartons und loses Material"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -12526,6 +12579,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -13569,6 +13626,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &1729880478
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14567,9 +14627,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\r\n\r\n   
-    VPE\r\n\r\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\r\n\r\nRing
-    D\r\n\r\n20 pcs\r\n\r\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518"
+  m_text: 'RING D
+
+    Mat.-Nr: 264857
+
+    VPE: 25 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -14599,9 +14661,9 @@ MonoBehaviour:
   m_fontSize: 0.1
   m_fontSizeBase: 0.1
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.030000001
+  m_fontSizeMax: 0.1
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -14613,7 +14675,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -14862,6 +14924,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!65 &1868659468
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15946,13 +16011,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
+    Mat.-Nr: 512304
 
-    Cable Connector A
-
-
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -15982,9 +16045,9 @@ MonoBehaviour:
   m_fontSize: 0.2
   m_fontSizeBase: 0.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.060000002
+  m_fontSizeMax: 0.2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -15996,7 +16059,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -16762,6 +16825,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PackageData
   packageType: 4
+  materialKey: screw_b
+  materialNumber: 738190
+  vpe: 20
 --- !u!1 &2129854812
 GameObject:
   m_ObjectHideFlags: 0

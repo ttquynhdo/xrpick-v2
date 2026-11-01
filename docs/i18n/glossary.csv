@@ -10,7 +10,7 @@ Soll,,target qty,WMS field label for the target quantity.,yes,WMS screenshot,pro
 Istmenge,die,actual quantity,Quantity actually picked; when counting by hand it is pre-filled with the target quantity.,no,requirements: Kommissionierung.pptx slide 7,proposed,
 Ist,,actual qty,WMS field label for the actual quantity.,yes,WMS screenshot,proposed,
 Restmenge,die,remaining stock,Stock left in the storage container after the pick; NOT the quantity still missing.,no,requirements: Kommissionierung.pptx slide 7,proposed,BasicPickingScene shows Rest as static remaining stock since #34 (B6).
-Rest,,remaining stock,WMS field label for the remaining stock.,yes,WMS screenshot,proposed,
+Rest,,remaining stock,WMS field label for the remaining stock.,yes,WMS screenshot,proposed,Never use 'Rest' for the remainder/loose part or for 'what is missing' in feedback (german-reviewer #14).
 Restmengenzählung,die,remaining-stock count,Counting the stock left in the storage container (F9) to confirm it.,no,requirements: Kommissionierung.pptx slide 2/7,proposed,Also a WMS indicator label.
 Mindermenge,die,short quantity,Confirmed quantity when actual is less than target.,no,requirements: Kommissionierung.pptx slide 7,proposed,
 Verpackungseinheit,die,packaging unit,Number of pieces in one carton or bag.,no,requirements: Kommissionierung.pptx slide 8,proposed,"Abbreviation VPE. A quantity, not the name of the physical package: for the object use Karton or Tüte."
@@ -32,7 +32,7 @@ Behälterwaage,die,container scale,Scale used from 700 g.,no,requirements: Kommi
 Zählen,das,counting,Counting by hand (up to 7 pieces).,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator label.
 Tarieren,das,taring,Setting the scale to zero with the container on it.,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator and F7 button.
 Label,das,label,Printed sticker (pick label) for a bag or position.,no,requirements,proposed,
-bestätigen,,to confirm,Confirming a pick or a message.,no,requirements: Kommissionierung.pptx slide 2/3,proposed,"Confirm key depends on the dialog: new dialog (TMA/CSC4) F6 Bestätigen or foot pedal, old dialog (KOM 1/2) F12 Bestätigen. In the new dialog F12 is Aufkl. korr. Which dialog the app uses: question B8."
+bestätigen,,to confirm,Confirming a pick or a message.,no,requirements: Kommissionierung.pptx slide 2/3,proposed,"Confirm key depends on the dialog: new dialog (TMA/CSC4) F6 Bestätigen or foot pedal, old dialog (KOM 1/2) F12 Bestätigen. In the new dialog F12 is Aufkl. korr. B8 (2026-11-01): the app uses the new dialog, F6 Bestätigen."
 Teamleiter,der,team leader,Person to inform on deviations.,no,requirements: Kommissionierung.pptx slide 7,proposed,
 Materialnummer,die,material number,Identifier of a material.,no,requirements,proposed,WMS label Mat.-Nr:
 Bezeichnung,die,description,Material description text.,no,WMS screenshot,proposed,WMS label Bez.:
@@ -55,3 +55,15 @@ Kurs,der,course,The whole training sequence of five lessons.,no,decision 004 (#2
 5. Volle Kartons und loses Material,,5. Full cartons and loose material,"Lesson name, ComplexScene.",no,decision 004 D1 (#27),proposed,
 Kursleitung,die,course leader,Person who runs the training session and is told when the participant is done.,no,review of #27 strings,proposed,
 Position,die,order line,Auftragsposition: one line of an order (one material with its quantity).,no,review of #27 strings,proposed,Used in lesson name '4. Mehrere Positionen'.
+Lagerverwaltungssystem,das,warehouse management system (WMS),The warehouse software that shows the pick order. Abbreviation LVS; write it in full with (LVS) at first use on a screen.,no,requirements: Detail Description; Kommissionierung,proposed,"german-reviewer (#18): the German documents say LVS, not WMS."
+LVS,das,WMS,Abbreviation of Lagerverwaltungssystem.,no,requirements: Detail Description,proposed,
+Knopf,der,button,The big red physical button in VR that confirms the order. Not 'Taste' (keyboard key) or 'Schalter'.,no,app (#18),proposed,
+F6 Bestätigen,,F6 Confirm,Confirm key of the new WMS dialog (B8). The red button shows only 'F6'.,yes,WMS spec (B8),proposed,In the new dialog F12 is Aufkl. korr.
+Etikett,das,label (on the carton),"Label printed by the supplier on a carton or bag (material name, Mat.-Nr, VPE). Not 'Label', which is the pick label printed in the warehouse (F5).",no,german-reviewer (#17),proposed,
+Mat.-Nr:,,Mat. no.:,WMS field label and carton label line for the material number. No dot after 'Nr'.,yes,WMS spec E29,proposed,Basic WMS shows 'Mat.-Nr:' since #17.
+Bez.:,,Descr.:,WMS field label for the material description (Bezeichnung).,yes,WMS spec E31,proposed,Basic WMS shows 'Bez.:' since #17.
+KABELVERBINDER A,,cable connector A,"Fake material name (B10, decision 007), key connector_a, Mat.-Nr 512304, VPE 50.",yes,app (#17),proposed,Fake master data; capitals as in the WMS.
+SCHRAUBE B,,screw B,"Fake material name, key screw_b, Mat.-Nr 738190, VPE 20 (bag).",yes,app (#17),proposed,Fake master data.
+RING D,,ring D,"Fake material name, key ring_d, Mat.-Nr 264857, VPE 25.",yes,app (#17),proposed,Fake master data.
+SCHLAUCHSCHELLE B,,hose clamp B,"Fake material name, key training_b (BasicPickingScene), Mat.-Nr 443890, VPE 50.",yes,app (#17),proposed,Replaces TRAINING-MATERIAL B.
+Stückzahl,die,piece count,"Number of pieces, e.g. of the full cartons in a calculation (Sollmenge minus Stückzahl der vollen Kartons).",no,german-reviewer (#14),proposed,'Stück' alone only after a number.

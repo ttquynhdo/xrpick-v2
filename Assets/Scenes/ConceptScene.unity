@@ -752,7 +752,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 2. Package Types
+      value: "2.\_Grundlagen"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -769,6 +773,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -1205,6 +1213,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1154696804}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1154696805}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!1 &145497900
 GameObject:
@@ -1338,9 +1349,25 @@ MonoBehaviour:
     picked as a full package or opened when loose items are required.
   packageRule: VPE packages CAN be opened when needed.
   formulaPackageType: VPE
-  formulaMaterial: Ring D
-  formulaOrderQuantity: 60
-  formulaPackageSize: 20
+  formulaMaterial: RING D
+  formulaOrderQuantity: 75
+  formulaPackageSize: 25
+--- !u!114 &150227144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 150227138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 1
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &156983608
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1824,6 +1851,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 252984203}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 252984204}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &252984199 stripped
 Transform:
@@ -1906,6 +1936,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350002, y: 0.0634613, z: 0.0039687157}
   m_Center: {x: 0.027067583, y: 0.008580338, z: 0.0019843727}
+--- !u!114 &252984204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252984200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &293866462
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1974,6 +2020,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1969635235}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1969635236}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!1 &307092971
 GameObject:
@@ -2086,6 +2135,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.063500024, y: 0.0634613, z: 0.0039687753}
   m_Center: {x: 0.02706761, y: 0.00858034, z: 0.001984343}
+--- !u!114 &318409009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 10560374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &354245433
 GameObject:
   m_ObjectHideFlags: 0
@@ -2281,6 +2346,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 380399157}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 380399158}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &380399153 stripped
 Transform:
@@ -2363,6 +2431,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350002, y: 0.0634613, z: 0.0039687157}
   m_Center: {x: 0.027067583, y: 0.008580338, z: 0.0019843727}
+--- !u!114 &380399158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380399154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &390707911
 GameObject:
   m_ObjectHideFlags: 0
@@ -3366,6 +3450,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 422443745}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 422443746}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &422443741 stripped
 Transform:
@@ -3448,6 +3535,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350003, y: 0.06346133, z: 0.003968859}
   m_Center: {x: 0.027067602, y: 0.008580361, z: 0.001984368}
+--- !u!114 &422443746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422443742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &456129784
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3546,7 +3649,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 1. Introduction
+      value: "1.\_Einf\xFChrung"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -3563,6 +3670,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -3960,6 +4071,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 472046844}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 472046845}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &472046840 stripped
 Transform:
@@ -4042,6 +4156,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350002, y: 0.0634613, z: 0.0039687157}
   m_Center: {x: 0.027067583, y: 0.008580338, z: 0.0019843727}
+--- !u!114 &472046845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472046841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &475520420
 GameObject:
   m_ObjectHideFlags: 0
@@ -5291,6 +5421,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 581239851}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 581239852}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &581239847 stripped
 Transform:
@@ -5373,6 +5506,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350008, y: 0.0634613, z: 0.0039687753}
   m_Center: {x: 0.027067624, y: 0.008580338, z: 0.001984343}
+--- !u!114 &581239852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581239848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &592346426
 GameObject:
   m_ObjectHideFlags: 0
@@ -5588,7 +5737,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 4. Mixed Picking
+      value: "4.\_Mehrere Positionen"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -5605,6 +5758,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -6004,7 +6161,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 3. Basic Picking
+      value: "3.\_Kommissionieren nach EKZ 3"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -6021,6 +6182,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -6827,6 +6992,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 318409008}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 318409009}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!1 &705516262
 GameObject:
@@ -7091,6 +7259,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 719087172}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 719087173}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &719087168 stripped
 Transform:
@@ -7173,6 +7344,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350003, y: 0.06346133, z: 0.003968859}
   m_Center: {x: 0.027067602, y: 0.008580361, z: 0.001984368}
+--- !u!114 &719087173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 719087169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &726902808
 GameObject:
   m_ObjectHideFlags: 0
@@ -7325,11 +7512,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'VPE
+  m_text: 'RING D
 
-    Ring D
+    Mat.-Nr: 264857
 
-    20 pcs'
+    VPE: 25 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7359,9 +7546,9 @@ MonoBehaviour:
   m_fontSize: 0.3
   m_fontSizeBase: 0.3
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.09
+  m_fontSizeMax: 0.3
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -7373,7 +7560,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -7510,11 +7697,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'KABELVERBINDER A
 
-    Cable Connector A
+    Mat.-Nr: 512304
 
-    50 pcs'
+    VPE: 50 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7544,9 +7731,9 @@ MonoBehaviour:
   m_fontSize: 0.16
   m_fontSizeBase: 0.16
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.048
+  m_fontSizeMax: 0.16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -7558,7 +7745,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -8142,6 +8329,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350008, y: 0.0634613, z: 0.0039687753}
   m_Center: {x: 0.027067624, y: 0.008580338, z: 0.001984343}
+--- !u!114 &859877606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706061954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &890841610
 GameObject:
   m_ObjectHideFlags: 0
@@ -9610,6 +9813,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350008, y: 0.06346138, z: 0.0039687483}
   m_Center: {x: 0.02706761, y: 0.008580353, z: 0.0019843462}
+--- !u!114 &1154696805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1154696801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1154802089
 GameObject:
   m_ObjectHideFlags: 0
@@ -10273,6 +10492,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 859877605}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 859877606}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!1 &1229026132
 GameObject:
@@ -10506,6 +10728,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 527392657969095388, guid: a7d3261157810394fbba9cc47524e01e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1259077243}
+    - targetCorrespondingSourceObject: {fileID: 527392657969095388, guid: a7d3261157810394fbba9cc47524e01e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1259077244}
   m_SourcePrefab: {fileID: 100100000, guid: a7d3261157810394fbba9cc47524e01e, type: 3}
 --- !u!1 &1259077238 stripped
 GameObject:
@@ -10586,9 +10811,25 @@ MonoBehaviour:
     handled as a complete package.
   packageRule: GG packages must NOT be opened.
   formulaPackageType: GG
-  formulaMaterial: Screw B
+  formulaMaterial: SCHRAUBE B
   formulaOrderQuantity: 80
   formulaPackageSize: 20
+--- !u!114 &1259077244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1259077238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 4
+  materialKey: screw_b
+  materialNumber: 738190
+  vpe: 20
 --- !u!1 &1271196315
 GameObject:
   m_ObjectHideFlags: 0
@@ -10796,6 +11037,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1455869652}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1455869653}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!1 &1327779188
 GameObject:
@@ -11775,6 +12019,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 15b812524550788439ebf77bb9ddf7f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 150227143}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 15b812524550788439ebf77bb9ddf7f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 150227144}
   m_SourcePrefab: {fileID: 100100000, guid: 15b812524550788439ebf77bb9ddf7f7, type: 3}
 --- !u!1 &1413327477
 GameObject:
@@ -12003,6 +12250,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1420353977}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1420353978}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &1420353973 stripped
 Transform:
@@ -12085,6 +12335,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350008, y: 0.06346138, z: 0.0039687483}
   m_Center: {x: 0.02706761, y: 0.008580353, z: 0.0019843462}
+--- !u!114 &1420353978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1420353974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1433062942
 GameObject:
   m_ObjectHideFlags: 0
@@ -12278,7 +12544,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_text
-      value: 5. Complex Picking
+      value: "5.\_Volle Kartons und loses Material"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.a
@@ -12295,6 +12565,10 @@ PrefabInstance:
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1174126387451099336, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_sharedMaterial
@@ -12979,6 +13253,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350003, y: 0.06346133, z: 0.003968859}
   m_Center: {x: 0.027067602, y: 0.008580361, z: 0.001984368}
+--- !u!114 &1455869653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 834246864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1460907006
 GameObject:
   m_ObjectHideFlags: 0
@@ -14574,6 +14864,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1803643644}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1803643645}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &1803643640 stripped
 Transform:
@@ -14656,6 +14949,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350008, y: 0.0634613, z: 0.0039687753}
   m_Center: {x: 0.027067624, y: 0.008580338, z: 0.001984343}
+--- !u!114 &1803643645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1803643641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1813024968
 GameObject:
   m_ObjectHideFlags: 0
@@ -14746,11 +15055,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GG
+  m_text: 'SCHRAUBE B
 
-    Screw B
+    Mat.-Nr: 738190
 
-    20 pcs'
+    VPE: 20 ST'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -14780,9 +15089,9 @@ MonoBehaviour:
   m_fontSize: 0.3
   m_fontSizeBase: 0.3
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.09
+  m_fontSizeMax: 0.3
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -14794,7 +15103,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -16047,6 +16356,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350002, y: 0.0634613, z: 0.0039687157}
   m_Center: {x: 0.027067583, y: 0.008580338, z: 0.0019843727}
+--- !u!114 &1969635236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1858781438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1980131281
 GameObject:
   m_ObjectHideFlags: 0
@@ -16227,6 +16552,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1989833931}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1989833932}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &1989833927 stripped
 Transform:
@@ -16309,6 +16637,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350008, y: 0.06346138, z: 0.0039687483}
   m_Center: {x: 0.02706761, y: 0.008580353, z: 0.0019843462}
+--- !u!114 &1989833932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1989833928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1 &1992295783
 GameObject:
   m_ObjectHideFlags: 0
@@ -16699,6 +17043,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2028691325}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2028691326}
   m_SourcePrefab: {fileID: 100100000, guid: 333fcbba0c1cdfe4ea7ad5d68c05f57d, type: 3}
 --- !u!4 &2028691321 stripped
 Transform:
@@ -16781,6 +17128,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06350003, y: 0.06346133, z: 0.003968859}
   m_Center: {x: 0.027067602, y: 0.008580361, z: 0.001984368}
+--- !u!114 &2028691326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2028691322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 5
+  materialKey: ring_d
+  materialNumber: 264857
+  vpe: 25
 --- !u!1001 &2046963479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17767,6 +18130,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8616823808319995515, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2136993949}
+    - targetCorrespondingSourceObject: {fileID: 8616823808319995515, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2136993950}
   m_SourcePrefab: {fileID: 100100000, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
 --- !u!1 &2136993943 stripped
 GameObject:
@@ -17873,9 +18239,25 @@ MonoBehaviour:
     handled as a complete package.
   packageRule: GG packages must NOT be opened.
   formulaPackageType: GG
-  formulaMaterial: Cable Connector A
+  formulaMaterial: KABELVERBINDER A
   formulaOrderQuantity: 100
   formulaPackageSize: 50
+--- !u!114 &2136993950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2136993943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ebeb91fc69f894c83728018b2359a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PackageData
+  packageType: 3
+  materialKey: connector_a
+  materialNumber: 512304
+  vpe: 50
 --- !u!1 &2138801329
 GameObject:
   m_ObjectHideFlags: 0
