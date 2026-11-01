@@ -64,7 +64,7 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
 - 4 spaces, no tabs. Braces on their own line (Allman), as in the existing code.
 - Always use braces for `if`/`else` bodies with more than one line. A one-line guard `if (x == null) return;` without braces is fine.
 - `using` order: `System…`, then `TMPro` / `UnityEngine…`, then project. Remove unused `using` lines.
-- No large blocks of commented-out code. Delete them; git keeps the history. `MenuSelectionController.cs` is an old exception.
+- No large blocks of commented-out code. Delete them; git keeps the history.
 - `var` only when the type is obvious from the right-hand side.
 - Use `new()` target-typed construction and `string.Empty`, as in the existing code.
 

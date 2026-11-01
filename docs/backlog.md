@@ -319,7 +319,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Test trên kính:** không
 - **Depends on:** #2, #3, #6 (làm sau để tránh xung đột)
 - **Ghi chú (2026-11-01, #18):** component `PackageCounter` đã được gỡ khỏi BasicPickingScene, nên `PackageCounter.cs` không còn scene nào dùng: xoá cả file (`.cs` + `.meta`) ở đây. Phần `MixPickingValidator.cs:87–107` và `using System.Xml.Schema` ở `MixPickingContainer.cs:3` đã sửa trong #6 (2026-11-01).
-- **Status:** todo
+- **Ghi chú (2026-11-01, khi làm):** xoá `PackageCounter.cs` và `MenuSelectionController.cs` (kèm `.meta`); giữ `ScaleItemCounter.cs` (code chạy được, để cho kịch bản cân sau này).
+- **Test report:** docs/test-reports/bl08.md
+- **Status:** done (nhánh `fix/8-dead-code`, test 7/7 ✅, không có case test tay)
 
 ### #9 [P3] Xoá các UnityEvent call trỏ vào "None"
 - **Type:** cleanup
