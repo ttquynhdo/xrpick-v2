@@ -8,6 +8,7 @@ Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tả
 **Cập nhật 2026-11-01 theo câu trả lời B1–B10, C1–C4, D1–D3** trong file câu hỏi (trả lời của nhóm, chưa phải của người hướng dẫn): mọi scene dùng **dialog mới** (`F6 Bestätigen`); Rest = tồn kho thùng kho, Ist theo cách lấy thật (B6, B7, B7a); dữ liệu giả cùng định dạng thật (B10); #22 ngoài phạm vi (D2); giữ thông tin kiện sau khi thả làm quiz quá dễ (D3). Câu A1–A6 vẫn mở.
 **Cập nhật 2026-11-01 (decision 003):** nhóm trả lời A1 (đơn Basic = tổng 300 chiếc) và D4–D7 (EKZ khi đặt hàng); thêm #41, bỏ chặn #1, #24. Sau đó nhóm trả lời nốt A2, A3, A5, A6, B3, B5, D1, chọn phương án C cho #34 (decision 001) và chốt mục 9 của spec log: không còn mục nào `blocked`.
 **Quy tắc màn hình (người dùng 2026-11-01, #10):** màn hình máy tính `WMS_Monitor` chỉ hiện WMS (dialog `WMS_Kommissionierung`). Hướng dẫn nằm trên thẻ ở bàn, kết quả xác nhận hiện trên thẻ cạnh nút đỏ (#33), không mục nào ghi hướng dẫn hay kết quả lên màn hình. Basic, Complex đã làm (#10); Mixed làm ở #21; Concept quyết định ở #45; Welcome không cần WMS (tuỳ chọn: đặt màn hình tắt để trạm làm việc giống các bài sau).
+**Quy tắc bố cục trạm (người dùng 2026-11-01, so với ảnh trạm thật `old/Orderpicking.png`):** chỉ thêm vào cảnh thứ mà bài tập dùng tới (#35 dời thẻ và Menu khỏi mép bàn, gồm #37; #47 băng lăn, #21 mỗi vị trí một thùng kho, #48 bàn phím). **Không thêm** cân, bàn đóng gói, tacker, băng dính, máy in nhãn, kệ carton: không bài nào dùng chúng, thêm vào chỉ tăng tải nhận thức (cùng lý do decision 009). Nếu muốn trạm trông đầy đủ thì chỉ đặt ở xa, ngoài vùng nhìn chính, không cầm được.
 
 Mỗi mục = 1 phiên làm việc = 1 nhánh. Không đánh số lại; mục xong thì ghi `done (commit …)`.
 
@@ -27,19 +28,19 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - #33 kết quả cạnh nút đỏ (sau #14, #45).
    - #23 tổng kết cuối khoá + mục tiêu Welcome (không kính).
    - #10 panel WMS giống dialog thật (decision 008: Basic + Complex, gồm phần Complex của #33; L) → #21 (Mixed dùng dialog, gồm phần Mixed của #33) → #46 dọn dẹp; #20 sau #10.
+   - #48 bàn phím tĩnh trong prefab `WMS_Monitor` (S, không kính; sau #10, chỉ sửa prefab nên không đụng file `.unity`).
    - #39 phản hồi ở WelcomeScene.
    - #11 nền tảng DE/EN: phần Editor làm được trong đợt này; thử ConceptScene trên Quest cùng buổi test.
 2. **Đợt 4 – dịch** (không kính, chờ nội dung ổn định): #12 (sau #11, #25, #45) → #13.
 3. **Đợt 5 – bắt buộc test kính** (tay thật, tầm với, FPS), gom thành các buổi test riêng:
-   - #36 nhãn đọc được từ chỗ đứng (sau #17).
-   - #37 Menu trong tầm với (sau #18).
-   - #41 EKZ khi đặt hàng (phần `Empf Kz` sau #10).
-   - #35 (sau #25) → #40.
+   - **Chuỗi trạm làm việc** (cùng sửa `Instruction Table`/`Menu`/bàn ở cả 5 scene, nên tuần tự; decision 011 đã chốt bố cục cho #35 và #47; cả chuỗi làm trước #30): #25 nội dung thẻ (đợt 3) → **#35** giá cho thẻ + Menu (gồm #37) → **#40** làm nổi bước hiện tại trên giá mới → **#47** bệ băng lăn, thùng đơn chạy đi (D10, D11). Nút đỏ và thẻ kết quả cạnh nút (#33) giữ chỗ suốt chuỗi.
+   - #36 nhãn đọc được từ chỗ đứng (sau #17; độc lập với chuỗi trên).
+   - #41 EKZ khi đặt hàng (phần `Empf Kz` sau #10; làm trước #47 vì cùng đụng thùng đơn).
    - #19 Complex hai bước (sau #3, #16, #17).
 4. **Đợt 6 – log nghiên cứu (cuối cùng, người dùng chọn 2026-11-01).**
    - #28 (đã gỡ chặn: Basic chấm bằng `OrderRule` từ #14; object kết quả trong `XRPick.Orders`) → #31.
    - #29, #30 (sau #26; bắt buộc test kính: FPS khi bật logger).
-   - #42 khoá Menu khi nghiên cứu (sau #26, #27, #18, #37).
+   - #42 khoá Menu khi nghiên cứu (sau #26, #27, #18, #35).
    - Chờ quyết định: #43 bài kiểm tra ngắn trong VR (để sau).
 
 ---
@@ -414,16 +415,27 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test report:** docs/test-reports/bl34.md
 - **Status:** verified-mcp (7/7 ✅, chờ test tay R5; theo giả định A1, tồn kho 9 carton)
 
-### #35 [P2] Thẻ hướng dẫn: đọc được mà không phải cúi 60°
+### #35 [P2] Bố cục trạm: thẻ hướng dẫn và Menu lên một giá riêng, mép bàn chỉ còn thùng và nút đỏ (gồm #37)
 - **Type:** logic
-- **Scene(s):** cả 5 scene (`Instruction Table` ở (0, 0.85, 0.45) giống nhau trong mọi scene, nhưng **không** phải prefab)
-- **Files:** `Instruction Table` trong từng scene
-- **Problem:** Các thẻ nằm phẳng trên bàn, cách mắt khoảng 0.9 m, góc cúi 59–60°. Chữ phụ cỡ 11, khoảng 6.7 mm (Basic, suy ra). Trong ảnh `overview` gần như không đọc được. Mỗi bước, trainee phải cúi xuống đọc thẻ rồi ngẩng lên WMS (khoảng 43°).
-- **Done when:** Từ vị trí đứng, ảnh `overview` đọc được chữ phụ của mọi thẻ. Góc cúi tới thẻ nhỏ hơn hiện tại; con số mục tiêu lấy theo khuyến nghị mà `xr-lit-scout` tìm được. Nút đỏ vẫn nằm sát thẻ 3. Năm scene giống nhau.
-- **Inspector work expected:** yes. Nên biến `Instruction Table` thành prefab trước, rồi sửa một lần.
+- **Scene(s):** cả 5 scene (`Instruction Table` ở (0, 0.85, 0.45) và `Menu` ở khoảng (0.66, 0.86, 0.45) giống nhau trong mọi scene, nhưng **không** phải prefab)
+- **Files:** `Instruction Table`, `Menu` trong từng scene; nút đỏ và thẻ kết quả cạnh nút (#33) giữ chỗ
+- **Problem:** Gộp ba vấn đề cùng một chỗ trên bàn:
+  - **Đọc thẻ (UX):** thẻ nằm phẳng trên bàn, cách mắt khoảng 0.9 m, cúi 59–60°, chữ phụ cỡ 11 (~6.7 mm, suy ra). Ảnh `overview` gần như không đọc được. Mỗi bước phải cúi đọc thẻ rồi ngẩng lên WMS (~43°).
+  - **Menu (UX, từ #37):** lệch phải 56°, cúi 43°, cách 1.09 m; ở Welcome bị cắt mép ảnh; không đánh dấu bài đang làm; ở Complex chỉ cách nút đỏ ~0.33 m, chạm nhầm là đổi scene.
+  - **Giống trạm thật:** ở trạm thật (`old/Orderpicking.png`) mép trước hai thùng là mép bệ băng lăn, không có giấy tờ; vùng trước mặt chỉ có thùng, màn hình và bàn đạp.
+- **Done when:**
+  - Không thẻ hướng dẫn hay Menu nào nằm trên mép bàn giữa trainee và hai thùng; cả hai đặt trên một giá riêng cạnh vùng làm việc. Năm scene giống nhau (một prefab).
+  - Từ vị trí đứng, ảnh `overview` đọc được chữ phụ của mọi thẻ. Góc cúi tới thẻ nhỏ hơn hiện tại; con số mục tiêu theo khuyến nghị mà `xr-lit-scout` tìm được.
+  - Đứng tại chỗ (không bước) chạm được mọi mục Menu, thử trên Quest. Mục của bài hiện tại được làm nổi.
+  - Khoảng cách từ nút đỏ tới Menu lớn hơn hiện tại, hoặc chuyển scene cần xác nhận.
+  - Nút đỏ (đóng vai bàn đạp, decision 008) và thẻ kết quả cạnh nút (#33) giữ chỗ cũ; bấm nút → kết quả vẫn hiện trong khoảng 0.15 m quanh nút.
+  - Đặt hàng từ thùng kho sang thùng đơn không chạm vào giá hay Menu.
+- **Inspector work expected:** yes. Biến `Instruction Table` + `Menu` thành một prefab trước, rồi sửa một lần.
 - **Công:** L
-- **Test trên kính:** bắt buộc (đọc được chữ, độ cúi đầu, thoải mái)
-- **Depends on:** đo world scale của canvas; #25 (nội dung thẻ)
+- **Test trên kính:** bắt buộc (đọc chữ, độ cúi đầu, chạm Menu không bước, tay không vướng)
+- **Depends on:** #25 (nội dung thẻ); #18 (tên mục Menu, verified-mcp); đo world scale của canvas. Cần `solution-decision` trước khi làm: chỗ đặt giá (cạnh màn hình ngang tầm mắt, gần WMS nhưng xa nút đỏ ↔ bên cạnh bàn, gần tay) và câu cũ "nút đỏ nằm sát thẻ 3" (bỏ, vì thẻ rời khỏi mép bàn; thẻ 3 chỉ nói nút ở đâu).
+- **Decision:** docs/decisions/011-workstation-layout-conveyor.md (giá thẻ ngang tầm mắt ~27° trái màn hình; Menu tấm riêng bên phải, không xác nhận; Done when đầy đủ ở mục *Done when / #35* của 011, thay các câu trên)
+- **Ghi chú:** từ #18, Menu dùng tên bài của `LessonNames`, cỡ chữ 12 để mục dài nhất („5. Volle Kartons und loses Material“) không bị cắt; khi làm Menu to hơn thì trả cỡ chữ lên lại.
 - **Status:** todo
 
 ### #36 [P2] Nhãn kiện đọc được từ chỗ đứng
@@ -450,7 +462,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** bắt buộc (chạm mọi mục mà không bước)
 - **Depends on:** #18 (tên mục ở Basic, verified-mcp)
 - **Bổ sung (2026-11-01, #18):** Menu ở cả 5 scene giờ dùng tên bài của `LessonNames`, cỡ chữ 12 để mục dài nhất („5. Volle Kartons und loses Material“) không bị cắt; mục 2 ở Basic là bản sao của mục Basic (`OpenConcept`). Khi làm Menu to hơn thì trả cỡ chữ lên lại.
-- **Status:** todo
+- **Status:** dropped (gộp vào #35, 2026-11-01: Menu và thẻ cùng lên một giá; Done when đã chuyển sang #35)
 
 ### #38 [P2] ComplexScene: panel chúc mừng chồng lên WMS, ô feedback quá thấp
 - **Type:** bug
@@ -488,7 +500,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Inspector work expected:** yes
 - **Công:** L
 - **Test trên kính:** bắt buộc (chuyển bước theo thao tác cầm thật)
-- **Depends on:** #25, #35
+- **Depends on:** #25, #35 (thẻ đã lên giá mới; làm nổi bước trên giá đó, không làm hai lần)
 - **Status:** todo
 
 ---
@@ -624,7 +636,33 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #10; câu trả lời B8 (đã có, 2026-11-01: dialog mới). Đơn của Mixed theo A5 (nhóm, 2026-11-01): giữ số hiện tại.
 - **Bổ sung (2026-11-01, #6):** hai vị trí đã là hai `OrderLine` trên `MixedPickingContainer`; mỗi dòng có `PlacedFull` riêng trong `OrderResult`, nên Ist theo từng vị trí lấy được từ đó.
 - **Bổ sung (2026-11-01, decision 008):** Mixed dựng dialog chung của #10 ở đây. Thêm Done when: MixedPickingScene dùng cùng prefab dialog, mỗi lần một vị trí; `Mehrfachpick` bật ở cả hai vị trí, `letzter Pick` chỉ bật ở vị trí 2; mỗi vị trí có Ist riêng; không còn `PACKAGE PLACED`; kết quả hiện trên thẻ cạnh nút đỏ (phần Mixed của #33). Câu hỏi B14 (Mehrfachpick "1/2"), B15 (`F4 Übersicht`).
+- **Bổ sung (2026-11-01, ảnh trạm thật `old/Orderpicking.png`):** ở trạm thật mỗi vị trí đi kèm một thùng kho riêng; thùng kho của Mixed hiện chứa cả CABLE CONNECTOR A và SCREW B (`TestEvidence/MixedPickingScene/views/overview.png`). Thêm Done when: lúc vào scene, thùng kho chỉ chứa vật tư của vị trí 1; sau khi xác nhận vị trí 1, thùng kho đó được thay bằng thùng kho chỉ chứa vật tư của vị trí 2. Cách đổi thùng (tự chạy hay đẩy tay) theo D11; giả định một thùng kho = một mã vật tư theo D12.
 - **Status:** todo (sau #10)
+
+### #47 [Feature] Bệ băng lăn cho hai thùng, thùng đơn chạy đi sau khi xác nhận đúng
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, ComplexScene (MixedPickingScene sau #21)
+- **Files:** bàn làm việc trong từng scene (`PlasticBox_Order` và thùng kho), validator `OrderConfirm`, `PiecesOrderValidator` (sự kiện kết quả đúng); script mới nhỏ cho chuyển động thùng
+- **Problem:** Ở trạm thật (`old/Orderpicking.png`, số 1, 6, 10), thùng kho và thùng đơn nằm trên băng lăn, và sau khi xác nhận thì thùng đơn được đẩy đi (Abschieben, Kommissionierung slide 2). App đặt hai thùng trên bàn phẳng, đơn đúng thì chỉ có thẻ chữ, không có dấu hiệu "xong việc" giống thật.
+- **Done when:** Lúc vào scene, hai thùng nằm trên bệ con lăn, cùng vị trí và độ cao với hiện tại (tầm với không đổi). Đơn đúng, bấm nút đỏ → thẻ `Correct` hiện như trước, và thùng đơn trượt ra sau theo băng lăn, rời vùng làm việc trong khoảng 2 s. Đơn sai, bấm nút đỏ → thùng đơn đứng yên. Trong lúc thùng đang trượt, kiện trong thùng không rơi ra và không được đếm lại. Bấm Menu hoặc vào lại scene → thùng đơn ở vị trí ban đầu. (code) Chuyển động bắt đầu từ sự kiện kết quả đúng của validator, không poll trong `Update`; không đổi `OrderRule`. Console không có lỗi mới.
+- **Inspector work expected:** yes (dựng bệ bằng primitive, gán thùng và validator)
+- **Công:** M
+- **Test trên kính:** nhanh (xem thùng chạy đi, kiện không rơi)
+- **Depends on:** #35 (dời thẻ và Menu khỏi mép bàn trước), #41 (cùng đụng thùng đơn); D11 (tự chạy hay đẩy tay: nếu đẩy tay thì Done when đổi thành trainee đẩy thùng); D10 (xác nhận đọc ảnh). Làm trước #30.
+- **Decision:** docs/decisions/011-workstation-layout-conveyor.md (thùng tự trượt, kinematic, trigger là con của thùng; không có thùng rỗng mới; Done when đầy đủ ở mục *Done when / #47* của 011, thay các câu trên)
+- **Status:** todo
+
+### #48 [P3] Bàn phím tĩnh dưới màn hình WMS
+- **Type:** cleanup
+- **Scene(s):** BasicPickingScene, ComplexScene (Mixed qua #21, Concept qua #20/#45 — cùng prefab)
+- **Files:** Assets/Prefabs/WMS_Monitor.prefab
+- **Problem:** Ở trạm thật có bàn phím ngay dưới màn hình (`old/Orderpicking.png`, số 9). Trong app các phím F chỉ có trên màn hình, trông như nút bấm trên màn hình cảm ứng.
+- **Done when:** Ảnh `overview` ở Basic và Complex thấy một bàn phím phẳng, tối màu ngay dưới màn hình, không có chữ, không cầm hay bấm được (không collider, không `Grabbable`). Bàn phím không che dialog trong ảnh `wms`/`wms_wide` và không chắn tay khi đặt hàng vào hai thùng. (code) Bàn phím là child của prefab `WMS_Monitor`, không thêm script.
+- **Inspector work expected:** yes (primitive trong prefab)
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** #10 (prefab `WMS_Monitor`)
+- **Status:** todo
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
@@ -771,6 +809,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Bổ sung (review cuối #44, 2026-11-01):** (a) `analyse.R` mất lần kết thúc `facilitator` nếu cùng mã được nhập lại, vì `end_status` chỉ lấy phiên cuối. Thêm `n_facilitator_ends` (hoặc chuỗi `end_status` theo phiên) vào `data_quality`/file rộng, kèm ca selftest "facilitator rồi nhập lại". (b) Ý kiến data-analyst cho câu "lý do kết thúc nào được tính là abgeschlossen": ràng buộc cứng là mọi lần kết thúc giữa khóa phải còn thấy được trong phân tích; ưu tiên là chỉ `completed` tính là xong, còn `facilitator`/`quit` được hỏi tiếp tục như sau crash (`TryFindResumePoint` theo lý do). Việc kèm theo: R (`prev_crash` thành "lần kết thúc trước không phải completed", `repeat_after_crash` thành `repeat_after_interrupt`), spec 4.1, trường cộng thêm `session_start.previous_end_reason`, chuỗi `entry.warning.finished`, các ca trong `make_fake_data.R`. Cho đến khi sửa, chữ cảnh báo "đã hoàn tất" là sai sự thật sau `facilitator`/`quit`.
 - **Decision:** docs/decisions/006-validator-result-format.md
 - **Depends on:** #26, #6 (rule và kết quả trong `XRPick.Orders`). Dùng chung object kết quả với #14.
+- **Bổ sung (2026-11-01, decision 011):** scene inventory (`BasicPickingScene.md:82,84`, `MixedPickingScene.md:73–74`) liệt kê hàm xác nhận hai lần trong `_whenSelect` của nút đỏ, nhưng đó là dữ liệu override cũ nằm ngoài `Array.size`. Đọc lúc chạy (MCP, 2026-11-01) thấy Basic, Mixed, Complex đều gọi đúng **một** lần (`PlayAudio` + validator, + `FlashConfirmKey` ở Basic/Complex), nên `confirm_count` không bị nhân đôi. Khi viết test log vẫn nên đếm số dòng `confirm_pressed` sau một lần bấm. Sau khi đơn đúng, nút đỏ không tính thêm lần xác nhận (#47). Log tại sự kiện đúng chung của validator (#47, #40).
 - **Bổ sung (2026-11-01, decision 007):** `quiz_answer` theo quiz mới của #45: thêm `question_id`, `selected` là khoá đáp án ngắn (thay `gg/vpe/both`); cách nối câu hỏi với kỹ năng do data-analyst quyết (có thể cho `calculate_quantity` một điểm đo từ Concept). Xoá `WRONG_TYPE` khỏi enum và `skill_map.csv` nếu A2 đã được người hướng dẫn chốt. Chỉ thêm `BasicPickingScene,check_material` nếu #18 giữ vật gây nhiễu ở Basic. Trường `package_type` của #29 (spec §4.4) đổi thành khoá vật tư ở #29.
 - **Bổ sung (2026-11-01, review data-analyst của #6):**
   - ~~**Chặn:**~~ **Đã gỡ ở #14 (2026-11-01):** `OrderConfirm` giờ gọi `OrderRule.Check` (dòng đơn từ `CalcForWMS.OrderLine`, đầu vào `CalcForWMS.PackagesInside`). Ghi chú gốc: BasicPickingScene chưa đi qua `OrderRule` (`OrderConfirm` vẫn so `currentSize == necessarySize`). Đầu #28: cho `OrderConfirm` gọi `OrderRule.Check` với một dòng `{training_b, SCHLAUCHSCHELLE B, soll = necessarySize, vpe = 50}`, `countsLoose = false`, đầu vào `OrderContents.From(...)` (9 carton Basic đã có `PackageData`). Ist trên WMS (`CalcForWMS` cộng theo tag) và rule (theo `PackageData`) phải đếm cùng một tập vật thể. Basic không có vật gây nhiễu (#18 đã xoá), nên **không** thêm `BasicPickingScene,check_material`.
@@ -803,7 +842,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Inspector work expected:** yes (gắn tag/collider cho các vùng nhìn)
 - **Công:** L
 - **Test trên kính:** bắt buộc (đo FPS trên Quest 3)
-- **Depends on:** #26. Spec mục 9 (2026-11-01): chỉ ghi hướng đầu, không ghi vị trí tay.
+- **Depends on:** #26. Spec mục 9 (2026-11-01): chỉ ghi hướng đầu, không ghi vị trí tay. #35, #47 trước (decision 011, người dùng 2026-11-01: không thu dữ liệu nhìn theo bố cục cũ; mỗi vùng nhìn có collider riêng trên prefab giá; thêm phiên bản bố cục vào header log).
 - **Bổ sung (review cuối #26, 2026-11-01):** dữ liệu 10 Hz (`_pose.csv`) phải ghi qua một stream mở sẵn suốt phiên (đóng/flush khi pause, đổi scene, kết thúc phiên). `SessionFiles` hiện mở file cho mỗi dòng: ổn cho sự kiện thưa, không ổn cho 10 dòng/giây (cấp phát và ghi đĩa liên tục). Không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (sự kiện rơi vào lượt scene trước).
 - **Status:** todo
 
@@ -844,5 +883,5 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Inspector work expected:** yes (gán trạng thái mờ cho toggle trong từng scene; nếu Menu chưa là prefab thì phải sửa 5 lần)
 - **Công:** M
 - **Test trên kính:** nhanh (chạm mục bị khoá và mục mở trên Quest)
-- **Depends on:** #26 (biết chế độ thử/nghiên cứu), #27 (mã được nhập ở Welcome), #18 và #37 (tên, vị trí, đánh dấu mục trong Menu: làm sau để không sửa Menu hai lần). Câu hỏi còn lại cho #37: có cần cho "chơi lại bài hiện tại" khi nghiên cứu không (spec nói mỗi người chạy một lần, nên mặc định là không).
+- **Depends on:** #26 (biết chế độ thử/nghiên cứu), #27 (mã được nhập ở Welcome), #18 và #35 (tên, vị trí, đánh dấu mục trong Menu: làm sau để không sửa Menu hai lần; #37 đã gộp vào #35). Câu hỏi còn lại cho Menu: có cần cho "chơi lại bài hiện tại" khi nghiên cứu không (spec nói mỗi người chạy một lần, nên mặc định là không).
 - **Status:** todo
