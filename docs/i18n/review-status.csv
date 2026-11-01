@@ -18,11 +18,11 @@ welcome.panel.goals,Am Ende des Kurses können Sie:\n• Materialnummer und VPE 
 welcome.panel.duration,Dauer: etwa 5 Minuten pro Lektion,proposed,german-reviewer (agent),2026-11-01,#25
 common.panel.see_cards,Ihre Aufgaben stehen auf den Karten auf dem Tisch.,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-01,#25
-mixed.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Der Auftrag hat zwei Positionen.",proposed,german-reviewer (agent),2026-11-01,#25
-mixed.card.step1_body,"Lesen Sie im LVS für jede Position Material, Sollmenge und VPE ab.",proposed,german-reviewer (agent),2026-11-01,#25
+mixed.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Bearbeiten Sie die zwei Positionen nacheinander.",proposed,german-reviewer (agent),2026-11-01,#21
+mixed.card.step1_body,"Lesen Sie im LVS die Angaben der aktuellen Position ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).",proposed,german-reviewer (agent),2026-11-01,#21
 mixed.card.step2_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
-mixed.card.step2_body,"Rechnen Sie für jede Position aus, wie viele Verpackungen Sie brauchen. Legen Sie die Verpackungen in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#25
-mixed.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf.,proposed,german-reviewer (agent),2026-11-01,#25
+mixed.card.step2_body,"Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie die Verpackungen in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#21
+mixed.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6). Danach zeigt das LVS die nächste Position an.,proposed,german-reviewer (agent),2026-11-01,#21
 complex.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Der Auftrag enthält auch loses Material.",proposed,german-reviewer (agent),2026-11-01,#25
 complex.card.step1_body,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).",proposed,german-reviewer (agent),2026-11-01,#25
 complex.card.step2_body,"Rechnen Sie aus, wie viele volle Kartons und lose Teile Sie brauchen. Legen Sie zuerst die Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#25
@@ -30,3 +30,4 @@ complex.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Kno
 complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
 basic.step3.text,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25 verb
 concept.card.step3_body,"Wählen Sie A, B oder C. Drücken Sie dann den roten Knopf.",proposed,german-reviewer (agent),2026-11-01,#25 verb
+mixed.feedback.position_done,Richtig! Position {position} ist erledigt.\nLesen Sie im LVS die Angaben von Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-01,#21

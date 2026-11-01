@@ -1,38 +1,55 @@
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
-public class MixedPickingContainer : MonoBehaviour
+public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string PackagesPlacedFormat = "PACKAGE PLACED: {0}"; // mixed.counter.package_placed
-    private const string OrderLineFormat =                            // mixed.wms.order_line
-        "───────────────────\n{0}.\nMaterial          {1}\nOrder quantity    {2} pcs\nPackage size      {3} pcs / package\n\n───────────────────";
-
     // #6, docs/decisions/005: the order is declared once, in WMS units (Soll pieces + VPE).
     [Header("Order")]
     [SerializeField] private List<OrderLine> orderLines = new();
 
-    [Header("WMS texts")]
-    [SerializeField] private TMP_Text packageCountText;
-
-    [Tooltip("One WMS text per order line, in the same order as Order Lines.")]
-    [SerializeField] private TMP_Text[] orderLineTexts;
-
-    // Every package counts, also foreign material: it must show up in PACKAGE PLACED and make the order wrong.
+    // Every package counts, also foreign material: it must make the order wrong.
     private readonly HashSet<PackageData> packagesInside = new();
+
+    // #21, decision 012: packages of finished positions stay in the container but no longer count
+    // for Ist or as foreign material of the current position.
+    private readonly HashSet<PackageData> confirmedPackages = new();
+
+    private OrderSequence sequence;
 
     public IReadOnlyList<OrderLine> OrderLines => orderLines;
 
-    // #4: raised when a package enters or leaves, so an old result can be cleared.
+    // #21: position number from 1, number of positions; for the result card and for #28.
+    public int CurrentPosition => Sequence.Position;
+
+    public int PositionCount => Sequence.Count;
+
+    public bool IsLastPosition => Sequence.IsLast;
+
+    // Pieces of the current position inside: every carton or bag counts its VPE (#17 data).
+    public int IstPieces { get; private set; }
+
+    // #10, decision 001: stock of the current material left in the scene after this position. Set when the
+    // position starts, never changed by picking.
+    public int RestPieces { get; private set; }
+
+    public OrderLine CurrentLine => Sequence.CurrentLine;
+
+    private OrderSequence Sequence => sequence ??= new OrderSequence(orderLines);
+
+    // #4: raised when a package enters or leaves, and when the position changes, so an old result is cleared
+    // and the WMS dialog redraws.
     public event Action ContentsChanged;
+
+    // #21: raised after the position changed, with the new position number. Storage boxes listen to it;
+    // #28 will log it.
+    public event Action<int> LineAdvanced;
 
     private void Start()
     {
-        OrderContents.LogSetupProblems(orderLines, false, orderLineTexts, this);
-        UpdateCounts();
-        UpdateOrderTexts();
+        OrderContents.LogSetupProblems(orderLines, false, null, this);
+        UpdateRest();
+        Recalculate();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -44,7 +61,7 @@ public class MixedPickingContainer : MonoBehaviour
 
         if (packagesInside.Add(package))
         {
-            UpdateCounts();
+            Recalculate();
             ContentsChanged?.Invoke();
         }
     }
@@ -58,37 +75,63 @@ public class MixedPickingContainer : MonoBehaviour
 
         if (packagesInside.Remove(package))
         {
-            UpdateCounts();
+            Recalculate();
             ContentsChanged?.Invoke();
         }
     }
 
+    public bool Contains(PackageData package) => packagesInside.Contains(package);
+
+    // Rates only the current position (decision 012).
     public OrderResult CheckOrder()
     {
-        return OrderRule.Check(orderLines, OrderContents.From(packagesInside), false);
+        return Sequence.CheckCurrent(OrderContents.From(CurrentPackages()), false);
     }
 
-    private void UpdateCounts()
+    // Called by the validator after a correct position. Returns false at the last position.
+    public bool AdvanceToNextLine()
     {
-        if (packageCountText != null)
+        if (!Sequence.TryAdvance())
+            return false;
+
+        confirmedPackages.UnionWith(packagesInside);
+
+        // Listeners show the next storage box first, so its stock is in the scene when Rest is computed.
+        LineAdvanced?.Invoke(CurrentPosition);
+
+        UpdateRest();
+        Recalculate();
+        ContentsChanged?.Invoke();
+        return true;
+    }
+
+    private IEnumerable<PackageData> CurrentPackages()
+    {
+        // A package destroyed or switched off while inside never sends OnTriggerExit.
+        packagesInside.RemoveWhere(p => p == null || !p.isActiveAndEnabled);
+
+        foreach (PackageData package in packagesInside)
         {
-            packageCountText.text = string.Format(PackagesPlacedFormat, packagesInside.Count);
+            if (!confirmedPackages.Contains(package))
+                yield return package;
         }
     }
 
-    private void UpdateOrderTexts()
+    private void Recalculate()
     {
-        if (orderLineTexts == null)
-            return;
+        int pieces = 0;
 
-        for (int i = 0; i < orderLineTexts.Length && i < orderLines.Count; i++)
+        foreach (PackageData package in CurrentPackages())
         {
-            OrderLine line = orderLines[i];
-
-            if (orderLineTexts[i] != null)
-            {
-                orderLineTexts[i].text = string.Format(OrderLineFormat, i + 1, line.materialName, line.soll, line.vpe);
-            }
+            pieces += package.Vpe;
         }
+
+        IstPieces = pieces;
+    }
+
+    private void UpdateRest()
+    {
+        OrderLine line = CurrentLine;
+        RestPieces = line != null ? OrderContents.StockInScene(line.materialKey) - line.soll : 0;
     }
 }

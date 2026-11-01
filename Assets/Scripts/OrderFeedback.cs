@@ -70,6 +70,14 @@ public static class OrderFeedback
         return sentence;
     }
 
+    // #21: at a later position the container still holds the material of earlier positions, so "the container
+    // is empty" would be wrong; say what is missing for this position instead (the result code stays EMPTY).
+    public static string ExplainEmptyPosition(OrderLine line, FeedbackLanguage language)
+    {
+        Dictionary<OrderErrorCode, string> table = language == FeedbackLanguage.German ? German : English;
+        return table[OrderErrorCode.TooFew].Replace("{name}", line != null ? line.materialName : string.Empty);
+    }
+
     private static string NameOf(OrderResult result, string materialKey)
     {
         foreach (OrderLineResult line in result.Lines)

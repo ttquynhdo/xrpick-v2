@@ -75,3 +75,4 @@ einfüllen,,pour in,Putting parts into the container without order (allowed for 
 STECKER C,,plug C,"Fake material name for the ConceptScene sample order only, key stecker_c, Mat.-Nr 625417, VPE 40, Empf Kz 003.",yes,"app (#20, decision 010)",proposed,Fake master data; no package of it exists in any scene.
 Lektion,die,lesson,One of the five lessons of the course (menu items 1-5).,no,app (#25),proposed,Not Lerneinheit/Kapitel.
 Karte,die,card,"Instruction card lying on the desk (Aufgabe, steps 1-3).",no,app (#25),proposed,Not Kärtchen/Tafel.
+erledigt,,done,A position (order line) that is picked and confirmed: Position 1 ist erledigt.,no,app (#21),proposed,Not 'fertig'.

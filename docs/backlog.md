@@ -22,14 +22,14 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
-- **Buổi test kính tiếp theo:** #25 T8-tay (đọc thẻ và panel Welcome).
+- **Buổi test kính tiếp theo:** #25 T8-tay (đọc thẻ và panel Welcome), #21 H1 (cầm thật hai position) + H2 (đọc thẻ kết quả, xem đổi thùng).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
 1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
    - #45 ConceptScene: dạy Mat.-Nr/VPE, quiz vận dụng (decision 007, gồm #32; test nhanh).
    - #25 mẫu thẻ hướng dẫn chung, tiếng Đức ở cả 5 scene: verified-mcp, chờ đọc trên kính.
    - #33 kết quả cạnh nút đỏ (sau #14, #45).
    - #23 tổng kết cuối khoá + mục tiêu Welcome (không kính).
-   - #10 panel WMS giống dialog thật (decision 008: Basic + Complex, gồm phần Complex của #33; L) → #21 (Mixed dùng dialog, gồm phần Mixed của #33) → #46 dọn dẹp; #20 sau #10.
+   - #21 Mixed từng position (decision 012): verified-mcp, chờ test tay H1/H2 → #46 dọn dẹp.
    - #39 phản hồi ở WelcomeScene.
    - #11 nền tảng DE/EN: phần Editor làm được trong đợt này; thử ConceptScene trên Quest cùng buổi test.
 2. **Đợt 4 – dịch** (không kính, chờ nội dung ổn định): #12 (sau #11, #25, #45) → #13.
@@ -650,7 +650,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (2026-11-01, #6):** hai vị trí đã là hai `OrderLine` trên `MixedPickingContainer`; mỗi dòng có `PlacedFull` riêng trong `OrderResult`, nên Ist theo từng vị trí lấy được từ đó.
 - **Bổ sung (2026-11-01, decision 008):** Mixed dựng dialog chung của #10 ở đây. Thêm Done when: MixedPickingScene dùng cùng prefab dialog, mỗi lần một vị trí; `Mehrfachpick` bật ở cả hai vị trí, `letzter Pick` chỉ bật ở vị trí 2; mỗi vị trí có Ist riêng; không còn `PACKAGE PLACED`; kết quả hiện trên thẻ cạnh nút đỏ (phần Mixed của #33). Câu hỏi B14 (Mehrfachpick "1/2"), B15 (`F4 Übersicht`).
 - **Bổ sung (2026-11-01, ảnh trạm thật `old/Orderpicking.png`):** ở trạm thật mỗi vị trí đi kèm một thùng kho riêng; thùng kho của Mixed hiện chứa cả CABLE CONNECTOR A và SCREW B (`TestEvidence/MixedPickingScene/views/overview.png`). Thêm Done when: lúc vào scene, thùng kho chỉ chứa vật tư của vị trí 1; sau khi xác nhận vị trí 1, thùng kho đó được thay bằng thùng kho chỉ chứa vật tư của vị trí 2. Cách đổi thùng (tự chạy hay đẩy tay) theo D11; giả định một thùng kho = một mã vật tư theo D12.
-- **Status:** in progress (nhánh `feat/21-mixed-sequential-positions`)
+- **Test report:** docs/test-reports/bl21.md
+- **Status:** verified-mcp (14/16 ✅, chờ test tay H1 cầm thật hai position, H2 đọc trên kính; đổi thùng bằng thu nhỏ/phóng to thay cho mờ dần, xem báo cáo)
 
 ### #47 [Feature] Bệ băng lăn cho hai thùng, thùng đơn chạy đi sau khi xác nhận đúng
 - **Type:** feature
@@ -831,6 +832,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
   - `analyse.R`: loại lần bấm chỉ có `EMPTY` khỏi mẫu số của các kỹ năng khác `calculate_quantity`.
   - Feedback đỏ vẫn in số đích (cầu nối tới #14): không thu dữ liệu thật trước #14; R tách dữ liệu trước/sau #14 theo build.
   - Mô tả `WRONG_TYPE` / `WRONG_MATERIAL` trong `analysis/skill_map.csv` còn theo mô hình GG/VPE: sửa cùng spec.
+- **Bổ sung (review data-analyst #21, 2026-11-01):** Mixed giờ xác nhận từng position (decision 012). Khi làm #28: (1) `confirm_pressed` thêm `position` (từ 1), `position_count`, `attempt_in_position` (Basic/Complex: 1/1); `attempt_no` vẫn đếm theo lượt scene. (2) `task_completed` chỉ phát khi position cuối đúng (hoặc thêm `order_complete`); R tính `completed`, `attempts_to_correct`, `time_to_correct_s` theo đó, không theo `correct` của từng lần bấm. (3) Ghi `confirm_pressed` **trước** `MixedPickingContainer.AdvanceToNextLine()`; nếu log đổi position (`LineAdvanced`) thì sự kiện đó đứng sau. (4) `EMPTY` ở position 2 nghĩa là „không có gói nào của position hiện tại“ (màn hình hiện câu TOO_FEW, mã giữ EMPTY): sửa định nghĩa trong spec và `skill_map.csv`. (5) `MixedPickingScene,check_material` trong `scene_skills.csv` gần như không thể sai nữa (thùng kho chỉ chứa vật tư của position hiện tại, RING D đã bỏ): người phụ trách nghiên cứu quyết bỏ dòng hay ghi chú. (6) `container`/`required` chỉ chứa gói của position hiện tại; `make_fake_data.R` + `selftest.R` mô phỏng Mixed 2 position (gồm sai ở position 2 rồi đúng, EMPTY ở position 2).
 - **Status:** todo
 
 ### #29 [Feature] Log thao tác: cầm/thả, thùng, nút, kiểu điều khiển
