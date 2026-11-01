@@ -102,3 +102,8 @@ crashlytics-build.properties
 .DS_Store
 Thumbs.db
 desktop.ini
+
+/analysis/data/
+/analysis/output/
+/Assets/Resources/ResearchBuildInfo.txt
+/Assets/Resources/ResearchBuildInfo.txt.meta
