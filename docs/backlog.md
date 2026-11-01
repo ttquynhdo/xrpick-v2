@@ -16,37 +16,26 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
-**Thứ tự đề xuất (cập nhật 2026-11-01: mục không cần kính làm trước).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau). #22 đã bỏ. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) dời xuống đợt cuối (Đợt 6).
-1. **Đợt 1 – không kính, không phụ thuộc** (đa số chỉ sửa script):
-   - ComplexScene: ~~#3 + #15~~ (verified-mcp) → ~~#16~~ (done).
-   - BasicPickingScene: ~~#2~~ (verified-mcp).
-   - Validator: ~~#4~~ (verified-mcp) → ~~#7~~ (done).
-   - Inspector nhiều scene: ~~#9~~ (verified-mcp), làm khi không nhánh nào khác đang mở các scene đó (#5 đã gộp vào #18).
-   - ~~#38~~ (verified-mcp).
-   - Song song, không đụng scene: ~~#26~~ (verified-mcp, merge `7533874`).
-   - **Đóng đợt 1:** 10 mục `verified-mcp` đang chờ case test tay (#1 E4, #2 D5, #3/#15 T5, #4 K5, #9 E6, #24 S4, #34 R5, #38 P4, #26 L19 trên Quest + L20 trong Editor): gom vào buổi test kính kế tiếp để chuyển sang `done`.
-**Đợt kế tiếp (người dùng chọn 2026-11-01: "cả hai, gọn"), xong thì một buổi test kính:**
-   - Làm tuần tự trong cùng checkout, vì Unity Editor và UnityMCP chỉ mở được một project một lúc: ~~#27~~ (verified-mcp; WelcomeScene + màn cuối ComplexScene, decision 004) → ~~#44~~ (verified-mcp; nút kết thúc phiên, 5 scene) → ~~#32~~ (gộp vào #45, decision 007) → #18 (BasicPickingScene, nhưng phần Menu đụng cả 5 scene nên làm sau cùng).
-   - Xen kẽ, không đụng scene: `solution-decision` cho nguồn số lượng đơn (#6) và định dạng kết quả validator (#14; giữ chỗ cho mã lỗi mà #28 sẽ dùng lại ở Đợt 6).
-   - **Buổi test kính:** 10 ca của "Đóng đợt 1" + #27 + #44 + #18 (+ #17, #45 nếu đã xong).
-2. **Đợt 2 – không kính, có phụ thuộc:**
-   - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → ~~#24~~ (verified-mcp) → ~~#34~~ (verified-mcp).
-   - Hai quyết định trong `docs/coding-conventions.md` đã chốt: nguồn số lượng đơn (decision 005, #6) và định dạng kết quả validator (decision 006, #14/#28).
-   - Chuỗi validator, làm **tuần tự** vì cùng sửa scene Mixed/Complex và `MixPickingValidator.cs` / `PiecesOrderValidator.cs` (người dùng chọn 2026-11-01): #18 → #17 (decision 007) → #6 (sau #1, #3, #17) → #14 (sau #4, #1, #6) → #8 (sau #2, #3, #6). #45 (Concept, gồm #32) chạy song song với #6 sau #17. Rule và kết quả trong `XRPick.Orders` (decision 006) để #28 dùng lại.
-3. **Đợt 3 – test kính nhanh, gom một buổi test ở cuối đợt:**
-   - #33 (sau #14, #45): kết quả cạnh nút đỏ.
-   - #18 đã chuyển lên Đợt 2 (trước #17). Sau #18: #25.
-   - #17 đã chuyển lên Đợt 2 (trước #6). Sau #17: #36, #23 (#23 không cần kính).
-   - #10 (L; bố cục trước, số liệu theo #1, #34) → #20, #21.
-   - #39 (sau #9).
-   - #11: phần Editor làm được trong đợt này; thử ConceptScene trên Quest trong cùng buổi test.
-4. **Đợt 4 – dịch** (không kính, nhưng chờ nội dung ổn định): #12 (sau #11, #4, #6, #14, #25) → #13.
-5. **Đợt 5 – bắt buộc test kính** (tay thật, tầm với, FPS), gom thành các buổi test riêng:
-   - #41 (sau #1, #2, #24; phần `Empf Kz` sau #10).
-   - #35 (sau #25) → #40; #37 (sau #18).
-   - #19 (sau #3, #16, #17).
-6. **Đợt 6 – log nghiên cứu (cuối cùng, người dùng chọn 2026-11-01).** Ca test tay còn lại của #26, #27, #44 vẫn nằm trong buổi test kính của đợt đang làm.
-   - #28 (sau #26, #14; dùng lại helper mã lỗi của #14) → #31 (sau #28; chỉ cắm kính vào máy).
+**Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
+- **Đã xong (verified-mcp hoặc done):** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, và chuỗi validator #18 → #17 → #6 → #14 → #8.
+- **Buổi test kính tiếp theo (gom một lần, để chuyển các mục sang `done`):** #1 E4, #2 D5, #3/#15 T5, #4 K5, #9 E6, #24 S4, #34 R5, #38 P4, #26 L19 (Quest) + L20 (Editor), #27 M1–M5, #44 Q1–Q5, #18 M1–M3, #17 H1–H2 (đọc nhãn mới, cả nhãn túi nhỏ), #6 H1, #14 H1. #17 chỉ thành `done` khi người hướng dẫn chốt A2.
+1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
+   - #45 ConceptScene: dạy Mat.-Nr/VPE, quiz vận dụng (decision 007, gồm #32; test nhanh).
+   - #25 mẫu thẻ hướng dẫn chung cho cả 5 scene (Basic đã xong phần Sie ở #18; Mixed/Complex còn "package type").
+   - #33 kết quả cạnh nút đỏ (sau #14, #45).
+   - #23 tổng kết cuối khoá + mục tiêu Welcome (không kính).
+   - #10 panel WMS giống dialog thật (L; đọc dữ liệu đơn từ `orderLines`/`CalcForWMS.OrderLine`) → #20, #21.
+   - #39 phản hồi ở WelcomeScene.
+   - #11 nền tảng DE/EN: phần Editor làm được trong đợt này; thử ConceptScene trên Quest cùng buổi test.
+2. **Đợt 4 – dịch** (không kính, chờ nội dung ổn định): #12 (sau #11, #25, #45) → #13.
+3. **Đợt 5 – bắt buộc test kính** (tay thật, tầm với, FPS), gom thành các buổi test riêng:
+   - #36 nhãn đọc được từ chỗ đứng (sau #17).
+   - #37 Menu trong tầm với (sau #18).
+   - #41 EKZ khi đặt hàng (phần `Empf Kz` sau #10).
+   - #35 (sau #25) → #40.
+   - #19 Complex hai bước (sau #3, #16, #17).
+4. **Đợt 6 – log nghiên cứu (cuối cùng, người dùng chọn 2026-11-01).**
+   - #28 (đã gỡ chặn: Basic chấm bằng `OrderRule` từ #14; object kết quả trong `XRPick.Orders`) → #31.
    - #29, #30 (sau #26; bắt buộc test kính: FPS khi bật logger).
    - #42 khoá Menu khi nghiên cứu (sau #26, #27, #18, #37).
    - Chờ quyết định: #43 bài kiểm tra ngắn trong VR (để sau).
@@ -257,7 +246,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Inspector work expected:** yes (text trong scene)
 - **Công:** M
 - **Test trên kính:** nhanh (đọc thẻ trên kính)
-- **Depends on:** #18 cho phần Basic. Nên làm **trước** #12 để chỉ phải dịch một lần.
+- **Depends on:** #18 cho phần Basic (verified-mcp). Nên làm **trước** #12 để chỉ phải dịch một lần.
+- **Bổ sung (2026-11-01, sau #14/#17/#18):** Basic đã dùng *Sie* và mẫu `Aufgabe` + 3 bước (#18, key `basic.*`). Mixed/Complex: thẻ bước 1 vẫn ghi "Identify the package type …" (sai theo A2/#17). Từ #14, khi xác nhận sai thì `TXT_Instruction` giữ nguyên, nên câu hướng dẫn trên panel phải đúng cả lúc có feedback.
 - **Bổ sung (review UX):**
   - **Mỗi màu một nghĩa:** vàng = việc cần làm, xanh lá = đúng, đỏ = sai. Hiện chữ "red" trên thẻ được tô đỏ, trùng màu với feedback lỗi. Welcome `[Info Panel]/TXT_NextAction` là chữ xanh lá cỡ 16, trùng màu "đúng", và là chữ nhỏ nhất panel.
   - **Xoá ký tự xuống dòng thừa** cuối `Secondary Text` (Welcome có 7, Concept có 6), để layout không bị đẩy khi dịch.
@@ -321,7 +311,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Ghi chú (2026-11-01, #18):** component `PackageCounter` đã được gỡ khỏi BasicPickingScene, nên `PackageCounter.cs` không còn scene nào dùng: xoá cả file (`.cs` + `.meta`) ở đây. Phần `MixPickingValidator.cs:87–107` và `using System.Xml.Schema` ở `MixPickingContainer.cs:3` đã sửa trong #6 (2026-11-01).
 - **Ghi chú (2026-11-01, khi làm):** xoá `PackageCounter.cs` và `MenuSelectionController.cs` (kèm `.meta`); giữ `ScaleItemCounter.cs` (code chạy được, để cho kịch bản cân sau này).
 - **Test report:** docs/test-reports/bl08.md
-- **Status:** done (nhánh `fix/8-dead-code`, test 7/7 ✅, không có case test tay)
+- **Status:** done (commit 201cde6, test 7/7 ✅, không có case test tay)
 
 ### #9 [P3] Xoá các UnityEvent call trỏ vào "None"
 - **Type:** cleanup
@@ -388,7 +378,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** M–L
 - **Test trên kính:** nhanh (cầm/thả kiện, làm quiz)
 - **Depends on:** #17 (dữ liệu và nhãn 3 kiện Concept). Chạy song song được với #6 (khác scene). Câu hỏi mới cho người hướng dẫn: A9, A10, A11 (không chặn).
-- **Status:** todo (sau #17)
+- **Status:** todo (#17 đã verified-mcp)
 
 ### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
 - **Type:** logic
@@ -440,7 +430,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Inspector work expected:** yes (prefab kiện, TMP nhãn)
 - **Công:** M
 - **Test trên kính:** nhanh (đọc nhãn từ chỗ đứng)
-- **Depends on:** #17 (nội dung nhãn đúng)
+- **Depends on:** #17 (nội dung nhãn đúng, verified-mcp)
+- **Bổ sung (2026-11-01, #17):** nhãn giờ có 3 dòng `TÊN` / `Mat.-Nr: …` / `VPE: n ST`, không tự xuống dòng, tự thu nhỏ chữ (min 30 %). Nhãn túi SCHRAUBE B (Mixed, Concept) và nhãn carton Basic (một mặt bên) rất nhỏ khi nhìn từ chỗ đứng (`TestEvidence/ConceptScene/bl17/L_after_labels_1.png`, `TestEvidence/BasicPickingScene/bl17/L_after_labels.png`). Nhãn vẫn là chữ tĩnh, phải khớp `PackageData` (`testing.md` K2).
 - **Status:** todo
 
 ### #37 [P2] Menu: trong tầm với, đánh dấu bài đang làm, khó chạm nhầm
@@ -452,7 +443,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Inspector work expected:** yes
 - **Công:** M
 - **Test trên kính:** bắt buộc (chạm mọi mục mà không bước)
-- **Depends on:** #18 (tên mục ở Basic)
+- **Depends on:** #18 (tên mục ở Basic, verified-mcp)
+- **Bổ sung (2026-11-01, #18):** Menu ở cả 5 scene giờ dùng tên bài của `LessonNames`, cỡ chữ 12 để mục dài nhất („5. Volle Kartons und loses Material“) không bị cắt; mục 2 ở Basic là bản sao của mục Basic (`OpenConcept`). Khi làm Menu to hơn thì trả cỡ chữ lên lại.
 - **Status:** todo
 
 ### #38 [P2] ComplexScene: panel chúc mừng chồng lên WMS, ô feedback quá thấp
@@ -515,13 +507,13 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 ### #12 [Feature] Chuyển toàn bộ text hiển thị sang bảng dịch (EN + DE)
 - **Type:** refactor
 - **Scene(s):** tất cả
-- **Files:** khoảng 128 TMP text trong 5 scene; các chuỗi feedback trong `PackageCounter`, `MixPickingValidator`, `PiecesOrderValidator`, `PackageQuizController`, `PackageInfoDisplay`, `SampleFormulaDisplay`
+- **Files:** khoảng 128 TMP text trong 5 scene; các chuỗi feedback trong `OrderFeedback` (#14), `MixPickingValidator`, `PiecesOrderValidator`, `MixPickingContainer`/`PiecesContainerCounter` (text WMS sinh từ dòng đơn, #6), `PackageQuizController`, `PackageInfoDisplay`, `SampleFormulaDisplay`, `LessonNames`
 - **Problem:** Text đang viết cứng bằng tiếng Anh trong code và scene, nên không dịch được.
 - **Done when:** Ở chế độ Deutsch không còn chữ tiếng Anh nào, trừ chú thích WMS. Mọi chuỗi tiếng Đức đã qua `german-reviewer`. Có file `docs/i18n/review-status.csv`. Ở `de`, ảnh `wms`, `instructions` và `menu` của cả 5 scene không có chữ tràn khung và không có ô `□`. Nhãn WMS (`do_not_translate=yes`) giống từng ký tự ở cả hai locale. (code) Không còn câu nào ghép từ mảnh (`SampleFormulaDisplay.cs:31–36`, `PiecesOrderValidator.cs:40–42`); số lượng là placeholder.
 - **Inspector work expected:** yes (gắn key cho từng TMP text)
 - **Công:** L
 - **Test trên kính:** không (cần người Đức duyệt bản dịch)
-- **Depends on:** #11. Nên làm sau #4, #6 và #25 để không phải dịch các chuỗi sắp bị sửa. Nút xác nhận là `F6 Bestätigen` (B8, dialog mới, 2026-11-01); theo A2 (2026-11-01) không còn chữ "GG" làm tên loại kiện.
+- **Depends on:** #11. #4, #6, #14 đã verified-mcp; nên làm sau #25 để không phải dịch các chuỗi sắp bị sửa. Nút xác nhận là `F6 Bestätigen` (B8, dialog mới, 2026-11-01); theo A2 (2026-11-01) không còn chữ "GG" làm tên loại kiện.
 - **Decision:** docs/decisions/002-localization-mechanism.md
 - **Bổ sung (2026-11-01, review thiết kế khóa học):** Khi dịch, thống nhất luôn: một thuật ngữ cho LVS/WMS (tài liệu dùng LVS); một tên cho mỗi vật tư (Mixed đang có "Cable Connector A", "GG Connector A", "GG Screw packages"…); đơn vị `ST` trên panel WMS và `Stück` trong câu; Basic đang xưng *du* và có lỗi chính tả "Vervolsständige" → chuyển sang *Sie*. Chuỗi ghép từng mảnh (`SampleFormulaDisplay.cs:31–36`, `PiecesOrderValidator.cs:40–42`) phải thành câu trọn vẹn có placeholder.
 - **Status:** todo
@@ -552,7 +544,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** L
 - **Test trên kính:** nhanh (so bố cục, đọc chữ panel trên kính)
 - **Depends on:** #1 (dữ liệu đơn), #34 (cách hiện Ist/Rest). Có thể dựng bố cục trước khi hai mục này xong.
-- **Status:** todo (dựng bố cục được ngay; số liệu đơn chờ #1, #34)
+- **Bổ sung (2026-11-01, rà backlog sau #6/#14/#17/#18):** dữ liệu đơn đã có một nguồn: `orderLines` (`OrderLine` {materialKey, materialName, soll, vpe}) trên counter Mixed/Complex, text WMS sinh từ đó lúc Start (`orderLineTexts`); Basic dùng `CalcForWMS.OrderLine` (Soll = `necessarySize`). Panel mới phải đọc từ đó, không gõ số tay. Nhãn panel EN Mixed/Complex còn ghi "Order quantity"/"Package size" (german-reviewer #14: đổi "Package size" thành VPE khi dựng panel). Basic: ô Anweisung vẫn hiện ba thanh xanh đậm (B4: không highlight). Mat.-Nr giả và tên vật tư theo #17 (`docs/i18n/glossary.csv`).
+- **Status:** todo (#1, #34 đã verified-mcp)
 
 ### #19 [Feature] ComplexScene: tách thành hai bước, có ví dụ phép chia có dư
 - **Type:** feature
@@ -565,7 +558,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** bắt buộc (mở VPE lấy hàng lẻ bằng tay)
 - **Depends on:** #3, #16, #17. A3 (2026-11-01): kiện là carton của một mã vật tư; bước "tự lấy hàng lẻ từ carton đã mở" được phép.
 - **Bổ sung (2026-11-01):** Chuyển từ #22 (đã bỏ) sang đây tình huống **Anbruchmenge**: theo Detail Description mục 5.12, khi mở một VPE mà còn dư thì phần dư phải cất vào một Modul. Bước (a) của mục này tạo đúng tình huống đó, nên nên có bước cất phần dư (hoặc ít nhất nhắc đến).
-- **Status:** todo (sau #3, #16, #17)
+- **Bổ sung (2026-11-01, rà backlog sau #6/#14/#17):** đơn Complex giờ khai báo bằng `orderLines` trên `PiecesContainerCounter` (Soll + VPE, #6) và chấm bằng `OrderRule` (thành phần carton nguyên + chiếc lẻ, A7 còn mở). Ring D = `ring_d`, VPE 25 ở mọi nơi (#17). Carton Ring D đã mở hiện được tính là carton nguyên (TOO_MANY) và không cầm được; nếu bước (b) cho trainee tự lấy hàng lẻ từ carton mở thì cần nhánh riêng trong `OrderContents.From` (review data-analyst #6).
+- **Status:** todo (#3, #16, #17 đã xong hoặc verified-mcp)
 
 ### #20 [Feature] Dạy Soll/Ist/Rest, EKZ, Anweisung trước khi dùng
 - **Type:** feature
@@ -590,6 +584,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** L
 - **Test trên kính:** nhanh (làm lần lượt 2 vị trí)
 - **Depends on:** #10; câu trả lời B8 (đã có, 2026-11-01: dialog mới). Đơn của Mixed theo A5 (nhóm, 2026-11-01): giữ số hiện tại.
+- **Bổ sung (2026-11-01, #6):** hai vị trí đã là hai `OrderLine` trên `MixedPickingContainer`; mỗi dòng có `PlacedFull` riêng trong `OrderResult`, nên Ist theo từng vị trí lấy được từ đó.
 - **Status:** todo (sau #10)
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
@@ -615,7 +610,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Inspector work expected:** yes (text trong scene)
 - **Công:** S
 - **Test trên kính:** không
-- **Depends on:** #17 (để tóm tắt đúng quy tắc)
+- **Depends on:** #17 (để tóm tắt đúng quy tắc, verified-mcp)
+- **Bổ sung (2026-11-01, #17):** gạch đầu dòng đầu tiên của Welcome đã đổi thành "Read the material number and VPE on the label" (EN giữ trong scene tới #12, key `welcome.objective.label`). Các gạch còn lại chưa rà.
 - **Status:** todo
 
 ### #41 [Feature] EKZ quyết định cách đặt hàng: Basic EKZ 3 (snap), các bài khác EKZ 0
