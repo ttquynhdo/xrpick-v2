@@ -138,8 +138,8 @@ Task time, first-attempt accuracy, attempts to correct, error profile per scene,
 
 ## 9. Open decisions (need the study lead)
 
-- Is there a between-group condition, and are repeat runs planned?
-- Who types the ID: facilitator before handing over (default), or the trainee?
-- Should trainees be able to skip scenes freely during the study, or should the menu be locked to the build order?
-- Pose stream at 10 Hz and hand positions: needed for the research questions, or is head pose enough?
-- Retention: how long logs stay on the headset; who deletes them after transfer.
+- ~~Is there a between-group condition, and are repeat runs planned?~~ Decided 2026-11-01: no between-group condition; each participant runs the course once.
+- ~~Who types the ID: facilitator before handing over (default), or the trainee?~~ Decided 2026-11-01: the facilitator types it before handing over the headset.
+- ~~Should trainees be able to skip scenes freely during the study, or should the menu be locked to the build order?~~ Decided 2026-11-01: the menu is locked to the build order during the study.
+- ~~Pose stream at 10 Hz and hand positions: needed for the research questions, or is head pose enough?~~ Decided 2026-11-01: head pose only, no hand positions.
+- ~~Retention: how long logs stay on the headset; who deletes them after transfer.~~ Decided 2026-11-01: the facilitator deletes the logs on the headset right after copying them and checking that all files are complete.

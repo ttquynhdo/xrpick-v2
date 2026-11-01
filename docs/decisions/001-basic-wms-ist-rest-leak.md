@@ -1,11 +1,17 @@
 # Quyết định 001: Ist/Rest trên WMS làm lộ đáp án ở BasicPickingScene
 
 - **Backlog:** #34
-- **Trạng thái:** blocked (chờ người hướng dẫn trả lời B6, B7, B7a)
+- **Trạng thái:** accepted (phương án C, 2026-11-01)
 - **Ngày:** 2026-11-01
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-01):** chưa làm phương án nào, chờ người hướng dẫn. Khi có câu trả lời thì chạy lại `solution-decision`, bắt đầu từ file này.
 - **Cập nhật 2026-11-01:** nhóm trả lời B6, B7, B7a là **theo tài liệu** (Rest = tồn kho thùng kho; đếm tay thì Ist = Soll, cân thì Ist tăng dần), gần phương án C. Chưa chạy lại `solution-decision`; cần làm sau khi #1 chốt đơn Basic, vì cách lấy (đếm hay cân) phụ thuộc Soll.
+- **Lựa chọn của người dùng (2026-11-01, sau decision 003):** đơn Basic là 300 chiếc (giả định A1), tức là cân (B7a). Người dùng chọn **phương án C, theo tài liệu**: Ist tăng dần trong lúc lấy, Rest là tồn kho tĩnh của thùng kho. Chấp nhận rằng Ist cho biết lúc nào đủ; phép tính 300 ÷ 50 không còn được kiểm ở bài này. Không chạy lại `solution-decision`: người dùng chọn thẳng giữa hai phương án còn lại (C hoặc A).
+- ***Done when* của phương án C** (thay cho mục *Done when* của A bên dưới):
+  - Lúc vào scene: Soll hiện `300`, Ist hiện `0`, Rest hiện tồn kho còn lại của thùng kho sau khi lấy đủ đơn (tồn kho thùng kho − 300; số tồn kho theo #24).
+  - Đặt 1 carton vào thùng đơn → Ist tăng đúng 50; lấy ra → Ist giảm đúng 50. Rest không đổi.
+  - Đặt đủ 6 carton → Ist `300`; bấm xác nhận → `Correct`.
+  - Console không có lỗi mới.
 
 ## Bài toán
 Trong BasicPickingScene, trainee phải tự tính số kiện cần lấy (Soll 300 ÷ VPE 50). Họ chỉ được biết đúng hay sai sau khi xác nhận. `CalcForWMS` cập nhật số trên WMS theo từng kiện đặt vào thùng: Rest giảm 50, Ist tăng 50. Vì vậy `Rest: 0` hoặc `Ist = Soll` báo luôn là đã đủ. Ngoài ra, Rest đang mang nghĩa "còn thiếu", trong khi tài liệu yêu cầu định nghĩa Rest là tồn kho còn lại của thùng kho (Kommissionierung, slide 7).
@@ -29,7 +35,7 @@ Trong BasicPickingScene, trainee phải tự tính số kiện cần lấy (Soll
 | C. Theo WMS thật: Rest = tồn kho tĩnh, Ist theo chế độ thật | ++ nếu B6/B7 xác nhận | − nếu chưa dạy (#20) | 0 | − blocked, phải chọn số tồn kho | + khớp #10/#20 | — (blocked) |
 | D. Thêm câu hỏi "Wie viele VPE?" | − | + | − | − | − | — |
 
-## Khuyến nghị (proposed, chưa được chấp nhận): phương án A
+## Khuyến nghị ban đầu của synthesizer (không được chọn): phương án A
 - **Được:** đạt *Done when* mà không cần #1/#2. Bỏ nghĩa sai của Rest. Không có chuỗi mới cần dịch. Dễ đảo lại.
 - **Mất:** panel lệch so với dialog thật, và Ist/Rest chưa được dạy (việc của #10/#20). Mất phần feedback giải thích; phần này đưa vào #14, làm sau #2.
 - **Ràng buộc khi làm:** `Update()` ghi đè text mỗi frame, nên phải che trong script, không thể làm trong Inspector. Không đổi tên field public. `currentSize` vẫn phải đếm, vì `OrderConfirm` dùng nó.
