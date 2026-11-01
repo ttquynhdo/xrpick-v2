@@ -252,8 +252,9 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Problem:** Rest bắt đầu bằng Soll (300) và giảm 50 mỗi khi đặt một kiện, nên `Rest: 0` báo luôn "đủ rồi". Trainee không phải tự tính 300 ÷ 50, chỉ cần bỏ kiện vào tới khi Rest về 0. Như vậy tải nội tại bị mất, và con số 300 hiện hai lần. Theo tài liệu yêu cầu, Rest là tồn kho còn lại trong thùng (#20), không phải "còn thiếu".
 - **Done when:** Đặt từng kiện vào thùng thì không có số nào trên WMS cho biết còn thiếu bao nhiêu kiện. Trainee chỉ biết đủ hay chưa sau khi bấm xác nhận. Nếu đã chốt nghĩa của Rest thì Rest hiện đúng nghĩa đó.
 - **Inspector work expected:** có thể (giá trị `restSize`, hoặc ẩn text Rest)
-- **Depends on:** #2 (sửa cùng file); câu hỏi người hướng dẫn: Rest nghĩa là gì, Ist ở hệ thống thật có tự cập nhật không (#20). Có thể làm tạm bằng cách ẩn số Rest trước khi có câu trả lời.
-- **Status:** todo
+- **Depends on:** câu hỏi người hướng dẫn B6, B7, B7a; #2 chỉ cần nếu hiện Ist sau khi xác nhận. Ghi chú (2026-11-01): **Ist cũng làm lộ đáp án** (`Ist = Soll`), không chỉ Rest.
+- **Decision:** docs/decisions/001-basic-wms-ist-rest-leak.md (blocked; khuyến nghị tạm: che Ist/Rest bằng `–` trong lúc nhặt)
+- **Status:** blocked (chờ người hướng dẫn trả lời B6, B7, B7a)
 
 ### #35 [P2] Thẻ hướng dẫn: đọc được mà không phải cúi 60°
 - **Type:** logic
