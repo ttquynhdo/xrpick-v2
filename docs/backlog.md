@@ -3,7 +3,7 @@
 Nguồn: `/code-review` toàn bộ `Assets/Scripts` (2026-11-01), đã đối chiếu với code và scene (commit `db4160f`).
 Mục #14–#23: review thiết kế khóa học (`instructional-design-reviewer`, cả 5 scene, 2026-11-01, chưa có ảnh Play mode). Các mã A2, B8… là câu hỏi trong `docs/requirements/questions-for-instructor.md`.
 Mục #24–#25 và các dòng **Bổ sung (ảnh Play mode)**: review lần 2 có ảnh Play mode của 5 góc nhìn chuẩn ở cả 5 scene (`TestEvidence/<Scene>/views/`, chỉ có trên máy, không commit), 2026-11-01. Đã đối chiếu lại với code/scene.
-Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01).
+Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01). Mục #42: từ quyết định ở spec mục 9 (khoá Menu khi nghiên cứu), thêm khi rà backlog 2026-11-01. Mục #43: bài kiểm tra trong VR, ghi lại để sau khi bàn thiết kế #26 (không có bài kiểm tra trên giấy).
 Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tải nhận thức (`xr-ux-reviewer`, cả 5 scene, ảnh `TestEvidence/<Scene>/views/`, 2026-11-01). Góc/khoảng cách tính từ mắt (0, 1.6, 0). Vị trí nút đỏ là suy ra từ cấu trúc cha–con, chưa đo trong Play mode.
 **Cập nhật 2026-11-01 theo câu trả lời B1–B10, C1–C4, D1–D3** trong file câu hỏi (trả lời của nhóm, chưa phải của người hướng dẫn): mọi scene dùng **dialog mới** (`F6 Bestätigen`); Rest = tồn kho thùng kho, Ist theo cách lấy thật (B6, B7, B7a); dữ liệu giả cùng định dạng thật (B10); #22 ngoài phạm vi (D2); giữ thông tin kiện sau khi thả làm quiz quá dễ (D3). Câu A1–A6 vẫn mở.
 **Cập nhật 2026-11-01 (decision 003):** nhóm trả lời A1 (đơn Basic = tổng 300 chiếc) và D4–D7 (EKZ khi đặt hàng); thêm #41, bỏ chặn #1, #24. Sau đó nhóm trả lời nốt A2, A3, A5, A6, B3, B5, D1, chọn phương án C cho #34 (decision 001) và chốt mục 9 của spec log: không còn mục nào `blocked`.
@@ -24,10 +24,12 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - Inspector nhiều scene: ~~#9~~ (verified-mcp), làm khi không nhánh nào khác đang mở các scene đó (#5 đã gộp vào #18).
    - ~~#38~~ (verified-mcp).
    - Song song, không đụng scene: #26.
+   - **Đóng đợt 1:** 9 mục `verified-mcp` đang chờ case test tay (#1 E4, #2 D5, #3/#15 T5, #4 K5, #9 E6, #24 S4, #34 R5, #38 P4): gom thành một buổi test (P4 cần kính) để chuyển sang `done` trước khi mở thêm nhánh.
 2. **Đợt 2 – không kính, có phụ thuộc:**
    - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → ~~#24~~ (verified-mcp) → ~~#34~~ (verified-mcp).
-   - #14 (sau #4, #1) → #28 (sau #26, dùng chung helper mã lỗi với #14).
-   - #6 (sau #1, #3) → #8 (sau #2, #3, #6).
+   - Trước khi code: chạy `solution-decision` cho hai quyết định còn mở trong `docs/coding-conventions.md`: nguồn số lượng đơn (#6) và định dạng kết quả validator (#14, #28).
+   - Chuỗi validator, làm **tuần tự** vì cùng sửa `MixPickingValidator.cs` / `PiecesOrderValidator.cs`: #6 (sau #1, #3) → #14 (sau #4, #1) → #8 (sau #2, #3, #6).
+   - #28 (sau #26, dùng chung helper mã lỗi với #14).
 3. **Đợt 3 – test kính nhanh, gom một buổi test ở cuối đợt:**
    - #32 (Concept) và #33 (sau #14, #32): kết quả cạnh nút đỏ.
    - #18 (sau #1; gồm cả #5) → #25 (sau #18).
@@ -41,6 +43,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - #35 (sau #25) → #40; #37 (sau #18).
    - #19 (sau #3, #16, #17).
    - #27, #29, #30 (sau #26).
+   - #42 khoá Menu khi nghiên cứu (sau #26, #27, #18, #37).
+6. **Chờ quyết định:** #43 bài kiểm tra ngắn trong VR (để sau).
 
 ---
 
@@ -133,7 +137,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Inspector work expected:** yes, với Basic (text nằm trong scene, không trong code)
 - **Công:** M
 - **Test trên kính:** không
-- **Depends on:** #4 (sửa cùng các dòng), #1 cho phần Basic
+- **Depends on:** #4 (sửa cùng các dòng), #1 cho phần Basic, #6 (cùng sửa hai validator, làm sau #6). Quyết định "định dạng kết quả validator" (`docs/coding-conventions.md`, chung với #28) phải chốt bằng `solution-decision` trước.
 - **Bổ sung (review UX):** "Cùng một chỗ" nên là **cạnh nút đỏ**, vì đó là chỗ trainee đang nhìn lúc xác nhận. Basic đã làm vậy (thẻ cách nút khoảng 0.11 m). Concept, Mixed và Complex thì ghi lên panel WMS, lệch 42–51° so với nút. Vị trí do #33 xử lý, mục này chỉ lo nội dung.
 - **Status:** todo
 
@@ -245,7 +249,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Inspector work expected:** có thể. Nếu dùng ScriptableObject thì phải tạo asset và gán vào. Field cũ cần `[FormerlySerializedAs]`.
 - **Công:** M
 - **Test trên kính:** không
-- **Depends on:** #1, #3
+- **Depends on:** #1, #3. Quyết định "nguồn duy nhất cho số lượng đơn" (`docs/coding-conventions.md`) phải chốt bằng `solution-decision` trước. Làm trước #14 (cùng sửa hai validator).
+- **Ghi chú (2026-11-01, rà backlog):** Basic không còn số viết cứng trong logic: `OrderConfirm` so `CalcForWMS.currentSize` với `necessarySize`. `PackageCounter.cs:115` ("selected 2 GG") là code chết sau #1, xoá ở #8/#18.
 - **Status:** todo
 
 ## P3 – Dọn dẹp
@@ -267,9 +272,10 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 ### #8 [P3] Xoá code chết trong scripts
 - **Type:** cleanup
 - **Scene(s):** —
-- **Files:** Assets/Scripts/SceneMenuController.cs:48–102, Assets/Scripts/PackageInfoDisplay.cs:1–41, Assets/Scripts/MixPickingContainer.cs:2, Assets/Scripts/MixPickingValidator.cs:44–64, Assets/Scripts/WS Scripts/OrderConfirm.cs:11–20, Assets/Scripts/WS Scripts/BoxInfo.cs:6–16
+- **Files:** Assets/Scripts/SceneMenuController.cs:48–102, Assets/Scripts/PackageInfoDisplay.cs (khối comment), Assets/Scripts/MixPickingContainer.cs:3, Assets/Scripts/MixPickingValidator.cs:87–107, Assets/Scripts/WS Scripts/BoxInfo.cs:6–16, Assets/Scripts/PackageCounter.cs (`CheckOrder` không còn được gọi sau #1) (số dòng rà lại 2026-11-01, sau #4, #7)
 - **Problem:** Có các khối code bị comment out, `using System.Xml.Schema` không dùng, hai nhánh if/else giống hệt nhau, và các `Start`/`Update` rỗng. Chúng làm code khó đọc. Còn `MenuSelectionController.cs` đã bị comment toàn bộ và `ScaleItemCounter.cs` không được scene nào dùng: phải quyết định giữ hay xoá cả `.cs` lẫn `.meta`. Trước khi xoá, chạy `scene-ref-auditor`.
-- **Done when:** Code compile không lỗi, cả 5 scene chạy như trước, và không có khối code bị comment dài nào.
+- **Done when:** Code compile không lỗi, cả 5 scene chạy như trước, và không có khối code bị comment dài nào. (code) `PackageCounter.CheckOrder` (quy tắc "2 GG") đã bị xoá, hoặc cả component bị gỡ khỏi `PlasticBox_Order` nếu #18 chưa làm việc đó.
+- **Ghi chú (2026-11-01, rà backlog):** `OrderConfirm.cs` không còn code chết (đoạn :11–20 cũ giờ là `OnEnable`/`OnDisable` của #4). Xoá hẳn `PackageCounter` (vẫn đếm tag, ghi vào `Info Panel` đang tắt) làm ở đây hoặc ở #18, mục nào làm trước; chạy `scene-ref-auditor` trước khi xoá.
 - **Inspector work expected:** no
 - **Công:** S
 - **Test trên kính:** không
@@ -278,7 +284,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 
 ### #9 [P3] Xoá các UnityEvent call trỏ vào "None"
 - **Type:** cleanup
-- **Scene(s):** WelcomeScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** WelcomeScene.unity:556–575 (`MixedPickingValidator.ConfirmOrder`, target trống), các call `PackageInfoDisplay.ShowDefaultInfo` có `m_Target: {fileID: 0}` trong Basic/Mixed/Complex
 - **Bổ sung (2026-11-01, từ scene inventory):** Sự kiện cầm package (`ISDK_HandGrabInteraction`) trong MixedPickingScene còn gọi `PackageInfoDisplay.ShowGGInfo` / `ShowVPEInfo`. Hai method này đã bị comment out trong code, và target cũng đang trống. Cần kiểm tra BasicPickingScene và ComplexScene xem có tình trạng tương tự không.
 - **Problem:** Các call còn sót lại khi copy prefab. Chúng không làm gì nhưng gây nhầm lẫn khi đọc Inspector.
@@ -345,8 +351,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #2 (Ist phải đếm đúng), #1, #24 (số tồn kho thùng kho). B6, B7, B7a đã có câu trả lời của nhóm. Ghi chú (2026-11-01): **Ist cũng làm lộ đáp án** (`Ist = Soll`), không chỉ Rest.
-- **Bổ sung (2026-11-01, trả lời B6, B7, B7a):** Nhóm chọn **theo tài liệu**: Rest = tồn kho còn lại trong thùng kho; đếm tay (≤ 7 chiếc) thì Ist điền sẵn bằng Soll; cân (≥ 8 chiếc) thì Ist tăng dần trong lúc lấy. Hướng này gần phương án C của decision 001, nhưng Ist tăng dần vẫn cho biết lúc nào đủ. Phải chạy lại `solution-decision` từ decision 001 với câu trả lời này (và đơn mới của #1) trước khi làm. Done when sẽ viết lại sau quyết định đó.
-- **Decision:** docs/decisions/001-basic-wms-ist-rest-leak.md (cần chạy lại với câu trả lời B6/B7/B7a)
+- **Bổ sung (2026-11-01, trả lời B6, B7, B7a):** Nhóm chọn **theo tài liệu**: Rest = tồn kho còn lại trong thùng kho; đếm tay (≤ 7 chiếc) thì Ist điền sẵn bằng Soll; cân (≥ 8 chiếc) thì Ist tăng dần trong lúc lấy. Hướng này gần phương án C của decision 001, nhưng Ist tăng dần vẫn cho biết lúc nào đủ. (Đã xử lý: người dùng chọn thẳng phương án C, không chạy lại `solution-decision`; Done when đã viết lại theo C, xem dòng dưới.)
+- **Decision:** docs/decisions/001-basic-wms-ist-rest-leak.md (accepted, phương án C)
 - **Bổ sung (2026-11-01, giả định A1 = 300 chiếc):** 300 chiếc thuộc nhóm "từ 8 chiếc thì cân" (B7a), nên theo tài liệu Ist tăng dần trong lúc lấy. Người dùng chọn phương án C (theo tài liệu), decision 001 đã ghi lại.
 - **Test report:** docs/test-reports/bl34.md
 - **Status:** verified-mcp (7/7 ✅, chờ test tay R5; theo giả định A1, tồn kho 9 carton)
@@ -438,7 +444,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Done when:** WelcomeScene có nút **Deutsch / English** cạnh canvas `Welcome`; Menu của các scene không có nút này. Lần chạy đầu (chưa có lựa chọn đã lưu), text mẫu ở mỗi scene hiện tiếng Đức. Bấm `English` ở WelcomeScene thì scene tải lại và text mẫu hiện tiếng Anh; chọn ConceptScene trong Menu thì text mẫu ở đó cũng là tiếng Anh. Thoát rồi mở lại app vẫn là tiếng Anh. ConceptScene (scene thử) chạy được trên Quest với package Localization; ghi lại thời gian build và có nhấp nháy ở frame đầu hay không. Dùng một key không tồn tại thì Console có `LogError` ghi tên key và TMP hiện tên key, không để trống. Một chuỗi runtime có placeholder (bộ đếm ở Concept) hiện đúng số ở cả `de` và `en`.
 - **Inspector work expected:** yes (cài package, tạo Localization Settings và locale, gắn `LocalizeStringEvent`)
 - **Công:** M
-- **Test trên kính:** có (ConceptScene thử package Localization trên Quest)
+- **Test trên kính:** nhanh (ConceptScene thử package Localization trên Quest: chữ Đức hiện đúng, thời gian build, nhấp nháy frame đầu)
 - **Depends on:** —
 - **Decision:** docs/decisions/002-localization-mechanism.md
 - **Status:** todo
@@ -575,11 +581,11 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** bắt buộc (snap bằng tay thật, âm thanh/rung, gỡ carton ra)
 - **Depends on:** #1, #2, #24 (làm trước, decision 003), #10 cho ô `Empf Kz`; câu D4–D6 (nhóm đã trả lời, chờ người hướng dẫn xác nhận)
 - **Decision:** docs/decisions/003-ekz-placement.md
-- **Status:** todo (sau #1, #2, #24; phần `Empf Kz` sau #10)
+- **Status:** todo (#1, #2, #24 đã verified-mcp; phần `Empf Kz` chờ #10)
 
 ## Feature – Log dữ liệu nghiên cứu
 
-Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu: ghi log theo từng người học, gắn mã ẩn danh `participant_id` để nối với phiếu khảo sát giấy. Làm theo thứ tự #26 → #31. Các câu hỏi mở ở mục 9 của spec cần người phụ trách nghiên cứu trả lời trước khi bắt đầu thu dữ liệu thật, nhưng không chặn #26.
+Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu: ghi log theo từng người học, gắn mã ẩn danh `participant_id` để nối với phiếu khảo sát giấy. Làm theo thứ tự #26 → #31, rồi #42. Mục 9 của spec đã chốt hết (2026-11-01): không chia nhóm, mỗi người chạy một lần; người điều phối nhập mã; Menu khoá theo thứ tự build (#42); chỉ ghi hướng đầu; người điều phối xoá log trên kính sau khi chép. Code log viết được ngay, nhưng **thu dữ liệu thật** nên chờ #14 (feedback không in số đích) và #1, #15 `done` (spec mục 7).
 
 ### #26 [Feature] ResearchLogger: lõi ghi log theo phiên
 - **Type:** feature
@@ -591,6 +597,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** M
 - **Test trên kính:** không
 - **Depends on:** —
+- **Bổ sung (2026-11-01):** thiết kế chi tiết và Done when bổ sung ở `docs/superpowers/specs/2026-11-01-research-logger-design.md` (§9), gồm đổi tên app `XRISE` / `xpick` / `com.xrise.xpick`, khung `_summary.csv`, script R trên dữ liệu giả. "Dừng Play giữa chừng → `crash_recovered`" được thay bằng tuỳ chọn dev bỏ `session_end`. Review bắt buộc bởi `data-analyst`.
 - **Status:** todo
 
 ### #27 [Feature] Bàn phím nhập mã người học ở WelcomeScene
@@ -603,18 +610,20 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** M
 - **Test trên kính:** bắt buộc (bấm phím số bằng tay)
 - **Depends on:** #26. Ai nhập mã: **người điều phối**, nhập trước khi đưa kính cho trainee (người dùng chốt 2026-11-01, spec mục 9).
+- **Bổ sung (design #26, 2026-11-01):** thêm nút ẩn cho người điều phối gọi `ResearchLogger.EndSession("facilitator")`. Mã `P900`–`P999` là mã thử (log vào `practice/`); bàn phím báo "chế độ thử" với các mã này. Làm tiếp sau crash (người dùng chốt): nhập lại mã cũ → nếu `ResearchLogger.TryFindResumePoint` thấy phiên trước bị crash thì hỏi người điều phối "Tiếp tục khóa của `P017`?" và báo bài đang dở. Xem `docs/superpowers/specs/2026-11-01-research-logger-design.md` §4, §6.
 - **Status:** todo
 
 ### #28 [Feature] Log kết quả mỗi lần xác nhận + mã lỗi + summary.csv
 - **Type:** feature
 - **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
-- **Files:** Assets/Scripts/PackageQuizController.cs:25, Assets/Scripts/PackageCounter.cs:104, Assets/Scripts/WS Scripts/OrderConfirm.cs:22, Assets/Scripts/MixPickingValidator.cs:18, Assets/Scripts/PiecesOrderValidator.cs:24; helper mới tính mã lỗi; spec mục 4.2, 4.3, 5
+- **Files:** Assets/Scripts/PackageQuizController.cs:25, Assets/Scripts/WS Scripts/OrderConfirm.cs:27, Assets/Scripts/MixPickingValidator.cs:18, Assets/Scripts/PiecesOrderValidator.cs:24; helper mới tính mã lỗi; spec mục 4.2, 4.3, 5
 - **Problem:** Validator chỉ có đúng/sai và chữ hiển thị, không ghi lại số lần thử, thời gian, trong thùng có gì hay loại lỗi.
-- **Done when:** Mỗi lần bấm xác nhận có một `confirm_pressed` (số lần thử, số đếm từng loại so với yêu cầu, `correct`, `error_codes`), quiz có `quiz_answer`, lần đúng đầu tiên có `task_completed`. Rời scene thì có thêm một dòng trong `_summary.csv`. Thử các trường hợp: thùng trống, thiếu, thừa, sai loại, sai vật tư, đủ → mã lỗi đúng. Chữ phản hồi trên màn hình **không đổi**. Basic ghi cả hai kết quả (`rule_package_counter`, `rule_calc_for_wms`) cho tới khi xong #1.
+- **Done when:** Mỗi lần bấm xác nhận có một `confirm_pressed` (số lần thử, số đếm từng loại so với yêu cầu, `correct`, `error_codes`), quiz có `quiz_answer`, lần đúng đầu tiên có `task_completed`. Rời scene thì có thêm một dòng trong `_summary.csv`. Thử các trường hợp: thùng trống, thiếu, thừa, sai loại, sai vật tư, đủ → mã lỗi đúng. Chữ phản hồi trên màn hình **không đổi**. Basic chỉ ghi kết quả của `OrderConfirm` (quy tắc tổng số chiếc); `PackageCounter.CheckOrder` không còn được gọi sau #1 nên không log.
 - **Inspector work expected:** no
 - **Công:** M
 - **Test trên kính:** không
-- **Depends on:** #26. Helper mã lỗi dùng lại được cho #14; nếu làm #14 trước thì dùng chung.
+- **Bổ sung (design #26, 2026-11-01):** định dạng `confirm_pressed` / `quiz_answer` / `task_completed` đã chốt ở design §6 (fake data của #26 dùng nó). Bất biến `correct == (error_codes rỗng)`; thêm mã `WRONG_ANSWER` cho quiz. Lần xác nhận đúng đầu tiên ở ComplexScene gọi `EndSession("completed")`. Khung `_summary.csv` do #26 tạo; #28 chỉ điền các cột kết quả.
+- **Depends on:** #26. Helper mã lỗi dùng lại được cho #14; nếu làm #14 trước thì dùng chung. Định dạng kết quả validator (enum/struct lý do) chốt chung với #14 qua `solution-decision` (`docs/coding-conventions.md`, pending decision).
 - **Status:** todo
 
 ### #29 [Feature] Log thao tác: cầm/thả, thùng, nút, kiểu điều khiển
@@ -650,5 +659,31 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Inspector work expected:** no
 - **Công:** M
 - **Test trên kính:** nhanh (cắm kính vào máy để chép log, không cần đeo)
+- **Bổ sung (2026-11-01):** phiếu giấy: SSQ trước khi đeo kính và cuối khóa, NASA-TLX một lần cuối khóa. #31 thêm file mẫu nhập phiếu (cột `participant_id`, `ssq_pre_*`, `ssq_post_*`, `tlx_*`) và bước "điền SSQ trước" vào quy trình của người điều phối.
+- **Bổ sung (design #26, 2026-11-01):** phần gộp dữ liệu đã nằm trong `analysis/analyse.R` (file rộng mỗi người một dòng, dựng từ `events.jsonl`). #31 chỉ còn: hướng dẫn chép log và nối file rộng với phiếu giấy. Script thuộc `data-analyst`.
 - **Depends on:** #28 (cần `summary.csv`). Spec mục 9 (2026-11-01): người điều phối xoá log trên kính ngay sau khi chép về và kiểm tra đủ file.
+- **Status:** todo
+
+### #43 [Feature] Bài kiểm tra ngắn trong VR ở đầu và cuối khóa
+- **Type:** feature
+- **Scene(s):** WelcomeScene (đầu khóa), ComplexScene hoặc một scene cuối mới (cuối khóa)
+- **Files:** chưa xác định; ghi log qua `ResearchLogger` (#26)
+- **Problem:** Không có bài kiểm tra kiến thức trên giấy (người dùng xác nhận 2026-11-01), nên log chỉ cho *dấu hiệu* tiến bộ (lỗi theo kỹ năng qua các bài), không có số đo trước–sau. Một bài kiểm tra ngắn giống nhau ở đầu và cuối khóa (vd. đọc một dialog WMS, tính số kiện) sẽ cho số đo đó, đổi lại khóa học dài thêm vài phút.
+- **Done when:** (viết lại khi quyết định làm) Ở đầu và cuối khóa có cùng dạng câu hỏi, khác số liệu. Mỗi câu trả lời được log kèm đúng/sai và thời gian trả lời. Script R vẽ được điểm trước–sau theo từng người học.
+- **Inspector work expected:** yes
+- **Công:** M
+- **Test trên kính:** nhanh (trả lời câu hỏi bằng tay)
+- **Depends on:** #26, #27; nội dung câu hỏi cần người hướng dẫn duyệt; chữ tiếng Đức qua `localize-strings`.
+- **Status:** blocked (để sau: người dùng hoặc người phụ trách nghiên cứu quyết định có làm không, 2026-11-01)
+
+### #42 [Feature] Chế độ nghiên cứu: khoá Menu theo thứ tự bài
+- **Type:** feature
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Scripts/SceneMenuController.cs, `Menu` (toggle các bài) trong từng scene, `ResearchLogger` (#26, biết mã người học đang chạy); spec mục 9
+- **Problem:** Spec mục 9 (2026-11-01) chốt: khi thu dữ liệu, mỗi người học đi hết khóa một lần, theo đúng thứ tự build. Hiện Menu cho nhảy tới bất kỳ bài nào, nên người học có thể bỏ bài hoặc làm lại, làm hỏng so sánh giữa các người học. Chưa có mục nào làm việc này.
+- **Done when:** Đang chạy với một mã nghiên cứu (vd. `P017`), ở WelcomeScene: Menu chỉ cho mở bài kế tiếp (ConceptScene); các mục khác hiện mờ và chạm vào thì không chuyển scene. Ở mỗi scene sau: chỉ mục bài kế tiếp mở được, không quay lại bài trước. Sau crash, người điều phối nhập lại mã cũ và chọn tiếp tục (#27) → Menu mở khoá tới bài đang dở (theo `ResearchLogger.TryFindResumePoint`), bài đó bắt đầu lại từ đầu. Đang chạy với mã thử (`P000`, `P900`–`P999`) hoặc không có logger: mọi mục mở được như hiện tại. Chạm một mục bị khoá thì log có `menu_select` kèm `blocked: true` (khi đã có #29), không có scene nào được tải. (code) Thứ tự lấy từ build order, không viết cứng tên scene thêm một lần nữa.
+- **Inspector work expected:** yes (gán trạng thái mờ cho toggle trong từng scene; nếu Menu chưa là prefab thì phải sửa 5 lần)
+- **Công:** M
+- **Test trên kính:** nhanh (chạm mục bị khoá và mục mở trên Quest)
+- **Depends on:** #26 (biết chế độ thử/nghiên cứu), #27 (mã được nhập ở Welcome), #18 và #37 (tên, vị trí, đánh dấu mục trong Menu: làm sau để không sửa Menu hai lần). Câu hỏi còn lại cho #37: có cần cho "chơi lại bài hiện tại" khi nghiên cứu không (spec nói mỗi người chạy một lần, nên mặc định là không).
 - **Status:** todo
