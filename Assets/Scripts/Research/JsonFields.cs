@@ -8,8 +8,8 @@ using System.Text;
 /// </summary>
 public sealed class JsonFields
 {
-    private readonly StringBuilder _builder = new StringBuilder("{");
-    private bool _hasFields;
+    private readonly StringBuilder builder = new StringBuilder("{");
+    private bool hasFields;
 
     public JsonFields Add(string key, string value)
     {
@@ -36,13 +36,13 @@ public sealed class JsonFields
     /// <summary>Adds already-valid JSON (object, array, number) without escaping.</summary>
     public JsonFields AddRaw(string key, string json)
     {
-        if (_hasFields)
+        if (hasFields)
         {
-            _builder.Append(',');
+            builder.Append(',');
         }
 
-        _hasFields = true;
-        _builder.Append('"').Append(Escape(key)).Append("\":").Append(json ?? "null");
+        hasFields = true;
+        builder.Append('"').Append(Escape(key)).Append("\":").Append(json ?? "null");
         return this;
     }
 
@@ -69,7 +69,7 @@ public sealed class JsonFields
 
     public string ToJson()
     {
-        return _builder.ToString() + "}";
+        return builder.ToString() + "}";
     }
 
     /// <summary>Escapes quotes, backslash and control characters; non-ASCII stays as UTF-8.</summary>

@@ -10,8 +10,8 @@ using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// Writes the git hash into Resources/ResearchBuildInfo.txt before each player build, so the
-/// research log header can tell builds apart (#26). "git describe --always --dirty" adds
-/// "-dirty" when the build has uncommitted changes. Play mode logs "editor" instead.
+/// research log header can tell builds apart (#26): the 7-digit short hash, plus "-dirty" when
+/// the build has uncommitted changes. Play mode logs "editor" instead; "unknown" when git fails.
 /// The file is git-ignored.
 /// </summary>
 public sealed class ResearchBuildInfoWriter : IPreprocessBuildWithReport
@@ -33,7 +33,9 @@ public sealed class ResearchBuildInfoWriter : IPreprocessBuildWithReport
     {
         try
         {
-            var info = new ProcessStartInfo("git", "describe --always --dirty")
+            // --exclude=* ignores every tag, so the result is always the short hash
+            // ("868fea7" or "868fea7-dirty"), never "v1.0-3-g868fea7".
+            var info = new ProcessStartInfo("git", "describe --always --dirty --abbrev=7 --exclude=*")
             {
                 WorkingDirectory = Directory.GetCurrentDirectory(),
                 RedirectStandardOutput = true,

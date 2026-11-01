@@ -8,28 +8,28 @@ public sealed class PauseTracker
 {
     private const string DefaultHmdCause = "hmd_unmounted";
 
-    private readonly string _hmdCause;
-    private readonly List<string> _activeCauses = new List<string>();
-    private readonly List<string> _causesThisPause = new List<string>();
-    private double _pauseStart;
-    private double _closedSeconds;
-    private bool _hmdInCurrentPause;
+    private readonly string hmdCause;
+    private readonly List<string> activeCauses = new List<string>();
+    private readonly List<string> causesThisPause = new List<string>();
+    private double pauseStart;
+    private double closedSeconds;
+    private bool hmdInCurrentPause;
 
     /// <param name="hmdCause">The cause that counts as "headset removed" for HmdRemovedCount.</param>
     public PauseTracker(string hmdCause = DefaultHmdCause)
     {
-        _hmdCause = hmdCause;
+        this.hmdCause = hmdCause;
     }
 
-    public IReadOnlyList<string> ActiveCauses => _activeCauses;
+    public IReadOnlyList<string> ActiveCauses => activeCauses;
 
     /// <summary>
     /// Every cause seen during the current pause, or during the last one after it resumed,
     /// in the order they started. Cleared when the next pause starts.
     /// </summary>
-    public IReadOnlyList<string> CausesThisPause => _causesThisPause;
+    public IReadOnlyList<string> CausesThisPause => causesThisPause;
 
-    public bool IsPaused => _activeCauses.Count > 0;
+    public bool IsPaused => activeCauses.Count > 0;
 
     public int PauseCount { get; private set; }
 
@@ -38,15 +38,15 @@ public sealed class PauseTracker
     public PauseTransition SetCause(string cause, bool active, double t)
     {
         bool wasPaused = IsPaused;
-        bool known = _activeCauses.Contains(cause);
+        bool known = activeCauses.Contains(cause);
 
         if (active && !known)
         {
-            _activeCauses.Add(cause);
+            activeCauses.Add(cause);
         }
         else if (!active && known)
         {
-            _activeCauses.Remove(cause);
+            activeCauses.Remove(cause);
         }
         else
         {
@@ -55,31 +55,31 @@ public sealed class PauseTracker
 
         if (!wasPaused && IsPaused)
         {
-            _causesThisPause.Clear();
+            causesThisPause.Clear();
         }
 
-        if (active && !_causesThisPause.Contains(cause))
+        if (active && !causesThisPause.Contains(cause))
         {
-            _causesThisPause.Add(cause);
+            causesThisPause.Add(cause);
         }
 
-        if (active && cause == _hmdCause && !_hmdInCurrentPause)
+        if (active && cause == hmdCause && !hmdInCurrentPause)
         {
-            _hmdInCurrentPause = true;
+            hmdInCurrentPause = true;
             HmdRemovedCount++;
         }
 
         if (!wasPaused && IsPaused)
         {
-            _pauseStart = t;
+            pauseStart = t;
             PauseCount++;
             return PauseTransition.Paused;
         }
 
         if (wasPaused && !IsPaused)
         {
-            _closedSeconds += t - _pauseStart;
-            _hmdInCurrentPause = false;
+            closedSeconds += t - pauseStart;
+            hmdInCurrentPause = false;
             return PauseTransition.Resumed;
         }
 
@@ -89,6 +89,6 @@ public sealed class PauseTracker
     /// <summary>Total paused time, including a still-open pause up to <paramref name="now"/>.</summary>
     public double PausedSeconds(double now)
     {
-        return IsPaused ? _closedSeconds + (now - _pauseStart) : _closedSeconds;
+        return IsPaused ? closedSeconds + (now - pauseStart) : closedSeconds;
     }
 }

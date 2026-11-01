@@ -13,4 +13,10 @@ public readonly struct ErrorDecision
     public int FoldedCount { get; }
 
     public bool CapReachedNow { get; }
+
+    /// <summary>
+    /// Errors the written line stands for (its n_errors): the swallowed repeats plus this one.
+    /// 0 when nothing is written.
+    /// </summary>
+    public int ErrorCount => Write ? FoldedCount + 1 : 0;
 }

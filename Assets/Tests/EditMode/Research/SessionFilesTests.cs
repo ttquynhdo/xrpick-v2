@@ -61,6 +61,16 @@ namespace XRPick.Research.Tests
         }
 
         [Test]
+        public void ForceToDisk_AppendsLikeNormalWrite()
+        {
+            var files = new SessionFiles(root, "P101", "s1");
+            Assert.IsTrue(files.AppendEvent("{\"a\":1}"));
+            Assert.IsTrue(files.AppendEvent("{\"b\":2}", true));
+            Assert.IsTrue(files.AppendEvent("{\"c\":3}"));
+            Assert.AreEqual("{\"a\":1}\n{\"b\":2}\n{\"c\":3}\n", File.ReadAllText(files.EventsPath));
+        }
+
+        [Test]
         public void Summary_WritesHeaderOnce()
         {
             var files = new SessionFiles(root, "P101", "s1");

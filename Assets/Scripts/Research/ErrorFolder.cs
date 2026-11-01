@@ -26,30 +26,30 @@ public sealed class ErrorFolder
         public int Folded;
     }
 
-    private readonly double _windowSeconds;
-    private readonly int _cap;
-    private readonly Dictionary<string, Entry> _entries = new Dictionary<string, Entry>();
-    private int _written;
-    private bool _capReported;
+    private readonly double windowSeconds;
+    private readonly int cap;
+    private readonly Dictionary<string, Entry> entries = new Dictionary<string, Entry>();
+    private int written;
+    private bool capReported;
 
     public ErrorFolder(double windowSeconds = 5, int cap = 200)
     {
-        _windowSeconds = windowSeconds;
-        _cap = cap;
+        this.windowSeconds = windowSeconds;
+        this.cap = cap;
     }
 
     public ErrorDecision Decide(string message, double t)
     {
         message = message ?? string.Empty;
 
-        if (_written >= _cap)
+        if (written >= cap)
         {
-            bool first = !_capReported;
-            _capReported = true;
+            bool first = !capReported;
+            capReported = true;
             return new ErrorDecision(false, 0, first);
         }
 
-        if (_entries.TryGetValue(message, out Entry entry) && t - entry.LastWrittenAt < _windowSeconds)
+        if (entries.TryGetValue(message, out Entry entry) && t - entry.LastWrittenAt < windowSeconds)
         {
             entry.Folded++;
             return new ErrorDecision(false, 0, false);
@@ -59,23 +59,24 @@ public sealed class ErrorFolder
         if (entry == null)
         {
             entry = new Entry();
-            _entries[message] = entry;
+            entries[message] = entry;
         }
 
         entry.LastWrittenAt = t;
         entry.Folded = 0;
-        _written++;
+        written++;
         return new ErrorDecision(true, folded, false);
     }
 
     /// <summary>
     /// Returns every message with swallowed repeats not yet written, with its count, and
-    /// resets those counts. Works after the cap was reached.
+    /// resets those counts. The count is also the line's n_errors (no new error comes with it).
+    /// Works after the cap was reached.
     /// </summary>
     public IReadOnlyList<KeyValuePair<string, int>> DrainPending()
     {
         var pending = new List<KeyValuePair<string, int>>();
-        foreach (KeyValuePair<string, Entry> pair in _entries)
+        foreach (KeyValuePair<string, Entry> pair in entries)
         {
             if (pair.Value.Folded > 0)
             {

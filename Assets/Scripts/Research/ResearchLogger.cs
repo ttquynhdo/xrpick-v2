@@ -12,13 +12,16 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public sealed class ResearchLogger : MonoBehaviour
 {
-    private const int SchemaVersion = 1;
+    private const int SchemaVersion = ResearchEventData.SchemaVersion;
     private const string ResearchFolder = "research";
     private const string BuildInfoResource = "ResearchBuildInfo";
     private const string UtcFormat = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'";
     private const int StackLines = 5;
 
     private static readonly string[] EndReasons = { "completed", "facilitator", "quit" };
+
+    // Lines written right before the headset may sleep or power off: forced to the storage device.
+    private static readonly string[] ForceToDiskEvents = { "app_pause", "scene_exit", "session_end" };
 
     // Errors Unity/OVR print on every Play start without a headset or Link; they say nothing
     // about the trainee's session. Matched as substrings of the message.
@@ -77,6 +80,11 @@ public sealed class ResearchLogger : MonoBehaviour
     /// </summary>
     public static bool StartSession(string participantId)
     {
+        return StartSession(participantId, ResearchEventData.StartModeManual);
+    }
+
+    private static bool StartSession(string participantId, string startMode)
+    {
         if (!ResearchIds.IsValid(participantId))
         {
             LogOwnError("ResearchLogger: invalid participant ID, expected P + 3 digits.");
@@ -89,7 +97,7 @@ public sealed class ResearchLogger : MonoBehaviour
             return false;
         }
 
-        EnsureInstance().BeginSession(participantId);
+        EnsureInstance().BeginSession(participantId, startMode);
         return true;
     }
 
@@ -150,7 +158,7 @@ public sealed class ResearchLogger : MonoBehaviour
         ResearchLogger logger = EnsureInstance();
         if (logger.autoStart)
         {
-            StartSession(logger.autoStartParticipantId);
+            StartSession(logger.autoStartParticipantId, ResearchEventData.StartModeAuto);
         }
     }
 
@@ -280,7 +288,7 @@ public sealed class ResearchLogger : MonoBehaviour
         }
     }
 
-    private void BeginSession(string id)
+    private void BeginSession(string id, string startMode)
     {
         participantId = id;
         sessionId = Guid.NewGuid().ToString("D");
@@ -302,17 +310,8 @@ public sealed class ResearchLogger : MonoBehaviour
         sessionActive = true;
 
         string activeScene = SceneManager.GetActiveScene().name;
-        var header = new JsonFields()
-            .Add("schema_version", SchemaVersion)
-            .Add("app_version", Application.version)
-            .Add("build", build)
-            .Add("device_model", SystemInfo.deviceModel)
-            .Add("os_version", SystemInfo.operatingSystem)
-            .Add("participant_id", participantId)
-            .Add("session_id", sessionId)
-            .Add("language", (string)null)
-            .Add("input_mode_at_start", ReadInputMode())
-            .Add("target_refresh_rate", ReadRefreshRate());
+        JsonFields header = ResearchEventData.Header(Application.version, build, SystemInfo.deviceModel,
+            SystemInfo.operatingSystem, participantId, sessionId, startMode, ReadInputMode(), ReadRefreshRate());
         WriteLine(SessionFiles.EventLine(0, UtcNow(), participantId, sessionId, null, null, "header", header));
         WriteLine(SessionFiles.EventLine(0, UtcNow(), participantId, sessionId, activeScene, null, "session_start", null));
 
@@ -334,10 +333,17 @@ public sealed class ResearchLogger : MonoBehaviour
             return;
         }
 
-        // The previous Scene struct is often already unloaded (empty name); use the tracked name.
-        string from = sceneName;
-        CloseVisit();
-        OpenVisit(next.name, from, null);
+        try
+        {
+            // The previous Scene struct is often already unloaded (empty name); use the tracked name.
+            string from = sceneName;
+            CloseVisit();
+            OpenVisit(next.name, from, null);
+        }
+        catch (Exception e)
+        {
+            StopAfterException("scene change", e);
+        }
     }
 
     private void OpenVisit(string scene, string fromScene, string via)
@@ -414,11 +420,7 @@ public sealed class ResearchLogger : MonoBehaviour
         foreach (KeyValuePair<string, int> pending in errors.DrainPending())
         {
             errorTypes.TryGetValue(pending.Key, out string type);
-            WriteEvent("unity_error", new JsonFields()
-                .Add("type", type)
-                .Add("message", pending.Key)
-                .Add("stack", (string)null)
-                .Add("folded_count", pending.Value));
+            WriteEvent("unity_error", ResearchEventData.DrainedError(type, pending.Key, pending.Value));
         }
     }
 
@@ -429,6 +431,18 @@ public sealed class ResearchLogger : MonoBehaviour
             return;
         }
 
+        try
+        {
+            ApplyPauseCause(source, active);
+        }
+        catch (Exception e)
+        {
+            StopAfterException("pause tracking", e);
+        }
+    }
+
+    private void ApplyPauseCause(string source, bool active)
+    {
         double t = Now();
         PauseTransition transition = pauses.SetCause(source, active, t);
         if (transition == PauseTransition.Paused)
@@ -469,10 +483,16 @@ public sealed class ResearchLogger : MonoBehaviour
         }
         catch (Exception e)
         {
-            // Logging must never break the app; stop writing instead of retrying on every error.
-            writeFailed = true;
-            Debug.LogWarning("ResearchLogger: error capture failed (" + e.GetType().Name + "); logging stops for this session.");
+            StopAfterException("error capture", e);
         }
+    }
+
+    private void StopAfterException(string what, Exception e)
+    {
+        // Logging must never break the app; stop writing instead of retrying on every call.
+        // A warning, not an error: warnings aren't captured, so this can't loop back into the log.
+        writeFailed = true;
+        Debug.LogWarning("ResearchLogger: " + what + " failed (" + e.GetType().Name + "); logging stops for this session.");
     }
 
     private void CaptureError(string message, string stackTrace, LogType type)
@@ -493,11 +513,8 @@ public sealed class ResearchLogger : MonoBehaviour
 
         string typeName = TypeName(type);
         errorTypes[stripped] = typeName;
-        WriteEvent("unity_error", new JsonFields()
-            .Add("type", typeName)
-            .Add("message", stripped)
-            .Add("stack", FirstLines(ErrorFolder.StripPaths(stackTrace), StackLines))
-            .Add("folded_count", decision.FoldedCount));
+        WriteEvent("unity_error", ResearchEventData.UnityError(typeName, stripped,
+            FirstLines(ErrorFolder.StripPaths(stackTrace), StackLines), decision.FoldedCount, decision.ErrorCount));
     }
 
     private static bool IsNoise(string message)
@@ -521,10 +538,11 @@ public sealed class ResearchLogger : MonoBehaviour
     private void WriteEvent(string eventName, JsonFields data)
     {
         WriteLine(SessionFiles.EventLine(Now(), UtcNow(), participantId, sessionId, sceneName,
-            visitOpen ? sceneVisit : (int?)null, eventName, data));
+            visitOpen ? sceneVisit : (int?)null, eventName, data),
+            Array.IndexOf(ForceToDiskEvents, eventName) >= 0);
     }
 
-    private void WriteLine(string line)
+    private void WriteLine(string line, bool forceToDisk = false)
     {
         if (writeFailed || writing)
         {
@@ -534,7 +552,7 @@ public sealed class ResearchLogger : MonoBehaviour
         writing = true;
         try
         {
-            if (!files.AppendEvent(line))
+            if (!files.AppendEvent(line, forceToDisk))
             {
                 ReportWriteFailure();
             }

@@ -16,18 +16,18 @@ public sealed class SessionFiles
 
     private static readonly UTF8Encoding Utf8NoBom = new UTF8Encoding(false);
 
-    private readonly string _folder;
-    private bool _eventsFailed;
-    private bool _summaryFailed;
+    private readonly string folder;
+    private bool eventsFailed;
+    private bool summaryFailed;
 
     public string EventsPath { get; }
     public string SummaryPath { get; }
 
     public SessionFiles(string researchRoot, string participantId, string sessionId)
     {
-        _folder = ResearchIds.FolderFor(researchRoot, participantId);
-        EventsPath = Path.Combine(_folder, participantId + "_" + sessionId + EventsSuffix);
-        SummaryPath = Path.Combine(_folder, participantId + "_" + sessionId + "_summary.csv");
+        folder = ResearchIds.FolderFor(researchRoot, participantId);
+        EventsPath = Path.Combine(folder, participantId + "_" + sessionId + EventsSuffix);
+        SummaryPath = Path.Combine(folder, participantId + "_" + sessionId + "_summary.csv");
     }
 
     /// <summary>Builds one event line with the common fields in the agreed order.</summary>
@@ -47,16 +47,20 @@ public sealed class SessionFiles
             .ToJson();
     }
 
-    public bool AppendEvent(string jsonLine)
+    /// <summary>
+    /// Appends one event line. With <paramref name="forceToDisk"/> the OS cache is flushed to the
+    /// storage device too, for the lines written right before the headset may sleep or power off.
+    /// </summary>
+    public bool AppendEvent(string jsonLine, bool forceToDisk = false)
     {
-        if (_eventsFailed)
+        if (eventsFailed)
         {
             return false;
         }
 
-        if (!TryAppend(EventsPath, jsonLine + "\n"))
+        if (!TryAppend(EventsPath, jsonLine + "\n", forceToDisk))
         {
-            _eventsFailed = true;
+            eventsFailed = true;
             return false;
         }
 
@@ -65,28 +69,35 @@ public sealed class SessionFiles
 
     public bool AppendSummary(string csvRow)
     {
-        if (_summaryFailed)
+        if (summaryFailed)
         {
             return false;
         }
 
         // The header goes in front of the first row of a new file.
         string text = File.Exists(SummaryPath) ? csvRow + "\n" : SummaryCsv.Header + "\n" + csvRow + "\n";
-        if (!TryAppend(SummaryPath, text))
+        if (!TryAppend(SummaryPath, text, false))
         {
-            _summaryFailed = true;
+            summaryFailed = true;
             return false;
         }
 
         return true;
     }
 
-    private bool TryAppend(string path, string text)
+    private bool TryAppend(string path, string text, bool forceToDisk)
     {
         try
         {
-            Directory.CreateDirectory(_folder);
-            File.AppendAllText(path, text, Utf8NoBom);
+            Directory.CreateDirectory(folder);
+            byte[] bytes = Utf8NoBom.GetBytes(text);
+            using (var stream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Read))
+            {
+                stream.Write(bytes, 0, bytes.Length);
+                // Flush(true) also flushes the OS buffers (fsync), not only the stream's own.
+                stream.Flush(forceToDisk);
+            }
+
             return true;
         }
         catch (IOException)
@@ -171,12 +182,12 @@ public sealed class SessionFiles
         out string scene)
     {
         scene = null;
-        string folder = ResearchIds.FolderFor(researchRoot, participantId);
+        string participantFolder = ResearchIds.FolderFor(researchRoot, participantId);
         string excluded = participantId + "_" + excludeSessionId + EventsSuffix;
 
         List<ParsedLine> newest = null;
         string newestUtc = null;
-        foreach (var path in ListEventFiles(folder, participantId + "_*" + EventsSuffix))
+        foreach (var path in ListEventFiles(participantFolder, participantId + "_*" + EventsSuffix))
         {
             if (Path.GetFileName(path) == excluded)
             {
