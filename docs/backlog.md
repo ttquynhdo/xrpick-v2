@@ -22,12 +22,12 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
-- **Buổi test kính tiếp theo:** #25 T8-tay (đọc thẻ và panel Welcome), #21 H1 (cầm thật hai position) + H2 (đọc thẻ kết quả, xem đổi thùng).
+- **Buổi test kính tiếp theo:** #25 T8-tay (đọc thẻ và panel Welcome), #21 H1 (cầm thật hai position) + H2 (đọc thẻ kết quả, xem đổi thùng), #33 H1 (bấm nút ở Concept/Mixed/Complex, đọc thẻ kết quả).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
 1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
    - #45 ConceptScene: dạy Mat.-Nr/VPE, quiz vận dụng (decision 007, gồm #32; test nhanh).
    - #25 mẫu thẻ hướng dẫn chung, tiếng Đức ở cả 5 scene: verified-mcp, chờ đọc trên kính.
-   - #33 kết quả cạnh nút đỏ (sau #14, #45).
+   - #33 kết quả cạnh nút đỏ: verified-mcp (đã có sẵn từ #10/#21/#45), chờ test kính H1.
    - #23 tổng kết cuối khoá + mục tiêu Welcome (không kính).
    - #21 Mixed từng position (decision 012): verified-mcp, chờ test tay H1/H2 → #46 dọn dẹp.
    - #39 phản hồi ở WelcomeScene.
@@ -400,15 +400,17 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 ### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
 - **Type:** logic
 - **Scene(s):** ConceptScene, MixedPickingScene, ComplexScene (Basic đã đúng mẫu: thẻ kết quả cách nút khoảng 0.11 m)
-- **Files:** `[Info Panel]/TXT_Feedback` (Mixed, Complex), `[Info Panel]/TXT_Description` (Concept, xem #45); Assets/Scripts/MixPickingValidator.cs, Assets/Scripts/PiecesOrderValidator.cs, Assets/Scripts/PackageQuizController.cs (thêm reference cho dòng kết quả ngắn)
+- **Files:** `Instruction Table/Feedback` (Concept, #45), `Instruction Table/Result` (Mixed #21, Complex #10); không cần sửa script
 - **Problem:** Lúc bấm nút, mắt trainee đang nhìn xuống bàn (nút ở khoảng 40° phải, 60° xuống). Kết quả lại hiện trên panel WMS (16° xuống), lệch 42° (Mixed), 43° dọc + 34° ngang (Concept) hoặc 51° (Complex). Trainee phải ngẩng đầu để biết mình đúng hay sai, và có thể không thấy kết quả. Đây là split attention.
-- **Done when:** Bấm nút với đơn sai → trong vòng khoảng 0.15 m quanh nút hiện một dòng ngắn (sai + loại lỗi), nhìn thấy được trong ảnh `confirm`. Bấm với đơn đúng → dòng đó báo đúng. Chi tiết (nếu cần) vẫn nằm trên WMS. Cả ba scene dùng cùng kiểu thẻ với Basic.
-- **Inspector work expected:** yes (tạo thẻ hoặc Canvas nhỏ cạnh nút trong từng scene, gán reference)
-- **Công:** M
+- **Done when:** Bấm nút đỏ với đơn sai (Concept: đáp án sai) → thẻ kết quả cạnh nút (tâm thẻ cách tâm nút ≤ 0.15 m) hiện „Nicht richtig“ màu đỏ + lý do của lỗi đầu tiên, nhìn thấy trong ảnh `confirm`. Bấm với đơn đúng (Concept: đáp án đúng) → cùng thẻ đó hiện „Richtig!“ màu xanh. Sau mỗi lần bấm, màn hình `WMS_Monitor` không hiện chữ kết quả nào (quy tắc màn hình, #10). Thẻ kết quả ở cả ba scene có cùng nền thẻ với thẻ `Correct`/`Incorrect` của Basic.
+- **Ghi chú (2026-11-01, khi làm):** Done when cũ có câu „Chi tiết (nếu cần) vẫn nằm trên WMS“, trái quy tắc màn hình nên đã bỏ. Không phải sửa code hay scene: Complex (#10), Mixed (#21), Concept (#45) đã có thẻ kết quả cạnh nút. Kiểu chữ hơi khác Basic (không có tiêu đề cỡ 14), ghi trong báo cáo, không chặn mục này.
+- **Inspector work expected:** no
+- **Công:** S (chỉ kiểm tra)
 - **Test trên kính:** nhanh (thấy dòng kết quả khi bấm nút)
 - **Depends on:** #14 (nội dung feedback), #45 cho Concept (đã gộp #32). Có thể tách mỗi scene một nhánh.
 - **Bổ sung (2026-11-01, decision 008):** phần ComplexScene làm trong #10, phần MixedPickingScene làm trong #21. #33 chỉ còn ConceptScene (sau #45).
-- **Status:** todo
+- **Test report:** docs/test-reports/bl33.md
+- **Status:** verified-mcp (8/9 ✅, chờ test tay H1: bấm nút trên kính ở 3 scene, đọc thẻ kết quả)
 
 ### #34 [P1] BasicPickingScene: Rest đếm ngược làm lộ đáp án
 - **Type:** logic
