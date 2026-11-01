@@ -30,6 +30,12 @@ public class ParticipantEntryController : MonoBehaviour
 
     [Header("Controls")]
     [SerializeField] private Button okButton;
+    // Optional: dimmed together with okButton, because the button tint only reaches its background.
+    [SerializeField] private TMP_Text okLabel;
+
+    // The poke canvas (surface, collider, raycast image). Hidden once a session runs so no
+    // invisible slab stays in the workspace; kept on the error path so errorText stays visible.
+    [SerializeField] private GameObject entrySurface;
 
     // One badge on the keypad, one on the confirm panel; shown only for test codes.
     [SerializeField] private GameObject[] testModeBadges;
@@ -37,6 +43,8 @@ public class ParticipantEntryController : MonoBehaviour
     [Header("Course")]
     [SerializeField] private GameObject[] courseRoots;
     [SerializeField] private SceneMenuController sceneMenu;
+
+    private const float DisabledLabelAlpha = 0.3f;
 
     private readonly ParticipantCodeBuffer buffer = new();
 
@@ -62,6 +70,7 @@ public class ParticipantEntryController : MonoBehaviour
             | RequiredReference.IsMissing(warningText, nameof(warningText), this)
             | RequiredReference.IsMissing(errorText, nameof(errorText), this)
             | RequiredReference.IsMissing(okButton, nameof(okButton), this)
+            | RequiredReference.IsMissing(entrySurface, nameof(entrySurface), this)
             | RequiredReference.IsMissing(sceneMenu, nameof(sceneMenu), this)
             | !HasCourseRoots())
         {
@@ -76,6 +85,7 @@ public class ParticipantEntryController : MonoBehaviour
         {
             started = true;
             HideEntryPanels();
+            entrySurface.SetActive(false);
             SetCourseVisible(true);
             return;
         }
@@ -235,6 +245,7 @@ public class ParticipantEntryController : MonoBehaviour
 
         errorText.text = string.Empty;
         HideEntryPanels();
+        entrySurface.SetActive(false);
 
         if (loadScene != null)
         {
@@ -256,6 +267,8 @@ public class ParticipantEntryController : MonoBehaviour
     {
         codeDisplay.text = buffer.Display;
         okButton.interactable = buffer.IsComplete;
+        if (okLabel != null)
+            okLabel.alpha = buffer.IsComplete ? 1f : DisabledLabelAlpha;
         SetBadges(buffer.IsComplete && ResearchIds.IsTestId(buffer.Code));
     }
 
