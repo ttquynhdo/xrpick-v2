@@ -22,6 +22,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 4. Song song, không đụng scene: #26 → #28 (sau #14) → #29, #30, #27 → #31; #11. #12 → #13 làm sau khi nội dung ổn định (#4, #6, #14, #25).
 5. Đã gỡ chặn (2026-11-01): #10 dựng bố cục panel WMS ở BasicPickingScene (không làm song song với nhánh khác sửa BasicPickingScene, như #2, #5). Việc quyết định (không sửa scene): rà soát tên bài cho cả 5 scene (D1) → mở #18.
 6. Còn chặn: A1 → #1 → #24, chạy lại decision 001 → #34; tên bài + #1 → #18 → #37; A2/A3 → #17 → #36, #23; #10 → #20, #21 (+ A5); A5/A6 → #16 → #19. #22 đã bỏ.
+7. Cuối cùng: #8 dọn code chết, sau khi #2, #3, #6 xong (tránh xung đột cùng file).
 
 ---
 

@@ -16,7 +16,7 @@ Mindermenge,die,short quantity,Confirmed quantity when actual is less than targe
 Verpackungseinheit,die,packaging unit,Number of pieces in one carton or bag.,no,requirements: Kommissionierung.pptx slide 8,proposed,"Abbreviation VPE. A quantity, not the name of the physical package: for the object use Karton or Tüte."
 VPE,die,packaging unit (VPE),Abbreviation of Verpackungseinheit.,yes,requirements: Kommissionierung.pptx slide 8,proposed,Keep the abbreviation in both languages.
 Verp.-Einh.,,packaging unit,WMS field label (abbreviation of Verpackungseinheit).,yes,WMS screenshot,proposed,
-EKZ,die,handling class (EKZ),Classification (0–9) that defines how a material may be packed and handled.,yes,requirements: Kommissionierung.pptx slide 8,proposed,Full German form not stated in the documents – ask.
+EKZ,die,handling class (EKZ),"Class (0, 2–6, 8, 9) that states how a material may be picked: loose bulk (0, 2), placed one by one in order (3), touching in one/two/no layer with separators (4/5/6), ESD-protected (8), special packaging (9; 8 and 9 not without instructions).",yes,requirements: Kommissionierung.pptx slide 8 (EKZ-Vorgabe),proposed,Full German form not stated in the documents – ask. Classes 1 and 7 do not exist in the table.
 Empf Kz,,–,WMS field label; meaning not stated in the documents.,yes,WMS screenshot,proposed,Probably shows the EKZ class – question B3.
 Stück,das,piece,Unit of count.,no,requirements,proposed,Abbreviation ST on the WMS screen.
 ST,,pcs,Unit abbreviation for Stück on the WMS screen.,yes,WMS screenshot,proposed,
