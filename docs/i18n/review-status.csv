@@ -16,7 +16,7 @@ welcome.subtitle,Ein VR-Training für die Kommissionierung im Lager,proposed,ger
 welcome.panel.title,Das lernen Sie,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.panel.goals,Am Ende des Kurses können Sie:\n• Materialnummer und VPE auf dem Etikett ablesen\n• einen Auftrag im Lagerverwaltungssystem (LVS) ablesen\n• einen Auftrag kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.panel.duration,Dauer: etwa 5 Minuten pro Lektion,proposed,german-reviewer (agent),2026-11-01,#25
-common.panel.see_cards,Ihre Aufgaben stehen auf den Karten auf dem Tisch.,proposed,german-reviewer (agent),2026-11-01,#25
+common.panel.see_cards,Ihre Aufgaben stehen links auf den Karten.,proposed,german-reviewer (agent),2026-11-02,#35
 welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-01,#25
 mixed.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Bearbeiten Sie die zwei Positionen nacheinander.",proposed,german-reviewer (agent),2026-11-01,#21
 mixed.card.step1_body,"Lesen Sie im LVS die Angaben der aktuellen Position ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).",proposed,german-reviewer (agent),2026-11-01,#21

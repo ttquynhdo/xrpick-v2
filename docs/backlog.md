@@ -23,7 +23,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
 - **Buổi test kính tiếp theo:** #25 T8-tay (đọc thẻ và panel Welcome), #21 H1 (cầm thật hai position) + H2 (đọc thẻ kết quả, xem đổi thùng), #33 H1 (bấm nút ở Concept/Mixed/Complex, đọc thẻ kết quả), #41 H1–H3 (nhánh `feat/41-ekz-snap`: thả carton vào ô, nghe tiếng khớp, gỡ ra, câu EKZ 3; merge vào `main` sau khi đạt).
-- **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. #35 hiện vẫn ở nhóm "để sau demo".
+- **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
 1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
    - #45 ConceptScene: dạy Mat.-Nr/VPE, quiz vận dụng (decision 007, gồm #32; test nhanh).
@@ -451,7 +451,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #25 (nội dung thẻ); #18 (tên mục Menu, verified-mcp); đo world scale của canvas. Cần `solution-decision` trước khi làm: chỗ đặt giá (cạnh màn hình ngang tầm mắt, gần WMS nhưng xa nút đỏ ↔ bên cạnh bàn, gần tay) và câu cũ "nút đỏ nằm sát thẻ 3" (bỏ, vì thẻ rời khỏi mép bàn; thẻ 3 chỉ nói nút ở đâu).
 - **Decision:** docs/decisions/011-workstation-layout-conveyor.md (giá thẻ ngang tầm mắt ~27° trái màn hình; Menu tấm riêng bên phải, không xác nhận; Done when đầy đủ ở mục *Done when / #35* của 011, thay các câu trên)
 - **Ghi chú:** từ #18, Menu dùng tên bài của `LessonNames`, cỡ chữ 12 để mục dài nhất („5. Volle Kartons und loses Material“) không bị cắt; khi làm Menu to hơn thì trả cỡ chữ lên lại.
-- **Status:** todo
+- **Test report:** docs/test-reports/bl35.md
+- **Status:** verified-mcp (MCP 15/15 ✅ kể cả phần MCP của L5/L7; chờ test tay L5, L7, L10, H1, H2 trên kính; nhánh `feat/35-shelf-menu` tách từ `feat/41-ekz-snap`)
 
 ### #36 [P2] Nhãn kiện đọc được từ chỗ đứng
 - **Type:** logic
