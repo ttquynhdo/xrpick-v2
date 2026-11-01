@@ -22,6 +22,11 @@
 # Test screenshots taken via MCP for Unity (shared separately, not committed)
 /TestEvidence/
 
+# Meta XR SDK DevAgent settings: regenerated on every Editor load with this
+# machine's LAN IP and an access token
+/Assets/Resources/DevAgentSettings.asset
+/Assets/Resources/DevAgentSettings.asset.meta
+
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*
 
