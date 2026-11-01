@@ -27,14 +27,15 @@ local({
   source("analysis/make_fake_data.R", local = TRUE)
   source("analysis/analyse.R", local = TRUE)
 
-  # 2. One row per real participant: P101-P110; the test ID P950 is dropped.
-  stopifnot(nrow(wide) == 10)
+  # 2. One row per real participant: P101-P112; the test ID P950 is dropped.
+  stopifnot(nrow(wide) == 12)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
 
-  # 3. P103 crashed and came back in a second session.
+  # 3. P103 crashed and came back in a second session (and so did P111, the
+  #    declined resume in 8i; P112 quit and was restarted despite the warning, 8j).
   stopifnot(isTRUE(wide$multi_session[wide$participant_id == "P103"]))
-  stopifnot(sum(wide$multi_session) == 1)
+  stopifnot(identical(sort(wide$participant_id[wide$multi_session]), c("P103", "P111", "P112")))
 
   # 4. P105 crashed and never came back.
   stopifnot(wide$end_status[wide$participant_id == "P105"] == "crash")
@@ -115,6 +116,38 @@ local({
   stopifnot(!any(c("time_ComplexScene", "confirms_WelcomeScene", "error_rate_WelcomeScene",
                    "completed_WelcomeScene") %in% names(wide)))
 
+  # 8i. Resume (#27): P103 accepted the offer after the crash, P111 declined
+  #     it and repeated the lessons from WelcomeScene (warned). Everyone else
+  #     was never offered one: FALSE (measured), not NA.
+  rw <- function(col, pid) wide[[col]][wide$participant_id == pid]
+  stopifnot(isTRUE(rw("resume_offered", "P103")), isFALSE(rw("resume_declined", "P103")))
+  stopifnot(isTRUE(rw("resume_offered", "P111")), isTRUE(rw("resume_declined", "P111")))
+  stopifnot(identical(wide$participant_id[wide$resume_declined], "P111"))
+  stopifnot(isFALSE(rw("resume_offered", "P101")), isFALSE(rw("resume_declined", "P101")))
+  stopifnot(identical(data_quality$resume_declined, wide$resume_declined))
+  stopifnot(any(grepl("resume", warn_lines) & grepl("declined", warn_lines) & grepl("P111", warn_lines)))
+  stopifnot(!any(grepl("declined", warn_lines) & grepl("P103", warn_lines)))
+  stopifnot("P111" %in% flagged)
+  # An offer is checked against the session right before it (P103, P111: a
+  # crash), so no "files missing?" warning on the fake data. P112's restart
+  # follows a clean quit: no resume offered, prev_crash FALSE.
+  stopifnot(!any(grepl("not a crash", warn_lines)))
+  prev <- sessions %>% filter(participant_id %in% c("P111", "P112"), session_no == 2) %>%
+    arrange(participant_id) %>% pull(prev_crash)
+  stopifnot(identical(prev, c(TRUE, FALSE)))
+
+  # 8j. Finished-session warning overridden (#27 fix wave): only P112's second
+  #     session has ended_session_warning = true. Everyone else logged false
+  #     (FALSE, measured, not NA). Warned by name and flagged.
+  stopifnot(isTRUE(rw("ended_session_override", "P112")))
+  stopifnot(identical(wide$participant_id[wide$ended_session_override], "P112"))
+  stopifnot(isFALSE(rw("ended_session_override", "P101")), isFALSE(rw("ended_session_override", "P103")))
+  stopifnot(isFALSE(rw("resume_offered", "P112")))
+  stopifnot(identical(data_quality$ended_session_override, wide$ended_session_override))
+  stopifnot(any(grepl("ended-session warning overridden", warn_lines) & grepl("P112", warn_lines)))
+  stopifnot(sum(grepl("ended-session warning overridden", warn_lines)) == 1)
+  stopifnot("P112" %in% flagged)
+
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.
   stopifnot(data_quality$duplicate_files[data_quality$participant_id == "P101"] == 2)
@@ -133,6 +166,44 @@ local({
   stopifnot(isTRUE(all.equal(visits_with_copy, visits)))
   stopifnot(isTRUE(all.equal(dq_with_copy %>% select(-duplicate_files), data_quality %>% select(-duplicate_files))))
   stopifnot(all(data_quality$duplicate_files == 0), !"P101" %in% flagged)
+
+  # 8k. NA paths for older logs, on a temp copy of the fake data:
+  #     P106 = a pre-#27 log (session_start data {}: no resume fields, no
+  #     ended_session_warning) -> resume_offered, resume_declined and
+  #     ended_session_override all NA (not measured), not FALSE.
+  #     P109 = a #27 log from before the fix wave (resume fields, but no
+  #     ended_session_warning) -> resume_offered FALSE, ended_session_override NA.
+  old_logs <- file.path(tempdir(), "selftest_old_logs")
+  unlink(old_logs, recursive = TRUE)
+  dir.create(file.path(old_logs, "research"), recursive = TRUE)
+  file.copy(list.files(file.path(data_dir, "research"), full.names = TRUE),
+            file.path(old_logs, "research"))
+  rewrite_session_start <- function(pid, edit) {
+    for (path in list.files(file.path(old_logs, "research"), pattern = paste0("^", pid, "_.*_events\\.jsonl$"),
+                            full.names = TRUE)) {
+      lines <- readLines(path, encoding = "UTF-8")
+      hit <- grepl("\"event\":\"session_start\"", lines, fixed = TRUE)
+      stopifnot(sum(hit) == 1)
+      lines[hit] <- edit(lines[hit])
+      con <- file(path, open = "wb")
+      writeLines(enc2utf8(lines), con, sep = "\n", useBytes = TRUE)
+      close(con)
+    }
+  }
+  rewrite_session_start("P106", function(l) sub("\"data\":\\{[^}]*\\}", "\"data\":{}", l))
+  rewrite_session_start("P109", function(l) sub(",\"ended_session_warning\":(true|false)", "", l))
+  data_dir <- old_logs
+  output_dir <- file.path(tempdir(), "selftest_old_logs_out")
+  source("analysis/analyse.R", local = TRUE)
+  stopifnot(is.na(rw("resume_offered", "P106")), is.na(rw("resume_declined", "P106")),
+            is.na(rw("ended_session_override", "P106")))
+  stopifnot(isFALSE(rw("resume_offered", "P109")), isFALSE(rw("resume_declined", "P109")),
+            is.na(rw("ended_session_override", "P109")))
+  stopifnot(isTRUE(rw("ended_session_override", "P112")), isFALSE(rw("ended_session_override", "P101")))
+  stopifnot(identical(data_quality$ended_session_override, wide$ended_session_override))
+  old_warn <- readLines(file.path(output_dir, "warnings.txt"), encoding = "UTF-8")
+  stopifnot(!any(grepl("inconsistent", old_warn)))
+  unlink(c(old_logs, output_dir), recursive = TRUE)
 
   # 9. Without allow_fake, analyse.R must refuse the fake folder.
   # (parent = globalenv(), so it can't see allow_fake from this environment)

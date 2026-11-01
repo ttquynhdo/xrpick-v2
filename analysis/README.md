@@ -69,7 +69,7 @@ RStudio. Without Rscript on PATH use the full path, e.g.
 | `error_rate_by_skill_first_attempt.png` | 1 | Same skills, first press only: `k/n` participants made that error on attempt 1. |
 | `error_codes_by_scene.png` | 2 | Which error codes occur in which scene (counting visits). Unknown codes are marked `(unknown)`. |
 | `time_to_correct_by_scene.png` | 2 | Active time to the first correct confirm per scene; `never` counts the people who didn't get there (survivor bias). |
-| `data_quality.csv` / `.png` | 6 | One row per participant: `end_status` (completed / facilitator / quit / crash), `course_finished` (empty = no outcome events logged), `multi_session`, `mixed_build`, `builds`, `gap_h`, `duration_censored`, repeat visits, `paused_s` (seconds), pauses, headset removals, Unity errors, `error_cap_reached`, invariant breaks, unknown codes, mismatches with `summary.csv`, `exit_disagreements` (visits whose `scene_exit` numbers differ from their events), `duplicate_files` (copies of a session's files that were dropped). Orange = check. |
+| `data_quality.csv` / `.png` | 6 | One row per participant: `end_status` (completed / facilitator / quit / crash), `course_finished` (empty = no outcome events logged), `multi_session`, `mixed_build`, `builds`, `gap_h`, `resume_offered` / `resume_declined` (#27: a resume after a crash was offered / declined in any session; empty = log from before #27), `ended_session_override` (a session was started with "Trotzdem starten" although the ID already had a finished session; empty = log from before the #27 fix wave), `duration_censored`, repeat visits, `paused_s` (seconds), pauses, headset removals, Unity errors, `error_cap_reached`, invariant breaks, unknown codes, mismatches with `summary.csv`, `exit_disagreements` (visits whose `scene_exit` numbers differ from their events), `duplicate_files` (copies of a session's files that were dropped). Orange = check. |
 | `wide.csv` | all | One row per real participant for SPSS. Per-scene columns (`active_s_<Scene>`, `paused_s_<Scene>`, `time_to_correct_s_<Scene>`, `confirms_<Scene>`, `error_rate_<Scene>`, `error_rate_<Scene>_<skill>`, …) come from the counting visit; scenes without a confirm or quiz (WelcomeScene) have no outcome columns. Join the paper forms (SSQ, NASA-TLX, #31) on `participant_id`. |
 | `warnings.txt` | 6 | Everything the script found odd, then the validity limits. Read it first. |
 
@@ -95,6 +95,14 @@ its time is split over the visits it spans, and a pause never resumed ends at
 the session's last event; sessions that hit the error cap are not
 cross-checked for `unity_errors`; `session_start_mode` `auto` for a real ID,
 `build` null / `unknown`, and a gap over 1 s between `utc` and `t` are warned.
+A declined resume (`session_start.resume_accepted` false) is warned and the
+participant flagged: they restarted at WelcomeScene and repeated lessons
+already seen, so their later visits are second exposures. Also warned: resume
+fields that break the null rule, and a resume offer whose previous session of
+that ID in the data is not a crash (files missing from the copy?). A session
+started despite the "already finished" warning
+(`session_start.ended_session_warning` true) is warned and the participant
+flagged: check it is the same person.
 
 ## Validity limits (state them with every result)
 

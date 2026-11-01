@@ -1,6 +1,6 @@
 # Research data logging – specification (draft)
 
-Status: 2026-11-01. The session core (sections 1, 3, 4.1, `unity_error` and `crash_recovered` in 4.6, 5) is implemented by backlog #26; the other events are still planned (#27-#30). Design and decisions: `docs/superpowers/specs/2026-11-01-research-logger-design.md`.
+Status: 2026-11-01. The session core (sections 1, 3, 4.1, `unity_error` and `crash_recovered` in 4.6, 5) is implemented by backlog #26; the participant keypad, resume offer and the `session_start` fields (section 2, 4.1) by #27; the other events are still planned (#28-#30). Design and decisions: `docs/superpowers/specs/2026-11-01-research-logger-design.md`.
 
 Goal: record, per learner and per session, how trainees perform and experience the VR order-picking course on Meta Quest 3, so the logs can later be analysed and joined with the paper questionnaires (SSQ before and after, NASA-TLX at the end) via a pseudonymous participant ID. There is no paper test of the course content and no control group, so improvement is read from error rates per skill across scenes (an indication, not proof).
 
@@ -17,7 +17,7 @@ Goal: record, per learner and per session, how trainees perform and experience t
 1. Facilitator puts the headset on the table, starts the app → WelcomeScene shows a **numeric keypad** panel (digits, delete, confirm). ID format `P` + 3 digits; the `P` is fixed, only digits are typed.
 2. On confirm: a second panel shows `P017 – correct?` with *Yes* / *Back*. Only *Yes* starts the session. Before that, the rest of WelcomeScene is hidden/disabled.
 3. There is no between-group variable and each participant runs the course once, so the header has no group or run field. A restart after a crash gets a new `session_id` under the same `participant_id`; `ResearchLogger.TryFindResumePoint(participantId, out scene)` tells whether that ID's newest earlier session ended in a crash and which scene it was in.
-4. Session starts → logger creates files, writes the header, emits `session_start`. Until #27 exists the logger starts a session itself at app start with the ID from the `ResearchSettings` asset (default `P000`).
+4. Session starts → logger creates files, writes the header, emits `session_start`. Since #27 the keypad starts it; the logger starts a session itself (ID from the `ResearchSettings` asset, default `P000`) only when the app starts in a scene other than WelcomeScene (build index 0), i.e. in the Editor.
 5. Session ends when the trainee reaches the end (ComplexScene correct + congratulations), the facilitator uses a hidden *End session* control, or the app quits/pauses for good. Emits `session_end` with the reason (`completed`, `facilitator`, `quit`). A crash is never a reason: it is a file without `session_end`. The end screen shows the participant ID again so the facilitator can check it against the paper form and write down the end time.
 6. **Test IDs** `P000` and `P900`-`P999` are logged to `research/practice/` and excluded from analysis (`analyse.R` also drops them if they appear elsewhere). Real participants use `P001`-`P899`.
 
@@ -58,7 +58,7 @@ Emitted by #26 unless noted.
 
 | Event | Data | Source |
 |---|---|---|
-| `session_start` / `session_end` | `session_end`: `reason` completed / facilitator / quit. `scene_visit` is `null` on both | logger |
+| `session_start` / `session_end` | `session_start` (#27): `resume_offered_scene` = build scene name the keypad offered to resume at (from `TryFindResumePoint`, i.e. the newest earlier session of this ID crashed in that scene), `null` when nothing was offered; `resume_accepted` = `true` / `false` for the answer, `null` exactly when `resume_offered_scene` is `null` (so "declined" and "never asked" stay apart). Logs from before #27 lack both keys (R: NA, not measured). A crash while WelcomeScene was the last scene offers no resume (WelcomeScene is never a resume point). `ended_session_warning` (#27 fix wave) = `true` when the keypad showed the "already finished" warning (a real ID with an earlier session that has `session_end`) and the facilitator pressed `Trotzdem starten`, otherwise `false` (also for `auto` starts); logs written before it lack the key (R: NA). Additive, `schema_version` stays 1. `session_end`: `reason` completed / facilitator / quit. `scene_visit` is `null` on both | logger |
 | `scene_enter` | `from_scene` (`null` on first entry), `via`: `"start"` on the first entry, otherwise `null` until #29 knows menu / auto | `SceneManager.activeSceneChanged` |
 | `scene_exit` | `duration_s` (active), `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors` (all `unity_error` lines of the visit incl. folded and post-cap), so every summary column #26 fills can be rebuilt from events | logger |
 | `menu_select` | `target_scene`, `item_label` (#29) | `SceneMenuController.Open*` |

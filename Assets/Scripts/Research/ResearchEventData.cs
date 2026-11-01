@@ -31,6 +31,27 @@ public static class ResearchEventData
     }
 
     /// <summary>
+    /// The session_start data. resume_accepted is null when no resume point was offered
+    /// (resumeOfferedScene null), so "declined" and "never asked" stay distinguishable.
+    /// </summary>
+    public static JsonFields SessionStart(string resumeOfferedScene, bool resumeAccepted)
+    {
+        return SessionStart(resumeOfferedScene, resumeAccepted, false);
+    }
+
+    /// <summary>
+    /// Same, plus ended_session_warning: true when the "already finished" warning was shown and the
+    /// facilitator started anyway, false otherwise.
+    /// </summary>
+    public static JsonFields SessionStart(string resumeOfferedScene, bool resumeAccepted, bool endedSessionWarning)
+    {
+        return new JsonFields()
+            .Add("resume_offered_scene", resumeOfferedScene)
+            .Add("resume_accepted", resumeOfferedScene != null ? resumeAccepted : (bool?)null)
+            .Add("ended_session_warning", endedSessionWarning);
+    }
+
+    /// <summary>
     /// One unity_error line. <paramref name="errorCount"/> is n_errors: how many errors the line
     /// stands for (1 for a first occurrence, folded_count + 1 after the fold window,
     /// folded_count for a line that only reports folded repeats).

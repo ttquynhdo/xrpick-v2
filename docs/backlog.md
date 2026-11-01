@@ -3,7 +3,7 @@
 Nguồn: `/code-review` toàn bộ `Assets/Scripts` (2026-11-01), đã đối chiếu với code và scene (commit `db4160f`).
 Mục #14–#23: review thiết kế khóa học (`instructional-design-reviewer`, cả 5 scene, 2026-11-01, chưa có ảnh Play mode). Các mã A2, B8… là câu hỏi trong `docs/requirements/questions-for-instructor.md`.
 Mục #24–#25 và các dòng **Bổ sung (ảnh Play mode)**: review lần 2 có ảnh Play mode của 5 góc nhìn chuẩn ở cả 5 scene (`TestEvidence/<Scene>/views/`, chỉ có trên máy, không commit), 2026-11-01. Đã đối chiếu lại với code/scene.
-Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01). Mục #42: từ quyết định ở spec mục 9 (khoá Menu khi nghiên cứu), thêm khi rà backlog 2026-11-01. Mục #43: bài kiểm tra trong VR, ghi lại để sau khi bàn thiết kế #26 (không có bài kiểm tra trên giấy).
+Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01). Mục #42: từ quyết định ở spec mục 9 (khoá Menu khi nghiên cứu), thêm khi rà backlog 2026-11-01. Mục #43: bài kiểm tra trong VR, ghi lại để sau khi bàn thiết kế #26 (không có bài kiểm tra trên giấy). Mục #44: nút kết thúc phiên, tách từ #27 theo decision 004.
 Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tải nhận thức (`xr-ux-reviewer`, cả 5 scene, ảnh `TestEvidence/<Scene>/views/`, 2026-11-01). Góc/khoảng cách tính từ mắt (0, 1.6, 0). Vị trí nút đỏ là suy ra từ cấu trúc cha–con, chưa đo trong Play mode.
 **Cập nhật 2026-11-01 theo câu trả lời B1–B10, C1–C4, D1–D3** trong file câu hỏi (trả lời của nhóm, chưa phải của người hướng dẫn): mọi scene dùng **dialog mới** (`F6 Bestätigen`); Rest = tồn kho thùng kho, Ist theo cách lấy thật (B6, B7, B7a); dữ liệu giả cùng định dạng thật (B10); #22 ngoài phạm vi (D2); giữ thông tin kiện sau khi thả làm quiz quá dễ (D3). Câu A1–A6 vẫn mở.
 **Cập nhật 2026-11-01 (decision 003):** nhóm trả lời A1 (đơn Basic = tổng 300 chiếc) và D4–D7 (EKZ khi đặt hàng); thêm #41, bỏ chặn #1, #24. Sau đó nhóm trả lời nốt A2, A3, A5, A6, B3, B5, D1, chọn phương án C cho #34 (decision 001) và chốt mục 9 của spec log: không còn mục nào `blocked`.
@@ -23,8 +23,12 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - Validator: ~~#4~~ (verified-mcp) → ~~#7~~ (done).
    - Inspector nhiều scene: ~~#9~~ (verified-mcp), làm khi không nhánh nào khác đang mở các scene đó (#5 đã gộp vào #18).
    - ~~#38~~ (verified-mcp).
-   - Song song, không đụng scene: #26.
-   - **Đóng đợt 1:** 9 mục `verified-mcp` đang chờ case test tay (#1 E4, #2 D5, #3/#15 T5, #4 K5, #9 E6, #24 S4, #34 R5, #38 P4): gom thành một buổi test (P4 cần kính) để chuyển sang `done` trước khi mở thêm nhánh.
+   - Song song, không đụng scene: ~~#26~~ (verified-mcp, merge `7533874`).
+   - **Đóng đợt 1:** 10 mục `verified-mcp` đang chờ case test tay (#1 E4, #2 D5, #3/#15 T5, #4 K5, #9 E6, #24 S4, #34 R5, #38 P4, #26 L19 trên Quest + L20 trong Editor): gom vào buổi test kính kế tiếp để chuyển sang `done`.
+**Đợt kế tiếp (người dùng chọn 2026-11-01: "cả hai, gọn"), xong thì một buổi test kính:**
+   - Làm tuần tự trong cùng checkout, vì Unity Editor và UnityMCP chỉ mở được một project một lúc: ~~#27~~ (verified-mcp; WelcomeScene + màn cuối ComplexScene, decision 004) → #44 (nút kết thúc phiên, 5 scene) → #32 (ConceptScene) → #18 (BasicPickingScene, nhưng phần Menu đụng cả 5 scene nên làm sau cùng).
+   - Xen kẽ, không đụng scene: `solution-decision` cho nguồn số lượng đơn (#6) và định dạng kết quả validator (#14, #28).
+   - **Buổi test kính:** 10 ca của "Đóng đợt 1" + #27 + #44 + #32 + #18.
 2. **Đợt 2 – không kính, có phụ thuộc:**
    - Chuỗi Basic (giả định A1 = 300 chiếc), cùng BasicPickingScene nên làm tuần tự: ~~#1~~ (verified-mcp) → ~~#24~~ (verified-mcp) → ~~#34~~ (verified-mcp).
    - Trước khi code: chạy `solution-decision` cho hai quyết định còn mở trong `docs/coding-conventions.md`: nguồn số lượng đơn (#6) và định dạng kết quả validator (#14, #28).
@@ -604,16 +608,52 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 
 ### #27 [Feature] Bàn phím nhập mã người học ở WelcomeScene
 - **Type:** feature
-- **Scene(s):** WelcomeScene
-- **Files:** WelcomeScene (panel bàn phím số + panel xác nhận), script mới gọi `ResearchLogger` bắt đầu phiên; spec mục 2
+- **Scene(s):** WelcomeScene, ComplexScene (màn cuối)
+- **Files:** WelcomeScene (bàn phím + panel hỏi lại, tiếp tục, cảnh báo), script mới gọi `ResearchLogger`, `Assets/Scripts/Research/ResearchLogger.cs` (không auto-start ở scene đầu; ghi quyết định tiếp tục; truy vấn phiên đã kết thúc sạch), `Assets/Scripts/SceneMenuController.cs` (thêm hàm nạp scene theo tên), ComplexScene `[Congratulations]`, `analysis/make_fake_data.R`, `analysis/analyse.R`, `docs/research-logging-spec.md`, `docs/i18n/strings-todo.csv`, `docs/i18n/glossary.csv`
 - **Problem:** Cần nhập `participant_id` trong VR mà không gõ nhầm, và trên kính không được lưu tên người học.
-- **Done when:** Mở app: chỉ thấy bàn phím số (`P` cố định + 3 chữ số, xoá, xác nhận). Xác nhận → hỏi lại "`P017` – đúng chưa?" → *Yes* mới mở phần còn lại của WelcomeScene và bắt đầu phiên; *Back* quay lại nhập. Màn hình cuối khóa hiện lại mã. Thử bằng poke tay trên Quest (MCP không bấm được).
-- **Inspector work expected:** yes (dựng Canvas, gán nút, ẩn phần Welcome cho tới khi xác nhận)
-- **Công:** M
-- **Test trên kính:** bắt buộc (bấm phím số bằng tay)
-- **Depends on:** #26. Ai nhập mã: **người điều phối**, nhập trước khi đưa kính cho trainee (người dùng chốt 2026-11-01, spec mục 9).
+- **Done when:** (theo decision 004)
+  - Mở bản build: chỉ thấy bàn phím (`P` cố định + 3 chữ số, `Löschen`, `OK`); `Menu`, nút đỏ, thùng, `Info Panel`, `Welcome` đều ẩn. `OK` mờ khi chưa đủ 3 chữ số.
+  - Gõ `017`, bấm `OK` → panel `Ist der Code P017 richtig?`; `Korrigieren` quay lại bàn phím, mã vẫn còn. Nút `Ja` không nằm đúng chỗ phím `OK`.
+  - Nhập `P101`, bấm `Ja` → bàn phím biến mất, Welcome hiện ra, có file `research/P101_…` với `session_start_mode` `manual`, và không có file `P000` nào được tạo trong lần chạy này.
+  - Mở bản build (Play từ WelcomeScene) và không gõ mã → không có file log mới nào.
+  - Mở thẳng ConceptScene trong Editor → phiên `P000` tự bắt đầu như trước.
+  - Nhập `P950` → bàn phím và panel hỏi lại có chữ "Testmodus" kèm biểu tượng; log vào `research/practice/`; vào các bài sau không còn chữ "Testmodus".
+  - `StartSession` trả `false` hoặc `ParticipantId` khác mã vừa gõ → hiện lỗi tiếng Đức, Welcome không mở.
+  - `P101` vào MixedPickingScene, crash (tuỳ chọn dev), chạy lại, nhập `P101` → panel `Kurs von P101 fortsetzen?` ghi tên bài tiếng Đức. `Ja` → MixedPickingScene bắt đầu lại từ đầu, log mới ghi quyết định tiếp tục. Không đồng ý → Welcome, log ghi là từ chối. `analyse.R` đọc được cả hai ca (`selftest.R` vẫn `selftest OK`).
+  - Nhập một mã thật đã có phiên kết thúc sạch → cảnh báo; phải chọn rõ `Korrigieren` hoặc vẫn tiếp tục.
+  - Đang có phiên, chọn Menu `1. Introduction` → Welcome hiện ra, không có bàn phím.
+  - Màn cuối ComplexScene: dòng chính tiếng Đức (*Sie*) nói bước tiếp theo (bỏ kính, báo người điều phối), dòng phụ `P101`; không có phiên thì không có dòng mã.
+  - Mọi chuỗi mới nằm trong `docs/i18n/strings-todo.csv` (key, EN, DE, `max_chars`) và đã qua `german-reviewer`; `Code`, `Sitzung`, `Testmodus`, `Kurs` và tên 5 bài nằm trong glossary với trạng thái `proposed`.
+  - Bấm phím bằng poke tay trên Quest (MCP không bấm được).
+- **Inspector work expected:** yes (dựng Canvas bàn phím và các panel, gán nút, ẩn 5 đối tượng gốc của Welcome cho tới khi xác nhận, sửa `[Congratulations]` ở ComplexScene)
+- **Công:** L
+- **Test trên kính:** bắt buộc (bấm phím số bằng tay, tầm với của bàn phím)
+- **Depends on:** #26. Ai nhập mã: **người điều phối**, nhập trước khi đưa kính cho trainee (người dùng chốt 2026-11-01, spec mục 9). Câu hỏi cho người hướng dẫn (không chặn): ngôn ngữ của người điều phối, `Code`/`Teilnehmer-Code`, `Sitzung`/`Session`, `Kurs`/`Schulung`, tên tiếng Đức 5 bài.
+- **Decision:** docs/decisions/004-participant-keypad.md
+- **Ghi chú (2026-11-01):** nút kết thúc phiên cho người điều phối tách thành #44 (người dùng chọn). Dòng Bổ sung bên dưới đã gộp vào Done when.
 - **Bổ sung (design #26, 2026-11-01):** thêm nút ẩn cho người điều phối gọi `ResearchLogger.EndSession("facilitator")`. Mã `P900`–`P999` là mã thử (log vào `practice/`); bàn phím báo "chế độ thử" với các mã này. Làm tiếp sau crash (người dùng chốt): nhập lại mã cũ → nếu `ResearchLogger.TryFindResumePoint` thấy phiên trước bị crash thì hỏi người điều phối "Tiếp tục khóa của `P017`?" và báo bài đang dở. Xem `docs/superpowers/specs/2026-11-01-research-logger-design.md` §4, §6.
 - **Bổ sung (review cuối #26, 2026-11-01):** bản build nghiên cứu phải bắt đầu phiên **từ bàn phím**. Hiện `ResearchSettings.autoStart` bật sẵn: app tự mở phiên `P000` lúc khởi động, và `StartSession(realId)` trả `false` khi đang có phiên chạy → cả phiên người học bị ghi dưới `P000` (vào `practice/`, bị loại khỏi phân tích). Chọn một trong hai: tắt `autoStart` trong bản build nghiên cứu, hoặc gọi `EndSession(...)` cho phiên `P000` tự động trước khi `StartSession(realId)`. Header có `session_start_mode` (`auto`/`manual`); `analyse.R` cảnh báo khi mã người học thật có `auto`. Done when nên có ca: nhập `P101` → file `research/P101_…` với `session_start_mode` `manual`.
+- **Bổ sung (review cuối #27, 2026-11-01, đã làm trên nhánh):** không nút không đảo ngược nào nằm dưới vùng của `Ja` (panel cảnh báo: `Korrigieren` thế chỗ `Ja`; panel tiếp tục: cả hai nút ở hàng dưới); crash ở WelcomeScene không hỏi tiếp tục; log ghi `session_start.ended_session_warning` khi người điều phối bấm `Trotzdem starten`; màn cuối lưu sẵn `Code: –` thay vì `Code: P000`.
+- **Test report:** docs/test-reports/bl27.md
+- **Status:** verified-mcp (48/53 ✅, chờ test tay M1–M5 trên Quest)
+
+### #44 [Feature] Nút kết thúc phiên cho người điều phối
+- **Type:** feature
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** component hoặc prefab mới gọi `ResearchLogger.EndSession("facilitator")`; đặt ở cả 5 scene (hoặc một object tồn tại qua các scene, chốt khi làm, `unity-reviewer` duyệt)
+- **Problem:** Người điều phối cần chủ động kết thúc phiên (người học dừng giữa chừng, đổi người). Hiện không có cách nào trên kính, nên phiên chỉ kết thúc khi thoát app hoặc crash.
+- **Done when:** (theo decision 004 mục 9)
+  - Trong bất kỳ scene nào, khi đang có phiên: chạm nhanh vào nút → không có gì xảy ra.
+  - Giữ khoảng 3 s → hỏi `Sitzung wirklich beenden?`; chọn không → quay lại bài, phiên vẫn chạy.
+  - Giữ khoảng 3 s rồi xác nhận → dòng cuối của log là `session_end` lý do `facilitator`; WelcomeScene hiện bàn phím (#27).
+  - Khi chưa kích hoạt, nút không hiện chữ hay panel nào trong vùng làm việc, và nằm ngoài tầm tay quanh bàn và Menu.
+  - Chuỗi mới qua `localize-strings` và `german-reviewer`.
+- **Inspector work expected:** yes (đặt nút/prefab ở 5 scene)
+- **Công:** M
+- **Test trên kính:** bắt buộc (giữ lâu bằng tay thật, kiểm tra không chạm nhầm khi làm bài)
+- **Depends on:** #27 (bàn phím để quay về)
+- **Decision:** docs/decisions/004-participant-keypad.md
+- **Bổ sung (review cuối #27, 2026-11-01):** sau `EndSession("facilitator")` mã đó có `session_end`, nên lần gõ lại sẽ hiện cảnh báo "đã có phiên hoàn tất" của #27 (hôm nay mọi `session_end` đều tính là hoàn tất, cả `quit`/`facilitator`). Chốt cùng #28 lý do nào được tính là "abgeschlossen".
 - **Status:** todo
 
 ### #28 [Feature] Log kết quả mỗi lần xác nhận + mã lỗi + summary.csv
@@ -626,8 +666,10 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** M
 - **Test trên kính:** không
 - **Bổ sung (design #26, 2026-11-01):** định dạng `confirm_pressed` / `quiz_answer` / `task_completed` đã chốt ở design §6 (fake data của #26 dùng nó). Bất biến `correct == (error_codes rỗng)`; thêm mã `WRONG_ANSWER` cho quiz. Lần xác nhận đúng đầu tiên ở ComplexScene gọi `EndSession("completed")`. Khung `_summary.csv` do #26 tạo; #28 chỉ điền các cột kết quả.
+- **Bổ sung (#27, 2026-11-01):** ở ComplexScene phải bật panel `Congratulations` **trước** khi gọi `EndSession("completed")`, vì `ParticipantCodeLabel` đọc `ResearchLogger.ParticipantId` trong `OnEnable`; sau `EndSession` thì mã đã bị xoá và dòng `Code: P…` sẽ không hiện.
 - **Bổ sung (2026-11-01, chốt khi làm #26, fake data đang dùng các lựa chọn này):** điểm cần chốt lại khi làm #28: (1) header thêm một trường báo build này có phát sự kiện kết quả, để R không phải đoán NA hay 0 theo từng phiên; (2) `error_codes_all` viết dạng `CODE:n;CODE:n`; (3) `quiz_answer.selected` là `null` khi chưa chọn gì (kèm `NO_ANSWER`); (4) ConceptScene có ghi `task_completed` không, và `confirm_count` của Concept có bằng số `quiz_answer` không. Câu hỏi cho trưởng nhóm nghiên cứu (data-analyst): BasicPickingScene có kiểm tra vật tư (`check_material`) không, vì `WRONG_TYPE` có thể xảy ra ở đó; một lượt scene bị cắt bởi crash có được tính là lượt đếm không (hiện: có, gắn cờ `visit_censored_<Scene>`). Khi #14 xong cần danh sách build để tách dữ liệu trước/sau #14.
 - **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp: `SceneManager.activeSceneChanged` (nơi logger mở lượt scene mới) chạy **sau** các hàm đó, nên sự kiện sẽ rơi vào lượt scene trước. Ghi từ `Start` trở đi hoặc từ thao tác của người học.
+- **Bổ sung (review cuối #27, 2026-11-01):** chốt lý do kết thúc nào được tính là "abgeschlossen" cho cảnh báo của bàn phím #27. Hôm nay `ResearchLogger.HasEndedSession` coi mọi `session_end` là hoàn tất, kể cả `quit`: người học thoát app sạch giữa khoá rồi quay lại sẽ thấy cảnh báo, không được hỏi tiếp tục (fake P112 trong `make_fake_data.R` là ca này). Cân nhắc chỉ tính `completed` (và có thể `facilitator`), hoặc hiện lý do kết thúc trong cảnh báo; nếu đổi thì sửa chuỗi `entry.warning.finished`, spec 4.1 và `analyse.R` cùng lúc.
 - **Depends on:** #26. Helper mã lỗi dùng lại được cho #14; nếu làm #14 trước thì dùng chung. Định dạng kết quả validator (enum/struct lý do) chốt chung với #14 qua `solution-decision` (`docs/coding-conventions.md`, pending decision).
 - **Status:** todo
 
@@ -668,6 +710,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Test trên kính:** nhanh (cắm kính vào máy để chép log, không cần đeo)
 - **Bổ sung (2026-11-01):** phiếu giấy: SSQ trước khi đeo kính và cuối khóa, NASA-TLX một lần cuối khóa. #31 thêm file mẫu nhập phiếu (cột `participant_id`, `ssq_pre_*`, `ssq_post_*`, `tlx_*`) và bước "điền SSQ trước" vào quy trình của người điều phối.
 - **Bổ sung (design #26, 2026-11-01):** phần gộp dữ liệu đã nằm trong `analysis/analyse.R` (file rộng mỗi người một dòng, dựng từ `events.jsonl`). #31 chỉ còn: hướng dẫn chép log và nối file rộng với phiếu giấy. Script thuộc `data-analyst`.
+- **Bổ sung (review cuối #27, 2026-11-01):** trước mỗi đợt thu dữ liệu: xoá thư mục `research/` trên kính và làm trống `analysis/data/real/` (hiện có log thử `P101`, `P899` của dev). Dev test dùng mã thử `P9xx` (vào `practice/`, bị loại khỏi phân tích); chỉ ca cảnh báo "đã có phiên hoàn tất" cần mã thật, dùng `P899` và xoá ngay sau đó.
 - **Depends on:** #28 (cần `summary.csv`). Spec mục 9 (2026-11-01): người điều phối xoá log trên kính ngay sau khi chép về và kiểm tra đủ file.
 - **Status:** todo
 

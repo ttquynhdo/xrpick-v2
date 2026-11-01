@@ -91,6 +91,46 @@ namespace XRPick.Research.Tests
         }
 
         [Test]
+        public void SessionStart_ResumeAccepted_WritesSceneAndTrue()
+        {
+            Assert.AreEqual(
+                "{\"resume_offered_scene\":\"MixedPickingScene\",\"resume_accepted\":true,\"ended_session_warning\":false}",
+                ResearchEventData.SessionStart("MixedPickingScene", true).ToJson());
+        }
+
+        [Test]
+        public void SessionStart_ResumeDeclined_WritesSceneAndFalse()
+        {
+            Assert.AreEqual(
+                "{\"resume_offered_scene\":\"MixedPickingScene\",\"resume_accepted\":false,\"ended_session_warning\":false}",
+                ResearchEventData.SessionStart("MixedPickingScene", false).ToJson());
+        }
+
+        [Test]
+        public void SessionStart_NothingOffered_AcceptedIsNullEvenIfTrue()
+        {
+            Assert.AreEqual(
+                "{\"resume_offered_scene\":null,\"resume_accepted\":null,\"ended_session_warning\":false}",
+                ResearchEventData.SessionStart(null, true).ToJson());
+        }
+
+        [TestCase(true, "\"ended_session_warning\":true")]
+        [TestCase(false, "\"ended_session_warning\":false")]
+        public void SessionStart_EndedSessionWarning_IsWritten(bool warning, string expected)
+        {
+            string json = ResearchEventData.SessionStart(null, false, warning).ToJson();
+            StringAssert.Contains(expected, json);
+            StringAssert.EndsWith(expected + "}", json);
+        }
+
+        [Test]
+        public void SessionStart_TwoArgOverload_DefaultsWarningToFalse()
+        {
+            Assert.AreEqual(ResearchEventData.SessionStart("ConceptScene", true, false).ToJson(),
+                ResearchEventData.SessionStart("ConceptScene", true).ToJson());
+        }
+
+        [Test]
         public void Header_NullsStayNull()
         {
             string json = ResearchEventData.Header("0.1.0", null, "Quest", "Android", "P101", "s1",

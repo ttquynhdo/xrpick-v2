@@ -44,3 +44,14 @@ Kartonage,die,cardboard packaging,Cardboard packaging of pre-packed material.,no
 Schachtel,die,small box,Product packaging box.,no,requirements: Kommissionierung.pptx slide 17,proposed,
 Material,das,material,"The goods of an order line (identified by Materialnummer), whatever their packaging.",no,requirements,proposed,Used in feedback such as complex.feedback.wrong_package.
 loses Material,das,loose material,Material that is not pre-packed and is picked piece by piece.,no,requirements: Kommissionierung.pptx slide 6/9; Detail Description,proposed,"Use for loose items; the unit is Stück (ST). The documents use neither Paket, Packstück nor Gebinde."
+Code,der,code,"Short identifier of a participant, P plus three digits (e.g. P017), typed on the keypad.",no,decision 004 (#27),proposed,"Used as 'Code eingeben', 'Code: P017'."
+Sitzung,die,session,"One run of the app by one participant, recorded by the research logger.",no,decision 004 (#27),proposed,Used in entry.warning.finished and entry.error.start.
+Testmodus,der,test mode,"State for test codes (P000, P900-P999) whose data is not analysed.",no,decision 004 (#27),proposed,
+Kurs,der,course,The whole training sequence of five lessons.,no,decision 004 (#27),proposed,Course leader = Kursleitung.
+1. Einführung,,1. Introduction,"Lesson name, WelcomeScene.",no,decision 004 D1 (#27),proposed,
+2. Grundlagen,,2. Basics,"Lesson name, ConceptScene.",no,decision 004 D1 (#27),proposed,
+3. Kommissionieren nach EKZ 3,,3. Single pick by EKZ 3,"Lesson name, BasicPickingScene.",no,decision 004 D1 (#27),proposed,EKZ stays untranslated.
+4. Mehrere Positionen,,4. Several positions,"Lesson name, MixedPickingScene.",no,decision 004 D1 (#27),proposed,
+5. Volle Kartons und loses Material,,5. Full cartons and loose material,"Lesson name, ComplexScene.",no,decision 004 D1 (#27),proposed,
+Kursleitung,die,course leader,Person who runs the training session and is told when the participant is done.,no,review of #27 strings,proposed,
+Position,die,order line,Auftragsposition: one line of an order (one material with its quantity).,no,review of #27 strings,proposed,Used in lesson name '4. Mehrere Positionen'.

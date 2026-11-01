@@ -80,10 +80,43 @@ public sealed class ResearchLogger : MonoBehaviour
     /// </summary>
     public static bool StartSession(string participantId)
     {
-        return StartSession(participantId, ResearchEventData.StartModeManual);
+        return StartSession(participantId, ResearchEventData.StartModeManual, null, false, false);
     }
 
-    private static bool StartSession(string participantId, string startMode)
+    /// <summary>
+    /// Same, and records the resume offer in session_start: the scene offered (null when none) and
+    /// whether the participant accepted it.
+    /// </summary>
+    public static bool StartSession(string participantId, string resumeOfferedScene, bool resumeAccepted)
+    {
+        return StartSession(participantId, resumeOfferedScene, resumeAccepted, false);
+    }
+
+    /// <summary>
+    /// Same, and records in session_start whether the facilitator started despite the
+    /// "already finished" warning (ended_session_warning).
+    /// </summary>
+    public static bool StartSession(string participantId, string resumeOfferedScene, bool resumeAccepted,
+        bool endedSessionWarning)
+    {
+        return StartSession(participantId, ResearchEventData.StartModeManual, resumeOfferedScene, resumeAccepted,
+            endedSessionWarning);
+    }
+
+    /// <summary>True when an earlier session of this participant ended with session_end. False for invalid IDs.</summary>
+    public static bool HasEndedSession(string participantId)
+    {
+        if (!ResearchIds.IsValid(participantId))
+        {
+            return false;
+        }
+
+        string exclude = IsSessionActive ? instance.sessionId : string.Empty;
+        return SessionFiles.HasEndedSession(ResearchRoot, participantId, exclude);
+    }
+
+    private static bool StartSession(string participantId, string startMode, string resumeOfferedScene,
+        bool resumeAccepted, bool endedSessionWarning)
     {
         if (!ResearchIds.IsValid(participantId))
         {
@@ -97,7 +130,8 @@ public sealed class ResearchLogger : MonoBehaviour
             return false;
         }
 
-        EnsureInstance().BeginSession(participantId, startMode);
+        EnsureInstance().BeginSession(participantId, startMode, resumeOfferedScene, resumeAccepted,
+            endedSessionWarning);
         return true;
     }
 
@@ -156,9 +190,9 @@ public sealed class ResearchLogger : MonoBehaviour
     private static void CreateAtAppStart()
     {
         ResearchLogger logger = EnsureInstance();
-        if (logger.autoStart)
+        if (AutoStartRule.ShouldAutoStart(logger.autoStart, SceneManager.GetActiveScene().buildIndex))
         {
-            StartSession(logger.autoStartParticipantId, ResearchEventData.StartModeAuto);
+            StartSession(logger.autoStartParticipantId, ResearchEventData.StartModeAuto, null, false, false);
         }
     }
 
@@ -288,7 +322,8 @@ public sealed class ResearchLogger : MonoBehaviour
         }
     }
 
-    private void BeginSession(string id, string startMode)
+    private void BeginSession(string id, string startMode, string resumeOfferedScene, bool resumeAccepted,
+        bool endedSessionWarning)
     {
         participantId = id;
         sessionId = Guid.NewGuid().ToString("D");
@@ -313,7 +348,8 @@ public sealed class ResearchLogger : MonoBehaviour
         JsonFields header = ResearchEventData.Header(Application.version, build, SystemInfo.deviceModel,
             SystemInfo.operatingSystem, participantId, sessionId, startMode, ReadInputMode(), ReadRefreshRate());
         WriteLine(SessionFiles.EventLine(0, UtcNow(), participantId, sessionId, null, null, "header", header));
-        WriteLine(SessionFiles.EventLine(0, UtcNow(), participantId, sessionId, activeScene, null, "session_start", null));
+        WriteLine(SessionFiles.EventLine(0, UtcNow(), participantId, sessionId, activeScene, null, "session_start",
+            ResearchEventData.SessionStart(resumeOfferedScene, resumeAccepted, endedSessionWarning)));
 
         OpenVisit(activeScene, null, "start");
     }

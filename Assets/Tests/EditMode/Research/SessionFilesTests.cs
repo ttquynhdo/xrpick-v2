@@ -142,6 +142,24 @@ namespace XRPick.Research.Tests
         }
 
         [Test]
+        public void HasEndedSession_TrueOnlyWithSessionEnd()
+        {
+            WriteEvents(root, "P101", "done", "header", "scene_enter:WelcomeScene", "session_end");
+            WriteEvents(root, "P102", "crash", "header", "scene_enter:WelcomeScene");
+            Assert.IsTrue(SessionFiles.HasEndedSession(root, "P101", "current"));
+            Assert.IsFalse(SessionFiles.HasEndedSession(root, "P102", "current"));
+            Assert.IsFalse(SessionFiles.HasEndedSession(root, "P555", "current"));
+            Assert.IsFalse(SessionFiles.HasEndedSession(root, "P101", "done")); // excluded session
+        }
+
+        [Test]
+        public void HasEndedSession_TestIdLooksInPractice()
+        {
+            WriteEvents(root, "P950", "done", "header", "session_end"); // test IDs are written under practice/
+            Assert.IsTrue(SessionFiles.HasEndedSession(root, "P950", "current"));
+        }
+
+        [Test]
         public void TruncatedLastLine_CountsAsCrash_WithoutThrowing()
         {
             WriteEvents(root, "P103", "cut", "header", "scene_enter:BasicPickingScene");

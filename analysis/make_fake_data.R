@@ -264,7 +264,13 @@ open_pause_part <- function(s) {
 active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s - open_pause_part(s), 3)
 
 # start_mode: "manual" (keypad, #27) or "auto" (ResearchSettings.autoStart).
-start_session <- function(person, build, start_utc, start_mode = "manual") {
+# resume_scene / resume_accepted: the resume offer after a crash (#27).
+# Nothing offered = both null; resume_accepted is null whenever resume_scene is.
+# ended_warning: TRUE when the facilitator started despite the "already
+# finished" warning ("Trotzdem starten"); the logger writes false otherwise.
+start_session <- function(person, build, start_utc, start_mode = "manual",
+                          resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE) {
+  if (is.null(resume_scene)) resume_accepted <- NULL
   s <- new.env()
   s$pid <- person$pid
   s$sid <- make_uuid()
@@ -307,7 +313,9 @@ start_session <- function(person, build, start_utc, start_mode = "manual") {
              language = NULL,
              input_mode_at_start = "controllers", target_refresh_rate = 72))
   s$scene <- "WelcomeScene"
-  emit(s, "session_start")
+  emit(s, "session_start", json_obj(resume_offered_scene = resume_scene,
+                                    resume_accepted = resume_accepted,
+                                    ended_session_warning = ended_warning))
   advance(s, 0.006)
   enter_scene(s, "WelcomeScene", NULL, "start")
   s
@@ -600,8 +608,9 @@ run_visit <- function(s, person, ...) {
 
 # A normal course: every scene in build order, ends "completed" on the first
 # correct confirm in ComplexScene (#28 calls EndSession("completed") there).
-run_full_course <- function(person, build, start_utc, special = list(), start_mode = "manual") {
-  s <- start_session(person, build, start_utc, start_mode)
+run_full_course <- function(person, build, start_utc, special = list(), start_mode = "manual",
+                            resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE) {
+  s <- start_session(person, build, start_utc, start_mode, resume_scene, resume_accepted, ended_warning)
   run_welcome(s)
   for (scene in scene_order[-1]) {
     go_to_scene(s, scene)
@@ -671,9 +680,10 @@ crash_session(s)
 crash_epoch <- s$start + s$t
 restart_utc <- format(as.POSIXct(round(crash_epoch + 6 * 60), origin = "1970-01-01", tz = "UTC"),
                       "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
-# Resume: the menu is unlocked up to MixedPickingScene, which restarts from
-# its beginning (design section 4, resume after a crash).
-s <- start_session(p103, "bbb2222", restart_utc)
+# Resume: the keypad offers MixedPickingScene and P103 accepts; the scene
+# restarts from its beginning (design section 4, resume after a crash).
+s <- start_session(p103, "bbb2222", restart_utc,
+                   resume_scene = "MixedPickingScene", resume_accepted = TRUE)
 run_welcome(s)
 go_to_scene(s, "MixedPickingScene"); run_picking(s, p103)
 go_to_scene(s, "ComplexScene"); run_picking(s, p103, end_on_correct = TRUE)
@@ -744,6 +754,35 @@ run_full_course(new_person("P110"), "aaa1111", "2026-11-05T08:00:00Z",
   special = list(BasicPickingScene = list(first_press = list(
     box = list(gg = 6, vpe = 1, other = 0, total_pieces = 300),
     codes = list(err("WRONG_TYPE")), correct = TRUE))))
+
+# P111: crashes in BasicPickingScene after one wrong confirm. On restart the
+# keypad offers BasicPickingScene, but the resume is declined, so the trainee
+# repeats the whole course from WelcomeScene (same build, a few minutes later):
+# repeat visits after a crash that analyse.R must warn about.
+p111 <- new_person("P111")
+s <- start_session(p111, "aaa1111", "2026-11-05T09:30:00Z")
+run_welcome(s)
+go_to_scene(s, "ConceptScene"); run_quiz(s, p111)
+go_to_scene(s, "BasicPickingScene"); run_picking(s, p111, max_confirms = 1, give_up = TRUE)
+crash_session(s)
+restart_utc <- format(as.POSIXct(round(s$start + s$t + 4 * 60), origin = "1970-01-01", tz = "UTC"),
+                      "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+s <- run_full_course(p111, "aaa1111", restart_utc,
+                     resume_scene = "BasicPickingScene", resume_accepted = FALSE)
+
+# P112: the app is quit cleanly in ConceptScene (session_end "quit"). On
+# restart the keypad shows no resume (no crash) but the "already finished"
+# warning, because any session_end counts as finished (backlog #28/#44); the
+# facilitator presses "Trotzdem starten" (ended_session_warning = true) and
+# P112 runs the whole course. analyse.R must show ended_session_override and warn.
+p112 <- new_person("P112")
+s <- start_session(p112, "aaa1111", "2026-11-05T11:30:00Z")
+run_welcome(s)
+go_to_scene(s, "ConceptScene"); run_quiz(s, p112)
+end_session(s, "quit")
+restart_utc <- format(as.POSIXct(round(s$start + s$t + 3 * 60), origin = "1970-01-01", tz = "UTC"),
+                      "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+run_full_course(p112, "aaa1111", restart_utc, ended_warning = TRUE)
 
 # ---- 8. Write the files ----------------------------------------------------
 

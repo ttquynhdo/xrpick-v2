@@ -43,6 +43,16 @@ public class SceneMenuController : MonoBehaviour
         SceneManager.LoadScene("ComplexScene");
     }
 
+    // #27: resume entry point. Loads only scenes that are in the build; returns false otherwise.
+    public bool OpenScene(string sceneName)
+    {
+        if (!Application.CanStreamedLevelBeLoaded(sceneName))
+            return false;
+
+        SceneManager.LoadScene(sceneName);
+        return true;
+    }
+
 }
 
 //using UnityEngine;
