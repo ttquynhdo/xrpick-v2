@@ -382,7 +382,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #17 (dữ liệu và nhãn 3 kiện Concept). Chạy song song được với #6 (khác scene). Câu hỏi mới cho người hướng dẫn: A9, A10, A11 (không chặn).
 - **Bổ sung (2026-11-01, #10):** Basic/Complex đã dùng màn hình máy tính `WMS_Monitor` thay TV; Concept chỉ có panel trơn 0,57 × 0,43 m không có màn hình. **Đã quyết ở decision 010 (#20, 2026-11-01): có đặt `WMS_Monitor` chỉ xem trong Concept; #45 và #20 làm chung một nhánh; không đánh dấu gì trên vùng dialog.** Đề xuất ban đầu: đặt `WMS_Monitor` với dialog ở chế độ chỉ xem (một đơn mẫu), nhãn chú thích nằm ngoài màn hình chỉ vào `Mat.-Nr`, `Verp.-Einh.`, `Soll`; lời giảng và quiz trên một bảng riêng bên cạnh, không đè lên màn hình (theo quy tắc màn hình ở đầu file). Đánh đổi cần cân: làm quen màn hình WMS sớm, bố cục giống các bài sau ↔ thêm thứ phải nhìn trong bài lý thuyết.
 - **Test report:** docs/test-reports/bl20.md (chung với #20)
-- **Status:** verified-mcp (14/14 MCP/code ✅, chờ test tay H1–H3; nhánh `feat/20-45-concept-wms`, cùng #20)
+- **Status:** done (commit b950df5, test 17/17 ✅, cùng #20)
 
 ### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
 - **Type:** logic
@@ -610,7 +610,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (2026-11-01):** B6 đã chốt: Rest = tồn kho còn lại trong thùng kho. B4: ô Anweisung không highlight, nên phần dạy Anweisung chỉ dạy nội dung chữ. B3 (màu ô Empf Kz) còn mở, không chặn phần dạy nghĩa của EKZ.
 - **Bổ sung (2026-11-01):** đèn chỉ báo R2 không dùng trong kịch bản XR training (xem #10) → không dạy nghĩa từng đèn, chỉ nói ngắn "vùng này không dùng trong bài tập".
 - **Test report:** docs/test-reports/bl20.md
-- **Status:** verified-mcp (14/14 MCP/code ✅, chờ test tay H1–H3; theo giả định B16 `Empf Kz` = EKZ; nhánh `feat/20-45-concept-wms`, cùng #45)
+- **Status:** done (commit b950df5, test 17/17 ✅, theo giả định B16 `Empf Kz` = EKZ; cùng #45)
 
 ### #21 [Feature] MixedPickingScene: nhặt tuần tự từng vị trí như dialog thật
 - **Type:** feature
