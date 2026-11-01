@@ -21,7 +21,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - ComplexScene: ~~#3 + #15~~ (verified-mcp) → ~~#16~~ (done).
    - BasicPickingScene: ~~#2~~ (verified-mcp).
    - Validator: ~~#4~~ (verified-mcp) → ~~#7~~ (done).
-   - Inspector nhiều scene: #5 + #9, làm khi không nhánh nào khác đang mở các scene đó.
+   - Inspector nhiều scene: ~~#9~~ (verified-mcp), làm khi không nhánh nào khác đang mở các scene đó (#5 đã gộp vào #18).
    - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
    - Song song, không đụng scene: #26.
 2. **Đợt 2 – không kính, có phụ thuộc:**
@@ -30,7 +30,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - #6 (sau #1, #3) → #8 (sau #2, #3, #6).
 3. **Đợt 3 – test kính nhanh, gom một buổi test ở cuối đợt:**
    - #32 (Concept) và #33 (sau #14, #32): kết quả cạnh nút đỏ.
-   - #18 (sau #1, #5) → #25 (sau #18).
+   - #18 (sau #1; gồm cả #5) → #25 (sau #18).
    - #17 (chạy `solution-decision` trước, L) → #36, #23 (#23 không cần kính).
    - #10 (L; bố cục trước, số liệu theo #1, #34) → #20, #21.
    - #39 (sau #9). #31 (sau #28; chỉ cắm kính vào máy).
@@ -120,7 +120,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** —
-- **Status:** todo
+- **Ghi chú (2026-11-01):** Kiểm tra lại scene: menu Basic có 4 mục riêng (`1. Einleitung` → Welcome, `2. EKZ 2` → Basic, `3. EKZ 3` → Mixed, `4. EKZ 8` → Complex) và **không có** toggle Concept nào. Muốn sửa phải thêm hẳn một mục, mà #18 làm lại toàn bộ menu này. Người dùng chọn gộp vào #18.
+- **Status:** dropped (gộp vào #18, 2026-11-01)
 
 ### #14 [P1] Một mẫu feedback chung: khi sai thì nói lý do và giữ hướng dẫn
 - **Type:** logic
@@ -183,11 +184,11 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Scene(s):** BasicPickingScene
 - **Files:** BasicPickingScene: menu (prefab override `2. EKZ 2`, `3. EKZ 3`, `4. EKZ 8`), `Instruction Table/*` (`1. Lesen des LVS` … `3. Versenden des Auftrags`), các package cũ dưới `Interactables` (`[VPE_OpenedPackage]`, Cable Connector A), panel cũ `[Info Panel]` (CABLE CONNECTOR A 100 pcs)
 - **Problem:** Basic được làm lại riêng thành bài "EKZ 3": menu đặt tên theo EKZ, mẫu hướng dẫn khác các scene còn lại, bước 3 ghi "versenden" (gửi đi) thay vì xác nhận, còn sót package và panel của kịch bản cũ. Trainee đi từ Concept sang Basic gặp một giao diện hoàn toàn khác.
-- **Done when:** Menu giống hệt các scene khác (tên bài, thứ tự, có Concept). Hướng dẫn theo cùng mẫu tiêu đề + 3 bước. Không còn package/panel nào không thuộc đơn hiện tại, trừ khi được đặt có chủ ý làm vật gây nhiễu.
+- **Done when:** Menu giống hệt các scene khác (tên bài, thứ tự, có Concept). Bấm mục Concept trong menu của BasicPickingScene → ConceptScene được mở (từ #5). Hướng dẫn theo cùng mẫu tiêu đề + 3 bước. Không còn package/panel nào không thuộc đơn hiện tại, trừ khi được đặt có chủ ý làm vật gây nhiễu.
 - **Inspector work expected:** yes (chủ yếu sửa scene)
 - **Công:** M
 - **Test trên kính:** nhanh (bấm menu, xem tổng thể scene)
-- **Depends on:** #1, #5. D1 (nhóm đã trả lời 2026-11-01): tên bài theo kỹ năng: `Einführung / Grundlagen / Einzelpick nach EKZ 3 / Mehrere Positionen / Volle Kartons + Einzelteile` (tiếng Đức chờ `german-reviewer`). Thêm câu Done when: *Menu ở cả 5 scene hiện đúng 5 tên này theo thứ tự.*
+- **Depends on:** #1 (#5 đã gộp vào đây). D1 (nhóm đã trả lời 2026-11-01): tên bài theo kỹ năng: `Einführung / Grundlagen / Einzelpick nach EKZ 3 / Mehrere Positionen / Volle Kartons + Einzelteile` (tiếng Đức chờ `german-reviewer`). Thêm câu Done when: *Menu ở cả 5 scene hiện đúng 5 tên này theo thứ tự.*
 - **Ghi chú:** Cần Play mode kiểm tra package cũ có nhìn thấy và cầm được không. Trong ảnh `overview`/`container` không thấy các package này.
 - **Bổ sung (ảnh Play mode):**
   - **Chỉ dẫn bắt làm việc không làm được:** Panel WMS ra lệnh `Bitte Material umpacken!` (`[Info Panel (1)]/Anweisung Visuals/Text (TMP) (1)`) và `EKZ Hinweis: Leerräume auffüllen`, nhưng scene không cho làm hai việc đó. Thẻ hướng dẫn lại bảo "Achte immer auf die Anweisungen", nên trainee học cách bỏ qua chỉ dẫn. Hoặc bỏ hai dòng này, hoặc dạy chúng (#20).
@@ -197,7 +198,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (2026-11-01, trả lời B8, D1):**
   - B8: dùng dialog mới → nút xác nhận và thẻ hướng dẫn ghi `F6`, không còn `F12`. Thêm câu Done when: *Nút đỏ và thẻ hướng dẫn ghi `F6`; không còn chữ `F12` nào trong scene.*
   - D1: mọi scene sẽ có cùng dialog WMS, nên đơn nào cũng có EKZ; đặt tên bài theo EKZ không phân biệt được các bài. Hướng đề xuất: đặt tên theo **kỹ năng** mỗi bài luyện (vd. đọc dialog → một pick → nhiều vị trí lần lượt → carton nguyên + chiếc lẻ). Cần rà soát lại cả 5 scene (`instructional-design-reviewer`), chốt tên, rồi mới sửa menu ở đây và ở #37. Tên tiếng Đức qua `localize-strings`.
-- **Status:** todo (sau #1, #5)
+- **Status:** todo (#1 đã verified-mcp)
 
 ### #24 [P1] BasicPickingScene: thêm kiện thừa để phép tính có ý nghĩa
 - **Type:** logic
@@ -287,7 +288,9 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** —
-- **Status:** todo
+- **Ghi chú (2026-11-01, khi làm):** quét bằng script trong Editor, xoá 68 call (target None hoặc method rỗng) ở cả 5 scene, kể cả ConceptScene.
+- **Test report:** docs/test-reports/bl09.md
+- **Status:** verified-mcp (7/7 ✅, chờ test tay E6)
 
 ---
 
