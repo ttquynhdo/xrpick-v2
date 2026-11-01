@@ -36,6 +36,13 @@ namespace XRPick.Research.Tests
         }
 
         [Test]
+        public void ToJson_NonFiniteNumbersBecomeNull()
+        {
+            Assert.AreEqual("{\"a\":null,\"b\":null,\"c\":null}",
+                new JsonFields().Add("a", double.NaN).Add("b", double.PositiveInfinity).Add("c", double.NegativeInfinity).ToJson());
+        }
+
+        [Test]
         public void ToJson_StringListAndRaw()
         {
             Assert.AreEqual("{\"causes\":[\"focus_lost\",\"hmd_unmounted\"],\"x\":{\"k\":1}}",

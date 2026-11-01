@@ -18,7 +18,9 @@ public sealed class JsonFields
 
     public JsonFields Add(string key, double? value)
     {
-        return AddRaw(key, value.HasValue ? value.Value.ToString("R", CultureInfo.InvariantCulture) : "null");
+        // NaN/Infinity are not valid JSON; one such token would break the whole JSONL file for R.
+        bool finite = value.HasValue && !double.IsNaN(value.Value) && !double.IsInfinity(value.Value);
+        return AddRaw(key, finite ? value.Value.ToString("R", CultureInfo.InvariantCulture) : "null");
     }
 
     public JsonFields Add(string key, int? value)
