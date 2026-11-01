@@ -23,6 +23,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
 - **Buổi test kính tiếp theo:** #25 T8-tay (đọc thẻ và panel Welcome).
+- **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
 1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
    - #45 ConceptScene: dạy Mat.-Nr/VPE, quiz vận dụng (decision 007, gồm #32; test nhanh).
    - #25 mẫu thẻ hướng dẫn chung, tiếng Đức ở cả 5 scene: verified-mcp, chờ đọc trên kính.
@@ -640,15 +641,16 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** MixedPickingScene
 - **Files:** MixedPickingScene `[Info Panel]/TXT_Description`, `TXT_Description (1)`, Assets/Scripts/MixPickingContainer.cs, Assets/Scripts/MixPickingValidator.cs
 - **Problem:** Dialog thật xử lý từng vị trí một (`Pick 1/2`, `2/2`). Mixed hiện hai dòng đơn cạnh nhau trên một panel, và không có bộ đếm riêng cho từng vật tư, nên lỗi chỉ lộ ra khi xác nhận.
-- **Done when:** Trainee làm vị trí 1, xác nhận, rồi panel chuyển sang vị trí 2. Mỗi vị trí có Ist riêng. Mixed dùng cùng prefab `WMS_Monitor` + dialog như Basic/Complex (bỏ TV), cùng vị trí và cỡ.
+- **Done when:** (theo decision 012; đã gộp các dòng Bổ sung, câu bật đèn `Mehrfachpick`/`letzter Pick` bị thay vì trái decision 009) Vào MixedPickingScene: dialog `WMS_Kommissionierung` trong `WMS_Monitor` ở (0.06, 1.26, 1.066), cùng cỡ như Basic/Complex, chỉ hiện KABELVERBINDER A, Soll 100, Ist 0; không còn TV, `Info Panel` hay `PACKAGE PLACED`. Vào scene: thùng kho chỉ chứa carton KABELVERBINDER A; không có túi SCHRAUBE B hay hộp RING D trong scene. Đặt 2 carton KABELVERBINDER A, bấm nút đỏ → thẻ cạnh nút báo position 1 đúng và nói bước tiếp bằng chữ; dialog chuyển sang SCHRAUBE B, Soll 40, Ist 0; thùng kho cũ mờ đi, thùng chỉ chứa túi SCHRAUBE B hiện ra đúng chỗ đó. Ở position 1, bấm nút đỏ với 1 carton → thẻ báo lỗi đầu tiên kèm lý do; dialog vẫn ở position 1, thùng kho không đổi. Ở position 2, các carton KABELVERBINDER A đã nằm trong thùng đơn không làm đổi Ist và không bị báo là vật tư lạ. Ở position 2, bấm nút đỏ với số túi sai → thẻ báo lỗi, dialog vẫn ở position 2. Ở position 2, đặt 2 túi SCHRAUBE B, bấm nút đỏ → thẻ báo cả đơn đúng. Ở mọi position, tất cả đèn R2 (gồm `Mehrfachpick`, `letzter Pick`) tắt. Thẻ hướng dẫn trên bàn nói trước khi bắt đầu rằng đơn có hai position, làm lần lượt. (code) Container có số thứ tự position, tổng số position và một sự kiện khi đổi position; `OrderRule` không đổi; order chỉ khai báo trong `orderLines`. Console không có lỗi mới.
 - **Inspector work expected:** yes
 - **Công:** L
 - **Test trên kính:** nhanh (làm lần lượt 2 vị trí)
-- **Depends on:** #10; câu trả lời B8 (đã có, 2026-11-01: dialog mới). Đơn của Mixed theo A5 (nhóm, 2026-11-01): giữ số hiện tại.
+- **Depends on:** #10; câu trả lời B8 (đã có, 2026-11-01: dialog mới). Đơn của Mixed theo A5 (nhóm, 2026-11-01): giữ số hiện tại. Nên commit #25 trước (cùng sửa MixedPickingScene và `MixPickingValidator.cs`). Câu hỏi mở: B13, B14, D11, D12, D13, D14.
+- **Decision:** docs/decisions/012-mixed-sequential-positions.md (người dùng 2026-11-01: phương án A; nếu tới demo 2026-11-02 phần đổi thùng chưa ổn thì demo bản C, #21 chưa `done`; bỏ hẳn RING D)
 - **Bổ sung (2026-11-01, #6):** hai vị trí đã là hai `OrderLine` trên `MixedPickingContainer`; mỗi dòng có `PlacedFull` riêng trong `OrderResult`, nên Ist theo từng vị trí lấy được từ đó.
 - **Bổ sung (2026-11-01, decision 008):** Mixed dựng dialog chung của #10 ở đây. Thêm Done when: MixedPickingScene dùng cùng prefab dialog, mỗi lần một vị trí; `Mehrfachpick` bật ở cả hai vị trí, `letzter Pick` chỉ bật ở vị trí 2; mỗi vị trí có Ist riêng; không còn `PACKAGE PLACED`; kết quả hiện trên thẻ cạnh nút đỏ (phần Mixed của #33). Câu hỏi B14 (Mehrfachpick "1/2"), B15 (`F4 Übersicht`).
 - **Bổ sung (2026-11-01, ảnh trạm thật `old/Orderpicking.png`):** ở trạm thật mỗi vị trí đi kèm một thùng kho riêng; thùng kho của Mixed hiện chứa cả CABLE CONNECTOR A và SCREW B (`TestEvidence/MixedPickingScene/views/overview.png`). Thêm Done when: lúc vào scene, thùng kho chỉ chứa vật tư của vị trí 1; sau khi xác nhận vị trí 1, thùng kho đó được thay bằng thùng kho chỉ chứa vật tư của vị trí 2. Cách đổi thùng (tự chạy hay đẩy tay) theo D11; giả định một thùng kho = một mã vật tư theo D12.
-- **Status:** todo (sau #10)
+- **Status:** in progress (nhánh `feat/21-mixed-sequential-positions`)
 
 ### #47 [Feature] Bệ băng lăn cho hai thùng, thùng đơn chạy đi sau khi xác nhận đúng
 - **Type:** feature
