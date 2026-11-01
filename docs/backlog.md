@@ -559,7 +559,9 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** nhanh (so bố cục, đọc chữ panel trên kính)
 - **Depends on:** #1 (dữ liệu đơn), #34 (cách hiện Ist/Rest). Có thể dựng bố cục trước khi hai mục này xong.
 - **Bổ sung (2026-11-01, rà backlog sau #6/#14/#17/#18):** dữ liệu đơn đã có một nguồn: `orderLines` (`OrderLine` {materialKey, materialName, soll, vpe}) trên counter Mixed/Complex, text WMS sinh từ đó lúc Start (`orderLineTexts`); Basic dùng `CalcForWMS.OrderLine` (Soll = `necessarySize`). Panel mới phải đọc từ đó, không gõ số tay. Nhãn panel EN Mixed/Complex còn ghi "Order quantity"/"Package size" (german-reviewer #14: đổi "Package size" thành VPE khi dựng panel). Basic: ô Anweisung vẫn hiện ba thanh xanh đậm (B4: không highlight). Mat.-Nr giả và tên vật tư theo #17 (`docs/i18n/glossary.csv`).
-- **Status:** in progress (nhánh `feat/10-wms-dialog`)
+- **Bổ sung (2026-11-01, người dùng):** các đèn chỉ báo R2 (Referenzwaage, Behälterwaage, Zählen, letzter Pick, …) **không dùng trong kịch bản XR training**: không có bài tập nào yêu cầu cân hay đổi cách đếm theo đèn. Thiết kế lại cho hợp lý: giữ bố cục R2 để giống màn hình thật nhưng không để đèn gây chú ý (ví dụ tất cả tắt/xám, bỏ logic `CountingMethod` khỏi hiển thị), và không dạy/chấm theo đèn ở #20. Cần chốt cách làm (solution-decision hoặc sửa decision 008) trước khi đóng #10.
+- **Test report:** docs/test-reports/bl10.md
+- **Status:** verified-mcp (22/22 MCP/code ✅, chờ test tay H1–H3; nhánh `feat/10-wms-dialog`)
 
 ### #46 [P3] Dọn field text cũ sau khi có dialog WMS chung
 - **Type:** cleanup
@@ -600,6 +602,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** nhanh (đọc bước dạy trên kính)
 - **Depends on:** #10; câu trả lời B3, B4, B6 (đã có)
 - **Bổ sung (2026-11-01):** B6 đã chốt: Rest = tồn kho còn lại trong thùng kho. B4: ô Anweisung không highlight, nên phần dạy Anweisung chỉ dạy nội dung chữ. B3 (màu ô Empf Kz) còn mở, không chặn phần dạy nghĩa của EKZ.
+- **Bổ sung (2026-11-01):** đèn chỉ báo R2 không dùng trong kịch bản XR training (xem #10) → không dạy nghĩa từng đèn, chỉ nói ngắn "vùng này không dùng trong bài tập".
 - **Status:** todo (sau #10)
 
 ### #21 [Feature] MixedPickingScene: nhặt tuần tự từng vị trí như dialog thật

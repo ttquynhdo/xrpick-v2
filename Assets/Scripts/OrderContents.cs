@@ -25,6 +25,46 @@ public static class OrderContents
         return contents;
     }
 
+    // #10: pieces of one material in the scene: closed cartons count their VPE, loose pieces one each.
+    // Opened display cartons are skipped, their loose pieces are counted on their own.
+    public static int StockInScene(string materialKey)
+    {
+        int stock = 0;
+
+        foreach (PackageData package in Object.FindObjectsByType<PackageData>())
+        {
+            if (package.MaterialKey != materialKey)
+                continue;
+
+            if (package.packageType == PackageType.LooseItemDisplay)
+            {
+                stock++;
+            }
+            else if (package.packageType != PackageType.VPEFull && package.packageType != PackageType.VPEOpenedDisplay)
+            {
+                stock += package.Vpe;
+            }
+        }
+
+        return stock;
+    }
+
+    // #10: the Mat.-Nr shown in the WMS must be the one printed on the cartons of the same material (#17).
+    public static void LogMaterialNumberMismatch(OrderLine line, Object context)
+    {
+        if (line == null || string.IsNullOrEmpty(line.materialNumber))
+            return;
+
+        foreach (PackageData package in Object.FindObjectsByType<PackageData>(FindObjectsInactive.Include))
+        {
+            if (package.MaterialKey == line.materialKey && package.MaterialNumber != line.materialNumber)
+            {
+                Debug.LogError($"{context.GetType().Name}: Mat.-Nr {line.materialNumber} of order line '{line.materialKey}' differs from {package.MaterialNumber} on {package.name}.", package);
+                return;
+            }
+        }
+    }
+
     // Order lines are typed in the Inspector: log every mistake, naming the counter, so the WMS text
     // and the result can never disagree silently.
     public static void LogSetupProblems(IReadOnlyList<OrderLine> lines, bool countsLoose, TMP_Text[] lineTexts, Object context)
@@ -50,8 +90,9 @@ public static class OrderContents
             }
         }
 
+        // #10: a scene with the WMS dialog has no separate order-line texts (empty array is fine).
         int textCount = lineTexts != null ? lineTexts.Length : 0;
-        if (textCount != lines.Count)
+        if (textCount != 0 && textCount != lines.Count)
         {
             Debug.LogError($"{owner}: orderLineTexts has {textCount} entries but there are {lines.Count} order lines.", context);
         }

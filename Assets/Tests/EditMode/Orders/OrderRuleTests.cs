@@ -48,6 +48,17 @@ namespace XRPick.Orders.Tests
             Assert.AreEqual(0, Mixed[0].RequiredLoose);
         }
 
+        // Kommissionierung.pptx slide 6, decision 008: up to 7 pieces counted, from 0.7 kg container scale.
+        [TestCase(7, 5f, CountingMethod.Zaehlen)]
+        [TestCase(8, 0.2f, CountingMethod.Referenzwaage)]
+        [TestCase(55, 0.69f, CountingMethod.Referenzwaage)]
+        [TestCase(300, 0.7f, CountingMethod.Behaelterwaage)]
+        public void CountingMethod_FollowsPiecesAndWeight(int soll, float kg, CountingMethod expected)
+        {
+            var line = new OrderLine("x", "X", soll, 25) { weightKg = kg };
+            Assert.AreEqual(expected, line.CountingMethod);
+        }
+
         [Test]
         public void Empty_IsLoggedAlone()
         {
