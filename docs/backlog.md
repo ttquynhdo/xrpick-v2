@@ -20,7 +20,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 1. **Đợt 1 – không kính, không phụ thuộc** (đa số chỉ sửa script):
    - ComplexScene: ~~#3 + #15~~ (verified-mcp) → ~~#16~~ (done).
    - BasicPickingScene: ~~#2~~ (verified-mcp).
-   - Validator: #4 → #7 (cùng các dòng).
+   - Validator: ~~#4~~ (verified-mcp) → #7 (cùng các dòng).
    - Inspector nhiều scene: #5 + #9, làm khi không nhánh nào khác đang mở các scene đó.
    - #38: chỉ chụp ảnh `wms` sau bấm sai/đúng để xác nhận; sửa phần panel chúc mừng nếu lỗi có thật, phần ô feedback để chờ #33.
    - Song song, không đụng scene: #26.
@@ -96,10 +96,10 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 
 ### #4 [P1] Xoá trạng thái "thành công" khi kiểm tra lại mà đơn sai
 - **Type:** logic
-- **Scene(s):** BasicPickingScene, ComplexScene
-- **Files:** Assets/Scripts/PackageCounter.cs:119–142, Assets/Scripts/PiecesOrderValidator.cs:45, :50–56
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Scripts/WS Scripts/OrderConfirm.cs, Assets/Scripts/MixPickingValidator.cs, Assets/Scripts/PiecesOrderValidator.cs (+ event "nội dung thùng đổi" trong CalcForWMS, MixPickingContainer, PiecesContainerCounter)
 - **Problem:** Trainee làm đúng một lần, sau đó lấy bớt package ra rồi bấm kiểm tra lại. Lúc này feedback chuyển sang đỏ, nhưng `instructionText` vẫn ghi "successfully completed" (BasicPicking), hoặc `congratulationsPanel` vẫn hiện (Complex).
-- **Done when:** Trong cả hai scene, sau chuỗi đúng → lấy bớt → kiểm tra, màn hình chỉ còn thông báo sai: không còn chữ thành công và không còn panel chúc mừng.
+- **Done when:** Ở BasicPickingScene, MixedPickingScene và ComplexScene: sau chuỗi đúng → lấy bớt → bấm nút, màn hình chỉ còn thông báo sai: không còn chữ thành công, không còn thẻ `Correct` (Basic), không còn panel chúc mừng (Complex). Sau một lần bấm nút (đúng hoặc sai), đặt thêm hoặc lấy ra 1 kiện → kết quả cũ biến mất (Basic: cả hai thẻ `Correct`/`Incorrect` tắt; Mixed/Complex: `TXT_Feedback` trống, chúc mừng tắt, hướng dẫn trở về như lúc vào scene), và chỉ hiện lại khi bấm nút. (Đã gộp Bổ sung 2026-11-01; `PackageCounter` không còn nối với nút sau #1.)
 - **Inspector work expected:** no
 - **Công:** S
 - **Test trên kính:** không
@@ -107,7 +107,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Bổ sung (review UX):**
   - Ở Basic, trainee chỉ **thấy** thẻ `Correct`/`Incorrect` của `OrderConfirm` (feedback của `PackageCounter` nằm trên panel đang tắt, xem #1). Phần Basic của mục này phải xét cả hai thẻ đó.
   - Kết quả cũ còn hiện khi nội dung thùng đã đổi, tới lúc bấm lại mới cập nhật. Điều này đúng ở Basic (thẻ `Correct` vẫn bật khi Ist đã khác, Assets/Scripts/WS Scripts/OrderConfirm.cs:22–33), Mixed và Complex (`TXT_Feedback`, `Congratulations`). Thêm câu Done when: *Sau một lần xác nhận (đúng hoặc sai), đặt thêm hoặc lấy ra 1 kiện → kết quả cũ biến mất, chỉ hiện lại khi bấm nút.* Scene: thêm MixedPickingScene.
-- **Status:** todo
+- **Test report:** docs/test-reports/bl04.md
+- **Status:** verified-mcp (tất cả case MCP ✅ ở 3 scene, chờ test tay K5)
 
 ### #5 [P1] Menu ở BasicPickingScene thiếu nút sang ConceptScene
 - **Type:** bug

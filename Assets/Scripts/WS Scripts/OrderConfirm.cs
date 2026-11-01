@@ -7,16 +7,21 @@ public class OrderConfirm : MonoBehaviour
     private GameObject correct;
     [SerializeField]
     private GameObject incorrect;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    private void OnEnable()
     {
-        
+        if (calc != null)
+        {
+            calc.ContentsChanged += ClearResult;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDisable()
     {
-        
+        if (calc != null)
+        {
+            calc.ContentsChanged -= ClearResult;
+        }
     }
 
     public void OrderConfirmation()
@@ -29,6 +34,19 @@ public class OrderConfirm : MonoBehaviour
         {
             correct.SetActive(false);
             incorrect.SetActive(true);
+        }
+    }
+
+    // #4: an old result must not stay visible once the container content changes.
+    private void ClearResult()
+    {
+        if (correct != null)
+        {
+            correct.SetActive(false);
+        }
+        if (incorrect != null)
+        {
+            incorrect.SetActive(false);
         }
     }
 }

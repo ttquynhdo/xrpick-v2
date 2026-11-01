@@ -13,6 +13,32 @@ public class PiecesOrderValidator : MonoBehaviour
     [SerializeField] private GameObject congratulationsPanel;
     [SerializeField] private TMP_Text instructionText;
 
+    private string initialInstruction;
+
+    private void Awake()
+    {
+        if (instructionText != null)
+        {
+            initialInstruction = instructionText.text;
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (containerCounter != null)
+        {
+            containerCounter.ContentsChanged += ClearResult;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (containerCounter != null)
+        {
+            containerCounter.ContentsChanged -= ClearResult;
+        }
+    }
+
     private void Start()
     {
         if (feedbackText != null)
@@ -60,5 +86,28 @@ public class PiecesOrderValidator : MonoBehaviour
 
         feedbackText.color = Color.red;
         instructionText.text = string.Empty;
+
+        // #4: a wrong order after a correct one must not leave the panel visible.
+        if (congratulationsPanel != null)
+        {
+            congratulationsPanel.SetActive(false);
+        }
+    }
+
+    // #4: an old result must not stay visible once the container content changes.
+    private void ClearResult()
+    {
+        if (feedbackText != null)
+        {
+            feedbackText.text = string.Empty;
+        }
+        if (congratulationsPanel != null)
+        {
+            congratulationsPanel.SetActive(false);
+        }
+        if (instructionText != null)
+        {
+            instructionText.text = initialInstruction;
+        }
     }
 }
