@@ -26,7 +26,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - Song song, không đụng scene: ~~#26~~ (verified-mcp, merge `7533874`).
    - **Đóng đợt 1:** 10 mục `verified-mcp` đang chờ case test tay (#1 E4, #2 D5, #3/#15 T5, #4 K5, #9 E6, #24 S4, #34 R5, #38 P4, #26 L19 trên Quest + L20 trong Editor): gom vào buổi test kính kế tiếp để chuyển sang `done`.
 **Đợt kế tiếp (người dùng chọn 2026-11-01: "cả hai, gọn"), xong thì một buổi test kính:**
-   - Làm tuần tự trong cùng checkout, vì Unity Editor và UnityMCP chỉ mở được một project một lúc: ~~#27~~ (verified-mcp; WelcomeScene + màn cuối ComplexScene, decision 004) → #44 (nút kết thúc phiên, 5 scene) → #32 (ConceptScene) → #18 (BasicPickingScene, nhưng phần Menu đụng cả 5 scene nên làm sau cùng).
+   - Làm tuần tự trong cùng checkout, vì Unity Editor và UnityMCP chỉ mở được một project một lúc: ~~#27~~ (verified-mcp; WelcomeScene + màn cuối ComplexScene, decision 004) → ~~#44~~ (verified-mcp; nút kết thúc phiên, 5 scene) → #32 (ConceptScene) → #18 (BasicPickingScene, nhưng phần Menu đụng cả 5 scene nên làm sau cùng).
    - Xen kẽ, không đụng scene: `solution-decision` cho nguồn số lượng đơn (#6) và định dạng kết quả validator (#14, #28).
    - **Buổi test kính:** 10 ca của "Đóng đợt 1" + #27 + #44 + #32 + #18.
 2. **Đợt 2 – không kính, có phụ thuộc:**
@@ -654,7 +654,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** #27 (bàn phím để quay về)
 - **Decision:** docs/decisions/004-participant-keypad.md
 - **Bổ sung (review cuối #27, 2026-11-01):** sau `EndSession("facilitator")` mã đó có `session_end`, nên lần gõ lại sẽ hiện cảnh báo "đã có phiên hoàn tất" của #27 (hôm nay mọi `session_end` đều tính là hoàn tất, cả `quit`/`facilitator`). Chốt cùng #28 lý do nào được tính là "abgeschlossen".
-- **Status:** in progress (nhánh `feat/44-facilitator-end-session`)
+- **Test report:** docs/test-reports/bl44.md
+- **Status:** verified-mcp (33/38 ✅, chờ test tay Q1–Q5 trên Quest)
 
 ### #28 [Feature] Log kết quả mỗi lần xác nhận + mã lỗi + summary.csv
 - **Type:** feature
