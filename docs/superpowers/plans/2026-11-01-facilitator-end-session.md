@@ -16,6 +16,7 @@
 - A quick touch does nothing visible. Holding ≥ 3.0 s (`HoldSeconds = 3.0`) opens the confirm panel; releasing or leaving earlier cancels with nothing shown. A thin progress indicator may appear only after 0.5 s of continuous hold.
 - Confirm panel: `Sitzung wirklich beenden?` with `Abbrechen` and `Beenden`. `Abbrechen` closes the panel and the session keeps running. `Beenden` calls `ResearchLogger.EndSession("facilitator")` exactly once, then loads WelcomeScene via the scene's `SceneMenuController.OpenWelcome(true)`.
 - After `Beenden`, the last line of the events file is `session_end` with reason `facilitator` (ResearchLogger guarantees ordering) and WelcomeScene shows the keypad.
+- Note: after german-reviewer the cancel button became `Fortsetzen` (not `Abbrechen`); the strings and scenes use `Fortsetzen`.
 - Placement, same in all 5 scenes: outside the trainee's reach around the table and the Menu — on the trainee's left side, about x −0.80, y 1.40, z 0.10, facing the rig origin; nothing within ~0.6 m of the table front, the red button or `Menu` (0.66, 0.86, 0.45). The idle control is a small dark disc with no text.
 - The confirm panel's `Beenden` must not sit where the hold disc is (a continued press must not confirm).
 - Strings German (formal *Sie*), keys + EN + DE in `docs/i18n/strings-todo.csv`, `german-reviewer` before commit: `end.confirm.question` "End the session?" / "Sitzung wirklich beenden?", `end.confirm.cancel` "Cancel" / "Abbrechen", `end.confirm.end` "End" / "Beenden".

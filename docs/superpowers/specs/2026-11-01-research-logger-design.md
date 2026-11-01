@@ -114,7 +114,7 @@ One row per scene visit, appended on `scene_exit` and on `session_end` for the c
 
 The fake data in #26 already uses these shapes, so they are fixed here *(designer's call, after the data-analyst review)*. The in-code validator result type (pending decision with #14, `docs/coding-conventions.md` §5) can be shaped freely, as long as it maps 1:1 onto this log format.
 
-**Session end reasons.** #26 provides `ResearchLogger.EndSession(reason)` and writes `quit` itself. #28 calls `EndSession("completed")` on the first correct confirm in ComplexScene. #27 adds a hidden facilitator control that calls `EndSession("facilitator")`. `crash` is never a `session_end` reason: a crash is the absence of `session_end`. `analyse.R` derives `end_status` (completed / facilitator / quit / crash) itself and computes `course_finished` from a `task_completed` in ComplexScene, so a Quest session that skips the quit callback after finishing still counts as finished.
+**Session end reasons.** #26 provides `ResearchLogger.EndSession(reason)` and writes `quit` itself. #28 calls `EndSession("completed")` on the first correct confirm in ComplexScene. #44 adds a hidden facilitator control (decision 004 §9) that calls `EndSession("facilitator")`. `crash` is never a `session_end` reason: a crash is the absence of `session_end`. `analyse.R` derives `end_status` (completed / facilitator / quit / crash) itself and computes `course_finished` from a `task_completed` in ComplexScene, so a Quest session that skips the quit callback after finishing still counts as finished.
 
 **`confirm_pressed`** (one per press):
 ```json
