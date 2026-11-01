@@ -17,6 +17,16 @@ public class OrderLine
     public int soll;
     public int vpe;
 
+    // #10, docs/decisions/008: fields shown in the WMS dialog only (fake data in real formats, B10).
+    // Fake material number (Mat.-Nr), equal to PackageData.MaterialNumber of the cartons of this material.
+    public string materialNumber;
+
+    // Empf Kz: EKZ class as three digits, e.g. "003".
+    public string empfKz;
+
+    // Gew. in kg for the whole order line (question B12 still open).
+    public float weightKg;
+
     public OrderLine()
     {
     }

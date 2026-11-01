@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class PiecesContainerCounter : MonoBehaviour
+public class PiecesContainerCounter : MonoBehaviour, IWmsOrderSource
 {
     // #15: counters show only what is placed, never the required amount.
     // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
@@ -34,12 +34,21 @@ public class PiecesContainerCounter : MonoBehaviour
     // Pieces inside: every carton counts its VPE (#17 data), every loose piece counts one.
     public int TotalPieces { get; private set; }
 
+    // #10, decision 008: Rest = stock of the order material left in the scene after the full order
+    // (as CalcForWMS in Basic, decision 001). Set in Start, never changed by picking.
+    public int RestPieces { get; private set; }
+
+    OrderLine IWmsOrderSource.CurrentLine => orderLines.Count > 0 ? orderLines[0] : null;
+
+    int IWmsOrderSource.IstPieces => TotalPieces;
+
     // #4: raised when a package enters or leaves, so an old result can be cleared.
     public event Action ContentsChanged;
 
     private void Start()
     {
         OrderContents.LogSetupProblems(orderLines, true, orderLineTexts, this);
+        RestPieces = orderLines.Count > 0 ? OrderContents.StockInScene(orderLines[0].materialKey) - orderLines[0].soll : 0;
         Recalculate();
         UpdateOrderTexts();
     }

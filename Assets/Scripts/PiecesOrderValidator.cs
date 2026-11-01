@@ -11,7 +11,14 @@ public class PiecesOrderValidator : MonoBehaviour
     [SerializeField] private PiecesContainerCounter containerCounter;
     [SerializeField] private TMP_Text feedbackText;
     [SerializeField] private GameObject congratulationsPanel;
+
+    // #10, decision 008: the WMS dialog has no instruction line; the task text stays on the Instruction Table.
+    [Tooltip("Optional. Left empty when the scene uses the WMS dialog.")]
     [SerializeField] private TMP_Text instructionText;
+
+    // #10 (#33 Complex part): result card next to the red button; hidden until a confirm.
+    [Tooltip("Optional card that holds feedbackText; shown on confirm, hidden when the container changes.")]
+    [SerializeField] private GameObject resultCard;
 
     private string initialInstruction;
 
@@ -49,6 +56,10 @@ public class PiecesOrderValidator : MonoBehaviour
         {
             congratulationsPanel.SetActive(false);
         }
+        if (resultCard != null)
+        {
+            resultCard.SetActive(false);
+        }
     }
 
     public void ConfirmOrder()
@@ -57,8 +68,7 @@ public class PiecesOrderValidator : MonoBehaviour
         bool missing =
             RequiredReference.IsMissing(containerCounter, nameof(containerCounter), this) |
             RequiredReference.IsMissing(feedbackText, nameof(feedbackText), this) |
-            RequiredReference.IsMissing(congratulationsPanel, nameof(congratulationsPanel), this) |
-            RequiredReference.IsMissing(instructionText, nameof(instructionText), this);
+            RequiredReference.IsMissing(congratulationsPanel, nameof(congratulationsPanel), this);
 
         if (missing)
             return;
@@ -66,12 +76,20 @@ public class PiecesOrderValidator : MonoBehaviour
         // #6: one rule decides right/wrong (docs/decisions/005, 006).
         OrderResult result = containerCounter.CheckOrder();
 
+        if (resultCard != null)
+        {
+            resultCard.SetActive(true);
+        }
+
         if (result.Correct)
         {
             feedbackText.text = CorrectText;
             feedbackText.color = Color.green;
             congratulationsPanel.SetActive(true);
-            instructionText.text = string.Empty;
+            if (instructionText != null)
+            {
+                instructionText.text = string.Empty;
+            }
             return;
         }
 
@@ -79,7 +97,10 @@ public class PiecesOrderValidator : MonoBehaviour
         feedbackText.text =
             OrderFeedback.Title(FeedbackLanguage.English) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.English);
         feedbackText.color = Color.red;
-        instructionText.text = initialInstruction;
+        if (instructionText != null)
+        {
+            instructionText.text = initialInstruction;
+        }
 
         // #4: a wrong order after a correct one must not leave the panel visible.
         if (congratulationsPanel != null)
@@ -102,6 +123,10 @@ public class PiecesOrderValidator : MonoBehaviour
         if (instructionText != null)
         {
             instructionText.text = initialInstruction;
+        }
+        if (resultCard != null)
+        {
+            resultCard.SetActive(false);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class CalcForWMS : MonoBehaviour
+public class CalcForWMS : MonoBehaviour, IWmsOrderSource
 {
     public int currentSize;
     public int necessarySize;
@@ -25,7 +25,28 @@ public class CalcForWMS : MonoBehaviour
     [Tooltip("Pieces per carton (VPE).")]
     [SerializeField] private int vpe = 50;
 
-    public OrderLine OrderLine => new(materialKey, materialName, necessarySize, vpe);
+    // #10, decision 008: shown in the WMS dialog (fake data in real formats).
+    [Tooltip("Fake Mat.-Nr, equal to PackageData.MaterialNumber of the order cartons (#17).")]
+    [SerializeField] private string materialNumber = "443890";
+
+    [Tooltip("Empf Kz: EKZ class as three digits (decision 003: Basic is EKZ 3).")]
+    [SerializeField] private string empfKz = "003";
+
+    [Tooltip("Gew. in kg of the whole order line (fake).")]
+    [SerializeField] private float weightKg = 4.5f;
+
+    public OrderLine OrderLine => new(materialKey, materialName, necessarySize, vpe)
+    {
+        materialNumber = materialNumber,
+        empfKz = empfKz,
+        weightKg = weightKg
+    };
+
+    OrderLine IWmsOrderSource.CurrentLine => OrderLine;
+
+    int IWmsOrderSource.IstPieces => currentSize;
+
+    int IWmsOrderSource.RestPieces => restSize;
 
     // Packages counted in Ist, as PackageData for OrderRule.
     public IEnumerable<PackageData> PackagesInside

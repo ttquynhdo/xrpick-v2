@@ -7,6 +7,8 @@ Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ 
 Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tải nhận thức (`xr-ux-reviewer`, cả 5 scene, ảnh `TestEvidence/<Scene>/views/`, 2026-11-01). Góc/khoảng cách tính từ mắt (0, 1.6, 0). Vị trí nút đỏ là suy ra từ cấu trúc cha–con, chưa đo trong Play mode.
 **Cập nhật 2026-11-01 theo câu trả lời B1–B10, C1–C4, D1–D3** trong file câu hỏi (trả lời của nhóm, chưa phải của người hướng dẫn): mọi scene dùng **dialog mới** (`F6 Bestätigen`); Rest = tồn kho thùng kho, Ist theo cách lấy thật (B6, B7, B7a); dữ liệu giả cùng định dạng thật (B10); #22 ngoài phạm vi (D2); giữ thông tin kiện sau khi thả làm quiz quá dễ (D3). Câu A1–A6 vẫn mở.
 **Cập nhật 2026-11-01 (decision 003):** nhóm trả lời A1 (đơn Basic = tổng 300 chiếc) và D4–D7 (EKZ khi đặt hàng); thêm #41, bỏ chặn #1, #24. Sau đó nhóm trả lời nốt A2, A3, A5, A6, B3, B5, D1, chọn phương án C cho #34 (decision 001) và chốt mục 9 của spec log: không còn mục nào `blocked`.
+**Quy tắc màn hình (người dùng 2026-11-01, #10):** màn hình máy tính `WMS_Monitor` chỉ hiện WMS (dialog `WMS_Kommissionierung`). Hướng dẫn nằm trên thẻ ở bàn, kết quả xác nhận hiện trên thẻ cạnh nút đỏ (#33), không mục nào ghi hướng dẫn hay kết quả lên màn hình. Basic, Complex đã làm (#10); Mixed làm ở #21; Concept quyết định ở #45; Welcome không cần WMS (tuỳ chọn: đặt màn hình tắt để trạm làm việc giống các bài sau).
+
 Mỗi mục = 1 phiên làm việc = 1 nhánh. Không đánh số lại; mục xong thì ghi `done (commit …)`.
 
 **Trạng thái:** `todo` → `in progress` → `verified-mcp (x/y ✅, chờ test tay)` → `done (commit …, test x/x ✅)`; hoặc `blocked (lý do)`; mục bị bỏ ghi `dropped (lý do)`. Chỉ ghi `done` khi mọi case trong `docs/test-reports/bl<nn>.md` đều ✅, kể cả phần bạn test bằng tay. Các dòng **Bổ sung** được gộp vào **Done when** / **Scene(s)** khi bắt đầu làm mục đó.
@@ -24,7 +26,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
    - #25 mẫu thẻ hướng dẫn chung cho cả 5 scene (Basic đã xong phần Sie ở #18; Mixed/Complex còn "package type").
    - #33 kết quả cạnh nút đỏ (sau #14, #45).
    - #23 tổng kết cuối khoá + mục tiêu Welcome (không kính).
-   - #10 panel WMS giống dialog thật (L; đọc dữ liệu đơn từ `orderLines`/`CalcForWMS.OrderLine`) → #20, #21.
+   - #10 panel WMS giống dialog thật (decision 008: Basic + Complex, gồm phần Complex của #33; L) → #21 (Mixed dùng dialog, gồm phần Mixed của #33) → #46 dọn dẹp; #20 sau #10.
    - #39 phản hồi ở WelcomeScene.
    - #11 nền tảng DE/EN: phần Editor làm được trong đợt này; thử ConceptScene trên Quest cùng buổi test.
 2. **Đợt 4 – dịch** (không kính, chờ nội dung ổn định): #12 (sau #11, #25, #45) → #13.
@@ -378,6 +380,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** M–L
 - **Test trên kính:** nhanh (cầm/thả kiện, làm quiz)
 - **Depends on:** #17 (dữ liệu và nhãn 3 kiện Concept). Chạy song song được với #6 (khác scene). Câu hỏi mới cho người hướng dẫn: A9, A10, A11 (không chặn).
+- **Bổ sung (2026-11-01, #10):** Basic/Complex đã dùng màn hình máy tính `WMS_Monitor` thay TV; Concept chỉ có panel trơn 0,57 × 0,43 m không có màn hình. Đề xuất (chưa quyết, chạy `solution-decision` khi bắt đầu mục này): đặt `WMS_Monitor` với dialog ở chế độ chỉ xem (một đơn mẫu), nhãn chú thích nằm ngoài màn hình chỉ vào `Mat.-Nr`, `Verp.-Einh.`, `Soll`; lời giảng và quiz trên một bảng riêng bên cạnh, không đè lên màn hình (theo quy tắc màn hình ở đầu file). Đánh đổi cần cân: làm quen màn hình WMS sớm, bố cục giống các bài sau ↔ thêm thứ phải nhìn trong bài lý thuyết.
 - **Status:** todo (#17 đã verified-mcp)
 
 ### #33 [P1] Hiện kết quả xác nhận ngay cạnh nút đỏ
@@ -390,6 +393,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** M
 - **Test trên kính:** nhanh (thấy dòng kết quả khi bấm nút)
 - **Depends on:** #14 (nội dung feedback), #45 cho Concept (đã gộp #32). Có thể tách mỗi scene một nhánh.
+- **Bổ sung (2026-11-01, decision 008):** phần ComplexScene làm trong #10, phần MixedPickingScene làm trong #21. #33 chỉ còn ConceptScene (sau #45).
 - **Status:** todo
 
 ### #34 [P1] BasicPickingScene: Rest đếm ngược làm lộ đáp án
@@ -539,13 +543,42 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (ảnh Play mode):** Hiện có 3 kiểu panel trong 3 scene thực hành: Basic là dialog xám tiếng Đức (`Soll/Ist/Rest`, `EKZ`, `VPE: 50`), còn Mixed/Complex là panel đen tiếng Anh (`Order quantity`, `Package type`, `Package size`). Cùng một khái niệm có tên khác nhau giữa các bài (`Soll` ↔ `Order quantity`, `VPE: 50` ↔ `50 pcs / package`). Hơn nữa, màn hình giống thật lại xuất hiện *trước* màn hình đơn giản. Khi làm mục này thì dùng **một mẫu** cho cả 3 scene, với tên trường thật.
 - **Bổ sung (review UX):** Ở Mixed, cột giá trị trong `TXT_Description` lệch nhau vì dùng lẫn tab và dấu cách. Khi dựng panel mới, nên dùng TMP riêng cho nhãn và cho giá trị.
 - **Bổ sung (2026-11-01, trả lời B1–B10):** Dựng theo dialog mới (B8); màu tương đối, dùng cột "Đề xuất cho UI" của spec (B1); không có số khoanh tròn đỏ (B2); không highlight ô Anweisung (B4); chỉ `F6 Bestätigen` có chức năng, các nút F khác chỉ hiển thị (B9); dữ liệu giả theo bảng định dạng trong spec (B10). B3 (2026-11-01): ô `Empf Kz` có nền màu (006 đỏ, 000 xám, 003 vàng). B5: chỉ vùng dialog.
-- **Done when:** Trong Play mode, đặt panel cạnh ảnh gốc: bố cục, chữ và trạng thái chỉ báo khớp với spec. Panel chỉ có vùng dialog, không có thanh tiêu đề/menu/thanh trạng thái của MdiShell (B5). Ô `Empf Kz` có nền đỏ khi `006`, xám khi `000`, vàng khi `003` (B3). Bấm `F6 Bestätigen` thì đơn được kiểm tra; bấm các nút F khác thì không có gì xảy ra. Rest hiện tồn kho còn lại trong thùng kho, Ist theo cách lấy của đơn (đếm tay: bằng Soll; cân: tăng dần), theo quyết định của #34. Mã vật tư, tên hàng và số liệu là dữ liệu giả, cùng định dạng với spec. Không có ảnh hay tài liệu gốc nào nằm trong `Assets/`.
+- **Decision:** docs/decisions/008-wms-dialog-panel.md, docs/decisions/009-wms-indicators-off.md (đèn R2 tắt hết) (phương án C: prefab dialog đầy đủ cho Basic và Complex; Mixed làm cùng #21; dọn field cũ ở #46; nút đỏ = bàn đạp; phần Complex của #33 gộp vào đây)
+- **Done when** (decision 008):
+  - BasicPickingScene, Play, view `wms_wide` đặt cạnh `slide07_img1.jpg`: panel có đủ R1–R6 theo spec (12 chỉ báo đúng chữ, 14 phím F đúng thứ tự R6, nhãn `Empf Kz:`, `Verp.-Einh.:`, `Mat.-Nr:`, `Bez.:`, `Karton:`, `Gew.:`, `Anweisung` đúng từng ký tự); không có thanh tiêu đề/menu/thanh trạng thái MdiShell; không còn `Auftrags-Nr`, `Pick: 1/1`, `EKZ Hinweis`, `EKZ:`, các thanh xanh trong ô Anweisung.
+  - BasicPickingScene lúc vào scene: Soll `300`, Ist `0`, Rest = tồn kho thùng kho − 300, đơn vị `ST`; Mat.-Nr `443890`, Bez. `SCHLAUCHSCHELLE B`; Empf Kz `003` nền vàng; Gew. có dấu phẩy thập phân; Karton và Anweisung trống, không tô; `Modus` `Kommissionierung`; cả 12 chỉ báo R2 tắt (không nền, chữ xám), decision 009.
+  - BasicPickingScene: đặt 1 carton → Ist +50; lấy ra → Ist −50; Rest không đổi.
+  - BasicPickingScene: 6 carton, bấm nút đỏ → thẻ `Correct`, phím `F6 Bestätigen` hiện trạng thái *pressed* ~0,3 s; 5 carton, bấm → thẻ `Incorrect`, F6 cũng nháy.
+  - Poke hoặc ray vào bất kỳ phím F nào → không hover, không kết quả, Console không log mới.
+  - Đổi Empf Kz của đơn sang `006` → nền đỏ; `000` → nền xám. Đổi Soll hoặc Mat.-Nr của đơn trong Inspector → dialog hiện số mới. Mat.-Nr của đơn khác `PackageData.MaterialNumber` của carton cùng khoá → Console có một lỗi nêu tên object.
+  - Panel ~0,87 × 0,55 m ở chỗ cũ, nghiêng về phía mắt; trong view `overview` mép dưới R5 không bị thùng hay bàn che.
+  - (người dùng 2026-11-01) Basic và Complex không còn TV: dialog nằm trong prefab màn hình máy tính `WMS_Monitor` (viền mỏng vừa dialog, cột + đế sau bàn), cùng vị trí (0.06, 1.26, 1.066) và cùng cỡ ở cả hai scene; panel `Congratulations` không chồng lên viền màn hình.
+  - ComplexScene lúc vào scene: Soll `55`, Ist `0`, Rest = tồn kho Ring D trong scene − 55; Mat.-Nr `264857`, Bez. `RING D`, Empf Kz `000` nền xám, mọi chỉ báo R2 tắt. Đặt 1 carton → Ist `25`; thêm 1 chiếc lẻ → Ist `26`; Rest không đổi. Panel không còn `Cartons placed`, `Ist: n ST` riêng, câu "Look below…".
+  - ComplexScene: 2 carton + 5 chiếc lẻ, bấm nút đỏ → kết quả đúng hiện trên thẻ trong khoảng 0,15 m quanh nút, không hiện trên dialog; 1 carton, bấm → kết quả sai ở cùng chỗ (phần Complex của #33). `Congratulations` không che dialog.
+  - Trên Quest, từ chỗ đứng: đọc được Soll, Ist, Rest, Mat.-Nr, Empf Kz và chữ `F6 Bestätigen` ở cả hai scene (test tay).
+  - Mọi nhãn mới có key trong `localize-strings`, giống từng ký tự ở `en` và `de`. (code) Không có ảnh hay tài liệu gốc trong `Assets/`; không ghi text trong `Update`. Console không có lỗi mới.
+- **Done when (bản cũ, thay bởi trên):** Trong Play mode, đặt panel cạnh ảnh gốc: bố cục, chữ và trạng thái chỉ báo khớp với spec. Panel chỉ có vùng dialog, không có thanh tiêu đề/menu/thanh trạng thái của MdiShell (B5). Ô `Empf Kz` có nền đỏ khi `006`, xám khi `000`, vàng khi `003` (B3). Bấm `F6 Bestätigen` thì đơn được kiểm tra; bấm các nút F khác thì không có gì xảy ra. Rest hiện tồn kho còn lại trong thùng kho, Ist theo cách lấy của đơn (đếm tay: bằng Soll; cân: tăng dần), theo quyết định của #34. Mã vật tư, tên hàng và số liệu là dữ liệu giả, cùng định dạng với spec. Không có ảnh hay tài liệu gốc nào nằm trong `Assets/`.
 - **Inspector work expected:** yes (dựng Canvas, gán reference)
 - **Công:** L
 - **Test trên kính:** nhanh (so bố cục, đọc chữ panel trên kính)
 - **Depends on:** #1 (dữ liệu đơn), #34 (cách hiện Ist/Rest). Có thể dựng bố cục trước khi hai mục này xong.
 - **Bổ sung (2026-11-01, rà backlog sau #6/#14/#17/#18):** dữ liệu đơn đã có một nguồn: `orderLines` (`OrderLine` {materialKey, materialName, soll, vpe}) trên counter Mixed/Complex, text WMS sinh từ đó lúc Start (`orderLineTexts`); Basic dùng `CalcForWMS.OrderLine` (Soll = `necessarySize`). Panel mới phải đọc từ đó, không gõ số tay. Nhãn panel EN Mixed/Complex còn ghi "Order quantity"/"Package size" (german-reviewer #14: đổi "Package size" thành VPE khi dựng panel). Basic: ô Anweisung vẫn hiện ba thanh xanh đậm (B4: không highlight). Mat.-Nr giả và tên vật tư theo #17 (`docs/i18n/glossary.csv`).
-- **Status:** todo (#1, #34 đã verified-mcp)
+- **Bổ sung (2026-11-01, người dùng):** các đèn chỉ báo R2 (Referenzwaage, Behälterwaage, Zählen, letzter Pick, …) **không dùng trong kịch bản XR training**: không có bài tập nào yêu cầu cân hay đổi cách đếm theo đèn. Thiết kế lại cho hợp lý: giữ bố cục R2 để giống màn hình thật nhưng không để đèn gây chú ý (ví dụ tất cả tắt/xám, bỏ logic `CountingMethod` khỏi hiển thị), và không dạy/chấm theo đèn ở #20. Cần chốt cách làm (solution-decision hoặc sửa decision 008) trước khi đóng #10.
+- **Test report:** docs/test-reports/bl10.md
+- **Status:** verified-mcp (25/25 MCP/code ✅, chờ test tay H1–H3; nhánh `feat/10-wms-dialog`)
+
+### #46 [P3] Dọn field text cũ sau khi có dialog WMS chung
+- **Type:** cleanup
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Scripts/WS Scripts/CalcForWMS.cs (`istText`, `sollText`, `restText`), Assets/Scripts/MixPickingContainer.cs (`packageCountText`, `orderLineTexts`), Assets/Scripts/PiecesContainerCounter.cs (`piecesPlacedText`, `packagesPlacedText`, `orderLineTexts`)
+- **Problem:** Sau #10 và #21, dialog chung tự hiện Soll/Ist/Rest và dòng đơn; các field text cũ trên counter chỉ còn để chuyển tiếp (decision 008 §10).
+- **Done when:** (code) Không counter nào còn ghi trực tiếp vào TMP của panel WMS; chỉ view của dialog ghi. Cả 3 scene chạy như trước (regression B1–B5, M1–M5, X1–X5), Console không lỗi. `scene-ref-auditor` không còn tham chiếu tới các field đã gỡ.
+- **Inspector work expected:** no (gỡ field; chạy `scene-ref-auditor` trước)
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** #10, #21
+- **Decision:** docs/decisions/008-wms-dialog-panel.md
+- **Status:** todo (sau #10, #21)
 
 ### #19 [Feature] ComplexScene: tách thành hai bước, có ví dụ phép chia có dư
 - **Type:** feature
@@ -559,6 +592,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #3, #16, #17. A3 (2026-11-01): kiện là carton của một mã vật tư; bước "tự lấy hàng lẻ từ carton đã mở" được phép.
 - **Bổ sung (2026-11-01):** Chuyển từ #22 (đã bỏ) sang đây tình huống **Anbruchmenge**: theo Detail Description mục 5.12, khi mở một VPE mà còn dư thì phần dư phải cất vào một Modul. Bước (a) của mục này tạo đúng tình huống đó, nên nên có bước cất phần dư (hoặc ít nhất nhắc đến).
 - **Bổ sung (2026-11-01, rà backlog sau #6/#14/#17):** đơn Complex giờ khai báo bằng `orderLines` trên `PiecesContainerCounter` (Soll + VPE, #6) và chấm bằng `OrderRule` (thành phần carton nguyên + chiếc lẻ, A7 còn mở). Ring D = `ring_d`, VPE 25 ở mọi nơi (#17). Carton Ring D đã mở hiện được tính là carton nguyên (TOO_MANY) và không cầm được; nếu bước (b) cho trainee tự lấy hàng lẻ từ carton mở thì cần nhánh riêng trong `OrderContents.From` (review data-analyst #6).
+- **Bổ sung (2026-11-01, decision 008):** từ #10, Ist trên dialog tăng dần khi cân, nên phép chia có dư (55 = 2×25 + 5) không còn được chấm qua việc đặt hàng; #19 nên kiểm phép chia trực tiếp (ví dụ hỏi "Wie viele Kartons?" trước khi cầm kiện).
 - **Status:** todo (#3, #16, #17 đã xong hoặc verified-mcp)
 
 ### #20 [Feature] Dạy Soll/Ist/Rest, EKZ, Anweisung trước khi dùng
@@ -572,6 +606,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** nhanh (đọc bước dạy trên kính)
 - **Depends on:** #10; câu trả lời B3, B4, B6 (đã có)
 - **Bổ sung (2026-11-01):** B6 đã chốt: Rest = tồn kho còn lại trong thùng kho. B4: ô Anweisung không highlight, nên phần dạy Anweisung chỉ dạy nội dung chữ. B3 (màu ô Empf Kz) còn mở, không chặn phần dạy nghĩa của EKZ.
+- **Bổ sung (2026-11-01):** đèn chỉ báo R2 không dùng trong kịch bản XR training (xem #10) → không dạy nghĩa từng đèn, chỉ nói ngắn "vùng này không dùng trong bài tập".
 - **Status:** todo (sau #10)
 
 ### #21 [Feature] MixedPickingScene: nhặt tuần tự từng vị trí như dialog thật
@@ -579,12 +614,13 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** MixedPickingScene
 - **Files:** MixedPickingScene `[Info Panel]/TXT_Description`, `TXT_Description (1)`, Assets/Scripts/MixPickingContainer.cs, Assets/Scripts/MixPickingValidator.cs
 - **Problem:** Dialog thật xử lý từng vị trí một (`Pick 1/2`, `2/2`). Mixed hiện hai dòng đơn cạnh nhau trên một panel, và không có bộ đếm riêng cho từng vật tư, nên lỗi chỉ lộ ra khi xác nhận.
-- **Done when:** Trainee làm vị trí 1, xác nhận, rồi panel chuyển sang vị trí 2. Mỗi vị trí có Ist riêng.
+- **Done when:** Trainee làm vị trí 1, xác nhận, rồi panel chuyển sang vị trí 2. Mỗi vị trí có Ist riêng. Mixed dùng cùng prefab `WMS_Monitor` + dialog như Basic/Complex (bỏ TV), cùng vị trí và cỡ.
 - **Inspector work expected:** yes
 - **Công:** L
 - **Test trên kính:** nhanh (làm lần lượt 2 vị trí)
 - **Depends on:** #10; câu trả lời B8 (đã có, 2026-11-01: dialog mới). Đơn của Mixed theo A5 (nhóm, 2026-11-01): giữ số hiện tại.
 - **Bổ sung (2026-11-01, #6):** hai vị trí đã là hai `OrderLine` trên `MixedPickingContainer`; mỗi dòng có `PlacedFull` riêng trong `OrderResult`, nên Ist theo từng vị trí lấy được từ đó.
+- **Bổ sung (2026-11-01, decision 008):** Mixed dựng dialog chung của #10 ở đây. Thêm Done when: MixedPickingScene dùng cùng prefab dialog, mỗi lần một vị trí; `Mehrfachpick` bật ở cả hai vị trí, `letzter Pick` chỉ bật ở vị trí 2; mỗi vị trí có Ist riêng; không còn `PACKAGE PLACED`; kết quả hiện trên thẻ cạnh nút đỏ (phần Mixed của #33). Câu hỏi B14 (Mehrfachpick "1/2"), B15 (`F4 Übersicht`).
 - **Status:** todo (sau #10)
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
