@@ -668,7 +668,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** nhanh (xem thùng chạy đi, kiện không rơi)
 - **Depends on:** #35 (dời thẻ và Menu khỏi mép bàn trước), #41 (cùng đụng thùng đơn); D11 (tự chạy hay đẩy tay: nếu đẩy tay thì Done when đổi thành trainee đẩy thùng); D10 (xác nhận đọc ảnh). Làm trước #30.
 - **Decision:** docs/decisions/011-workstation-layout-conveyor.md (thùng tự trượt, kinematic, trigger là con của thùng; không có thùng rỗng mới; Done when đầy đủ ở mục *Done when / #47* của 011, thay các câu trên)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl47.md
+- **Status:** verified-mcp (MCP/code 8/8 ✅, chờ test tay H1, H2 trên kính; nhánh `feat/47-conveyor` tách từ `feat/35-shelf-menu`)
 
 ### #48 [P3] Bàn phím tĩnh dưới màn hình WMS
 - **Type:** cleanup

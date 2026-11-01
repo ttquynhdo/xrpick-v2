@@ -1,8 +1,14 @@
+using System;
 using TMPro;
 using UnityEngine;
 
-public class OrderConfirm : MonoBehaviour
+public class OrderConfirm : MonoBehaviour, IOrderCompletion
 {
+    // #47: raised once when the order is correct; later confirms and content changes are ignored.
+    public bool IsCompleted { get; private set; }
+
+    public event Action OrderCompleted;
+
     public CalcForWMS calc;
     [SerializeField]
     private GameObject correct;
@@ -54,6 +60,10 @@ public class OrderConfirm : MonoBehaviour
 
     public void OrderConfirmation()
     {
+        // #47: the order is shipped; the result stays as it is.
+        if (IsCompleted)
+            return;
+
         // Non-short-circuit | so every missing reference is logged at once.
         bool missing =
             RequiredReference.IsMissing(calc, nameof(calc), this) |
@@ -80,6 +90,8 @@ public class OrderConfirm : MonoBehaviour
         {
             correct.SetActive(true);
             incorrect.SetActive(false);
+            IsCompleted = true;
+            OrderCompleted?.Invoke();
         }
     }
 
@@ -93,6 +105,9 @@ public class OrderConfirm : MonoBehaviour
     // #4: an old result must not stay visible once the container content changes.
     private void ClearResult()
     {
+        if (IsCompleted)
+            return;
+
         if (correct != null)
         {
             correct.SetActive(false);

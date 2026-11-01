@@ -9144,7 +9144,38 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 786606228}
+    - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 916427141}
   m_SourcePrefab: {fileID: 100100000, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
+--- !u!65 &916427140 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 6622762758620054013, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
+  m_PrefabInstance: {fileID: 916427139}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &916427141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786606210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6ec58192cd17cd43bd9fda85a325a55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrderBoxConveyor
+  validator: {fileID: 786606224}
+  containerTrigger: {fileID: 916427140}
+  travel: {x: 0, y: 0, z: 0.9}
+  duration: 2
+  carriedWithContainer:
+  - {fileID: 1888890480}
+  - {fileID: 1342360181}
+  - {fileID: 857841241}
+  - {fileID: 74329910}
+  - {fileID: 74952658}
+  - {fileID: 273594242}
 --- !u!1 &945836297
 GameObject:
   m_ObjectHideFlags: 0
@@ -12773,6 +12804,63 @@ MonoBehaviour:
   _defaultInteractable: {fileID: 0}
   _timeOutInteractable: {fileID: 0}
   _timeOut: 0
+--- !u!1001 &1472223577
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6815139078361346349, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_Name
+      value: RollerConveyor
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
 --- !u!1001 &1481610445
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18740,3 +18828,4 @@ SceneRoots:
   - {fileID: 444500569}
   - {fileID: 302949896}
   - {fileID: 1752891556}
+  - {fileID: 1472223577}

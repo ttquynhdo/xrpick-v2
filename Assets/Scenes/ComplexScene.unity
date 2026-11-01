@@ -8163,6 +8163,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7304294841493536581, guid: a7d9036a77dc02244a55f692f1e2642a, type: 3}
   m_PrefabInstance: {fileID: 953846181}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &957313322
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 150141876400999482, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6815139078361346349, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
+      propertyPath: m_Name
+      value: RollerConveyor
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cf773fa4feabaf240b42e2c7c814eb86, type: 3}
 --- !u!1001 &958403462
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8752,6 +8809,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1019723391}
+    - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1019723393}
   m_SourcePrefab: {fileID: 100100000, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
 --- !u!1 &1019723390 stripped
 GameObject:
@@ -8781,6 +8841,28 @@ MonoBehaviour:
   piecesPlacedText: {fileID: 0}
   packagesPlacedText: {fileID: 0}
   orderLineTexts: []
+--- !u!65 &1019723392 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 6622762758620054013, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
+  m_PrefabInstance: {fileID: 1019723389}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1019723393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019723390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6ec58192cd17cd43bd9fda85a325a55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrderBoxConveyor
+  validator: {fileID: 1933170180}
+  containerTrigger: {fileID: 1019723392}
+  travel: {x: 0, y: 0, z: 0.9}
+  duration: 2
+  carriedWithContainer: []
 --- !u!1 &1022127615
 GameObject:
   m_ObjectHideFlags: 0
@@ -20223,3 +20305,4 @@ SceneRoots:
   - {fileID: 1600235007}
   - {fileID: 1236853930}
   - {fileID: 697982874}
+  - {fileID: 957313322}

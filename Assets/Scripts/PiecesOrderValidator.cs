@@ -1,8 +1,14 @@
+using System;
 using TMPro;
 using UnityEngine;
 
-public class PiecesOrderValidator : MonoBehaviour
+public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
 {
+    // #47: raised once when the order is correct; later confirms and content changes are ignored.
+    public bool IsCompleted { get; private set; }
+
+    public event Action OrderCompleted;
+
     // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get. Last lesson: the Congratulations panel
     // tells the trainee what to do next. #25: German (Sie) like the cards.
     private const string CorrectText = "Richtig! Volle Kartons und loses Material stimmen mit dem Auftrag überein."; // complex.feedback.correct
@@ -64,6 +70,10 @@ public class PiecesOrderValidator : MonoBehaviour
 
     public void ConfirmOrder()
     {
+        // #47: the order is shipped; the result stays as it is.
+        if (IsCompleted)
+            return;
+
         // Non-short-circuit | so every missing reference is logged at once.
         bool missing =
             RequiredReference.IsMissing(containerCounter, nameof(containerCounter), this) |
@@ -90,6 +100,8 @@ public class PiecesOrderValidator : MonoBehaviour
             {
                 instructionText.text = string.Empty;
             }
+            IsCompleted = true;
+            OrderCompleted?.Invoke();
             return;
         }
 
@@ -112,6 +124,9 @@ public class PiecesOrderValidator : MonoBehaviour
     // #4: an old result must not stay visible once the container content changes.
     private void ClearResult()
     {
+        if (IsCompleted)
+            return;
+
         if (feedbackText != null)
         {
             feedbackText.text = string.Empty;
