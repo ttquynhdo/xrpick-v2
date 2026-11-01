@@ -1,2 +1,38 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Unity serializes YAML assets with LF. Check them out as LF too, so a
+# Windows checkout (core.autocrlf=true) doesn't flip them to CRLF and make
+# every Editor save show up as a line-ending-only modification.
+*.unity        text eol=lf
+*.prefab       text eol=lf
+*.asset        text eol=lf
+*.meta         text eol=lf
+*.mat          text eol=lf
+*.anim         text eol=lf
+*.controller   text eol=lf
+*.overrideController text eol=lf
+*.mask         text eol=lf
+*.physicMaterial text eol=lf
+*.physicsMaterial2D text eol=lf
+*.playable     text eol=lf
+*.signal       text eol=lf
+*.mixer        text eol=lf
+*.renderTexture text eol=lf
+*.lighting     text eol=lf
+*.preset       text eol=lf
+*.spriteatlas  text eol=lf
+*.terrainlayer text eol=lf
+*.mesh         text eol=lf
+*.cubemap      text eol=lf
+*.flare        text eol=lf
+*.guiskin      text eol=lf
+*.fontsettings text eol=lf
+*.brush        text eol=lf
+*.shadergraph  text eol=lf
+*.shadersubgraph text eol=lf
+*.inputactions text eol=lf
+*.vfx          text eol=lf
+ProjectSettings/*.txt text eol=lf
+ProjectSettings/*.json text eol=lf
+Packages/*.json text eol=lf
