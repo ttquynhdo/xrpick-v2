@@ -713,6 +713,19 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test report:** docs/test-reports/bl50.md
 - **Status:** verified-mcp (12/14 ✅, chờ test tay H1 xem cả chuyến + FPS, H2 kiện đang cầm ở lại; theo giả định D11, D15)
 
+### #51 [P2] Bàn sau đỡ màn hình đứng trên bàn làm việc, không chân chạm sàn
+- **Type:** cleanup
+- **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Prefabs/RearBench.prefab
+- **Problem:** Người dùng báo trên kính (2026-11-02, ảnh ConceptScene): bàn sau đỡ màn hình WMS có hai chân sau dài chạm xuống sàn, trông kỳ so với trạm thật, nơi giá màn hình đứng trên bàn làm việc. Nguyên nhân: mặt bàn làm việc (`Desk`, prefab mẫu của SDK) chỉ kéo tới z 1,10, còn chân sau của `RearBench` ở z 1,48.
+- **Done when:** Ở cả 4 scene, ảnh nhìn ngang cho thấy cả 4 chân của bàn sau đứng trên mặt bàn làm việc (đáy chân ≈ y 0,77, trong vùng z 0,30–1,10), không chân nào chạm sàn. Màn hình WMS vẫn ở chỗ cũ, đế màn hình nằm trọn trên mặt bàn sau. Ở Basic, Mixed, Complex, thùng kho và thùng đơn vẫn nằm dưới bàn sau mà không chạm chân hay mặt bàn; thùng đơn vẫn chạy hết tuyến của #50.
+- **Inspector work expected:** no (sửa prefab bằng code)
+- **Công:** S
+- **Test trên kính:** nhanh (nhìn bàn sau và màn hình từ chỗ đứng)
+- **Depends on:** #47, #50
+- **Test report:** docs/test-reports/bl51.md
+- **Status:** verified-mcp (3/4 ✅, chờ test tay H1: nhìn bàn sau trên kính)
+
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
 - **Scene(s):** chưa quyết định (có thể thêm vào Mixed/Complex)
