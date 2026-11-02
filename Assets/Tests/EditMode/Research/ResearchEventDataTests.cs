@@ -85,7 +85,7 @@ namespace XRPick.Research.Tests
         public void Header_CarriesSessionStartMode(string mode, string expected)
         {
             string json = ResearchEventData.Header("0.1.0", "868fea7", "Quest", "Android", "P101", "s1", mode,
-                "controllers", 72).ToJson();
+                "DE", "controllers", 72).ToJson();
             StringAssert.Contains(expected, json);
             StringAssert.StartsWith("{\"schema_version\":1,", json);
         }
@@ -130,11 +130,30 @@ namespace XRPick.Research.Tests
                 ResearchEventData.SessionStart("ConceptScene", true).ToJson());
         }
 
+        [TestCase("DE")]
+        [TestCase("EN")]
+        public void Header_CarriesLanguage(string language)
+        {
+            string json = ResearchEventData.Header("0.1.0", "868fea7", "Quest", "Android", "P901", "s1",
+                ResearchEventData.StartModeManual, language, "hands", 72).ToJson();
+            StringAssert.Contains("\"language\":\"" + language + "\"", json);
+        }
+
+        [TestCase("P101", "EN", "DE")]
+        [TestCase("P101", "DE", "DE")]
+        [TestCase("P901", "EN", "EN")]
+        [TestCase("P000", "EN", "EN")]
+        [TestCase("P901", "DE", "DE")]
+        public void SessionLanguage_ResearchCodesAreGerman(string id, string chosen, string expected)
+        {
+            Assert.AreEqual(expected, ResearchIds.SessionLanguage(id, chosen));
+        }
+
         [Test]
         public void Header_NullsStayNull()
         {
             string json = ResearchEventData.Header("0.1.0", null, "Quest", "Android", "P101", "s1",
-                ResearchEventData.StartModeAuto, null, null).ToJson();
+                ResearchEventData.StartModeAuto, null, null, null).ToJson();
             StringAssert.Contains("\"build\":null", json);
             StringAssert.Contains("\"language\":null", json);
             StringAssert.Contains("\"input_mode_at_start\":null", json);

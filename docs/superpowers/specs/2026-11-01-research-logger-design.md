@@ -144,7 +144,7 @@ The fake data in #26 already uses these shapes, so they are fixed here *(designe
 - **Error spam:** repeated `unity_error` with the same message within 5 s is folded into one line with `folded_count` (the repeats before that line) and `n_errors` (errors the line stands for: 1, `folded_count` + 1 after the window, `folded_count` on the visit-close line; R sums `n_errors`), and errors are capped per session (e.g. 200 lines, then one `unity_error_cap_reached`). File paths in messages are cut to the file name, so no `C:\Users\<name>` reaches the log.
 - **Time:** `t` uses `Time.realtimeSinceStartupAsDouble`. Every time or length field carries its unit (`_s`, `_m`) and is active time unless named `_wall_s`.
 - **Header line** carries `"event":"header"` so R can recognise it.
-- **Language:** in research mode (non-test ID) the language is locked to DE and logged in the header. A `language_change` event exists for test mode.
+- **Language:** in research mode (non-test ID) the language is locked to DE and logged in the header. Since #11 the language is fixed per session (chosen on the keypad before the code), so there is no `language_change` event.
 - **Build identity** (`build`, `schema_version`) is also a column in `summary.csv`.
 
 ## 8. Analysis rules (`analyse.R`)

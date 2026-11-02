@@ -21,7 +21,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
-- **Sau #40 (2026-11-02):** #40 verified-mcp (decision 017), chờ test kính H1–H3 cùng buổi với #19, #21, #36, #39, #50–#52, #53. #53 verified-mcp (thẻ 1 nhắc quiz, giả định D20). Tiếp theo: #11 → #12 → #13, rồi đợt 6.
+- **Sau #40 (2026-11-02):** #40 verified-mcp (decision 017), chờ test kính H1–H3 cùng buổi với #19, #21, #36, #39, #50–#52, #53. #53 verified-mcp (thẻ 1 nhắc quiz, giả định D20). #11 verified-mcp (2026-11-02, nền tảng DE/EN, chờ build ConceptScene trên Quest L9 + chạm nút L10). Tiếp theo: #12 → #13, rồi đợt 6.
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
@@ -533,14 +533,24 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** tất cả (nút chọn ngôn ngữ đặt ở WelcomeScene)
 - **Files:** Packages/manifest.json (`com.unity.localization`), String Table Collection `UI` (locale `de` mặc định, `en`), script lưu lựa chọn ngôn ngữ
 - **Problem:** End user là người Đức bản ngữ và không đọc được tiếng Anh, trong khi toàn bộ app hiện là tiếng Anh. Đội phát triển lại cần tiếng Anh để test.
-- **Done when:** WelcomeScene có nút **Deutsch / English** cạnh canvas `Welcome`; Menu của các scene không có nút này. Lần chạy đầu (chưa có lựa chọn đã lưu), text mẫu ở mỗi scene hiện tiếng Đức. Bấm `English` ở WelcomeScene thì scene tải lại và text mẫu hiện tiếng Anh; chọn ConceptScene trong Menu thì text mẫu ở đó cũng là tiếng Anh. Thoát rồi mở lại app vẫn là tiếng Anh. ConceptScene (scene thử) chạy được trên Quest với package Localization; ghi lại thời gian build và có nhấp nháy ở frame đầu hay không. Dùng một key không tồn tại thì Console có `LogError` ghi tên key và TMP hiện tên key, không để trống. Một chuỗi runtime có placeholder (bộ đếm ở Concept) hiện đúng số ở cả `de` và `en`.
+- **Done when:** (viết lại 2026-11-02 khi bắt đầu, gồm Bổ sung #26; text mẫu = tiêu đề thẻ 1 „Aufgabe“ `common.card.task_title`, chuỗi runtime = tiến độ quiz `concept.quiz.progress`)
+  - WelcomeScene có hàng nút **Deutsch / English** ở cuối bàn phím nhập mã (chỉ hiện cùng bàn phím, tức là trước khi bắt đầu phiên); Menu của 5 scene không có nút này. *(đổi từ „cạnh canvas `Welcome`“: canvas đó ở z 1.10, ngoài tầm chạm, và đây là khu của người điều phối)*
+  - Lần chạy đầu (chưa có lựa chọn đã lưu): tiêu đề thẻ 1 ở cả 5 scene là „Aufgabe“.
+  - Bấm `English` ở WelcomeScene thì scene tải lại và thẻ 1 là „Task“; nhập mã thử rồi chọn ConceptScene trong Menu thì thẻ 1 ở đó cũng là „Task“. Bấm `Deutsch` thì tải lại và thẻ 1 là „Aufgabe“.
+  - Thoát rồi mở lại app (dừng/Play lại trong Editor) vẫn là tiếng Anh.
+  - Dòng tiến độ quiz ở ConceptScene sau câu 1 đúng: `de` „Frage 2 von 4“, `en` „Question 2 of 4“.
+  - Dùng một key không tồn tại (qua `Loc.Get` và qua `LocalizeStringEvent`) thì Console có `LogError` ghi tên key và TMP hiện tên key, không để trống.
+  - Header log có `language` = `DE`/`EN` theo ngôn ngữ đang chọn; chọn English rồi nhập mã nghiên cứu (vd. P101) thì header là `DE` và thẻ 1 về „Aufgabe“. Ngôn ngữ cố định suốt phiên nên không có sự kiện `language_change` (spec §3, §9 đã sửa, data-analyst duyệt).
+  - ConceptScene chạy được trên Quest với package Localization; ghi lại thời gian build và có nhấp nháy ở frame đầu hay không.
+  - (code) Chỉ một chỗ đọc ngôn ngữ hiện tại: `Loc.CurrentLanguage`.
 - **Inspector work expected:** yes (cài package, tạo Localization Settings và locale, gắn `LocalizeStringEvent`)
 - **Công:** M
 - **Test trên kính:** nhanh (ConceptScene thử package Localization trên Quest: chữ Đức hiện đúng, thời gian build, nhấp nháy frame đầu)
 - **Depends on:** —
 - **Decision:** docs/decisions/002-localization-mechanism.md
-- **Bổ sung (2026-11-01, từ #26):** header của log nghiên cứu có trường `language` (hiện `null`). Trước khi thu dữ liệu thật, `language` phải khác `null` (ghi `DE`/`EN` lúc bắt đầu phiên) và phải có sự kiện `language_change` cho chế độ thử. Ở chế độ nghiên cứu (mã ngoài dải thử) ngôn ngữ khoá ở DE.
-- **Status:** todo
+- **Bổ sung (2026-11-01, từ #26, đã gộp vào Done when 2026-11-02):** header của log nghiên cứu có trường `language` (hiện `null`). Trước khi thu dữ liệu thật, `language` phải khác `null` (ghi `DE`/`EN` lúc bắt đầu phiên) ~~và phải có sự kiện `language_change` cho chế độ thử~~ (thay bằng "ngôn ngữ cố định theo phiên", không có sự kiện đổi ngôn ngữ; spec §3/§9, data-analyst duyệt 2026-11-02). Ở chế độ nghiên cứu (mã ngoài dải thử) ngôn ngữ khoá ở DE.
+- **Test report:** docs/test-reports/bl11.md
+- **Status:** verified-mcp (16/16 MCP ✅, chờ test tay L9 build ConceptScene trên Quest, L10 chạm nút ngôn ngữ trên kính)
 
 ### #12 [Feature] Chuyển toàn bộ text hiển thị sang bảng dịch (EN + DE)
 - **Type:** refactor

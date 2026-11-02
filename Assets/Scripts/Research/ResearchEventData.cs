@@ -13,8 +13,8 @@ public static class ResearchEventData
     public const string StartModeManual = "manual";
 
     public static JsonFields Header(string appVersion, string build, string deviceModel, string osVersion,
-        string participantId, string sessionId, string sessionStartMode, string inputModeAtStart,
-        double? targetRefreshRate)
+        string participantId, string sessionId, string sessionStartMode, string language,
+        string inputModeAtStart, double? targetRefreshRate)
     {
         return new JsonFields()
             .Add("schema_version", SchemaVersion)
@@ -25,7 +25,7 @@ public static class ResearchEventData
             .Add("participant_id", participantId)
             .Add("session_id", sessionId)
             .Add("session_start_mode", sessionStartMode)
-            .Add("language", (string)null)
+            .Add("language", language)
             .Add("input_mode_at_start", inputModeAtStart)
             .Add("target_refresh_rate", targetRefreshRate);
     }

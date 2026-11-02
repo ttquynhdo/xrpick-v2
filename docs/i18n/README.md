@@ -14,6 +14,10 @@ Người dùng cuối là người Đức bản ngữ. Đội phát triển dùn
 - **Số:** dấu phẩy thập phân (`0,4 kg`), đơn vị đặt sau số và cách một khoảng trắng (`5 ST`, `18 kg`).
 - **Độ dài:** tiếng Đức thường dài hơn tiếng Anh khoảng 30%. Phải kiểm tra chữ có tràn khỏi panel VR không.
 
+## Bảng dịch trong Unity (#11)
+- Chuỗi nằm trong String Table Collection `UI` (`Assets/Localization/Tables/`, locale `de` và `en`). Code lấy chuỗi qua `Loc.Get(key, ("name", value))`, text trong scene dùng `LocalizeStringEvent`.
+- **Không bật „Smart“ cho entry nào.** `Loc.Get` tự điền placeholder `{name}`. Nếu một entry bật Smart thì Smart Format sẽ báo lỗi (`FormattingException`) vì không nhận được argument.
+
 ## Glossary
 Mỗi dòng trong `glossary.csv` là một thuật ngữ:
 - `article` ghi giống (der/die/das).

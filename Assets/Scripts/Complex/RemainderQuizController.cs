@@ -30,7 +30,7 @@ public class RemainderQuizController : MonoBehaviour
     private const string NextQuestion = "<color=#27AE60><b>Richtig!</b></color> Beantworten Sie jetzt die zweite Frage."; // complex.quiz.next
     private const string Done =
         "<color=#27AE60><b>Richtig!</b></color> Nehmen Sie jetzt die vollen Kartons und die losen Teile aus dem Lagerbehälter."; // complex.quiz.done
-    private const string ProgressFormat = "Frage {0} von {1}";                                            // concept.quiz.progress
+    private const string ProgressKey = "concept.quiz.progress";   // Loc table UI (#11)
     private const string SelectedMark = "» ";
 
     private const string CartonsId = "cartons";
@@ -155,7 +155,7 @@ public class RemainderQuizController : MonoBehaviour
 
         if (progressText != null)
         {
-            progressText.text = string.Format(ProgressFormat, index + 1, 2);
+            progressText.text = Loc.Get(ProgressKey, ("n", index + 1), ("total", 2));
         }
 
         foreach (Toggle toggle in toggles)

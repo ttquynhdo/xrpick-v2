@@ -150,6 +150,20 @@ local({
   stopifnot(sum(grepl("ended-session warning overridden", warn_lines)) == 1)
   stopifnot("P112" %in% flagged)
 
+  # 8l. Language (#11): research sessions are DE; P108 ran in EN (autoStart
+  #     bypassed the keypad's DE lock) and is warned and flagged; P105 is a
+  #     pre-#11 log (language null): "NA", not flagged, not warned. The test
+  #     ID P950 (EN) is dropped before the check.
+  dq <- function(col, pid) data_quality[[col]][data_quality$participant_id == pid]
+  stopifnot(dq("languages", "P108") == "EN", isTRUE(dq("language_not_de", "P108")))
+  stopifnot(dq("languages", "P105") == "NA", isFALSE(dq("language_not_de", "P105")))
+  stopifnot(dq("languages", "P101") == "DE", isFALSE(dq("language_not_de", "P101")))
+  stopifnot(identical(data_quality$participant_id[data_quality$language_not_de], "P108"))
+  stopifnot("P108" %in% flagged)
+  stopifnot(sum(grepl("language '", warn_lines)) == 1,
+            any(grepl("language 'EN'", warn_lines) & grepl("P108", warn_lines)))
+  stopifnot(!any(grepl("P950", warn_lines) & grepl("language", warn_lines)))
+
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.
   stopifnot(data_quality$duplicate_files[data_quality$participant_id == "P101"] == 2)

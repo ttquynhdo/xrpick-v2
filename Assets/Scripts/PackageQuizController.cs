@@ -12,7 +12,7 @@ using UnityEngine.UI;
 public class PackageQuizController : MonoBehaviour
 {
     // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string ProgressFormat = "Frage {0} von {1}";                                   // concept.quiz.progress
+    private const string ProgressKey = "concept.quiz.progress";   // Loc table UI (#11)
     private const string SelectFirst = "<color=#F2C94C><b>Wählen Sie zuerst eine Antwort.</b></color>";    // concept.quiz.select_first
     private const string Correct = "<color=#27AE60><b>Richtig!</b></color>";                    // concept.quiz.correct
     private const string NextQuestion = "Beantworten Sie jetzt die nächste Frage.";              // concept.quiz.next_question
@@ -213,7 +213,7 @@ public class PackageQuizController : MonoBehaviour
 
         if (progressText != null)
         {
-            progressText.text = string.Format(ProgressFormat, index + 1, questions.Length);
+            progressText.text = Loc.Get(ProgressKey, ("n", index + 1), ("total", questions.Length));
         }
 
         for (int i = 0; i < toggles.Length; i++)

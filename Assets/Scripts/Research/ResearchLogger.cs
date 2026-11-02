@@ -37,6 +37,9 @@ public sealed class ResearchLogger : MonoBehaviour
     // True while the logger prints its own messages: they are developer errors, not the trainee's.
     private static bool loggingOwnMessage;
 
+    // Header language ("DE" / "EN"), pushed by the app's Loc layer (this assembly can't see it, #11).
+    private static string language;
+
     // Settings (asset values or defaults when the asset is missing).
     private bool autoStart = true;
     private string autoStartParticipantId = "P000";
@@ -71,6 +74,15 @@ public sealed class ResearchLogger : MonoBehaviour
     public static bool IsSessionActive => instance != null && instance.sessionActive;
 
     public static string ParticipantId => IsSessionActive ? instance.participantId : null;
+
+    /// <summary>
+    /// Sets the language written into the next session header. The language is fixed per session:
+    /// it is chosen on the keypad before the code is entered (#11).
+    /// </summary>
+    public static void SetLanguage(string languageCode)
+    {
+        language = languageCode;
+    }
 
     private static string ResearchRoot => Path.Combine(Application.persistentDataPath, ResearchFolder);
 
@@ -346,7 +358,7 @@ public sealed class ResearchLogger : MonoBehaviour
 
         string activeScene = SceneManager.GetActiveScene().name;
         JsonFields header = ResearchEventData.Header(Application.version, build, SystemInfo.deviceModel,
-            SystemInfo.operatingSystem, participantId, sessionId, startMode, ReadInputMode(), ReadRefreshRate());
+            SystemInfo.operatingSystem, participantId, sessionId, startMode, language, ReadInputMode(), ReadRefreshRate());
         WriteLine(SessionFiles.EventLine(0, UtcNow(), participantId, sessionId, null, null, "header", header));
         WriteLine(SessionFiles.EventLine(0, UtcNow(), participantId, sessionId, activeScene, null, "session_start",
             ResearchEventData.SessionStart(resumeOfferedScene, resumeAccepted, endedSessionWarning)));

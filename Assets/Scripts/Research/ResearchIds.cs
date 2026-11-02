@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 public static class ResearchIds
 {
     private const string PracticeFolder = "practice";
+    public const string GermanLanguage = "DE";
     private static readonly Regex IdPattern = new Regex(@"^P[0-9]{3}$", RegexOptions.CultureInvariant);
 
     public static bool IsValid(string id)
@@ -24,6 +25,15 @@ public static class ResearchIds
 
         // Compare as text so the rule stays visible: P000 and P900..P999.
         return id == "P000" || string.CompareOrdinal(id, "P900") >= 0;
+    }
+
+    /// <summary>
+    /// Language a session runs in: research IDs always German (spec section 9), test IDs keep the
+    /// chosen one (#11).
+    /// </summary>
+    public static string SessionLanguage(string id, string chosenLanguage)
+    {
+        return IsTestId(id) ? chosenLanguage : GermanLanguage;
     }
 
     /// <summary>Test IDs go to a "practice" subfolder so they never mix with real logs.</summary>

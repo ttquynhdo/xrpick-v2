@@ -243,6 +243,12 @@ public class ParticipantEntryController : MonoBehaviour
         // Set first so a second press cannot start another session.
         started = true;
 
+        // #11: research codes always run in German; before StartSession so the header has it.
+        // No reload: the keypad texts are not localized yet and scene texts follow the locale at once.
+        string language = ResearchIds.SessionLanguage(code, Loc.CurrentLanguage);
+        if (language != Loc.CurrentLanguage)
+            Loc.SetLanguage(language);
+
         bool ok = ResearchLogger.StartSession(code, offeredScene, accepted, endedSessionWarning);
 
         // Course content opens only for a started session that carries the typed code.

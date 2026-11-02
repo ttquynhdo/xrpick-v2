@@ -193,8 +193,7 @@ if (nrow(mixed_files) > 0) {
 # Unknown event names are kept but reported (maybe a newer logger version).
 known_events <- c("header", "session_start", "session_end", "scene_enter", "scene_exit",
                   "app_pause", "app_resume", "unity_error", "unity_error_cap_reached",
-                  "crash_recovered", "confirm_pressed", "quiz_answer", "task_completed",
-                  "language_change")
+                  "crash_recovered", "confirm_pressed", "quiz_answer", "task_completed")
 unknown_events <- setdiff(unique(events$event), known_events)
 if (length(unknown_events) > 0) {
   message("Note: event names not used by this script: ", paste(unknown_events, collapse = ", "))
@@ -205,13 +204,17 @@ if (length(unknown_events) > 0) {
 # Header line: build and schema_version of the app that wrote the file.
 # session_start_mode (added later, NA in older logs): "auto" = started by
 # ResearchSettings.autoStart, "manual" = started by the keypad (#27).
+# language (#11): "DE" / "EN", fixed for the whole session (chosen on the
+# keypad before the code; there is no language_change event). NA = a log from
+# a build before #11, which wrote null.
 headers <- events %>% filter(event == "header") %>%
   transmute(session_id,
             has_header = TRUE,
             header_utc = parse_utc(utc),
             build = map_chr(data, ~ as_chr(.x$build)),
             schema_version = map_int(data, ~ as_int(.x$schema_version)),
-            session_start_mode = map_chr(data, ~ as_chr(.x$session_start_mode)))
+            session_start_mode = map_chr(data, ~ as_chr(.x$session_start_mode)),
+            language = map_chr(data, ~ as_chr(.x$language)))
 if (any(duplicated(headers$session_id))) warn("a session has more than one header line")
 
 # session_start: the resume offer after a crash (#27). resume_offered_scene =
@@ -280,6 +283,22 @@ auto_real <- sessions %>% filter(session_start_mode %in% "auto")
 for (i in seq_len(nrow(auto_real))) {
   warn("session_start_mode 'auto' for real ID ", auto_real$participant_id[i], " (session ",
        auto_real$session_id[i], "): started by autoStart, not by the keypad")
+}
+
+# Language (#11). Research IDs must run in German: the keypad forces "DE"
+# for them, so "EN" means the session bypassed the keypad (e.g. autoStart) or
+# a bug; the trainee saw English texts, so their data are not comparable.
+# Null is allowed (logs from before #11) but counted, so the report says how
+# many sessions have no recorded language.
+non_de <- sessions %>% filter(has_header, !is.na(language), language != "DE")
+for (i in seq_len(nrow(non_de))) {
+  warn("language '", non_de$language[i], "' for real ID ", non_de$participant_id[i], " (session ",
+       non_de$session_id[i], "): research sessions must run in DE")
+}
+null_lang <- sessions %>% filter(has_header, is.na(language))
+if (nrow(null_lang) > 0) {
+  message("Note: ", nrow(null_lang), " session(s) with header language null (logs from before #11): ",
+          paste(unique(null_lang$participant_id), collapse = ", "))
 }
 
 # Resume offers (#27). A declined offer means the trainee started again at
@@ -721,6 +740,10 @@ data_quality <- sessions %>%
     n_sessions = n(),
     first_start_utc = format(min(start_utc), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
     builds = paste(unique(build), collapse = ";"),
+    # Header language per session ("NA" = log from before #11, not recorded).
+    languages = paste(unique(coalesce(language, "NA")), collapse = ";"),
+    # TRUE = a session ran in a language other than DE (warned above).
+    language_not_de = any(!is.na(language) & language != "DE"),
     schema_versions = paste(unique(schema_version), collapse = ";"),
     n_crashes = sum(end_status == "crash"),
     # end_status of the participant = how their last session ended.
@@ -763,7 +786,7 @@ data_quality <- sessions %>%
                   duplicate_files), ~ coalesce(.x, 0L)),
          error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
-         mixed_build, schema_versions, gap_h, n_crashes, resume_offered, resume_declined,
+         mixed_build, languages, language_not_de, schema_versions, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, invariant_breaks,
@@ -780,6 +803,8 @@ dq_long <- data_quality %>%
             # Empty = not measured (no outcome events logged).
             course_finished = coalesce(as.character(course_finished), ""),
             sessions = as.character(n_sessions), builds = str_replace_all(builds, ";", "\n"),
+            # "NA" = not recorded (log from before #11); orange = not DE.
+            language = if_else(language_not_de, paste0("!", languages), languages),
             gap_h = if_else(is.na(gap_h), "", as.character(gap_h)),
             # Empty = not measured (log from before #27).
             resume_declined = coalesce(as.character(resume_declined), ""),
@@ -805,6 +830,7 @@ dq_long <- data_quality %>%
            column == "sessions" ~ value != "1",
            column == "builds" ~ str_detect(value, "\n") | value %in% c("editor", "unknown", "NA"),
            column == "gap_h" ~ value != "",
+           column == "language" ~ str_starts(value, "!"),
            column %in% c("censored", "error_cap", "resume_declined", "ended_override") ~ value == "TRUE",
            column == "outcome" ~ value == "FALSE",
            TRUE ~ !value %in% c("0", "")),
@@ -1050,7 +1076,7 @@ flagged <- data_quality %>%
   filter(end_status != "completed" | multi_session | mixed_build | duration_censored |
            invariant_breaks > 0 | unknown_codes > 0 | summary_mismatches > 0 |
            exit_disagreements > 0 | duplicate_files > 0 | error_cap_reached |
-           resume_declined %in% TRUE | ended_session_override %in% TRUE) %>%
+           resume_declined %in% TRUE | ended_session_override %in% TRUE | language_not_de) %>%
   pull(participant_id)
 
 report_lines <- c(

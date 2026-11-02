@@ -268,13 +268,18 @@ active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s - open_pause_part
 # Nothing offered = both null; resume_accepted is null whenever resume_scene is.
 # ended_warning: TRUE when the facilitator started despite the "already
 # finished" warning ("Trotzdem starten"); the logger writes false otherwise.
+# language: header language (#11), "DE" or "EN", fixed for the session. The
+# keypad forces "DE" for research IDs; test IDs keep the chosen one. NULL =
+# a log written before #11 (header language null).
 start_session <- function(person, build, start_utc, start_mode = "manual",
-                          resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE) {
+                          resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
+                          language = "DE") {
   if (is.null(resume_scene)) resume_accepted <- NULL
   s <- new.env()
   s$pid <- person$pid
   s$sid <- make_uuid()
   s$build <- build
+  s$language <- language
   s$start <- to_epoch(start_utc)
   s$t <- 0
   s$last_t <- 0
@@ -310,7 +315,7 @@ start_session <- function(person, build, start_utc, start_mode = "manual",
     json_obj(schema_version = 1, app_version = "0.1.0", build = build,
              device_model = "Oculus Quest", os_version = "Android OS 14 / API-34",
              participant_id = s$pid, session_id = s$sid, session_start_mode = start_mode,
-             language = NULL,
+             language = s$language,
              input_mode_at_start = "controllers", target_refresh_rate = 72))
   s$scene <- "WelcomeScene"
   emit(s, "session_start", json_obj(resume_offered_scene = resume_scene,
@@ -609,8 +614,10 @@ run_visit <- function(s, person, ...) {
 # A normal course: every scene in build order, ends "completed" on the first
 # correct confirm in ComplexScene (#28 calls EndSession("completed") there).
 run_full_course <- function(person, build, start_utc, special = list(), start_mode = "manual",
-                            resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE) {
-  s <- start_session(person, build, start_utc, start_mode, resume_scene, resume_accepted, ended_warning)
+                            resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
+                            language = "DE") {
+  s <- start_session(person, build, start_utc, start_mode, resume_scene, resume_accepted, ended_warning,
+                     language)
   run_welcome(s)
   for (scene in scene_order[-1]) {
     go_to_scene(s, scene)
@@ -625,9 +632,10 @@ run_full_course <- function(person, build, start_utc, special = list(), start_mo
 # ---- 7. The fake participants ----------------------------------------------
 
 # P950: facilitator's trial run with a test ID. It belongs in practice/, but
-# here it sits in research/ on purpose: analyse.R must drop it anyway.
+# here it sits in research/ on purpose: analyse.R must drop it anyway. Test
+# IDs keep the chosen language, so this one ran in English (#11).
 p950 <- new_person("P950")
-s <- start_session(p950, "aaa1111", "2026-11-02T09:00:00Z", start_mode = "auto")
+s <- start_session(p950, "aaa1111", "2026-11-02T09:00:00Z", start_mode = "auto", language = "EN")
 run_welcome(s)
 go_to_scene(s, "ConceptScene"); run_quiz(s, p950)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p950)
@@ -705,8 +713,9 @@ end_session(s, "quit")
 
 # P105: crashes in BasicPickingScene right after an exception and never comes
 # back. The next session on the device (P106) marks the file crash_recovered.
+# Its header has language null: a log from a build before #11 (allowed).
 p105 <- new_person("P105")
-s <- start_session(p105, "aaa1111", "2026-11-04T08:00:00Z")
+s <- start_session(p105, "aaa1111", "2026-11-04T08:00:00Z", language = NULL)
 run_welcome(s)
 go_to_scene(s, "ConceptScene"); run_quiz(s, p105)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p105, max_confirms = 1, give_up = TRUE)
@@ -739,8 +748,11 @@ go_to_scene(s, "ComplexScene"); run_picking(s, p107, max_confirms = 0)
 end_session(s, "facilitator")
 
 # P108: normal course on the newer build bbb2222, but the study build still had
-# autoStart on (session_start_mode "auto"): analyse.R must warn.
-run_full_course(new_person("P108"), "bbb2222", "2026-11-04T13:00:00Z", start_mode = "auto")
+# autoStart on (session_start_mode "auto"): analyse.R must warn. autoStart
+# skips the keypad, so the research-ID lock to "DE" did not apply and the
+# session ran in the saved language "EN" (#11): analyse.R must warn too.
+run_full_course(new_person("P108"), "bbb2222", "2026-11-04T13:00:00Z", start_mode = "auto",
+                language = "EN")
 
 # P109: one confirm carries FOO_BAR, a code missing from skill_map.csv.
 run_full_course(new_person("P109"), "aaa1111", "2026-11-04T14:30:00Z",

@@ -102,7 +102,11 @@ fields that break the null rule, and a resume offer whose previous session of
 that ID in the data is not a crash (files missing from the copy?). A session
 started despite the "already finished" warning
 (`session_start.ended_session_warning` true) is warned and the participant
-flagged: check it is the same person.
+flagged: check it is the same person. The header `language` (#11, fixed per
+session, no `language_change` event) is listed per participant in
+`data_quality.csv` (`languages`, `NA` = log from before #11, allowed); a real
+ID with a language other than `DE` is warned and flagged (`language_not_de`):
+that trainee saw non-German texts.
 
 ## Validity limits (state them with every result)
 

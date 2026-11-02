@@ -21,6 +21,8 @@ EditorBuildSettings:
     path: Assets/Scenes/ComplexScene.unity
     guid: a1066ed9f8dc7784fa702b748bb2c7e1
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 050bcf46b9835db42a2fdef2a814e442, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.localization.settings: {fileID: 11400000, guid: 84e7b0c3378aa0b43a2cfbb95d0f7a16, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 3edca31460dfa5448ae1fc93a33a32a2, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: b7f59b8cbcb0168459c0cf706bb25139, type: 2}
