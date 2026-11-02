@@ -22,7 +22,7 @@ Stück,das,piece,Unit of count.,no,requirements,proposed,Abbreviation ST on the 
 ST,,pcs,Unit abbreviation for Stück on the WMS screen.,yes,WMS screenshot,proposed,
 Karton,der,carton,Cardboard box.,no,requirements,proposed,Also a WMS field label.
 PU-Beutel,der,plastic bag,Plastic bag used to pack loose material.,no,requirements: Kommissionierung.pptx,proposed,Documents also write PE-Beutel – confirm which term to use.
-Modul,das,module,Insert/container used to pre-pack material inside the order container.,no,requirements: Kommissionierung.pptx slide 4,proposed,
+Modul,das,module,"Insert/compartment in a container: in the order container for pre-packing; in the storage container it holds the opened carton with the Anbruchmenge (Detail Description 5.12 photo, A13).",no,requirements: Kommissionierung.pptx slide 4,proposed,
 Schüttgut,das,bulk material,Loose parts that may be poured.,no,requirements: Detail Description,proposed,
 Anbruchmenge,die,broken-case quantity,Quantity left over when a packaging unit is opened for a partial pick.,no,requirements: Detail Description,proposed,
 Lagernachschub,der,stock replenishment,Order that refills stock; marked light blue at the bottom left of the WMS screen.,no,requirements: Kommissionierung.pptx slide 4,proposed,
@@ -69,7 +69,7 @@ SCHLAUCHSCHELLE B,,hose clamp B,"Fake material name, key training_b (BasicPickin
 Stückzahl,die,piece count,"Number of pieces, e.g. of the full cartons in a calculation (Sollmenge minus Stückzahl der vollen Kartons).",no,german-reviewer (#14),proposed,'Stück' alone only after a number.
 Empfindlichkeitskennzeichen,das,sensitivity code,Full form of EKZ.,no,requirements: Detail Description glossary table,proposed,Abbreviated EKZ; on the WMS dialog as Empf Kz.
 Verpackung,die,package,Generic word for the physical packaging of a material (carton or bag).,no,app (#45),proposed,Use when the object may be a Karton or a Tüte; for the quantity use VPE.
-Teil,das,part,One single item of a material; used in the EKZ explanations (die Teile).,no,requirements: Kommissionierung.pptx slide 8,proposed,
+Teil,das,part,One single item of a material; used in the EKZ explanations (die Teile).,no,requirements: Kommissionierung.pptx slide 8,proposed,"'lose Teile' = loose items counted in lesson 5 (quiz, card, example); the WMS unit stays ST, Stück only after a number."
 Feld,das,field,One field of the LVS dialog (e.g. das Feld Anweisung).,no,app (#20),proposed,
 einfüllen,,pour in,Putting parts into the container without order (allowed for EKZ 0).,no,app (#20),proposed,Ask the instructor whether the warehouse says einfüllen or schütten.
 STECKER C,,plug C,"Fake material name for the ConceptScene sample order only, key stecker_c, Mat.-Nr 625417, VPE 40, Empf Kz 003.",yes,"app (#20, decision 010)",proposed,Fake master data; no package of it exists in any scene.
@@ -79,3 +79,5 @@ erledigt,,done,A position (order line) that is picked and confirmed: Position 1 
 einzeln und geordnet einlegen,,put in one by one and in order,How parts (in BasicPickingScene: cartons) are placed for EKZ 3; opposite of einfüllen (EKZ 0).,no,"requirements: Kommissionierung.pptx slide 8; app (#20, #41)",proposed,Used in ConceptScene tour/quiz and Basic feedback (geordnet).
 Rollenbahn,die,roller conveyor,Conveyor that brings the Lagerbehälter and takes the Auftragsbehälter away.,no,"app (#47, #49)",proposed,Not Förderband/Band. Ask the instructor whether the site says Rollenbahn or Fördertechnik.
 Kommissionierplatz,der,picking station,Workstation where the trainee picks; plural die Kommissionierplätze.,no,requirements: Leerbehälter definition; app (#49),proposed,"Ask the instructor: Kommissionierplatz, Kommissionierarbeitsplatz or Kommissionierstation."
+angebrochener Karton,der,opened carton,Carton already opened; loose pieces are taken from it.,no,german-reviewer #19,proposed,Not 'offener/geöffneter Karton'.
+Bildschirm,der,screen,The LVS screen at the workstation.,no,german-reviewer #19,proposed,

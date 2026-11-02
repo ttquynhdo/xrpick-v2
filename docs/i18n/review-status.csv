@@ -23,7 +23,7 @@ mixed.card.step1_body,"Lesen Sie im LVS die Angaben der aktuellen Position ab: M
 mixed.card.step2_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
 mixed.card.step2_body,"Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie die Verpackungen in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#21
 mixed.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6). Danach zeigt das LVS die nächste Position an.,proposed,german-reviewer (agent),2026-11-01,#21
-complex.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Der Auftrag enthält auch loses Material.",proposed,german-reviewer (agent),2026-11-01,#25
+complex.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Der Auftrag hat zwei Positionen mit losem Material. Bearbeiten Sie beide nacheinander.",proposed,german-reviewer (agent),2026-11-02,#19: text changed (two positions)
 complex.card.step1_body,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).",proposed,german-reviewer (agent),2026-11-01,#25
 complex.card.step2_body,"Rechnen Sie aus, wie viele volle Kartons und lose Teile Sie brauchen. Legen Sie zuerst die Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#25
 complex.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25
@@ -35,3 +35,22 @@ basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie die
 order.feedback.ekz3_loose,Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.,proposed,german-reviewer (agent),2026-11-01,"#41, ""Nicht alle"" per reviewer"
 concept.tour.material_flow.title,Weg der Behälter,proposed,german-reviewer (agent),2026-11-02,#49
 concept.tour.material_flow.body,Die Rollenbahn bringt den Lagerbehälter aus dem Lager. Nach dem Bestätigen fährt der Auftragsbehälter weiter. Es gibt mehrere Kommissionierplätze.,proposed,german-reviewer (agent),2026-11-02,"#49, variant B of the reviewer (fits: 5 lines, 114/160 px)"
+complex.quiz.q_cartons,Wie viele volle Kartons nehmen Sie für diese Position?,proposed,,2026-11-02,#19
+complex.quiz.q_loose,Wie viele lose Teile nehmen Sie zusätzlich?,proposed,,2026-11-02,#19
+complex.quiz.option_carton_one,1 Karton,proposed,,2026-11-02,#19
+complex.quiz.option_cartons,{count} Kartons,proposed,,2026-11-02,#19
+complex.quiz.option_piece_one,1 Teil,proposed,,2026-11-02,#19
+complex.quiz.option_pieces,{count} Teile,proposed,,2026-11-02,#19
+complex.quiz.wrong_cartons,Nicht richtig. Teilen Sie Soll durch VPE. Es zählen nur volle Kartons.,proposed,german-reviewer (agent),2026-11-02,#19
+complex.quiz.wrong_loose,Nicht richtig. Lose Teile = Soll minus (volle Kartons × VPE).,proposed,,2026-11-02,#19
+complex.quiz.next,Richtig! Beantworten Sie jetzt die zweite Frage.,proposed,,2026-11-02,#19
+complex.quiz.done,Richtig! Nehmen Sie jetzt die vollen Kartons und die losen Teile aus dem Lagerbehälter.,proposed,,2026-11-02,#19
+complex.example.title,Beispiel,proposed,german-reviewer (agent),2026-11-02,#19
+complex.example.body,"Soll 64 ST, VPE 20 ST
+1. 64 : 20 = 3,2 – also 3 volle Kartons (60 ST)
+2. 64 - 60 = 4 lose Teile
+Kontrolle: 60 + 4 = 64 ST",proposed,german-reviewer (agent),2026-11-02,#19
+complex.feedback.position_done,"Richtig! Position {done} ist erledigt.
+Der angebrochene Karton mit der Anbruchmenge bleibt im Modul im Lagerbehälter.
+Lesen Sie im LVS die Angaben von Position {next} ab.",proposed,german-reviewer (agent),2026-11-02,#19
+complex.card.step2_body_position1,Beantworten Sie zuerst die Fragen unter dem Bildschirm. Legen Sie dann die vollen Kartons und die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.,proposed,german-reviewer (agent),2026-11-02,#19

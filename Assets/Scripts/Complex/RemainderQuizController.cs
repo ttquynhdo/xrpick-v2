@@ -23,7 +23,7 @@ public class RemainderQuizController : MonoBehaviour
     private const string PieceOne = "1 Teil";                                                             // complex.quiz.option_piece_one
     private const string PiecesFormat = "{0} Teile";                                                      // complex.quiz.option_pieces
     private const string WrongCartons =
-        "<color=#EB5757><b>Nicht richtig.</b></color> Teilen Sie Soll durch VPE. Nur volle Kartons zählen."; // complex.quiz.wrong_cartons
+        "<color=#EB5757><b>Nicht richtig.</b></color> Teilen Sie Soll durch VPE. Es zählen nur volle Kartons."; // complex.quiz.wrong_cartons
     private const string WrongLoose =
         "<color=#EB5757><b>Nicht richtig.</b></color> Lose Teile = Soll minus (volle Kartons × VPE).";     // complex.quiz.wrong_loose
     private const string NextQuestion = "<color=#27AE60><b>Richtig!</b></color> Beantworten Sie jetzt die zweite Frage."; // complex.quiz.next

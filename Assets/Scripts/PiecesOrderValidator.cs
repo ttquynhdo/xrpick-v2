@@ -16,7 +16,7 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     // #19, decision 016: {0} = finished position, {1} = next position. The middle line is the Anbruchmenge
     // reminder (Detail Description 5.12); it is not rated.
     private const string PositionDoneFormat =
-        "Richtig! Position {0} ist erledigt.\nDie Restmenge im angebrochenen Karton bleibt im Modul im Lagerbehälter.\nLesen Sie im LVS die Angaben von Position {1} ab."; // complex.feedback.position_done
+        "Richtig! Position {0} ist erledigt.\nDer angebrochene Karton mit der Anbruchmenge bleibt im Modul im Lagerbehälter.\nLesen Sie im LVS die Angaben von Position {1} ab."; // complex.feedback.position_done
 
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
