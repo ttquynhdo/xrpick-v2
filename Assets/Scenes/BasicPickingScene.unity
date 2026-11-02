@@ -7985,9 +7985,6 @@ MonoBehaviour:
   currentSize: 0
   necessarySize: 300
   restSize: 300
-  istText: {fileID: 2101721028}
-  sollText: {fileID: 2101721029}
-  restText: {fileID: 2101721027}
   materialKey: training_b
   materialName: SCHLAUCHSCHELLE B
   vpe: 50
@@ -9167,8 +9164,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OrderBoxConveyor
   validator: {fileID: 786606224}
   containerTrigger: {fileID: 916427140}
-  travel: {x: 0, y: 0, z: 0.9}
-  duration: 2
+  path:
+  - {x: 0, y: 0, z: 2.288}
+  - {x: 4.671, y: 0, z: 2.288}
+  - {x: 4.671, y: 0, z: 3.678}
+  speed: 0.45
+  cornerPause: 1
   carriedWithContainer:
   - {fileID: 1888890480}
   - {fileID: 1342360181}
@@ -18702,39 +18703,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 591c1aa51857c0440bebc6e6eb8841b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WmsDialogView
---- !u!114 &2101721027 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8039996783600951252, guid: c2cc151dd301a0d45b8c3588843d61b1, type: 3}
-  m_PrefabInstance: {fileID: 2101721025}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
---- !u!114 &2101721028 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8249521964588508314, guid: c2cc151dd301a0d45b8c3588843d61b1, type: 3}
-  m_PrefabInstance: {fileID: 2101721025}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
---- !u!114 &2101721029 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8351699810078267058, guid: c2cc151dd301a0d45b8c3588843d61b1, type: 3}
-  m_PrefabInstance: {fileID: 2101721025}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!224 &2101721030 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2807112219663439310, guid: c2cc151dd301a0d45b8c3588843d61b1, type: 3}

@@ -47,7 +47,7 @@ public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositioned
 
     private void Start()
     {
-        OrderContents.LogSetupProblems(orderLines, false, null, this);
+        OrderContents.LogSetupProblems(orderLines, false, this);
         UpdateRest();
         Recalculate();
     }

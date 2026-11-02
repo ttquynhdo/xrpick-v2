@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class CalcForWMS : MonoBehaviour, IWmsOrderSource
@@ -10,9 +9,6 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource
     // #34, decision 001 option C: Rest is the stock left in the storage box after the
     // full order is picked. Set in Start from the GG packages in the scene, never changed by picking.
     public int restSize;
-    public TextMeshProUGUI istText;
-    public TextMeshProUGUI sollText;
-    public TextMeshProUGUI restText;
 
     // #14: the material of the order, so OrderConfirm can use OrderRule (docs/decisions/006). Soll stays necessarySize.
     [Header("Order material")]
@@ -73,16 +69,11 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource
     // #4: raised when a package enters or leaves, so an old result can be cleared.
     public event Action ContentsChanged;
 
+    // #46: the WMS dialog (WmsDialogView) shows Soll/Ist/Rest; this counter only raises ContentsChanged.
     private void Start()
     {
-        if (istText == null || sollText == null || restText == null)
-        {
-            Debug.LogError("CalcForWMS: istText, sollText or restText is not assigned.", this);
-        }
-
         currentSize = 0;
         restSize = GetStockInScene() - necessarySize;
-        UpdateDisplay();
     }
 
     private static int GetStockInScene()
@@ -113,7 +104,6 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource
         if (count == 0)
         {
             currentSize += box.packageSize;
-            UpdateDisplay();
             ContentsChanged?.Invoke();
         }
     }
@@ -133,7 +123,6 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource
 
         collidersInside.Remove(box);
         currentSize -= box.packageSize;
-        UpdateDisplay();
         ContentsChanged?.Invoke();
     }
 
@@ -146,21 +135,5 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource
             return null;
 
         return box;
-    }
-
-    private void UpdateDisplay()
-    {
-        if (istText != null)
-        {
-            istText.text = currentSize.ToString();
-        }
-        if (sollText != null)
-        {
-            sollText.text = necessarySize.ToString();
-        }
-        if (restText != null)
-        {
-            restText.text = restSize.ToString();
-        }
     }
 }
