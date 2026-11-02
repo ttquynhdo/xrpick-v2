@@ -22,7 +22,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
-- **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), cần `solution-decision` trước.
+- **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
 1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
@@ -703,13 +703,15 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** Assets/Scripts/OrderBoxConveyor.cs, Assets/Prefabs/WarehouseConveyorNetwork.prefab, docs/decisions/011-workstation-layout-conveyor.md, docs/decisions/013-warehouse-conveyor-network.md
 - **Problem:** Test kính #49 H1 (người dùng 2026-11-02): tuyến băng dài hợp lý và không gây phân tán, nhưng khi thấy thùng đơn trượt đi thì trainee tò mò muốn xem nó đi đâu tiếp. Hiện thùng chỉ trượt ~0,9 m rồi đứng yên (011 K1), nên tuyến dài trông như không dẫn tới đâu. Decision 013 đã xét đúng phương án này (C: chuyển động ở ranh giới nhiệm vụ) và hoãn lại cho tới khi có trả lời D11.
-- **Done when:** (nháp, `solution-decision` chốt lại) Đơn đúng → thùng đơn cùng các kiện bên trong trượt khỏi trạm rồi chạy tiếp theo làn đơn (z 3 → x 5 → về phía kệ) cho tới khi khuất, không xuyên qua vật khác. Đơn sai → thùng không chạy. Trong lúc thùng chạy, trainee vẫn đọc được thẻ kết quả và dùng được Menu. Nơi thùng biến mất không được đặt tên (D15 còn mở). (code) Không có `ContentsChanged` hay log thừa khi thùng rời trạm.
+- **Done when:** theo mục *Done when* của decision 014: đơn đúng → thùng đơn chạy theo làn đơn qua góc z ≈ 3 và x ≈ 5 (dừng ~1 s ở mỗi góc, không xoay) rồi dừng xếp hàng sau thùng của trạm trống ở x 5; kiện, snap đi cùng, kiện đang cầm ở lại; Mixed position 1 và đơn sai → không chạy; thẻ kết quả, Menu dùng được trong lúc chạy; Concept không đổi; FPS trên Quest giữ như sau #49; (code) không `ContentsChanged`, Ist không đổi, không tắt/xoá kiện, không log mới.
 - **Inspector work expected:** có thể (đường đi của thùng theo tuyến của `WarehouseConveyorNetwork`)
 - **Công:** M
 - **Test trên kính:** bắt buộc (chuyển động ngoài vùng nhìn chính có hút mắt hay gây khó chịu không, FPS)
 - **Depends on:** #47, #49; D11 (thùng đơn tự chạy đi hay người đẩy); sửa decision 011 (K1: thùng đứng yên)
 - **Bổ sung (người dùng trả lời D11, D15, 2026-11-02, chờ người hướng dẫn xác nhận):** thùng đơn tự chạy trên băng (không ai đẩy) tới khu giao hàng ở cửa kho (Versand) và dừng lần lượt thành hàng chờ người giao hàng tới lấy. Thùng kho đến từ đâu thì chưa chắc (D17), nên #50 không đụng tới thùng kho. Câu „nơi thùng biến mất không được đặt tên“ trong Done when hết hiệu lực nếu `solution-decision` chọn hiện khu Versand.
-- **Status:** todo (D11, D15 đã có trả lời của nhóm; chạy `solution-decision` trước khi làm, vì phải sửa decision 011 K1 và 013)
+- **Decision:** docs/decisions/014-order-box-rides-order-lane.md
+- **Test report:** docs/test-reports/bl50.md
+- **Status:** verified-mcp (12/14 ✅, chờ test tay H1 xem cả chuyến + FPS, H2 kiện đang cầm ở lại; theo giả định D11, D15)
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature

@@ -1,7 +1,7 @@
 # Quyết định 013: Băng lăn kéo dài tĩnh qua kho ở ba scene thực hành, gọi tên dòng thùng một lần ở ConceptScene
 
 - **Backlog:** #49
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (câu Done when „0,9 m … rồi đứng yên“ sửa bởi 014, 2026-11-02)
 - **Ngày:** 2026-11-02
 - **Ý kiến đã xét:** unity-reviewer, requirements-analyst, xr-ux-reviewer, instructional-design-reviewer → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-02):** phương án B, có 1–2 khung trạm trống ở xa, làm ngay (nhánh riêng `feat/49-warehouse-conveyor` tách từ `feat/47-conveyor`, không merge trước buổi demo).

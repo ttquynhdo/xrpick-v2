@@ -4,9 +4,10 @@ using Oculus.Interaction;
 using UnityEngine;
 
 /// <summary>
-/// #47, docs/decisions/011 (K1): when the validator reports the whole order correct, the order container
-/// slides back along the roller conveyor (Abschieben) with the packages inside it. Sits on the order container,
-/// whose trigger is the counter's trigger, so packages and trigger move together and nothing is counted again.
+/// #47/#50, docs/decisions/011 and 014: when the validator reports the whole order correct, the order container
+/// rides away along the order lane with the packages inside it: straight legs, a short stop at each right-angle
+/// transfer, no rotation. Sits on the order container, whose trigger is the counter's trigger, so packages and
+/// trigger move together and nothing is counted again.
 /// </summary>
 public class OrderBoxConveyor : MonoBehaviour
 {
@@ -16,11 +17,21 @@ public class OrderBoxConveyor : MonoBehaviour
     [Tooltip("Trigger of the order container; packages overlapping it ride along.")]
     [SerializeField] private BoxCollider containerTrigger;
 
-    [Tooltip("World offset of the whole slide (metres).")]
-    [SerializeField] private Vector3 travel = new(0f, 0f, 0.9f);
+    // Defaults follow the order lane of WarehouseConveyorNetwork from the station at (0.33, 0.71):
+    // corner at z 3.0, corner at x 5.0, stop behind the empty station's container (z 4.64) at x 5.
+    [Tooltip("Stops along the order lane as world offsets from the start position (metres), in order. Each leg is straight; the container waits at every stop but the last.")]
+    [SerializeField] private Vector3[] path =
+    {
+        new(0f, 0f, 2.288f),
+        new(4.671f, 0f, 2.288f),
+        new(4.671f, 0f, 3.678f),
+    };
 
-    [Tooltip("Duration of the slide in seconds (decision 011: about 2 s).")]
-    [SerializeField] private float duration = 2f;
+    [Tooltip("Average speed on each leg in m/s (decision 014: as the old slide, 0.9 m in 2 s).")]
+    [SerializeField] private float speed = 0.45f;
+
+    [Tooltip("Wait at each right-angle transfer in seconds.")]
+    [SerializeField] private float cornerPause = 1f;
 
     [Tooltip("Optional bodies that must move with the container, e.g. the EKZ snap places of #41.")]
     [SerializeField] private Rigidbody[] carriedWithContainer;
@@ -40,6 +51,11 @@ public class OrderBoxConveyor : MonoBehaviour
         if (containerTrigger == null)
         {
             Debug.LogError("OrderBoxConveyor: containerTrigger is not assigned.", this);
+            return;
+        }
+        if (path == null || path.Length == 0 || speed <= 0f)
+        {
+            Debug.LogError("OrderBoxConveyor: path is empty or speed is not positive.", this);
             return;
         }
 
@@ -126,6 +142,25 @@ public class OrderBoxConveyor : MonoBehaviour
 
     private IEnumerator Slide(List<Transform> riders)
     {
+        Vector3 previous = Vector3.zero;
+
+        for (int i = 0; i < path.Length; i++)
+        {
+            if (i > 0)
+            {
+                yield return new WaitForSeconds(cornerPause);
+            }
+
+            yield return Leg(riders, path[i] - previous);
+            previous = path[i];
+        }
+
+        slide = null;
+    }
+
+    private IEnumerator Leg(List<Transform> riders, Vector3 travel)
+    {
+        float duration = travel.magnitude / speed;
         float elapsed = 0f;
         float done = 0f;
 
@@ -134,7 +169,7 @@ public class OrderBoxConveyor : MonoBehaviour
             yield return new WaitForFixedUpdate();
 
             elapsed += Time.fixedDeltaTime;
-            float next = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+            float next = duration > 0f ? Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration)) : 1f;
             Vector3 step = travel * (next - done);
             done = next;
 
@@ -153,7 +188,5 @@ public class OrderBoxConveyor : MonoBehaviour
                 }
             }
         }
-
-        slide = null;
     }
 }

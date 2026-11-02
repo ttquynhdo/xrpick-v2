@@ -1,7 +1,7 @@
 # Quyết định 011: Thẻ hướng dẫn lên giá ngang tầm mắt bên trái màn hình, Menu ở bên phải gần tay; thùng đơn tự trượt đi khi xác nhận đúng
 
 - **Backlog:** #35 (gồm #37) + #47
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (phần K1 „rồi đứng yên“ sửa bởi 014, 2026-11-02)
 - **Ngày:** 2026-11-01
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer, data-analyst → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-01):** phương án A + băng lăn K1, **trừ vị trí Menu**: Menu ở bên phải, gần tay, không cần bước xác nhận khi đổi bài (người dùng: Menu và nút đỏ khác nhau rõ, khó bấm nhầm; chưa ai thấy chạm nhầm thật). Không cho thùng rỗng mới trượt vào sau khi thùng đơn đi. Làm #35/#47 trước #30.
