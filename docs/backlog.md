@@ -782,13 +782,15 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** WelcomeScene, ComplexScene (`[Congratulations]`)
 - **Files:** WelcomeScene `[Info Panel]/TXT_Description`, ComplexScene `[Congratulations]/TXT_Description`
 - **Problem:** Mục tiêu ở Welcome không nhắc phép tính, hàng lẻ hay đơn nhiều vật tư. Cuối khóa chỉ có "Congratulations!", không tóm tắt các quy tắc đã học.
-- **Done when:** Welcome liệt kê đúng những gì khóa học dạy. Panel cuối tóm tắt các quy tắc chính (nếu có #10 thì kèm so sánh với dialog thật).
+- **Done when:** WelcomeScene, vào Play: panel `Das lernen Sie` liệt kê 5 mục tiêu theo thứ tự bài (đọc đơn trong LVS, so nhãn với LVS, tính carton đầy và chiếc lẻ, xếp theo EKZ, nhiều position lần lượt), mỗi mục đúng một dòng, không chữ nào tràn khỏi panel. ComplexScene, trước khi xong đơn: panel `Congratulations` không hiện. ComplexScene, xong cả 2 position đúng: panel `Congratulations` hiện tiêu đề, „Das haben Sie gelernt“ + 4 quy tắc, dòng tháo kính và `Code: P<nnn>`. Nhìn từ chỗ đứng, toàn bộ panel đó nằm trước màn hình WMS, không bị màn hình che (trước #23 nó nằm sau màn hình). Quy tắc cuối nối nút đỏ với việc xác nhận bằng chân ở trạm thật (decision 008).
 - **Inspector work expected:** yes (text trong scene)
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #17 (để tóm tắt đúng quy tắc, verified-mcp)
 - **Bổ sung (2026-11-01, #17):** gạch đầu dòng đầu tiên của Welcome đã đổi thành "Read the material number and VPE on the label" (EN giữ trong scene tới #12, key `welcome.objective.label`). Các gạch còn lại chưa rà.
-- **Status:** todo
+- **Ghi chú (2026-11-02, khi làm):** chữ soạn theo review của `instructional-design-reviewer` và `german-reviewer` (xem báo cáo). Panel `Congratulations` trước đây nằm sau màn hình WMS (z 1,10, chỉ thấy tiêu đề), nay dời ra trước màn hình. Mục EKZ viết chung vì D4 chưa chốt; câu Anbruchmenge chưa đưa vào, chờ A13.
+- **Test report:** docs/test-reports/bl23.md
+- **Status:** done (commit 16ab3e9, test 8/8 ✅)
 
 ### #41 [Feature] EKZ quyết định cách đặt hàng: Basic EKZ 3 (snap), các bài khác EKZ 0
 - **Type:** feature
