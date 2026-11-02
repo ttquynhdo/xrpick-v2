@@ -21,6 +21,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
+- **Đang làm (2026-11-02):** #40 làm nổi bước hiện tại (decision 017, nhánh `feat/40-current-step-highlight`) → sau đó #53 (câu nhắc quiz trên thẻ 1 ở Complex, cùng sửa thẻ ComplexScene nên làm sau #40).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
@@ -512,14 +513,15 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 ### #40 [Feature] Làm nổi bước hiện tại trên thẻ hướng dẫn
 - **Type:** feature
 - **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
-- **Files:** `Instruction Table` (thẻ 1–3); script mới theo dõi **thao tác** (đã cầm kiện, thùng có kiện)
-- **Problem:** Cả 3–4 thẻ (khoảng 55 từ) hiện cùng lúc với cùng độ nổi bật, nên trainee không biết mình đang ở bước nào (segmenting/signalling).
-- **Done when:** Lúc bắt đầu, thẻ 1 nổi bật. Cầm kiện đầu tiên → thẻ 2 nổi bật. Thùng đơn có ít nhất 1 kiện → thẻ 3 nổi bật. Việc chuyển bước **chỉ** dựa vào thao tác, không bao giờ dựa vào đúng hay sai, để không lộ đáp án.
-- **Inspector work expected:** yes
+- **Files:** `InstructionShelf/Panel/Cards` (thẻ `Info Canvas` 1–3 + `Confirm`) trong 3 scene; script mới theo dõi **thao tác** (cầm kiện, kiện trong thùng); có thể thêm thuộc tính đọc số kiện của position hiện tại ở `MixedPickingContainer` / `PiecesContainerCounter`
+- **Problem:** Cả 4 thẻ (khoảng 55 từ) hiện cùng lúc với cùng độ nổi bật, nên trainee không biết mình đang ở bước nào (segmenting/signalling).
+- **Done when:** Ở Basic, Mixed và Complex, lúc bắt đầu bài thẻ `1. Angaben im LVS ablesen` là thẻ nổi bật chính; thẻ „Aufgabe“ không sáng và không bị làm mờ. Ở Complex position 1, trong lúc trả lời quiz thẻ 1 vẫn là thẻ chính. Cầm kiện đầu tiên của position → thẻ 2 thành thẻ chính và giữ vai trò đó tới hết position. Đặt một kiện bất kỳ vào thùng đơn (kể cả vật liệu sai) → thẻ 2 vẫn là thẻ chính, thẻ 3 có thêm dấu phụ "sẵn sàng". Lấy hết kiện của position hiện tại ra khỏi thùng → dấu phụ trên thẻ 3 tắt, thẻ 2 vẫn là thẻ chính. Bấm nút đỏ khi đơn sai → highlight không đổi. Ở Mixed và Complex, xác nhận đúng position 1 → thẻ 1 thành thẻ chính lại, thẻ 3 không có dấu phụ dù kiện của position 1 vẫn nằm trong thùng. Đơn đúng hoàn toàn → không thẻ nào còn highlight, không có ✓ hay chữ xanh lá/đỏ trên thẻ. Thẻ không đổi kích thước, vị trí hay chữ khi highlight đổi; thẻ `3. Auftrag bestätigen` cùng chiều rộng và lề với các thẻ khác, chữ không bị cắt (ảnh `instructions`). Thẻ chính nhận ra được cả khi không phân biệt màu (có tín hiệu thứ hai ngoài màu). (code) Highlight không có raycast target hay collider; không dùng tag; không đọc `OrderRule`/`OrderResult`; kiện của position 2 đang inactive lúc bắt đầu vẫn được theo dõi khi cầm.
+- **Inspector work expected:** yes (đối tượng đánh dấu trên thẻ, sửa chiều rộng thẻ `Confirm`, gắn script ở 3 scene)
 - **Công:** L
-- **Test trên kính:** bắt buộc (chuyển bước theo thao tác cầm thật)
-- **Depends on:** #25, #35 (thẻ đã lên giá mới; làm nổi bước trên giá đó, không làm hai lần)
-- **Status:** todo
+- **Test trên kính:** bắt buộc (chuyển bước theo thao tác cầm thật; highlight thấy rõ khi liếc lại giá)
+- **Depends on:** #25, #35 (thẻ đã lên giá mới); D19 chỉ để xác nhận, không chặn
+- **Decision:** docs/decisions/017-current-step-highlight.md
+- **Status:** in progress (nhánh `feat/40-current-step-highlight`)
 
 ---
 
@@ -764,6 +766,18 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Decision:** docs/decisions/015-concept-buttons-next-to-reading.md
 - **Test report:** docs/test-reports/bl52.md
 - **Status:** verified-mcp (13/16 ✅, chờ test tay H1–H3 trên kính: tầm với, bấm trúng, không bấm nhầm khi cầm kiện)
+
+### #53 [Feature] ComplexScene: thẻ 1 nhắc trả lời câu hỏi dưới màn hình
+- **Type:** feature
+- **Scene(s):** ComplexScene
+- **Files:** ComplexScene `InstructionShelf/Panel/Cards` (thẻ 1, thẻ 2 / `PositionTexts`)
+- **Problem:** Ở position 1, việc đầu tiên trainee phải làm là trả lời quiz dưới màn hình (thùng kho chỉ hiện sau khi trả lời đúng), nhưng thẻ 1–2 không nhắc tới quiz. Thẻ 2 viết „Rechnen Sie aus…“ trong khi phép tính đã làm ở quiz. Tách từ decision 017 (phương án C).
+- **Done when:** Ở Complex position 1, thẻ 1 có một câu nhắc trả lời các câu hỏi dưới màn hình. Ở position 2 (quiz đã ẩn) câu nhắc này không còn. Câu ở thẻ 2 không yêu cầu tính lại điều quiz đã hỏi. Chữ mới qua `localize-strings` + `german-reviewer`; thẻ không bị cắt chữ.
+- **Inspector work expected:** yes (chữ thẻ)
+- **Công:** S
+- **Test trên kính:** nhanh (đọc thẻ)
+- **Depends on:** #40 (cùng sửa thẻ ComplexScene); D20
+- **Status:** todo
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
