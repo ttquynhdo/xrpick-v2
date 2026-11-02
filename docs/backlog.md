@@ -22,7 +22,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
-- **Buổi test kính tiếp theo:** #25 T8-tay (đọc thẻ và panel Welcome), #21 H1 (cầm thật hai position) + H2 (đọc thẻ kết quả, xem đổi thùng), #33 H1 (bấm nút ở Concept/Mixed/Complex, đọc thẻ kết quả), #41 H1–H3 (nhánh `feat/41-ekz-snap`: thả carton vào ô, nghe tiếng khớp, gỡ ra, câu EKZ 3; merge vào `main` sau khi đạt).
+- **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), #49 N6 (FPS bằng OVR Metrics ở Basic/Mixed/Complex) + H1 (quay đầu, đi vài bước, tuyến băng có gây phân tán không).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
 1. **Đợt 3 – nội dung, không kính hoặc kính nhanh** (làm tuần tự vì đụng chung `Instruction Table` / ConceptScene):
@@ -268,7 +268,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   - **Xoá ký tự xuống dòng thừa** cuối `Secondary Text` (Welcome có 7, Concept có 6), để layout không bị đẩy khi dịch.
   - Concept có hai thứ cùng gọi là "instructions": panel `Instruction Panel` và các thẻ trên bàn. Nên đặt tên khác cho panel (xem #32).
 - **Test report:** docs/test-reports/bl25.md
-- **Status:** verified-mcp (15/16 ✅, chờ test tay T8-tay: đọc thẻ và panel Welcome trên kính)
+- **Status:** done (commit e42b105, test 16/16 ✅, test tay báo 2026-11-02)
 
 ## P2 – Bảo trì
 
@@ -411,7 +411,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #14 (nội dung feedback), #45 cho Concept (đã gộp #32). Có thể tách mỗi scene một nhánh.
 - **Bổ sung (2026-11-01, decision 008):** phần ComplexScene làm trong #10, phần MixedPickingScene làm trong #21. #33 chỉ còn ConceptScene (sau #45).
 - **Test report:** docs/test-reports/bl33.md
-- **Status:** verified-mcp (8/9 ✅, chờ test tay H1: bấm nút trên kính ở 3 scene, đọc thẻ kết quả)
+- **Status:** done (commit 2d69e85, test 9/9 ✅, không đổi code; test tay báo 2026-11-02)
 
 ### #34 [P1] BasicPickingScene: Rest đếm ngược làm lộ đáp án
 - **Type:** logic
@@ -452,7 +452,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Decision:** docs/decisions/011-workstation-layout-conveyor.md (giá thẻ ngang tầm mắt ~27° trái màn hình; Menu tấm riêng bên phải, không xác nhận; Done when đầy đủ ở mục *Done when / #35* của 011, thay các câu trên)
 - **Ghi chú:** từ #18, Menu dùng tên bài của `LessonNames`, cỡ chữ 12 để mục dài nhất („5. Volle Kartons und loses Material“) không bị cắt; khi làm Menu to hơn thì trả cỡ chữ lên lại.
 - **Test report:** docs/test-reports/bl35.md
-- **Status:** verified-mcp (MCP 15/15 ✅ kể cả phần MCP của L5/L7; chờ test tay L5, L7, L10, H1, H2 trên kính; nhánh `feat/35-shelf-menu` tách từ `feat/41-ekz-snap`)
+- **Status:** done (commit 1d4b294, test 18/18 ✅, test tay báo 2026-11-02)
 
 ### #36 [P2] Nhãn kiện đọc được từ chỗ đứng
 - **Type:** logic
@@ -655,7 +655,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (2026-11-01, decision 008):** Mixed dựng dialog chung của #10 ở đây. Thêm Done when: MixedPickingScene dùng cùng prefab dialog, mỗi lần một vị trí; `Mehrfachpick` bật ở cả hai vị trí, `letzter Pick` chỉ bật ở vị trí 2; mỗi vị trí có Ist riêng; không còn `PACKAGE PLACED`; kết quả hiện trên thẻ cạnh nút đỏ (phần Mixed của #33). Câu hỏi B14 (Mehrfachpick "1/2"), B15 (`F4 Übersicht`).
 - **Bổ sung (2026-11-01, ảnh trạm thật `old/Orderpicking.png`):** ở trạm thật mỗi vị trí đi kèm một thùng kho riêng; thùng kho của Mixed hiện chứa cả CABLE CONNECTOR A và SCREW B (`TestEvidence/MixedPickingScene/views/overview.png`). Thêm Done when: lúc vào scene, thùng kho chỉ chứa vật tư của vị trí 1; sau khi xác nhận vị trí 1, thùng kho đó được thay bằng thùng kho chỉ chứa vật tư của vị trí 2. Cách đổi thùng (tự chạy hay đẩy tay) theo D11; giả định một thùng kho = một mã vật tư theo D12.
 - **Test report:** docs/test-reports/bl21.md
-- **Status:** verified-mcp (14/16 ✅, chờ test tay H1 cầm thật hai position, H2 đọc trên kính; đổi thùng bằng thu nhỏ/phóng to thay cho mờ dần, xem báo cáo)
+- **Status:** verified-mcp (17/19 ✅; H1 lần 1 ❌ 2026-11-02 túi SCHRAUBE B biến mất khi cầm → đã sửa, chờ test lại H1 và H2 trên kính; đổi thùng bằng thu nhỏ/phóng to thay cho mờ dần, xem báo cáo)
 
 ### #47 [Feature] Bệ băng lăn cho hai thùng, thùng đơn chạy đi sau khi xác nhận đúng
 - **Type:** feature
@@ -669,7 +669,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #35 (dời thẻ và Menu khỏi mép bàn trước), #41 (cùng đụng thùng đơn); D11 (tự chạy hay đẩy tay: nếu đẩy tay thì Done when đổi thành trainee đẩy thùng); D10 (xác nhận đọc ảnh). Làm trước #30.
 - **Decision:** docs/decisions/011-workstation-layout-conveyor.md (thùng tự trượt, kinematic, trigger là con của thùng; không có thùng rỗng mới; Done when đầy đủ ở mục *Done when / #47* của 011, thay các câu trên)
 - **Test report:** docs/test-reports/bl47.md
-- **Status:** verified-mcp (MCP/code 8/8 ✅, chờ test tay H1, H2 trên kính; nhánh `feat/47-conveyor` tách từ `feat/35-shelf-menu`)
+- **Status:** done (commit 1e26762, test 10/10 ✅, test tay báo 2026-11-02)
 
 ### #48 [P3] Bàn phím tĩnh dưới màn hình WMS
 - **Type:** cleanup
@@ -752,7 +752,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #1, #2, #24 (làm trước, decision 003), #10 cho ô `Empf Kz`; câu D4–D6 (nhóm đã trả lời, chờ người hướng dẫn xác nhận)
 - **Decision:** docs/decisions/003-ekz-placement.md
 - **Test report:** docs/test-reports/bl41.md
-- **Status:** verified-mcp (24/24 MCP/code ✅, chờ test tay H1–H3 trên kính; theo giả định A1, D4–D6; nhánh `feat/41-ekz-snap`)
+- **Status:** done (commit 5cd22c3, test 27/27 ✅, theo giả định A1, D4–D6; test tay báo 2026-11-02)
 
 ## Feature – Log dữ liệu nghiên cứu
 

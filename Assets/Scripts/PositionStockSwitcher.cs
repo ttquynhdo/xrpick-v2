@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Oculus.Interaction;
 using UnityEngine;
 
 /// <summary>
@@ -160,6 +161,7 @@ public class PositionStockSwitcher : MonoBehaviour
                 if (entry.Key != null)
                 {
                     entry.Key.transform.localScale = entry.Value;
+                    ResetGrabScale(entry.Key);
                 }
             }
             comingScales = null;
@@ -175,6 +177,20 @@ public class PositionStockSwitcher : MonoBehaviour
                 }
             }
             wasKinematic = null;
+        }
+    }
+
+    // A package first shown by this switch ran Grabbable.Start while tiny, and the SDK's grab transformer locks
+    // the scale it sees there: without this, grabbing the package shrinks it to the hidden size (#21 H1).
+    private static void ResetGrabScale(GameObject member)
+    {
+        var grabbable = member.GetComponent<Grabbable>();
+        if (grabbable == null)
+            return;
+
+        foreach (ITransformer transformer in member.GetComponents<ITransformer>())
+        {
+            transformer.Initialize(grabbable);
         }
     }
 
