@@ -607,7 +607,9 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** không
 - **Depends on:** #10, #21
 - **Decision:** docs/decisions/008-wms-dialog-panel.md
-- **Status:** todo (sau #10, #21)
+- **Ghi chú (2026-11-02, khi làm):** `MixedPickingContainer` đã không còn field text từ #21. Ở Basic, `istText`/`sollText`/`restText` trỏ vào chính các ô của dialog, nên counter và `WmsDialogView` cùng ghi một ô. Đã gỡ, giờ chỉ view ghi. Bỏ thêm các khoá i18n không còn nguồn.
+- **Test report:** docs/test-reports/bl46.md
+- **Status:** done (commit fe76081, test 13/13 ✅)
 
 ### #19 [Feature] ComplexScene: tách thành hai bước, có ví dụ phép chia có dư
 - **Type:** feature
