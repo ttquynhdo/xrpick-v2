@@ -12,7 +12,7 @@ welcome.card.step2_body,Drücken Sie mit der Fingerspitze den roten Knopf. Spät
 welcome.title,Willkommen bei XPick!,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.subtitle,Ein VR-Training für die Kommissionierung im Lager,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.panel.title,Das lernen Sie,proposed,german-reviewer (agent),2026-11-01,#25
-welcome.panel.goals,Am Ende des Kurses können Sie:\n• Materialnummer und VPE auf dem Etikett ablesen\n• einen Auftrag im Lagerverwaltungssystem (LVS) ablesen\n• einen Auftrag kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.panel.goals,"Am Ende des Kurses können Sie:\n• einen Auftrag im Lagerverwaltungssystem (LVS) ablesen\n• das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n• volle Kartons und lose Teile berechnen\n• Kartons nach EKZ einlegen\n• mehrere Positionen nacheinander kommissionieren",proposed,german-reviewer (agent),2026-11-02,#23
 welcome.panel.duration,Dauer: etwa 5 Minuten pro Lektion,proposed,german-reviewer (agent),2026-11-01,#25
 common.panel.see_cards,Ihre Aufgaben stehen links auf den Karten.,proposed,german-reviewer (agent),2026-11-02,#35
 welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-01,#25
@@ -26,6 +26,8 @@ complex.card.step1_body,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nob
 complex.card.step2_body,"Rechnen Sie aus, wie viele volle Kartons und lose Teile Sie brauchen. Legen Sie zuerst die Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#25
 complex.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25
 complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
+complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
+complex.end.summary,"• Das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n• Sollmenge : VPE = volle Kartons, übrige Teile lose\n• Jede Position einzeln kommissionieren und bestätigen\n• Der rote Knopf ersetzt das Bestätigen mit dem Fuß",proposed,german-reviewer (agent),2026-11-02,#23
 basic.step3.text,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25 verb
 concept.card.step3_body,"Wählen Sie A, B oder C. Drücken Sie dann den roten Knopf.",proposed,german-reviewer (agent),2026-11-01,#25 verb
 mixed.feedback.position_done,Richtig! Position {position} ist erledigt.\nLesen Sie im LVS die Angaben von Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-01,#21

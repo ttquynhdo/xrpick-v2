@@ -14407,7 +14407,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1761320141}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14415,8 +14415,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.6, y: 27.5}
-  m_SizeDelta: {x: 422.5, y: 165.3}
+  m_AnchoredPosition: {x: 0, y: 27.5}
+  m_SizeDelta: {x: 530, y: 165.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1761320143
 MonoBehaviour:
@@ -14438,9 +14438,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Am Ende des Kurses k\xF6nnen Sie:\n\u2022 Materialnummer und VPE auf dem
-    Etikett ablesen\n\u2022 einen Auftrag im Lagerverwaltungssystem (LVS) ablesen\n\u2022
-    einen Auftrag kommissionieren"
+  m_text: "Am Ende des Kurses k\xF6nnen Sie:\n\u2022 einen Auftrag im Lagerverwaltungssystem
+    (LVS) ablesen\n\u2022 das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n\u2022
+    volle Kartons und lose Teile berechnen\n\u2022 Kartons nach EKZ einlegen\n\u2022
+    mehrere Positionen nacheinander kommissionieren"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -18259,8 +18260,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.6, y: -83.1}
-  m_SizeDelta: {x: 422.5, y: 32.5}
+  m_AnchoredPosition: {x: 0, y: -83.1}
+  m_SizeDelta: {x: 530, y: 32.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2131368572
 MonoBehaviour:
