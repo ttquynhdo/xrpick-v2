@@ -726,6 +726,20 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test report:** docs/test-reports/bl51.md
 - **Status:** verified-mcp (3/4 ✅, chờ test tay H1: nhìn bàn sau trên kính)
 
+### #52 [P1] ConceptScene: nút „Weiter“ và A/B/C to hơn, xa người hơn, gần chỗ đọc
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene `Interactables/NextButton`, `Interactables/AnswerOption` (PokeInteractable + PointableCanvas), Assets/Scripts/Concept/WmsFieldTour.cs, PackageQuizController
+- **Problem:** Người dùng báo trên kính (2026-11-02): bấm „Weiter“ và A/B/C rất khó. Đo trong Editor: mỗi nút chỉ 3,6 × 2,5 cm, nằm ở mép bàn (y 0,79, z 0,34), cách mắt ~0,88 m, phải cúi ~65°, chỉ ~0,34 m trước người nên tay phải co lại. Đồng thời phải nhìn thay đổi trên màn hình WMS (y 1,33) và bảng tour/quiz bên cạnh: mắt đi lên đi xuống giữa nút và chỗ đọc.
+- **Done when:** theo mục *Done when* của decision 015: tay phải duỗi thoải mái chạm „Weiter“ và từng nút đáp án, trúng ngay lần đầu; „Weiter“ cùng khung hình với bảng tour; đề, ba đáp án (ghi trên nút, „A: …“) và „Frage n von 4“ cùng khung hình, không chữ bị cắt; thẻ câu hỏi không còn trên giá và không liệt kê đáp án; nút không che dialog, bảng tour, `Info Panel`, kiện; cầm kiện không bấm nhầm; cách nút đỏ và Menu ≥ 15 cm; hover/nhấn thấy rõ, có âm thanh, đáp án chọn có „» “ + dấu hiệu thứ hai; tour 10 bước và quiz chấm như cũ; chữ mới qua `localize-strings` + `german-reviewer`; (code) logic tour/quiz không đổi.
+- **Inspector work expected:** có thể (dời/đổi cỡ canvas nút)
+- **Công:** S–M
+- **Test trên kính:** bắt buộc (tầm với, độ thoải mái của tay)
+- **Depends on:** #45, #35
+- **Decision:** docs/decisions/015-concept-buttons-next-to-reading.md
+- **Test report:** docs/test-reports/bl52.md
+- **Status:** verified-mcp (13/16 ✅, chờ test tay H1–H3 trên kính: tầm với, bấm trúng, không bấm nhầm khi cầm kiện)
+
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
 - **Scene(s):** chưa quyết định (có thể thêm vào Mixed/Complex)

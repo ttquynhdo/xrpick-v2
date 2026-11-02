@@ -5,9 +5,9 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
-/// #45 + #20, docs/decisions/007 (5) and 010: ConceptScene quiz. One question at a time on the table card with
-/// up to three answers (A–C), chosen on the poke toggles and checked with the red button. A correct answer moves on to the next
-/// question; a wrong one names the reason. Feedback has its own card (#32). No logging yet (#28).
+/// #45 + #20 + #52, docs/decisions/007 (5), 010 and 015: ConceptScene quiz. One question at a time on the card right
+/// above up to three answer toggles (A–C) that show the answer text, checked with the red button. A correct answer moves
+/// on to the next question; a wrong one names the reason. Feedback has its own card (#32). No logging yet (#28).
 /// </summary>
 public class PackageQuizController : MonoBehaviour
 {
@@ -21,7 +21,7 @@ public class PackageQuizController : MonoBehaviour
     private const string NextLesson = "3. Kommissionieren nach EKZ 3";                       // lesson.basic (LessonNames)
     private const string SelectedMark = "» ";
 
-    // The poke toggles are small: they show only the letter; the answers are listed on the question card.
+    // Decision 015: each toggle shows its letter and answer, so the trainee reads and presses in one place.
     private static readonly string[] Letters = { "A", "B", "C" };
 
     [Serializable]
@@ -209,13 +209,7 @@ public class PackageQuizController : MonoBehaviour
         current = index;
         Question question = questions[index];
 
-        var card = new System.Text.StringBuilder();
-        card.Append(question.text);
-        for (int i = 0; question.options != null && i < question.options.Length && i < Letters.Length; i++)
-        {
-            card.Append('\n').Append(Letters[i]).Append(": ").Append(question.options[i].label);
-        }
-        questionText.text = card.ToString();
+        questionText.text = question.text;
 
         if (progressText != null)
         {
@@ -225,7 +219,8 @@ public class PackageQuizController : MonoBehaviour
         for (int i = 0; i < toggles.Length; i++)
         {
             bool used = question.options != null && i < question.options.Length;
-            toggles[i].SetIsOnWithoutNotify(false);
+            // With notify: the SDK's AnimatorOverrideLayerWeight only drops the "selected" look on the event.
+            toggles[i].isOn = false;
             toggles[i].gameObject.SetActive(used);
         }
 
@@ -234,18 +229,24 @@ public class PackageQuizController : MonoBehaviour
 
     private void OnSelectionChanged(bool isOn)
     {
+        if (!isSetUp)
+            return;
+
         RefreshLabels();
     }
 
-    // #32: the chosen answer is marked with a text prefix, not by colour only.
+    // #32/#52: the chosen answer is marked with a text prefix and bold type, not by colour only.
     private void RefreshLabels()
     {
+        Option[] options = questions[current].options;
+
         for (int i = 0; i < labels.Length; i++)
         {
-            if (labels[i] != null)
-            {
-                labels[i].text = toggles[i].isOn ? SelectedMark + Letters[i] : Letters[i];
-            }
+            if (labels[i] == null || options == null || i >= options.Length)
+                continue;
+
+            string answer = Letters[i] + ": " + options[i].label;
+            labels[i].text = toggles[i].isOn ? "<b>" + SelectedMark + answer + "</b>" : answer;
         }
     }
 
