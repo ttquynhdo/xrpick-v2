@@ -498,14 +498,15 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 ### #39 [P2] WelcomeScene: có phản hồi khi cầm thùng và chạm nút
 - **Type:** feature
 - **Scene(s):** WelcomeScene
-- **Files:** WelcomeScene `BigRedButton` (`_whenSelect`, đang trống, xem #9), thùng trong `Interactables Obj`, `Instruction Table` thẻ 1–2, `Menu`
+- **Files:** Assets/Scripts/Welcome/WelcomePracticeFeedback.cs (mới), WelcomeScene `BigRedButton` (`_whenSelect`, đang trống, xem #9), thùng trong `Interactables Obj`, `Instruction Table` thẻ 1–2, `Menu`
 - **Problem:** Welcome dạy hai thao tác (cầm, chạm nút) nhưng cả hai đều không có phản hồi. Trainee không biết mình đã làm đúng chưa, cũng không biết lúc nào "xong" để sang Menu. Mọi chữ hiện ra cùng lúc ngay từ đầu (4 khối).
 - **Done when:** Cầm thùng → thẻ 1 có dấu ✓. Chạm nút đỏ → thẻ 2 có dấu ✓ kèm âm thanh. Xong cả hai → Menu (mục tiếp theo) được làm nổi. Nếu prefab nút đã có âm thanh hoặc animation thì giữ nguyên, chỉ thêm dấu ✓.
 - **Inspector work expected:** yes
 - **Công:** M
 - **Test trên kính:** nhanh (cầm thùng, chạm nút, nghe âm thanh)
 - **Depends on:** #9; nên làm cùng hoặc sau #27 (bàn phím nhập mã cũng nằm ở Welcome)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl39.md
+- **Status:** verified-mcp (10/10 ✅, chờ test tay H1 trên kính; âm thanh = tiếng bấm sẵn có của nút)
 
 ### #40 [Feature] Làm nổi bước hiện tại trên thẻ hướng dẫn
 - **Type:** feature
