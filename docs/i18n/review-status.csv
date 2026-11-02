@@ -18,7 +18,7 @@ common.panel.see_cards,Ihre Aufgaben stehen links auf den Karten.,proposed,germa
 welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-01,#25
 mixed.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Bearbeiten Sie die zwei Positionen nacheinander.",proposed,german-reviewer (agent),2026-11-01,#21
 mixed.card.step1_body,"Lesen Sie im LVS die Angaben der aktuellen Position ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).",proposed,german-reviewer (agent),2026-11-01,#21
-mixed.card.step2_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
+common.card.step2_pick_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
 mixed.card.step2_body,"Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie die Verpackungen in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#21
 mixed.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6). Danach zeigt das LVS die nächste Position an.,proposed,german-reviewer (agent),2026-11-01,#21
 complex.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Der Auftrag hat zwei Positionen mit losem Material. Bearbeiten Sie beide nacheinander.",proposed,german-reviewer (agent),2026-11-02,#19: text changed (two positions)
@@ -55,3 +55,28 @@ Der angebrochene Karton mit der Anbruchmenge bleibt im Modul im Lagerbehälter.
 Lesen Sie im LVS die Angaben von Position {next} ab.",proposed,german-reviewer (agent),2026-11-02,#19
 complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-02,#53 (quiz hint moved to card 1)
 complex.card.step1_body_position1,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>). Beantworten Sie dann die Fragen unter dem Bildschirm.",proposed,german-reviewer (agent),2026-11-02,#53
+basic.result.correct.text,Der Auftrag ist richtig. Wählen Sie jetzt im Menü „4. Mehrere Positionen“.,proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional '… auswählen', left to #13"
+basic.result.correct.title,"<color=""green"">Richtig!</color>",proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+basic.result.incorrect.title,"<color=""red"">Nicht richtig</color>",proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+basic.step1.text,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll), VPE (<nobr>Verp.-Einh.</nobr>), EKZ (<nobr>Empf Kz</nobr>). Rest: So viele Stück bleiben nach dem Auftrag im Lagerbehälter.",proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional 'Restmenge (Rest):' for parallel form, left to #13"
+basic.step2.title,2. Kartons kommissionieren,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+basic.task.intro,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird.",proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+common.button.f6,F6,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+common.card.step1_title,1. Angaben im LVS ablesen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+common.card.step3_title,3. Auftrag bestätigen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+complex.end.next,Bitte nehmen Sie die VR-Brille ab und melden Sie sich bei der Kursleitung.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.card.step1_body,Nehmen Sie jede Verpackung in die Hand. Die Erklärung steht links neben dem Bildschirm.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.card.step1_title,1. Etikett lesen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.card.step2_body,Lesen Sie die Erklärung rechts neben dem Bildschirm. Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.card.step2_title,2. LVS kennenlernen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.card.step3_title,3. Fragen beantworten,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.card.task_body,Lernen Sie das Etikett und das Lagerverwaltungssystem (LVS) kennen. Beantworten Sie dann die Fragen.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.label.header,Etikett,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+entry.confirm.correct,Korrigieren,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+entry.confirm.yes,Ja,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+entry.keypad.delete,Löschen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+entry.keypad.title,Code eingeben,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+entry.resume.continue,Fortsetzen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+entry.resume.restart,Neu beginnen,proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional 'Von vorn beginnen', left to #13"
+entry.testmode,Testmodus – wird nicht ausgewertet,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+entry.warning.continue,Trotzdem starten,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)

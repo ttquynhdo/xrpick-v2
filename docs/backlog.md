@@ -21,7 +21,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
-- **Sau #40 (2026-11-02):** #40 verified-mcp (decision 017), chờ test kính H1–H3 cùng buổi với #19, #21, #36, #39, #50–#52, #53. #53 verified-mcp (thẻ 1 nhắc quiz, giả định D20). #11 verified-mcp (2026-11-02, nền tảng DE/EN, chờ build ConceptScene trên Quest L9 + chạm nút L10). Tiếp theo: #12 → #13, rồi đợt 6.
+- **Sau #40 (2026-11-02):** #40 verified-mcp (decision 017), chờ test kính H1–H3 cùng buổi với #19, #21, #36, #39, #50–#52, #53. #53 verified-mcp (thẻ 1 nhắc quiz, giả định D20). #11 verified-mcp (2026-11-02, nền tảng DE/EN, chờ build ConceptScene trên Quest L9 + chạm nút L10). Tiếp theo: #12 (text cố định trong scene) → #54 (chuỗi trong code) → #55 (chuỗi trong Inspector) → #13, rồi đợt 6. #12 được chia ba ngày 2026-11-02.
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
@@ -552,18 +552,61 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test report:** docs/test-reports/bl11.md
 - **Status:** verified-mcp (commit 6e67608, 16/16 MCP ✅, chờ test tay L9 build ConceptScene trên Quest, L10 chạm nút ngôn ngữ trên kính)
 
-### #12 [Feature] Chuyển toàn bộ text hiển thị sang bảng dịch (EN + DE)
+### #12 [Feature] Text cố định trong 5 scene sang bảng dịch (EN + DE)
 - **Type:** refactor
-- **Scene(s):** tất cả
-- **Files:** khoảng 128 TMP text trong 5 scene; các chuỗi feedback trong `OrderFeedback` (#14), `MixPickingValidator`, `PiecesOrderValidator`, `MixPickingContainer`/`PiecesContainerCounter` (text WMS sinh từ dòng đơn, #6), `PackageQuizController`, `PackageInfoDisplay`, `SampleFormulaDisplay`, `LessonNames`
-- **Problem:** Text đang viết cứng bằng tiếng Anh trong code và scene, nên không dịch được.
-- **Done when:** Ở chế độ Deutsch không còn chữ tiếng Anh nào, trừ chú thích WMS. Mọi chuỗi tiếng Đức đã qua `german-reviewer`. Có file `docs/i18n/review-status.csv`. Ở `de`, ảnh `wms`, `instructions` và `menu` của cả 5 scene không có chữ tràn khung và không có ô `□`. Nhãn WMS (`do_not_translate=yes`) giống từng ký tự ở cả hai locale. (code) Không còn câu nào ghép từ mảnh (`SampleFormulaDisplay.cs:31–36`, `PiecesOrderValidator.cs:40–42`); số lượng là placeholder.
-- **Inspector work expected:** yes (gắn key cho từng TMP text)
-- **Công:** L
-- **Test trên kính:** không (cần người Đức duyệt bản dịch)
-- **Depends on:** #11. #4, #6, #14 đã verified-mcp; nên làm sau #25 để không phải dịch các chuỗi sắp bị sửa. Nút xác nhận là `F6 Bestätigen` (B8, dialog mới, 2026-11-01); theo A2 (2026-11-01) không còn chữ "GG" làm tên loại kiện.
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** tool Editor mới (nạp `docs/i18n/strings-todo.csv` vào bảng `UI`, gắn `LocalizeStringEvent` cho TMP theo chữ tiếng Đức), các TMP text cố định trong 5 scene, `docs/i18n/strings-todo.csv`, `docs/i18n/review-status.csv`
+- **Problem:** Text đang viết cứng trong scene, nên không dịch được. (Tách 2026-11-02, người dùng chọn chia 3: chuỗi trong code → #54, chuỗi lưu trong Inspector → #55.)
+- **Done when:** (viết lại 2026-11-02 khi tách; "text cố định" = TMP mà không script nào ghi chữ vào)
+  - Chọn English ở WelcomeScene rồi mở từng scene: mọi text cố định trong 5 scene hiện tiếng Anh. Trong ảnh `overview`, `instructions`, `wms`, `menu` ở `en`, chữ Đức chỉ còn ở: nhãn WMS (`do_not_translate=yes`), nhãn trên kiện (tên vật tư, `Mat.-Nr`, `VPE`), và text do script ghi (Menu, thẻ đổi theo position, feedback, quiz, tour: làm ở #54/#55).
+  - Ở `de` (lần chạy đầu), các text đó giống từng ký tự như trước #12 (so bảng TMP của `scene_inventory.py` trước/sau).
+  - Ở `de` và `en`, ảnh `wms`, `instructions` và `menu` của cả 5 scene không có chữ tràn khung và không có ô `□`.
+  - Nhãn WMS (`do_not_translate=yes`) giống từng ký tự ở cả hai locale.
+  - Mọi key gắn trong #12 có dòng trong `docs/i18n/review-status.csv`; dòng chưa có thì đã qua `german-reviewer`.
+  - (code) Không TMP nào vừa có `LocalizeStringEvent` vừa được script ghi chữ (tool liệt kê các TMP nó bỏ qua và lý do).
+  - (code) Chạy tool lần hai không đổi gì thêm.
+- **Inspector work expected:** no (tool gắn component)
+- **Công:** M
+- **Test trên kính:** không
+- **Depends on:** #11
 - **Decision:** docs/decisions/002-localization-mechanism.md
-- **Bổ sung (2026-11-01, review thiết kế khóa học):** Khi dịch, thống nhất luôn: một thuật ngữ cho LVS/WMS (tài liệu dùng LVS); một tên cho mỗi vật tư (Mixed đang có "Cable Connector A", "GG Connector A", "GG Screw packages"…); đơn vị `ST` trên panel WMS và `Stück` trong câu; Basic đang xưng *du* và có lỗi chính tả "Vervolsständige" → chuyển sang *Sie*. Chuỗi ghép từng mảnh (`SampleFormulaDisplay.cs:31–36`, `PiecesOrderValidator.cs:40–42`) phải thành câu trọn vẹn có placeholder.
+- **Bổ sung (2026-11-01, review thiết kế khóa học):** Khi dịch, thống nhất luôn: một thuật ngữ cho LVS/WMS (tài liệu dùng LVS); một tên cho mỗi vật tư; đơn vị `ST` trên panel WMS và `Stück` trong câu; *Sie*. (#25 đã làm phần Basic *du* → *Sie* và tên vật tư; câu ghép từ mảnh chuyển sang #54.)
+- **Test report:** docs/test-reports/bl12.md
+- **Status:** verified-mcp (9/9 ✅, không có case test tay; chờ commit)
+
+### #54 [Feature] Chuỗi trong code sang `Loc.Get`
+- **Type:** refactor
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Scripts/OrderFeedback.cs (bỏ cặp từ điển EN/DE, `FeedbackLanguage`), Assets/Scripts/MixPickingValidator.cs, Assets/Scripts/PiecesOrderValidator.cs, Assets/Scripts/WS Scripts/OrderConfirm.cs, Assets/Scripts/PackageQuizController.cs (hằng), Assets/Scripts/Complex/RemainderQuizController.cs, Assets/Scripts/Concept/WmsFieldTour.cs (hằng), Assets/Scripts/PackageInfoDisplay.cs, Assets/Scripts/PackageInfoOnGrab.cs, Assets/Scripts/ParticipantEntry/*.cs, Assets/Scripts/ParticipantEntry/LessonNames.cs + Assets/Scripts/MenuCurrentLesson.cs (Menu), text hướng dẫn mà validator đọc lại (`initialInstruction`)
+- **Problem:** Khoảng 60 hằng chuỗi trong 15 script vẫn viết cứng tiếng Đức (`// key` ở cuối dòng), `OrderFeedback` giữ hai bản EN/DE riêng. Ở `en` các text này vẫn là tiếng Đức.
+- **Done when:**
+  - Ở `en`, các case hồi quy C4–C6, B1, B3–B5, M2–M6, X1–X7, W1 và các panel bàn phím/kết thúc phiên hiện câu tiếng Anh; ở `de` hiện đúng câu như trước #54.
+  - Menu ở `en` hiện tên bài tiếng Anh, bài đang mở vẫn có „» “ và chữ đậm; panel tiếp tục ở Welcome hiện tên bài theo ngôn ngữ.
+  - (code) Không còn chuỗi trainee thấy viết cứng trong `Assets/Scripts` (trừ tên ngôn ngữ „Deutsch“/„English“ và ký hiệu như „» “); `FeedbackLanguage` và các bản `…English` bị bỏ.
+  - (code) Không còn câu ghép từ mảnh (`"
+" + …`, `string.Format({0})`); số lượng và tên là placeholder có tên.
+  - Mọi key mới/đổi có dòng trong `review-status.csv` và đã qua `german-reviewer`.
+- **Inspector work expected:** no
+- **Công:** M
+- **Test trên kính:** không
+- **Depends on:** #12 (bảng `UI` đã có các key từ CSV)
+- **Decision:** docs/decisions/002-localization-mechanism.md
+- **Status:** todo
+
+### #55 [Feature] Chuỗi lưu trong Inspector sang key (tour WMS, quiz, PositionTexts)
+- **Type:** refactor
+- **Scene(s):** ConceptScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Scripts/Concept/WmsFieldTour.cs (`Step.title/body`), Assets/Scripts/PackageQuizController.cs (`Question.text`, `Answer.label/wrongReason`), Assets/Scripts/PositionTexts.cs (`textPerPosition`), Assets/Scripts/PackageInfoOnGrab.cs (`materialName`, nếu là text trainee đọc)
+- **Problem:** Các chuỗi này nằm trong dữ liệu serialize của component, không phải hằng trong code, nên phải đổi cấu trúc dữ liệu sang key (giữ dữ liệu cũ bằng `[FormerlySerializedAs]` hoặc chuyển một lần).
+- **Done when:**
+  - Ở `en`, tour WMS 10 bước (C2), quiz 4 câu với đáp án và lý do sai (C5–C7), và thẻ 1/2 ở hai position của Mixed/Complex hiện tiếng Anh; ở `de` giống từng ký tự như trước #55.
+  - (code) Các component trên lưu key, không lưu chữ; key thiếu thì `Loc` báo lỗi như #11.
+  - Mọi key mới/đổi có dòng trong `review-status.csv` và đã qua `german-reviewer`.
+- **Inspector work expected:** no (chuyển dữ liệu bằng code)
+- **Công:** M
+- **Test trên kính:** không
+- **Depends on:** #12, #54 (cùng sửa `PackageQuizController`/`WmsFieldTour`: làm sau để không đụng nhau)
+- **Decision:** docs/decisions/002-localization-mechanism.md
 - **Status:** todo
 
 ### #13 [Feature] File export EN–DE cho người bản ngữ duyệt
@@ -575,7 +618,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Inspector work expected:** no
 - **Công:** M
 - **Test trên kính:** không (người duyệt mở file trong Excel)
-- **Depends on:** #12
+- **Depends on:** #12, #54, #55
 - **Decision:** docs/decisions/002-localization-mechanism.md
 - **Status:** todo
 

@@ -26,6 +26,622 @@ MonoBehaviour:
     m_Localized: Question {n} of {total}
     m_Metadata:
       m_Items: []
+  - m_Id: 7615867129856
+    m_Localized: Enter code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615938433024
+    m_Localized: Delete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627328
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627329
+    m_Localized: "Test mode \u2013 not analysed"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627330
+    m_Localized: Is the code {participant_id} correct?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627331
+    m_Localized: Edit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627332
+    m_Localized: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627333
+    m_Localized: Continue the course of {participant_id}?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627334
+    m_Localized: 'Interrupted in: {scene_name}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627335
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627336
+    m_Localized: Start over
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627337
+    m_Localized: '{participant_id} already has a finished session.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627338
+    m_Localized: Start anyway
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627339
+    m_Localized: The session could not be started. Please restart the app.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627340
+    m_Localized: Please take off the headset and tell the course leader.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627341
+    m_Localized: 'Code: {participant_id}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627342
+    m_Localized: 1. Introduction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627343
+    m_Localized: 2. Basics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627344
+    m_Localized: 3. Order picking by EKZ 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627345
+    m_Localized: 4. Several positions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627346
+    m_Localized: 5. Full cartons and loose material
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627347
+    m_Localized: End the session?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627348
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627349
+    m_Localized: End
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627350
+    m_Localized: Pick the order shown in the warehouse management system (WMS).
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627351
+    m_Localized: 1. Read the WMS data
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627352
+    m_Localized: 'Read in the WMS: material number (<nobr>Mat.-Nr</nobr>), target
+      quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>), EKZ (<nobr>Empf Kz</nobr>).
+      Rest: this many pieces stay in the storage container after the order.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627353
+    m_Localized: 2. Pick the cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627354
+    m_Localized: Work out how many cartons you need. Put the cartons into the order
+      container as the EKZ requires.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627355
+    m_Localized: 3. Confirm the order
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627356
+    m_Localized: Check the order. Then press the red button (F6).
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627357
+    m_Localized: <color="green">Correct!</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627358
+    m_Localized: "The order is correct. Now choose \u201C4. Several positions\u201D
+      in the menu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627359
+    m_Localized: <color="red">Not correct</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627360
+    m_Localized: The order is not correct. Check the WMS data and try again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627361
+    m_Localized: F6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627362
+    m_Localized: 'PACKAGE PLACED: {placed}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627363
+    m_Localized: The order container is empty. Put the material of the order into
+      the container.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627364
+    m_Localized: The container holds wrong material. Take it out. Check the material
+      number in the WMS.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627365
+    m_Localized: "Not enough {name}. Calculate again: order quantity \xF7 VPE."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627366
+    m_Localized: "Too much {name}. Calculate again: order quantity \xF7 VPE."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627367
+    m_Localized: 'Not enough loose {name}. Calculate again: order quantity minus
+      the pieces in the full cartons.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627368
+    m_Localized: 'Too much loose {name}. Calculate again: order quantity minus the
+      pieces in the full cartons.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627369
+    m_Localized: There are more errors.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627370
+    m_Localized: Not correct
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627371
+    m_Localized: "Correct! All materials and quantities match the order.\nNext, choose
+      \u201C{next_lesson}\u201D in the menu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627372
+    m_Localized: Correct! The full cartons and the loose material match the order.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627373
+    m_Localized: Get to know the label and the warehouse management system (WMS).
+      Then answer the questions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627374
+    m_Localized: 1. Read the label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627375
+    m_Localized: Pick up each package. The explanation is to the left of the screen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627376
+    m_Localized: 2. Get to know the WMS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627377
+    m_Localized: Read the explanation to the right of the screen. Press "Weiter".
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627378
+    m_Localized: 3. Answer the questions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627379
+    m_Localized: Choose A, B or C. Then press the red button.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627380
+    m_Localized: Label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627381
+    m_Localized: Read the label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627382
+    m_Localized: Pick up a package. Here you see what the label says.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627383
+    m_Localized: "Mat.-Nr: {matnr} \u2013 the material number. The same number is
+      in the LVS."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627384
+    m_Localized: "VPE: {vpe} ST \u2013 this many pieces are in this package."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627385
+    m_Localized: Next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627386
+    m_Localized: Start over
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627387
+    m_Localized: Step {n} of {total}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627388
+    m_Localized: The LVS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627389
+    m_Localized: On the screen you see an order in the warehouse management system
+      (LVS). Press "Weiter".
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627390
+    m_Localized: Mat.-Nr and Bez.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627391
+    m_Localized: Mat.-Nr is the material number, Bez. is the name of the material.
+      Compare both with the label.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627392
+    m_Localized: Verp.-Einh.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627393
+    m_Localized: This many pieces are in one carton. On the label it says VPE for
+      this.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627394
+    m_Localized: Soll
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627395
+    m_Localized: You must pick this many pieces.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627396
+    m_Localized: Ist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627397
+    m_Localized: When weighing, Ist shows how many pieces are already in the order
+      container.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627398
+    m_Localized: Rest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627399
+    m_Localized: This many pieces stay in the storage container after the order.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627400
+    m_Localized: Empf Kz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627401
+    m_Localized: 'Empf Kz shows the EKZ. It tells you how to put the parts in. 003
+      is EKZ 3: put the parts in one by one and in order.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627402
+    m_Localized: Empf Kz 000
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627403
+    m_Localized: '000 is EKZ 0: the parts may lie unordered. You may also pour the
+      parts in. There are more EKZ.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627404
+    m_Localized: Not in the exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627405
+    m_Localized: You don't need the marked areas in the exercise. The Anweisung field
+      stays empty in the exercise.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627406
+    m_Localized: Choose an answer first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627407
+    m_Localized: Correct!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627408
+    m_Localized: Now answer the next question.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627409
+    m_Localized: "You answered all questions correctly. Now choose \u201E{lesson}\u201C
+      in the menu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627410
+    m_Localized: Not correct
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627411
+    m_Localized: 'Soll 100, VPE 25: how many cartons do you take?'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627412
+    m_Localized: 2 cartons | 2 cartons are only 50 pieces.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627413
+    m_Localized: 4 cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627414
+    m_Localized: '25 cartons | 25 is the VPE: the number of pieces in one carton.
+      Divide Soll by VPE.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627415
+    m_Localized: Which material has Mat.-Nr 738190?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627416
+    m_Localized: Compare the Mat.-Nr on the labels with 738190.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627417
+    m_Localized: 'Empf Kz 003: how do you put the parts into the order container?'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627418
+    m_Localized: Put in one by one and in order
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627419
+    m_Localized: Pour in unordered | With 003 the parts must lie one by one and in
+      order.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627420
+    m_Localized: 'Empf Kz 000: how may you put the parts into the order container?'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627421
+    m_Localized: Only one by one and in order | With 000 the parts may lie unordered.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627422
+    m_Localized: Pouring in is allowed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627423
+    m_Localized: 'Read in the LVS: material number (Mat.-Nr), target quantity (Soll),
+      VPE (Verp.-Einh.), EKZ (Empf Kz). Rest: this many pieces stay in the storage
+      container after the order.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627424
+    m_Localized: Practise two simple hand movements.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627425
+    m_Localized: 1. Grab the box
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627426
+    m_Localized: Reach for the box with one hand and lift it up.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627427
+    m_Localized: 2. Press the button
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627428
+    m_Localized: Press the red button with your fingertip. Later you confirm the
+      order with it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627429
+    m_Localized: Welcome to <color=#0391DD>XPick!</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627430
+    m_Localized: A VR training for order picking in the warehouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627431
+    m_Localized: What you will learn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627432
+    m_Localized: "By the end of the course you will be able to:\n\u2022 read an order
+      in the warehouse management system (WMS)\n\u2022 compare the label with the
+      WMS (Mat.-Nr, VPE)\n\u2022 work out full cartons and loose pieces\n\u2022 place
+      cartons according to the EKZ\n\u2022 pick several positions one after another"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627433
+    m_Localized: 'Duration: about 5 minutes per lesson'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627434
+    m_Localized: Your tasks are on the cards on the left.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627435
+    m_Localized: Then choose the next lesson in the menu.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627436
+    m_Localized: Pick the order shown in the warehouse management system (WMS). Work
+      on the two positions one after the other.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627437
+    m_Localized: 'Read the data of the current position in the WMS: material number
+      (Mat.-Nr), target quantity (Soll) and VPE (Verp.-Einh.).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627438
+    m_Localized: 2. Pick the material
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627439
+    m_Localized: Work out how many packages you need. Put the packages into the order
+      container.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627440
+    m_Localized: Check the order. Then press the red button (F6). After that the
+      WMS shows the next position.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627441
+    m_Localized: Pick the order shown in the warehouse management system (WMS). The
+      order has two positions with loose material. Work on both one after the other.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627442
+    m_Localized: 'Read in the WMS: material number (Mat.-Nr), target quantity (Soll)
+      and VPE (Verp.-Einh.).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627443
+    m_Localized: Work out how many full cartons and loose pieces you need. Put the
+      cartons into the order container first, then the loose pieces.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627444
+    m_Localized: Check the order. Then press the red button (F6).
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627445
+    m_Localized: Congratulations!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627446
+    m_Localized: What you learned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627447
+    m_Localized: "\u2022 Compare the label with the WMS (Mat.-Nr, VPE)\n\u2022 Target
+      quantity : VPE = full cartons, remaining pieces loose\n\u2022 Pick and confirm
+      each position separately\n\u2022 The red button stands in for confirming with
+      your foot"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627448
+    m_Localized: 'Correct! Position {position} is done.
+
+      Read the data of position
+      {next_position} in the WMS.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627449
+    m_Localized: Not all cartons are placed in order. With Empf Kz 003, put the cartons
+      in one by one and in order.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627450
+    m_Localized: The way of the containers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627451
+    m_Localized: The roller conveyor brings the storage container from the warehouse.
+      After confirming, the order container moves on. There are several picking stations.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627452
+    m_Localized: How many full cartons do you take for this position?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627453
+    m_Localized: How many loose pieces do you take in addition?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627454
+    m_Localized: 1 carton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627455
+    m_Localized: '{count} cartons'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627456
+    m_Localized: 1 piece
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627457
+    m_Localized: '{count} pieces'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627458
+    m_Localized: Not correct. Divide Soll by VPE. Only full cartons count.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627459
+    m_Localized: "Not correct. Loose pieces = Soll minus (full cartons \xD7 VPE)."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627460
+    m_Localized: Correct! Now answer the second question.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627461
+    m_Localized: Correct! Now take the full cartons and the loose pieces from the
+      storage container.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627462
+    m_Localized: Example
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627463
+    m_Localized: "Soll 64 ST, VPE 20 ST\n1. 64 : 20 = 3.2 \u2013 so 3 full cartons
+      (60 ST)\n2. 64 - 60 = 4 loose pieces\nCheck: 60 + 4 = 64 ST"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627464
+    m_Localized: 'Correct! Position {done} is done.
+
+      The opened carton with
+      the broken-case quantity stays in the module in the storage container.
+
+      Read
+      the details of position {next} in the WMS.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627465
+    m_Localized: Put the full cartons into the order container first, then the loose
+      pieces from the opened carton.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627466
+    m_Localized: 'Read in the WMS: material number (Mat.-Nr), target quantity (Soll)
+      and VPE (Verp.-Einh.). Then answer the questions below the screen.'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

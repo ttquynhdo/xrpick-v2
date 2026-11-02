@@ -26,6 +26,635 @@ MonoBehaviour:
     m_Localized: Frage {n} von {total}
     m_Metadata:
       m_Items: []
+  - m_Id: 7615867129856
+    m_Localized: Code eingeben
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615938433024
+    m_Localized: "L\xF6schen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627328
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627329
+    m_Localized: "Testmodus \u2013 wird nicht ausgewertet"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627330
+    m_Localized: Ist der Code {participant_id} richtig?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627331
+    m_Localized: Korrigieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627332
+    m_Localized: Ja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627333
+    m_Localized: Kurs von {participant_id} fortsetzen?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627334
+    m_Localized: 'Unterbrochen in: {scene_name}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627335
+    m_Localized: Fortsetzen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627336
+    m_Localized: Neu beginnen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627337
+    m_Localized: "F\xFCr {participant_id} gibt es bereits eine abgeschlossene Sitzung."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627338
+    m_Localized: Trotzdem starten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627339
+    m_Localized: Die Sitzung konnte nicht gestartet werden. Bitte starten Sie die
+      App neu.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627340
+    m_Localized: Bitte nehmen Sie die VR-Brille ab und melden Sie sich bei der Kursleitung.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627341
+    m_Localized: 'Code: {participant_id}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627342
+    m_Localized: "1. Einf\xFChrung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627343
+    m_Localized: 2. Grundlagen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627344
+    m_Localized: 3. Kommissionieren nach EKZ 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627345
+    m_Localized: 4. Mehrere Positionen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627346
+    m_Localized: 5. Volle Kartons und loses Material
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627347
+    m_Localized: Sitzung wirklich beenden?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627348
+    m_Localized: Fortsetzen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627349
+    m_Localized: Beenden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627350
+    m_Localized: Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS)
+      angezeigt wird.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627351
+    m_Localized: 1. Angaben im LVS ablesen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627352
+    m_Localized: "Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge
+      (Soll), VPE (<nobr>Verp.-Einh.</nobr>), EKZ (<nobr>Empf Kz</nobr>). Rest: So
+      viele St\xFCck bleiben nach dem Auftrag im Lagerbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627353
+    m_Localized: 2. Kartons kommissionieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627354
+    m_Localized: "Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie die
+      Kartons nach der EKZ in den Auftragsbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627355
+    m_Localized: "3. Auftrag best\xE4tigen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627356
+    m_Localized: "Pr\xFCfen Sie den Auftrag. Dr\xFCcken Sie dann den roten Knopf
+      (F6)."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627357
+    m_Localized: <color="green">Richtig!</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627358
+    m_Localized: "Der Auftrag ist richtig. W\xE4hlen Sie jetzt im Men\xFC \u201E4.
+      Mehrere Positionen\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627359
+    m_Localized: <color="red">Nicht richtig</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627360
+    m_Localized: "Der Auftrag ist nicht richtig. Pr\xFCfen Sie die Angaben im LVS
+      und versuchen Sie es noch einmal."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627361
+    m_Localized: F6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627362
+    m_Localized: "Kartons im Auftragsbeh\xE4lter: {placed}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627363
+    m_Localized: "Der Auftragsbeh\xE4lter ist leer. Legen Sie das Material des Auftrags
+      hinein."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627364
+    m_Localized: "Im Auftragsbeh\xE4lter liegt falsches Material. Nehmen Sie es heraus.
+      Pr\xFCfen Sie die Materialnummer im LVS."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627365
+    m_Localized: 'Zu wenig Material {name}. Rechnen Sie nach: Sollmenge geteilt durch
+      VPE.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627366
+    m_Localized: 'Zu viel Material {name}. Rechnen Sie nach: Sollmenge geteilt durch
+      VPE.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627367
+    m_Localized: "Zu wenig loses Material {name}. Rechnen Sie nach: Sollmenge minus
+      St\xFCckzahl der vollen Kartons."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627368
+    m_Localized: "Zu viel loses Material {name}. Rechnen Sie nach: Sollmenge minus
+      St\xFCckzahl der vollen Kartons."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627369
+    m_Localized: Es gibt noch weitere Fehler.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627370
+    m_Localized: Nicht richtig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627371
+    m_Localized: "Richtig! Alle Materialien und Mengen stimmen mit dem Auftrag \xFCberein.\nW\xE4hlen
+      Sie jetzt im Men\xFC \u201E{next_lesson}\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627372
+    m_Localized: "Richtig! Volle Kartons und loses Material stimmen mit dem Auftrag
+      \xFCberein."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627373
+    m_Localized: Lernen Sie das Etikett und das Lagerverwaltungssystem (LVS) kennen.
+      Beantworten Sie dann die Fragen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627374
+    m_Localized: 1. Etikett lesen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627375
+    m_Localized: "Nehmen Sie jede Verpackung in die Hand. Die Erkl\xE4rung steht
+      links neben dem Bildschirm."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627376
+    m_Localized: 2. LVS kennenlernen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627377
+    m_Localized: "Lesen Sie die Erkl\xE4rung rechts neben dem Bildschirm. Dr\xFCcken
+      Sie \u201EWeiter\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627378
+    m_Localized: 3. Fragen beantworten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627379
+    m_Localized: "W\xE4hlen Sie A, B oder C. Dr\xFCcken Sie dann den roten Knopf."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627380
+    m_Localized: Etikett
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627381
+    m_Localized: Etikett lesen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627382
+    m_Localized: Nehmen Sie eine Verpackung in die Hand. Hier sehen Sie, was auf
+      dem Etikett steht.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627383
+    m_Localized: "Mat.-Nr: {matnr} \u2013 die Materialnummer. Dieselbe Nummer steht
+      im LVS."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627384
+    m_Localized: "VPE: {vpe} ST \u2013 so viele St\xFCck sind in dieser Verpackung."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627385
+    m_Localized: Weiter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627386
+    m_Localized: Von vorn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627387
+    m_Localized: Schritt {n} von {total}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627388
+    m_Localized: Das LVS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627389
+    m_Localized: "Auf dem Bildschirm sehen Sie einen Auftrag im Lagerverwaltungssystem
+      (LVS). Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627390
+    m_Localized: Mat.-Nr und Bez.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627391
+    m_Localized: Mat.-Nr ist die Materialnummer, Bez. ist der Name des Materials.
+      Vergleichen Sie beides mit dem Etikett.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627392
+    m_Localized: Verp.-Einh.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627393
+    m_Localized: "So viele St\xFCck sind in einem Karton. Auf dem Etikett steht daf\xFCr
+      VPE."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627394
+    m_Localized: Soll
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627395
+    m_Localized: "So viele St\xFCck m\xFCssen Sie kommissionieren."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627396
+    m_Localized: Ist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627397
+    m_Localized: "Beim Wiegen zeigt Ist, wie viele St\xFCck schon im Auftragsbeh\xE4lter
+      liegen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627398
+    m_Localized: Rest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627399
+    m_Localized: "So viele St\xFCck bleiben nach dem Auftrag im Lagerbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627400
+    m_Localized: Empf Kz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627401
+    m_Localized: 'Empf Kz zeigt die EKZ. Sie sagt, wie Sie die Teile einlegen. 003
+      ist EKZ 3: Legen Sie die Teile einzeln und geordnet ein.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627402
+    m_Localized: Empf Kz 000
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627403
+    m_Localized: "000 ist EKZ 0: Die Teile d\xFCrfen ungeordnet liegen. Sie d\xFCrfen
+      die Teile auch einf\xFCllen. Es gibt weitere EKZ."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627404
+    m_Localized: "Nicht in der \xDCbung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627405
+    m_Localized: "Die markierten Bereiche brauchen Sie in der \xDCbung nicht. Das
+      Feld Anweisung bleibt in der \xDCbung leer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627406
+    m_Localized: "W\xE4hlen Sie zuerst eine Antwort."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627407
+    m_Localized: Richtig!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627408
+    m_Localized: "Beantworten Sie jetzt die n\xE4chste Frage."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627409
+    m_Localized: "Sie haben alle Fragen richtig beantwortet. W\xE4hlen Sie jetzt
+      im Men\xFC \u201E{lesson}\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627410
+    m_Localized: Nicht richtig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627411
+    m_Localized: 'Soll 100, VPE 25: Wie viele Kartons nehmen Sie?'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627412
+    m_Localized: "2 Kartons | 2 Kartons sind nur 50 St\xFCck."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627413
+    m_Localized: 4 Kartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627414
+    m_Localized: "25 Kartons | 25 ist die VPE: die St\xFCckzahl in einem Karton.
+      Teilen Sie Soll durch VPE."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627415
+    m_Localized: Welches Material hat die Mat.-Nr 738190?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627416
+    m_Localized: Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627417
+    m_Localized: "Empf Kz 003: Wie legen Sie die Teile in den Auftragsbeh\xE4lter?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627418
+    m_Localized: Einzeln und geordnet einlegen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627419
+    m_Localized: "Ungeordnet einf\xFCllen | Bei 003 m\xFCssen die Teile einzeln und
+      geordnet liegen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627420
+    m_Localized: "Empf Kz 000: Wie d\xFCrfen Sie die Teile in den Auftragsbeh\xE4lter
+      geben?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627421
+    m_Localized: "Nur einzeln und geordnet einlegen | Bei 000 d\xFCrfen die Teile
+      ungeordnet liegen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627422
+    m_Localized: "Einf\xFCllen ist erlaubt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627423
+    m_Localized: "Lesen Sie im LVS ab: Materialnummer (Mat.-Nr), Sollmenge (Soll),
+      VPE (Verp.-Einh.), EKZ (Empf Kz). Rest: So viele St\xFCck bleiben nach dem
+      Auftrag im Lagerbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627424
+    m_Localized: "\xDCben Sie zwei einfache Handgriffe."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627425
+    m_Localized: 1. Karton greifen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627426
+    m_Localized: Greifen Sie mit einer Hand nach dem Karton und heben Sie ihn hoch.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627427
+    m_Localized: "2. Knopf dr\xFCcken"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627428
+    m_Localized: "Dr\xFCcken Sie mit der Fingerspitze den roten Knopf. Sp\xE4ter
+      best\xE4tigen Sie damit den Auftrag."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627429
+    m_Localized: Willkommen bei <color=#0391DD>XPick!</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627430
+    m_Localized: "Ein VR-Training f\xFCr die Kommissionierung im Lager"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627431
+    m_Localized: Das lernen Sie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627432
+    m_Localized: "Am Ende des Kurses k\xF6nnen Sie:\n\u2022 einen Auftrag im Lagerverwaltungssystem
+      (LVS) ablesen\n\u2022 das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n\u2022
+      volle Kartons und lose Teile berechnen\n\u2022 Kartons nach EKZ einlegen\n\u2022
+      mehrere Positionen nacheinander kommissionieren"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627433
+    m_Localized: 'Dauer: etwa 5 Minuten pro Lektion'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627434
+    m_Localized: Ihre Aufgaben stehen links auf den Karten.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627435
+    m_Localized: "Danach w\xE4hlen Sie im Men\xFC die n\xE4chste Lektion."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627436
+    m_Localized: Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS)
+      angezeigt wird. Bearbeiten Sie die zwei Positionen nacheinander.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627437
+    m_Localized: 'Lesen Sie im LVS die Angaben der aktuellen Position ab: Materialnummer
+      (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627438
+    m_Localized: 2. Material kommissionieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627439
+    m_Localized: "Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie
+      die Verpackungen in den Auftragsbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627440
+    m_Localized: "Pr\xFCfen Sie den Auftrag. Dr\xFCcken Sie dann den roten Knopf
+      (F6). Danach zeigt das LVS die n\xE4chste Position an."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627441
+    m_Localized: Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS)
+      angezeigt wird. Der Auftrag hat zwei Positionen mit losem Material. Bearbeiten
+      Sie beide nacheinander.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627442
+    m_Localized: 'Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge
+      (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627443
+    m_Localized: "Rechnen Sie aus, wie viele volle Kartons und lose Teile Sie brauchen.
+      Legen Sie zuerst die Kartons, dann die losen Teile in den Auftragsbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627444
+    m_Localized: "Pr\xFCfen Sie den Auftrag. Dr\xFCcken Sie dann den roten Knopf
+      (F6)."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627445
+    m_Localized: "Herzlichen Gl\xFCckwunsch!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627446
+    m_Localized: Das haben Sie gelernt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627447
+    m_Localized: "\u2022 Das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n\u2022
+      Sollmenge : VPE = volle Kartons, \xFCbrige Teile lose\n\u2022 Jede Position
+      einzeln kommissionieren und best\xE4tigen\n\u2022 Der rote Knopf ersetzt das
+      Best\xE4tigen mit dem Fu\xDF"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627448
+    m_Localized: 'Richtig! Position {position} ist erledigt.
+
+      Lesen Sie im
+      LVS die Angaben von Position {next_position} ab.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627449
+    m_Localized: 'Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie
+      die Kartons einzeln und geordnet ein.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627450
+    m_Localized: "Weg der Beh\xE4lter"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627451
+    m_Localized: "Die Rollenbahn bringt den Lagerbeh\xE4lter aus dem Lager. Nach
+      dem Best\xE4tigen f\xE4hrt der Auftragsbeh\xE4lter weiter. Es gibt mehrere
+      Kommissionierpl\xE4tze."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627452
+    m_Localized: "Wie viele volle Kartons nehmen Sie f\xFCr diese Position?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627453
+    m_Localized: "Wie viele lose Teile nehmen Sie zus\xE4tzlich?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627454
+    m_Localized: 1 Karton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627455
+    m_Localized: '{count} Kartons'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627456
+    m_Localized: 1 Teil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627457
+    m_Localized: '{count} Teile'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627458
+    m_Localized: "Nicht richtig. Teilen Sie Soll durch VPE. Es z\xE4hlen nur volle
+      Kartons."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627459
+    m_Localized: "Nicht richtig. Lose Teile = Soll minus (volle Kartons \xD7 VPE)."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627460
+    m_Localized: Richtig! Beantworten Sie jetzt die zweite Frage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627461
+    m_Localized: "Richtig! Nehmen Sie jetzt die vollen Kartons und die losen Teile
+      aus dem Lagerbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627462
+    m_Localized: Beispiel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627463
+    m_Localized: "Soll 64 ST, VPE 20 ST\n1. 64 : 20 = 3,2 \u2013 also 3 volle Kartons
+      (60 ST)\n2. 64 - 60 = 4 lose Teile\nKontrolle: 60 + 4 = 64 ST"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627464
+    m_Localized: "Richtig! Position {done} ist erledigt.\nDer angebrochene Karton
+      mit der Anbruchmenge bleibt im Modul im Lagerbeh\xE4lter.\nLesen Sie im LVS
+      die Angaben von Position {next} ab."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627465
+    m_Localized: "Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem
+      angebrochenen Karton in den Auftragsbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627466
+    m_Localized: 'Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge
+      (Soll) und VPE (<nobr>Verp.-Einh.</nobr>). Beantworten Sie dann die Fragen
+      unter dem Bildschirm.'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

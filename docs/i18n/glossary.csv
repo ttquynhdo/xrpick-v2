@@ -81,3 +81,6 @@ Rollenbahn,die,roller conveyor,Conveyor that brings the Lagerbehälter and takes
 Kommissionierplatz,der,picking station,Workstation where the trainee picks; plural die Kommissionierplätze.,no,requirements: Leerbehälter definition; app (#49),proposed,"Ask the instructor: Kommissionierplatz, Kommissionierarbeitsplatz or Kommissionierstation."
 angebrochener Karton,der,opened carton,Carton already opened; loose pieces are taken from it.,no,german-reviewer #19,proposed,Not 'offener/geöffneter Karton'.
 Bildschirm,der,screen,The LVS screen at the workstation.,no,german-reviewer #19,proposed,
+VR-Brille,die,headset,The VR headset the trainee wears.,no,team (#12),proposed,Used in complex.end.next; german-reviewer 2026-11-02.
+Menü,das,menu,The lesson menu right of the desk.,no,team (#12),proposed,"Use instead of Auswahl/Liste; german-reviewer 2026-11-02."
+Erklärung,die,explanation,The explanation boards next to the monitor in ConceptScene.,no,team (#12),proposed,german-reviewer 2026-11-02.

@@ -23,6 +23,570 @@ MonoBehaviour:
     m_Key: concept.quiz.progress
     m_Metadata:
       m_Items: []
+  - m_Id: 7615867129856
+    m_Key: entry.keypad.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615938433024
+    m_Key: entry.keypad.delete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627328
+    m_Key: entry.keypad.ok
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627329
+    m_Key: entry.testmode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627330
+    m_Key: entry.confirm.question
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627331
+    m_Key: entry.confirm.correct
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627332
+    m_Key: entry.confirm.yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627333
+    m_Key: entry.resume.question
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627334
+    m_Key: entry.resume.where
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627335
+    m_Key: entry.resume.continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627336
+    m_Key: entry.resume.restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627337
+    m_Key: entry.warning.finished
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627338
+    m_Key: entry.warning.continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627339
+    m_Key: entry.error.start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627340
+    m_Key: complex.end.next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627341
+    m_Key: complex.end.code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627342
+    m_Key: lesson.welcome
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627343
+    m_Key: lesson.concept
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627344
+    m_Key: lesson.basic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627345
+    m_Key: lesson.mixed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627346
+    m_Key: lesson.complex
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627347
+    m_Key: end.confirm.question
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627348
+    m_Key: end.confirm.cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627349
+    m_Key: end.confirm.end
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627350
+    m_Key: basic.task.intro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627351
+    m_Key: common.card.step1_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627352
+    m_Key: basic.step1.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627353
+    m_Key: basic.step2.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627354
+    m_Key: basic.step2.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627355
+    m_Key: common.card.step3_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627356
+    m_Key: basic.step3.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627357
+    m_Key: basic.result.correct.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627358
+    m_Key: basic.result.correct.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627359
+    m_Key: basic.result.incorrect.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627360
+    m_Key: basic.result.incorrect.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627361
+    m_Key: common.button.f6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627362
+    m_Key: mixed.counter.package_placed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627363
+    m_Key: order.feedback.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627364
+    m_Key: order.feedback.wrong_material
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627365
+    m_Key: order.feedback.too_few
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627366
+    m_Key: order.feedback.too_many
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627367
+    m_Key: order.feedback.missing_loose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627368
+    m_Key: order.feedback.extra_loose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627369
+    m_Key: order.feedback.more_errors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627370
+    m_Key: order.feedback.wrong_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627371
+    m_Key: mixed.feedback.correct
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627372
+    m_Key: complex.feedback.correct
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627373
+    m_Key: concept.card.task_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627374
+    m_Key: concept.card.step1_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627375
+    m_Key: concept.card.step1_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627376
+    m_Key: concept.card.step2_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627377
+    m_Key: concept.card.step2_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627378
+    m_Key: concept.card.step3_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627379
+    m_Key: concept.card.step3_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627380
+    m_Key: concept.label.header
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627381
+    m_Key: concept.label.default_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627382
+    m_Key: concept.label.default_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627383
+    m_Key: concept.label.matnr
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627384
+    m_Key: concept.label.vpe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627385
+    m_Key: concept.tour.next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627386
+    m_Key: concept.tour.restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627387
+    m_Key: concept.tour.progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627388
+    m_Key: concept.tour.intro.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627389
+    m_Key: concept.tour.intro.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627390
+    m_Key: concept.tour.material.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627391
+    m_Key: concept.tour.material.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627392
+    m_Key: concept.tour.verp_einh.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627393
+    m_Key: concept.tour.verp_einh.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627394
+    m_Key: concept.tour.soll.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627395
+    m_Key: concept.tour.soll.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627396
+    m_Key: concept.tour.ist.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627397
+    m_Key: concept.tour.ist.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627398
+    m_Key: concept.tour.rest.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627399
+    m_Key: concept.tour.rest.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627400
+    m_Key: concept.tour.empf_kz_003.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627401
+    m_Key: concept.tour.empf_kz_003.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627402
+    m_Key: concept.tour.empf_kz_000.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627403
+    m_Key: concept.tour.empf_kz_000.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627404
+    m_Key: concept.tour.not_used.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627405
+    m_Key: concept.tour.not_used.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627406
+    m_Key: concept.quiz.select_first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627407
+    m_Key: concept.quiz.correct
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627408
+    m_Key: concept.quiz.next_question
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627409
+    m_Key: concept.quiz.all_done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627410
+    m_Key: concept.quiz.wrong
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627411
+    m_Key: concept.quiz.cartons_from_soll.q
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627412
+    m_Key: concept.quiz.cartons_from_soll.a2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627413
+    m_Key: concept.quiz.cartons_from_soll.a4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627414
+    m_Key: concept.quiz.cartons_from_soll.a25
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627415
+    m_Key: concept.quiz.material_by_matnr.q
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627416
+    m_Key: concept.quiz.material_by_matnr.wrong
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627417
+    m_Key: concept.quiz.ekz_003.q
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627418
+    m_Key: concept.quiz.ekz_003.ordered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627419
+    m_Key: concept.quiz.ekz_003.poured
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627420
+    m_Key: concept.quiz.ekz_000.q
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627421
+    m_Key: concept.quiz.ekz_000.ordered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627422
+    m_Key: concept.quiz.ekz_000.poured
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627423
+    m_Key: basic.card.step1_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627424
+    m_Key: welcome.card.task_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627425
+    m_Key: welcome.card.step1_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627426
+    m_Key: welcome.card.step1_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627427
+    m_Key: welcome.card.step2_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627428
+    m_Key: welcome.card.step2_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627429
+    m_Key: welcome.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627430
+    m_Key: welcome.subtitle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627431
+    m_Key: welcome.panel.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627432
+    m_Key: welcome.panel.goals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627433
+    m_Key: welcome.panel.duration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627434
+    m_Key: common.panel.see_cards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627435
+    m_Key: welcome.panel.next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627436
+    m_Key: mixed.card.task_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627437
+    m_Key: mixed.card.step1_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627438
+    m_Key: common.card.step2_pick_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627439
+    m_Key: mixed.card.step2_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627440
+    m_Key: mixed.card.step3_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627441
+    m_Key: complex.card.task_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627442
+    m_Key: complex.card.step1_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627443
+    m_Key: complex.card.step2_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627444
+    m_Key: complex.card.step3_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627445
+    m_Key: complex.end.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627446
+    m_Key: complex.end.summary_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627447
+    m_Key: complex.end.summary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627448
+    m_Key: mixed.feedback.position_done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627449
+    m_Key: order.feedback.ekz3_loose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627450
+    m_Key: concept.tour.material_flow.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627451
+    m_Key: concept.tour.material_flow.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627452
+    m_Key: complex.quiz.q_cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627453
+    m_Key: complex.quiz.q_loose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627454
+    m_Key: complex.quiz.option_carton_one
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627455
+    m_Key: complex.quiz.option_cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627456
+    m_Key: complex.quiz.option_piece_one
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627457
+    m_Key: complex.quiz.option_pieces
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627458
+    m_Key: complex.quiz.wrong_cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627459
+    m_Key: complex.quiz.wrong_loose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627460
+    m_Key: complex.quiz.next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627461
+    m_Key: complex.quiz.done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627462
+    m_Key: complex.example.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627463
+    m_Key: complex.example.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627464
+    m_Key: complex.feedback.position_done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627465
+    m_Key: complex.card.step2_body_position1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7615942627466
+    m_Key: complex.card.step1_body_position1
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
