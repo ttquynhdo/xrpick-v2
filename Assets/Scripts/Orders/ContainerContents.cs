@@ -22,6 +22,20 @@ public sealed class ContainerContents
         Add(loose, Normalize(materialKey));
     }
 
+    // #19: an opened carton adds nothing; its loose pieces are counted one by one.
+    public void Add(string materialKey, PackageForm form)
+    {
+        switch (form)
+        {
+            case PackageForm.FullCarton:
+                AddFull(materialKey);
+                break;
+            case PackageForm.LoosePiece:
+                AddLoose(materialKey);
+                break;
+        }
+    }
+
     public int FullOf(string materialKey) => full.TryGetValue(Normalize(materialKey), out int n) ? n : 0;
 
     public int LooseOf(string materialKey) => loose.TryGetValue(Normalize(materialKey), out int n) ? n : 0;
