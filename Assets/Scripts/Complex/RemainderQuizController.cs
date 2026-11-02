@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using TMPro;
@@ -63,6 +64,7 @@ public class RemainderQuizController : MonoBehaviour
     private IReadOnlyList<int> options;
     private int question;
     private bool isSetUp;
+    private bool switching;
 
     public bool IsAnswered { get; private set; }
 
@@ -115,6 +117,9 @@ public class RemainderQuizController : MonoBehaviour
         {
             container.LineAdvanced -= OnLineAdvanced;
         }
+
+        // A disabled object stops its coroutines: never stay locked between the two questions.
+        switching = false;
     }
 
     private void Start()
@@ -164,7 +169,8 @@ public class RemainderQuizController : MonoBehaviour
 
     private void OnToggleChanged(int index, bool isOn)
     {
-        if (!isSetUp || IsAnswered)
+        // While the next question is one frame away, presses are not rated against the old options.
+        if (!isSetUp || IsAnswered || switching)
             return;
 
         // Switching the other toggles off raises their events with isOn = false: nothing to rate.
@@ -200,7 +206,7 @@ public class RemainderQuizController : MonoBehaviour
         if (question == 0)
         {
             feedbackText.text = NextQuestion;
-            ShowQuestion(1);
+            StartCoroutine(ShowSecondQuestionNextFrame());
             return;
         }
 
@@ -212,6 +218,16 @@ public class RemainderQuizController : MonoBehaviour
             toggle.interactable = false;
         }
         stock.RevealFirstSet();
+    }
+
+    // We are inside the pressed toggle's onValueChanged(true). The SDK's AnimatorOverrideLayerWeight listens after us,
+    // so switching that toggle off here would reach it before the outer "true" and leave it looking selected.
+    private IEnumerator ShowSecondQuestionNextFrame()
+    {
+        switching = true;
+        yield return null;
+        switching = false;
+        ShowQuestion(1);
     }
 
     // #32/#52: the chosen answer is marked with a text prefix and bold type, not by colour only.
