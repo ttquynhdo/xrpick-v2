@@ -459,13 +459,14 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** ConceptScene, MixedPickingScene, ComplexScene
 - **Files:** `…/Cube/Text (TMP)` của các kiện GG/GGA/GGB (font 0.2), nhãn túi `[PlasticBag_VPE_3]` (rect 0.07×0.13), `GGB/[VPE_n]/Cube/Text (TMP)`
 - **Problem:** Trong ảnh `container`, nhãn chỉ là những ô hoặc chấm trắng. GGA và GGB cùng một mô hình, nên nhãn là cách duy nhất để phân biệt vật tư. Ở Concept, nhãn GG là chữ xám mảnh, trong khi nhiệm vụ yêu cầu "Look for … labels". Trainee phải nhấc từng kiện lên mới đọc được.
-- **Done when:** Ảnh `shelf` đọc được tên vật tư và số lượng trên mọi kiện trong thùng kho. Nhãn quay về phía trainee, chữ đen đậm. Màu kiện **không** đổi theo vật tư.
+- **Done when:** Ảnh `labels` (đứng tại chỗ, nhìn xuống thùng kho) ở Concept, Basic, Mixed, Complex (cả thùng của vị trí 2): đọc được tên vật tư, Mat.-Nr và VPE trên mọi kiện có mặt trước hoặc mặt trên không bị kiện khác che. Carton có nhãn ở mặt trước (quay về phía trainee) và ở mặt trên. Mọi nhãn kiện là chữ đen đậm trên nền trắng. (code) Nội dung mọi nhãn vẫn khớp `PackageData` (K2). Màu kiện **không** đổi theo vật tư. (Viết lại 2026-11-02 khi bắt đầu: ảnh `shelf` không tồn tại; carton lớp dưới ở Basic chỉ lộ mặt trên.)
 - **Inspector work expected:** yes (prefab kiện, TMP nhãn)
 - **Công:** M
 - **Test trên kính:** nhanh (đọc nhãn từ chỗ đứng)
 - **Depends on:** #17 (nội dung nhãn đúng, verified-mcp)
 - **Bổ sung (2026-11-01, #17):** nhãn giờ có 3 dòng `TÊN` / `Mat.-Nr: …` / `VPE: n ST`, không tự xuống dòng, tự thu nhỏ chữ (min 30 %). Nhãn túi SCHRAUBE B (Mixed, Concept) và nhãn carton Basic (một mặt bên) rất nhỏ khi nhìn từ chỗ đứng (`TestEvidence/ConceptScene/bl17/L_after_labels_1.png`, `TestEvidence/BasicPickingScene/bl17/L_after_labels.png`). Nhãn vẫn là chữ tĩnh, phải khớp `PackageData` (`testing.md` K2).
-- **Status:** todo
+- **Test report:** docs/test-reports/bl36.md
+- **Status:** verified-mcp (11/13 ✅, chờ test tay H1 đọc nhãn trên kính, H2 cầm/đặt carton thật)
 
 ### #37 [P2] Menu: trong tầm với, đánh dấu bài đang làm, khó chạm nhầm
 - **Type:** logic
