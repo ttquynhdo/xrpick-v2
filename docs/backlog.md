@@ -550,7 +550,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Decision:** docs/decisions/002-localization-mechanism.md
 - **Bổ sung (2026-11-01, từ #26, đã gộp vào Done when 2026-11-02):** header của log nghiên cứu có trường `language` (hiện `null`). Trước khi thu dữ liệu thật, `language` phải khác `null` (ghi `DE`/`EN` lúc bắt đầu phiên) ~~và phải có sự kiện `language_change` cho chế độ thử~~ (thay bằng "ngôn ngữ cố định theo phiên", không có sự kiện đổi ngôn ngữ; spec §3/§9, data-analyst duyệt 2026-11-02). Ở chế độ nghiên cứu (mã ngoài dải thử) ngôn ngữ khoá ở DE.
 - **Test report:** docs/test-reports/bl11.md
-- **Status:** verified-mcp (16/16 MCP ✅, chờ test tay L9 build ConceptScene trên Quest, L10 chạm nút ngôn ngữ trên kính)
+- **Status:** verified-mcp (commit 6e67608, 16/16 MCP ✅, chờ test tay L9 build ConceptScene trên Quest, L10 chạm nút ngôn ngữ trên kính)
 
 ### #12 [Feature] Chuyển toàn bộ text hiển thị sang bảng dịch (EN + DE)
 - **Type:** refactor
