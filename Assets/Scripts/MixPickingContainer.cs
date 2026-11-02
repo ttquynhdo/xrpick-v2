@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositionedOrder
+public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositionedOrder, IOrderBoxContents
 {
     // #6, docs/decisions/005: the order is declared once, in WMS units (Soll pieces + VPE).
     [Header("Order")]
@@ -34,6 +34,22 @@ public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositioned
     public int RestPieces { get; private set; }
 
     public OrderLine CurrentLine => Sequence.CurrentLine;
+
+    // #40: packages of the current position inside, of any material (instruction shelf hint).
+    public int PackageCount
+    {
+        get
+        {
+            int count = 0;
+
+            foreach (PackageData _ in CurrentPackages())
+            {
+                count++;
+            }
+
+            return count;
+        }
+    }
 
     private OrderSequence Sequence => sequence ??= new OrderSequence(orderLines);
 

@@ -21,7 +21,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
-- **Đang làm (2026-11-02):** #40 làm nổi bước hiện tại (decision 017, nhánh `feat/40-current-step-highlight`) → sau đó #53 (câu nhắc quiz trên thẻ 1 ở Complex, cùng sửa thẻ ComplexScene nên làm sau #40).
+- **Sau #40 (2026-11-02):** #40 verified-mcp (decision 017), chờ test kính H1–H3 cùng buổi với #19, #21, #36, #39, #50–#52 → tiếp theo #53 (câu nhắc quiz trên thẻ 1 ở Complex, cùng sửa thẻ ComplexScene nên làm sau #40).
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
@@ -521,7 +521,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** bắt buộc (chuyển bước theo thao tác cầm thật; highlight thấy rõ khi liếc lại giá)
 - **Depends on:** #25, #35 (thẻ đã lên giá mới); D19 chỉ để xác nhận, không chặn
 - **Decision:** docs/decisions/017-current-step-highlight.md
-- **Status:** in progress (nhánh `feat/40-current-step-highlight`)
+- **Test report:** docs/test-reports/bl40.md
+- **Status:** verified-mcp (15/15 ✅, chờ test tay H1 cầm thật, H2 thả/lấy thật, H3 liếc lại giá trên kính)
 
 ---
 

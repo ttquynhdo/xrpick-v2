@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PiecesContainerCounter : MonoBehaviour, IWmsOrderSource, IPositionedOrder
+public class PiecesContainerCounter : MonoBehaviour, IWmsOrderSource, IPositionedOrder, IOrderBoxContents
 {
     // #6, docs/decisions/005: the order is declared once, in WMS units (Soll pieces + VPE).
     // Full cartons (Soll / VPE) and loose pieces (remainder) are derived by OrderRule.
@@ -27,6 +27,22 @@ public class PiecesContainerCounter : MonoBehaviour, IWmsOrderSource, IPositione
     public bool IsLastPosition => Sequence.IsLast;
 
     public OrderLine CurrentLine => Sequence.CurrentLine;
+
+    // #40: packages of the current position inside, of any material (instruction shelf hint).
+    public int PackageCount
+    {
+        get
+        {
+            int count = 0;
+
+            foreach (PackageData _ in CurrentPackages())
+            {
+                count++;
+            }
+
+            return count;
+        }
+    }
 
     // Closed cartons of the current position inside, of any material.
     public int CartonCount { get; private set; }

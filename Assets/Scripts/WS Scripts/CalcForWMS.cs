@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CalcForWMS : MonoBehaviour, IWmsOrderSource
+public class CalcForWMS : MonoBehaviour, IWmsOrderSource, IOrderBoxContents
 {
     public int currentSize;
     public int necessarySize;
@@ -60,6 +60,22 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource
                 if (package != null)
                     yield return package;
             }
+        }
+    }
+
+    // #40: packages inside (instruction shelf hint). Only GG cartons count here; Basic has no other material.
+    public int PackageCount
+    {
+        get
+        {
+            int count = 0;
+
+            foreach (PackageData _ in PackagesInside)
+            {
+                count++;
+            }
+
+            return count;
         }
     }
 
