@@ -611,18 +611,38 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 
 ### #19 [Feature] ComplexScene: tách thành hai bước, có ví dụ phép chia có dư
 - **Type:** feature
-- **Scene(s):** ComplexScene (có thể thêm một scene mới)
-- **Files:** ComplexScene, Assets/Scripts/PiecesContainerCounter.cs, Assets/Scripts/PiecesOrderValidator.cs
+- **Scene(s):** ComplexScene
+- **Files:** ComplexScene, Assets/Scripts/PiecesContainerCounter.cs, Assets/Scripts/PiecesOrderValidator.cs, Assets/Scripts/OrderContents.cs, Assets/Scripts/PositionStockSwitcher.cs
 - **Problem:** Complex thêm 4 thứ mới cùng lúc: phép chia có dư, hàng lẻ, hai dạng gói của một vật tư, cỡ gói không rõ. Chưa scene nào làm mẫu phép chia có dư. Việc mở VPE được dạy ở Concept nhưng chưa bao giờ được thực hành (hàng lẻ đã nằm sẵn).
-- **Done when:** Bước (a): package nguyên + hàng lẻ của **một** dạng gói, có ví dụ mẫu trước. Bước (b): thêm dạng gói thứ hai. Trainee tự lấy hàng lẻ từ một VPE (nếu A3 cho phép mở).
+- **Done when** (viết lại theo decision 016, 2026-11-02; câu cũ: „Bước (a): package nguyên + hàng lẻ của một dạng gói, có ví dụ mẫu trước. Bước (b): thêm dạng gói thứ hai. Trainee tự lấy hàng lẻ từ một VPE (nếu A3 cho phép mở).“):
+  - Vào ComplexScene: dialog `WMS_Kommissionierung` hiện RING D, Mat.-Nr 264857, Soll 55, Ist 0. Thẻ trên giá nói trước rằng đơn có hai position, làm lần lượt.
+  - Vào ComplexScene: bảng ví dụ bên phải màn hình giải từng bước 64 ÷ 20 = 3 carton nguyên + 4 chiếc lẻ. Không chỗ nào trong scene in sẵn „2 Kartons“ hay „5 Teile“ của đơn thật.
+  - Vào ComplexScene: thùng kho của position 1 chưa hiện. Cụm câu hỏi dưới màn hình hỏi số carton nguyên và số chiếc lẻ, mỗi nút ghi đủ đáp án.
+  - Chọn đáp án sai cho số carton: câu hỏi báo sai kèm cách tính (chia Soll cho VPE), không nói đáp án. Thùng kho vẫn chưa hiện, chọn lại được.
+  - Trả lời đúng cả hai câu: thùng kho của position 1 hiện ra, có carton RING D đóng, một carton RING D đã mở chứa 12 vòng và carton KABELVERBINDER A. Bấm nút đỏ lúc này không chấm câu hỏi.
+  - Trên Quest, lấy 5 chiếc vòng từ carton đã mở, từng chiếc một bằng tay: mỗi lần chỉ một chiếc rời ra, chiếc vòng không co nhỏ khi cầm, carton đã mở đứng yên.
+  - Mỗi chiếc vòng đặt vào thùng đơn làm Ist tăng đúng 1. Lấy ra thì Ist giảm đúng 1.
+  - Ở position 1, đặt 2 carton RING D + 5 chiếc vòng, bấm nút đỏ: thẻ `Result` báo position 1 đúng và nói bước tiếp. Thẻ nhắc phần còn lại trong carton đã mở (Anbruchmenge) để trong Modul ở thùng kho. Dialog chuyển sang SCHLAUCHSCHELLE B, Soll 156, Ist 0. Bảng ví dụ và cụm câu hỏi ẩn đi. Thùng kho đổi sang SCHLAUCHSCHELLE B. Thùng đơn **không** chạy đi.
+  - Ở position 1, đặt 3 carton RING D, bấm nút đỏ: thẻ báo lỗi đầu tiên kèm lý do, không có số đích. Dialog vẫn ở position 1.
+  - Ở position 1, có một carton KABELVERBINDER A trong thùng đơn, bấm nút đỏ: thẻ báo sai vật tư, vẫn ở position 1.
+  - Ở position 2, carton và chiếc vòng RING D của position 1 trong thùng đơn không làm đổi Ist và không bị báo là vật tư lạ.
+  - Ở position 2, đặt 3 carton SCHLAUCHSCHELLE B + 6 chiếc lẻ, bấm nút đỏ: thẻ báo cả đơn đúng. `Congratulations` hiện `Code: P<nnn>`. Thùng đơn chạy theo order lane như decision 014.
+  - Ở mọi pha, nút đỏ (F6) và thẻ `Instruction Table/Result` ở đúng chỗ cũ. Mọi đèn R2 tắt (009).
+  - Ảnh `overview`, `wms`, `instructions` (Play): bảng ví dụ và cụm câu hỏi không che dialog, giá thẻ hay đường tay tới hai thùng. Các nút cách nút đỏ và mép Menu ≥ 15 cm (đo trong Editor, như 015).
+  - Menu vẫn có đúng 5 bài, bài 5 vẫn là „5. Volle Kartons und loses Material“.
+  - Mọi chuỗi mới hoặc đổi có key + EN + DE qua `localize-strings` và đã qua `german-reviewer`.
+  - (code) Đơn chỉ khai báo trong `PiecesContainerCounter.orderLines` (hai dòng). Container lộ số thứ tự position, tổng số position và một event khi đổi position (như 012). `OrderRule` không đổi.
+  - (code) `OrderContents.From` không bao giờ tính carton đã mở (`VPEOpenedDisplay`) là carton nguyên. Có test EditMode: 2 carton + 5 chiếc = đúng, 3 carton = TOO_MANY, carton đã mở trong thùng không thành carton nguyên. `OrderContents.StockInScene` (Rest) vẫn đúng.
+  - (code) `PiecesOrderValidator.OrderCompleted` chỉ bắn một lần, ở position cuối. Đáp án câu hỏi chia là khoá cố định, không phải chữ tiếng Đức. Console ComplexScene không có lỗi mới.
 - **Inspector work expected:** yes
 - **Công:** L
 - **Test trên kính:** bắt buộc (mở VPE lấy hàng lẻ bằng tay)
-- **Depends on:** #3, #16, #17. A3 (2026-11-01): kiện là carton của một mã vật tư; bước "tự lấy hàng lẻ từ carton đã mở" được phép.
+- **Depends on:** #3, #16, #17. A3 (2026-11-01): kiện là carton của một mã vật tư; bước "tự lấy hàng lẻ từ carton đã mở" được phép. Không chặn: A7, A12 (túi PU cho ≤ 7 chiếc), A13 (Modul trong thùng kho).
+- **Decision:** docs/decisions/016-complex-two-positions-remainder.md
 - **Bổ sung (2026-11-01):** Chuyển từ #22 (đã bỏ) sang đây tình huống **Anbruchmenge**: theo Detail Description mục 5.12, khi mở một VPE mà còn dư thì phần dư phải cất vào một Modul. Bước (a) của mục này tạo đúng tình huống đó, nên nên có bước cất phần dư (hoặc ít nhất nhắc đến).
 - **Bổ sung (2026-11-01, rà backlog sau #6/#14/#17):** đơn Complex giờ khai báo bằng `orderLines` trên `PiecesContainerCounter` (Soll + VPE, #6) và chấm bằng `OrderRule` (thành phần carton nguyên + chiếc lẻ, A7 còn mở). Ring D = `ring_d`, VPE 25 ở mọi nơi (#17). Carton Ring D đã mở hiện được tính là carton nguyên (TOO_MANY) và không cầm được; nếu bước (b) cho trainee tự lấy hàng lẻ từ carton mở thì cần nhánh riêng trong `OrderContents.From` (review data-analyst #6).
 - **Bổ sung (2026-11-01, decision 008):** từ #10, Ist trên dialog tăng dần khi cân, nên phép chia có dư (55 = 2×25 + 5) không còn được chấm qua việc đặt hàng; #19 nên kiểm phép chia trực tiếp (ví dụ hỏi "Wie viele Kartons?" trước khi cầm kiện).
-- **Status:** todo (#3, #16, #17 đã xong hoặc verified-mcp)
+- **Status:** in progress (branch feat/19-complex-two-steps, 2026-11-02; decision 016 accepted)
 
 ### #20 [Feature] Dạy Soll/Ist/Rest, EKZ, Anweisung trước khi dùng
 - **Type:** feature
