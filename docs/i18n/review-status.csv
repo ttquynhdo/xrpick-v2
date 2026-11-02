@@ -53,4 +53,5 @@ Kontrolle: 60 + 4 = 64 ST",proposed,german-reviewer (agent),2026-11-02,#19
 complex.feedback.position_done,"Richtig! Position {done} ist erledigt.
 Der angebrochene Karton mit der Anbruchmenge bleibt im Modul im Lagerbehälter.
 Lesen Sie im LVS die Angaben von Position {next} ab.",proposed,german-reviewer (agent),2026-11-02,#19
-complex.card.step2_body_position1,Beantworten Sie zuerst die Fragen unter dem Bildschirm. Legen Sie dann die vollen Kartons und die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.,proposed,german-reviewer (agent),2026-11-02,#19
+complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-02,#53 (quiz hint moved to card 1)
+complex.card.step1_body_position1,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>). Beantworten Sie dann die Fragen unter dem Bildschirm.",proposed,german-reviewer (agent),2026-11-02,#53
