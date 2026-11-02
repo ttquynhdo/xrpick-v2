@@ -6959,6 +6959,11 @@ MonoBehaviour:
       bleibt in der \xDCbung leer."
     markers:
     - {fileID: 841820813}
+  - id: material_flow
+    title: "Weg der Beh\xE4lter"
+    body: "Die Rollenbahn bringt den Lagerbeh\xE4lter aus dem Lager. Nach dem Best\xE4tigen
+      f\xE4hrt der Auftragsbeh\xE4lter weiter. Es gibt mehrere Kommissionierpl\xE4tze."
+    markers: []
   titleText: {fileID: 804606567}
   bodyText: {fileID: 1598461627}
   progressText: {fileID: 1725532258}

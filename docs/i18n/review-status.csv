@@ -33,3 +33,5 @@ concept.card.step3_body,"Wählen Sie A, B oder C. Drücken Sie dann den roten Kn
 mixed.feedback.position_done,Richtig! Position {position} ist erledigt.\nLesen Sie im LVS die Angaben von Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-01,#21
 basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie die Kartons nach der EKZ in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#41
 order.feedback.ekz3_loose,Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.,proposed,german-reviewer (agent),2026-11-01,"#41, ""Nicht alle"" per reviewer"
+concept.tour.material_flow.title,Weg der Behälter,proposed,german-reviewer (agent),2026-11-02,#49
+concept.tour.material_flow.body,Die Rollenbahn bringt den Lagerbehälter aus dem Lager. Nach dem Bestätigen fährt der Auftragsbehälter weiter. Es gibt mehrere Kommissionierplätze.,proposed,german-reviewer (agent),2026-11-02,"#49, variant B of the reviewer (fits: 5 lines, 114/160 px)"

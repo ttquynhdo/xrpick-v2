@@ -684,6 +684,20 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Ghi chú (2026-11-01, đặt thử trong ComplexScene):** mặt bàn y 0,771, hai thùng cao tới y 0,968, mép dưới màn hình ≈ y 0,98, nên không có chỗ ngay dưới màn hình. Đặt giữa sau hai thùng thì ảnh `overview` chỉ thấy một khe giữa hai thùng, và chỗ đó nằm trên đường trượt của thùng đơn (#47, decision 011). Đặt trước thùng thì vào mép bàn, mà decision 011 giữ mép bàn trống.
 - **Status:** dropped (người dùng 2026-11-01: bàn phím bị thùng che và chắn đường trượt của #47; P3, bài tập không dùng tới)
 
+
+### #49 [Feature] Băng lăn kéo dài qua kho, có trạm khác; sơ đồ dòng thùng ở ConceptScene
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene, ConceptScene
+- **Files:** prefab mới cho mạng băng (mesh gộp) và khung trạm trống; `WmsFieldTour` (bước mới trong scene ConceptScene); `docs/i18n/strings-todo.csv`
+- **Problem:** Băng lăn chỉ là một đoạn ngắn dưới bàn sau, nên trainee không thấy thùng kho đến từ đâu, thùng đơn đi đâu, và trạm của mình nằm trong hệ thống nào (người dùng 2026-11-02: băng thật chạy quanh kho, qua các dãy kệ, dọc đường có trạm khác).
+- **Done when:** xem mục *Done when* của `docs/decisions/013-warehouse-conveyor-network.md`.
+- **Inspector work expected:** yes (đặt prefab vào 3 scene, thêm bước tour ở Concept)
+- **Công:** M
+- **Test trên kính:** bắt buộc (FPS bằng OVR Metrics, nhìn trái/phải 45°)
+- **Depends on:** #47 (nhánh `feat/47-conveyor`); D15, D16, D17 (không chặn, chỉ để chỉnh sau)
+- **Decision:** docs/decisions/013-warehouse-conveyor-network.md
+- **Test report:** docs/test-reports/bl49.md
+- **Status:** verified-mcp (MCP/code 8/8 ✅, chờ test tay trên kính: FPS bằng OVR Metrics ở 3 scene, quay đầu 45° hai bên; nhánh `feat/49-warehouse-conveyor`)
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
 - **Scene(s):** chưa quyết định (có thể thêm vào Mixed/Complex)
