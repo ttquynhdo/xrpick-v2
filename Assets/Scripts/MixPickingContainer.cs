@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource
+public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositionedOrder
 {
     // #6, docs/decisions/005: the order is declared once, in WMS units (Soll pieces + VPE).
     [Header("Order")]

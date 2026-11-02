@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
 {
-    // #47: raised once when the order is correct; later confirms and content changes are ignored.
+    // #47: raised once when the last position is correct (#19); later confirms and content changes are ignored.
     public bool IsCompleted { get; private set; }
 
     public event Action OrderCompleted;
@@ -12,6 +12,11 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get. Last lesson: the Congratulations panel
     // tells the trainee what to do next. #25: German (Sie) like the cards.
     private const string CorrectText = "Richtig! Volle Kartons und loses Material stimmen mit dem Auftrag überein."; // complex.feedback.correct
+
+    // #19, decision 016: {0} = finished position, {1} = next position. The middle line is the Anbruchmenge
+    // reminder (Detail Description 5.12); it is not rated.
+    private const string PositionDoneFormat =
+        "Richtig! Position {0} ist erledigt.\nDie Restmenge im angebrochenen Karton bleibt im Modul im Lagerbehälter.\nLesen Sie im LVS die Angaben von Position {1} ab."; // complex.feedback.position_done
 
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
@@ -83,13 +88,21 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         if (missing)
             return;
 
-        // #6: one rule decides right/wrong (docs/decisions/005, 006).
+        // #6: one rule decides right/wrong (docs/decisions/005, 006); #19: only the current position.
         OrderResult result = containerCounter.CheckOrder();
 
-        if (resultCard != null)
+        if (result.Correct && !containerCounter.IsLastPosition)
         {
-            resultCard.SetActive(true);
+            int finished = containerCounter.CurrentPosition;
+            // Advancing raises ContentsChanged, which clears the card: write the result after it.
+            containerCounter.AdvanceToNextLine();
+            ShowCard();
+            feedbackText.text = string.Format(PositionDoneFormat, finished, containerCounter.CurrentPosition);
+            feedbackText.color = Color.green;
+            return;
         }
+
+        ShowCard();
 
         if (result.Correct)
         {
@@ -106,8 +119,11 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         }
 
         // #14: the instruction stays visible; the feedback names the first error, never the target numbers.
-        feedbackText.text =
-            OrderFeedback.Title(FeedbackLanguage.German) + "\n" + OrderFeedback.Explain(result, FeedbackLanguage.German);
+        bool emptyLaterPosition = containerCounter.CurrentPosition > 1 && result.Errors[0].Code == OrderErrorCode.Empty;
+        string reason = emptyLaterPosition
+            ? OrderFeedback.ExplainEmptyPosition(containerCounter.CurrentLine, FeedbackLanguage.German)
+            : OrderFeedback.Explain(result, FeedbackLanguage.German);
+        feedbackText.text = OrderFeedback.Title(FeedbackLanguage.German) + "\n" + reason;
         feedbackText.color = Color.red;
         if (instructionText != null)
         {
@@ -118,6 +134,14 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         if (congratulationsPanel != null)
         {
             congratulationsPanel.SetActive(false);
+        }
+    }
+
+    private void ShowCard()
+    {
+        if (resultCard != null)
+        {
+            resultCard.SetActive(true);
         }
     }
 

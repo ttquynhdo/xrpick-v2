@@ -25,10 +25,19 @@ public class PositionStockSwitcher : MonoBehaviour
         public List<PackageData> packages = new();
     }
 
-    [SerializeField] private MixedPickingContainer container;
+    // #19: any container worked one position at a time (MixedPickingContainer, PiecesContainerCounter).
+    [Tooltip("Component implementing IPositionedOrder (MixedPickingContainer, PiecesContainerCounter).")]
+    [SerializeField] private MonoBehaviour container;
 
     [Tooltip("One set per order line, in the same order as the container's Order Lines.")]
     [SerializeField] private List<StockSet> sets = new();
+
+    // #19, decision 016: in ComplexScene the first box appears only after the division question is answered.
+    [Tooltip("Hide the first set at start; RevealFirstSet shows it.")]
+    [SerializeField] private bool hideFirstUntilRevealed;
+
+    private IPositionedOrder order;
+    private bool firstRevealed;
 
     // State of a running switch, so OnDisable can finish it.
     private Dictionary<GameObject, Vector3> leavingScales;
@@ -37,29 +46,32 @@ public class PositionStockSwitcher : MonoBehaviour
 
     private void Awake()
     {
+        order = container as IPositionedOrder;
+        firstRevealed = !hideFirstUntilRevealed;
+
         for (int i = 0; i < sets.Count; i++)
         {
-            SetVisible(sets[i], i == 0);
+            SetVisible(sets[i], i == 0 && firstRevealed);
         }
     }
 
     private void OnEnable()
     {
-        if (container != null)
+        if (order != null)
         {
-            container.LineAdvanced += OnLineAdvanced;
+            order.LineAdvanced += OnLineAdvanced;
         }
         else
         {
-            Debug.LogError("PositionStockSwitcher: container is not assigned.", this);
+            Debug.LogError("PositionStockSwitcher: container is not assigned or is not an IPositionedOrder.", this);
         }
     }
 
     private void OnDisable()
     {
-        if (container != null)
+        if (order != null)
         {
-            container.LineAdvanced -= OnLineAdvanced;
+            order.LineAdvanced -= OnLineAdvanced;
         }
 
         // A disabled object stops its coroutines: never leave boxes tiny or packages stuck kinematic.
@@ -68,10 +80,31 @@ public class PositionStockSwitcher : MonoBehaviour
 
     private void Start()
     {
-        if (container != null && sets.Count != container.OrderLines.Count)
+        if (order != null && sets.Count != order.OrderLines.Count)
         {
-            Debug.LogError($"PositionStockSwitcher: {sets.Count} stock sets but {container.OrderLines.Count} order lines.", this);
+            Debug.LogError($"PositionStockSwitcher: {sets.Count} stock sets but {order.OrderLines.Count} order lines.", this);
         }
+    }
+
+    // #19: grows the first box in once (after the division question). Does nothing when it is already shown.
+    public void RevealFirstSet()
+    {
+        if (firstRevealed || sets.Count == 0)
+            return;
+
+        firstRevealed = true;
+        StopAllCoroutines();
+        FinishSwitch();
+
+        List<GameObject> coming = Members(sets[0], false);
+        Dictionary<GameObject, Vector3> comingScale = Freeze(coming);
+        ApplyScale(comingScale, HiddenScale);
+        foreach (GameObject member in coming)
+        {
+            member.SetActive(true);
+        }
+
+        StartCoroutine(Switch(new List<GameObject>(), comingScale));
     }
 
     private void OnLineAdvanced(int position)
@@ -110,7 +143,7 @@ public class PositionStockSwitcher : MonoBehaviour
 
         foreach (PackageData package in set.packages)
         {
-            if (package == null || (skipPicked && container.Contains(package)))
+            if (package == null || (skipPicked && order.Contains(package)))
                 continue;
 
             members.Add(package.gameObject);

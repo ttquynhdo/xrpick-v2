@@ -12,26 +12,34 @@ public static class OrderContents
 
         foreach (PackageData package in packages)
         {
-            if (package.packageType == PackageType.LooseItemDisplay)
-            {
-                contents.AddLoose(package.MaterialKey);
-            }
-            else
-            {
-                contents.AddFull(package.MaterialKey);
-            }
+            contents.Add(package.MaterialKey, Form(package.packageType));
         }
 
         return contents;
     }
 
+    // #19, decision 016: the opened carton is never a full carton (its loose pieces count one by one).
+    public static PackageForm Form(PackageType type)
+    {
+        switch (type)
+        {
+            case PackageType.LooseItemDisplay:
+                return PackageForm.LoosePiece;
+            case PackageType.VPEOpenedDisplay:
+                return PackageForm.OpenedCarton;
+            default:
+                return PackageForm.FullCarton;
+        }
+    }
+
     // #10: pieces of one material in the scene: closed cartons count their VPE, loose pieces one each.
     // Opened display cartons are skipped, their loose pieces are counted on their own.
+    // #19: hidden storage boxes count too (ComplexScene shows its first box only after the division question).
     public static int StockInScene(string materialKey)
     {
         int stock = 0;
 
-        foreach (PackageData package in Object.FindObjectsByType<PackageData>())
+        foreach (PackageData package in Object.FindObjectsByType<PackageData>(FindObjectsInactive.Include))
         {
             if (package.MaterialKey != materialKey)
                 continue;
