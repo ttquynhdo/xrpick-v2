@@ -954,7 +954,8 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Công:** M
 - **Test trên kính:** nhanh (đọc thẻ từ chỗ đứng)
 - **Depends on:** #33, #58 (cùng thẻ `Result` ở Complex: làm #58 trước)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl59.md
+- **Status:** verified-mcp (11/11 MCP ✅, chờ test tay H1 đọc thẻ trên kính; thẻ `Correct` ở Basic chỉ kiểm bố cục)
 
 ### #60 [P1] ConceptScene: dạy phép tính Soll : VPE trong tour, sửa bước `Empf Kz 000`
 - **Type:** logic

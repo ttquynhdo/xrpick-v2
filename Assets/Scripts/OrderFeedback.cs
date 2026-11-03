@@ -23,8 +23,12 @@ public static class OrderFeedback
     // #41, decision 003: quantity is right but a carton lies loose (EKZ 3). No count, no place.
     private const string Ekz3PlacementKey = "order.feedback.ekz3_loose";
     private const string WrongTitleKey = "order.feedback.wrong_title";
+    // #59: first line of the result card after a correct confirm.
+    private const string CorrectTitleKey = "order.feedback.correct_title";
 
     public static string Title() => Loc.Get(WrongTitleKey);
+
+    public static string CorrectTitle() => Loc.Get(CorrectTitleKey);
 
     // Reason + what to do for the first error, plus the "more errors" line when needed. Empty when correct.
     public static string Explain(OrderResult result)

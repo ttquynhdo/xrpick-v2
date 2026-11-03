@@ -22,6 +22,11 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
     [SerializeField] private TMP_Text feedbackText;
+
+    // #59: bold coloured first line („Richtig!“ / „Nicht richtig“) above feedbackText.
+    [Tooltip("Optional title line of the result card; without it the title is written into feedbackText.")]
+    [SerializeField] private TMP_Text titleText;
+
     [SerializeField] private GameObject congratulationsPanel;
 
     // #10, decision 008: the WMS dialog has no instruction line; the task text stays on the Instruction Table.
@@ -97,8 +102,7 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         if (containerCounter.CurrentPosition == 1 && remainderQuiz != null && !remainderQuiz.IsAnswered)
         {
             ShowCard();
-            feedbackText.text = Loc.Get(AnswerQuizFirstKey);
-            feedbackText.color = Color.yellow;
+            ResultCardStyle.ShowPlain(titleText, feedbackText, Loc.Get(AnswerQuizFirstKey), ResultCardStyle.Reminder);
             return;
         }
 
@@ -111,8 +115,8 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
             // Advancing raises ContentsChanged, which clears the card: write the result after it.
             containerCounter.AdvanceToNextLine();
             ShowCard();
-            feedbackText.text = Loc.Get(PositionDoneKey, ("done", finished), ("next", containerCounter.CurrentPosition));
-            feedbackText.color = Color.green;
+            ResultCardStyle.Show(titleText, feedbackText, OrderFeedback.CorrectTitle(), ResultCardStyle.Correct,
+                Loc.Get(PositionDoneKey, ("done", finished), ("next", containerCounter.CurrentPosition)));
             return;
         }
 
@@ -120,8 +124,8 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
 
         if (result.Correct)
         {
-            feedbackText.text = Loc.Get(CorrectKey);
-            feedbackText.color = Color.green;
+            ResultCardStyle.Show(titleText, feedbackText, OrderFeedback.CorrectTitle(), ResultCardStyle.Correct,
+                Loc.Get(CorrectKey));
             congratulationsPanel.SetActive(true);
             if (instructionText != null)
             {
@@ -137,8 +141,7 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         string reason = emptyLaterPosition
             ? OrderFeedback.ExplainEmptyPosition(containerCounter.CurrentLine)
             : OrderFeedback.Explain(result);
-        feedbackText.text = OrderFeedback.Title() + "\n" + reason;
-        feedbackText.color = Color.red;
+        ResultCardStyle.Show(titleText, feedbackText, OrderFeedback.Title(), ResultCardStyle.Wrong, reason);
         if (instructionText != null)
         {
             instructionText.text = initialInstruction;

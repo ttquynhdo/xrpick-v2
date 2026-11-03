@@ -19,6 +19,15 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
     [SerializeField]
     private TMP_Text incorrectText;
 
+    // #59: title lines of the two cards (texts from the Loc table); coloured here, as in Mixed and Complex.
+    [Tooltip("Optional „Richtig!“ title of the Correct card.")]
+    [SerializeField]
+    private TMP_Text correctTitle;
+
+    [Tooltip("Optional „Nicht richtig“ title of the Incorrect card.")]
+    [SerializeField]
+    private TMP_Text incorrectTitle;
+
     // #41, decision 003: EKZ 3 needs every carton in its own snap place. Empty = no placement rule (EKZ 0).
     [SerializeField]
     private EkzPlacementCheck placementCheck;
@@ -49,6 +58,15 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
 
     private void Start()
     {
+        if (correctTitle != null)
+        {
+            correctTitle.color = ResultCardStyle.Correct;
+        }
+        if (incorrectTitle != null)
+        {
+            incorrectTitle.color = ResultCardStyle.Wrong;
+        }
+
         if (calc == null)
             return;
 

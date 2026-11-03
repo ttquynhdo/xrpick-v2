@@ -20,6 +20,10 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
     [SerializeField] private MixedPickingContainer container;
     [SerializeField] private TMP_Text feedbackText;
 
+    // #59: bold coloured first line („Richtig!“ / „Nicht richtig“) above feedbackText.
+    [Tooltip("Optional title line of the result card; without it the title is written into feedbackText.")]
+    [SerializeField] private TMP_Text titleText;
+
     // #21 (#33 Mixed part): result card next to the red button; hidden until a confirm.
     [Tooltip("Optional card that holds feedbackText; shown on confirm, hidden when the container changes.")]
     [SerializeField] private GameObject resultCard;
@@ -110,8 +114,8 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
 
             // Advancing raises ContentsChanged, which clears the card: write the result after it.
             container.AdvanceToNextLine();
-            ShowResult(Loc.Get(PositionDoneKey, ("position", finished), ("next_position", container.CurrentPosition)),
-                Color.green);
+            ShowResult(OrderFeedback.CorrectTitle(), ResultCardStyle.Correct,
+                Loc.Get(PositionDoneKey, ("position", finished), ("next_position", container.CurrentPosition)));
             return;
         }
 
@@ -121,7 +125,7 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
             {
                 Debug.LogError($"MixedPickingValidator: no lesson name for {NextScene}.", this);
             }
-            ShowResult(Loc.Get(CorrectKey, ("next_lesson", nextLesson)), Color.green);
+            ShowResult(OrderFeedback.CorrectTitle(), ResultCardStyle.Correct, Loc.Get(CorrectKey, ("next_lesson", nextLesson)));
             IsCompleted = true;
             OrderCompleted?.Invoke();
             return;
@@ -132,16 +136,15 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
             ? OrderFeedback.ExplainEmptyPosition(container.CurrentLine)
             : OrderFeedback.Explain(result);
 
-        ShowResult(OrderFeedback.Title() + "\n" + reason, Color.red);
+        ShowResult(OrderFeedback.Title(), ResultCardStyle.Wrong, reason);
     }
 
-    private void ShowResult(string text, Color color)
+    private void ShowResult(string title, Color titleColor, string body)
     {
         if (resultCard != null)
         {
             resultCard.SetActive(true);
         }
-        feedbackText.text = text;
-        feedbackText.color = color;
+        ResultCardStyle.Show(titleText, feedbackText, title, titleColor, body);
     }
 }

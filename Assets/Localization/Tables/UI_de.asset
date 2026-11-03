@@ -157,7 +157,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627357
-    m_Localized: <color="green">Richtig!</color>
+    m_Localized: Richtig!
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627358
@@ -166,7 +166,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
-    m_Localized: <color="red">Nicht richtig</color>
+    m_Localized: Nicht richtig
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627360
@@ -221,13 +221,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627371
-    m_Localized: "Richtig! Alle Materialien und Mengen stimmen mit dem Auftrag \xFCberein.\nW\xE4hlen
+    m_Localized: "Alle Materialien und Mengen stimmen mit dem Auftrag \xFCberein.\nW\xE4hlen
       Sie jetzt im Men\xFC \u201E{next_lesson}\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
-    m_Localized: "Richtig! Volle Kartons und loses Material stimmen mit dem Auftrag
-      \xFCberein."
+    m_Localized: "Volle Kartons und loses Material stimmen mit dem Auftrag \xFCberein."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
@@ -542,10 +541,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
-    m_Localized: 'Richtig! Position {position} ist erledigt.
+    m_Localized: 'Position {position} ist erledigt.
 
-      Lesen Sie im
-      LVS die Angaben von Position {next_position} ab.'
+      Lesen Sie im LVS die Angaben
+      von Position {next_position} ab.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
@@ -618,9 +617,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
-    m_Localized: "Richtig! Position {done} ist erledigt.\nDer angebrochene Karton
-      mit der Anbruchmenge bleibt im Modul im Lagerbeh\xE4lter.\nLesen Sie im LVS
-      die Angaben von Position {next} ab."
+    m_Localized: "Position {done} ist erledigt.\nDer angebrochene Karton mit der
+      Anbruchmenge bleibt im Modul im Lagerbeh\xE4lter.\nLesen Sie im LVS die Angaben
+      von Position {next} ab."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465
@@ -832,6 +831,10 @@ MonoBehaviour:
     m_Localized: "Z\xE4hlen Sie die vollen Kartons und die losen Teile nach. Pr\xFCfen
       Sie im LVS, ob Ist und Soll gleich sind. Dr\xFCcken Sie dann den roten Knopf
       (F6). Danach zeigt das LVS Position 2 an."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 350226641457152
+    m_Localized: Richtig!
     m_Metadata:
       m_Items: []
   references:

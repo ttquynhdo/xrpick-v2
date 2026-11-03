@@ -155,7 +155,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627357
-    m_Localized: <color="green">Correct!</color>
+    m_Localized: Correct!
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627358
@@ -164,7 +164,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
-    m_Localized: <color="red">Not correct</color>
+    m_Localized: Not correct
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627360
@@ -216,12 +216,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627371
-    m_Localized: "Correct! All materials and quantities match the order.\nNext, choose
-      \u201C{next_lesson}\u201D in the menu."
+    m_Localized: "All materials and quantities match the order.\nNext, choose \u201C{next_lesson}\u201D
+      in the menu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
-    m_Localized: Correct! The full cartons and the loose material match the order.
+    m_Localized: The full cartons and the loose material match the order.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
@@ -530,10 +530,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
-    m_Localized: 'Correct! Position {position} is done.
+    m_Localized: 'Position {position} is done.
 
-      Read the data of position
-      {next_position} in the WMS.'
+      Read the data of position {next_position}
+      in the WMS.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
@@ -605,13 +605,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
-    m_Localized: 'Correct! Position {done} is done.
+    m_Localized: 'Position {done} is done.
 
-      The opened carton with
-      the broken-case quantity stays in the module in the storage container.
+      The opened carton with the broken-case
+      quantity stays in the module in the storage container.
 
-      Read
-      the details of position {next} in the WMS.'
+      Read the details
+      of position {next} in the WMS.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465
@@ -823,6 +823,10 @@ MonoBehaviour:
     m_Localized: Count the full cartons and the loose pieces. Check in the WMS that
       Ist equals Soll. Then press the red button (F6). After that the WMS shows position
       2.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 350226641457152
+    m_Localized: Correct!
     m_Metadata:
       m_Items: []
   references:
