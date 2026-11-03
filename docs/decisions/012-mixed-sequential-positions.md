@@ -72,3 +72,7 @@ MixedPickingScene vẫn dùng `Info Panel` cũ: hiện cả hai dòng đơn cùn
 - `MixedPickingContainer.CheckOrder` chấm cả đơn một lần → `Assets/Scripts/MixPickingContainer.cs:66-69` → đã kiểm
 - Mehrfachpick đánh dấu bằng số vàng "1/2"; nhiều mã thì đánh số → Kommissionierung slide 4, 9 (requirements-analyst) → chưa kiểm
 - Mixed có 6 carton A, 3 túi B, `VPE_OpenedPackage` RING D → scene inventory, ảnh overview → chưa kiểm
+
+## Cập nhật 2026-11-03 (B14, D26)
+- `Picks 2/4` của dialog cũ đếm lượt pick từ **cùng một thùng kho** (`docs/requirements/old/WMS explanation.txt`, mục 13), không đếm position của đơn. Dòng *Nếu giả định sai* „B14 = có "1/2": thêm chữ vàng "1/2"/"2/2"“ vì vậy **bỏ**: không hiện „1/2“ để chỉ position; câu trên thẻ hướng dẫn tiếp tục báo position sau.
+- Bảng bấm giờ „OIS2 Kommi2“ (bước 1, 3, 9, 10) và ảnh trạm `old/Orderpicking.png` (các số trên ảnh là các bước đó) mô tả: thùng kho tới bằng làn trái và được kéo vào chỗ làm việc ở giữa; thùng rỗng kéo vào làn phải thành thùng đơn; sau mỗi lần xác nhận thùng kho tự đi (suy ra: về kho theo làn giữa, vì làn trái chỉ đi vào theo người dùng nhớ), thùng kho tiếp theo vào từ trái; thùng đơn đứng yên, chỉ được kéo sang làn giữa và tự đi khi đơn xong. Cách Mixed làm (thùng đơn đứng yên, thùng kho đổi theo position) khớp; việc đổi thùng kho bằng thu nhỏ/phóng to thay cho chạy trên băng được ghi thành #71. Chỗ chưa rõ (thùng kho nhiều lượt pick, làn giữa, ba ô trên dialog cũ) hỏi ở D26.

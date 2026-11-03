@@ -44,3 +44,6 @@ Basic, Mixed và Complex dùng ba kiểu panel WMS khác nhau. Basic là dialog 
 
 ## Bằng chứng (đã kiểm)
 Spec `kommissionierung-dialog.md` (E13, E14, E50, dòng 10, 179), `_extracted/Kommissionierung/text.md` (slide 2 "Bestätigen mit Fuß", slide 9 Mehrfachpick), quyết định 001, 002, 003, 005, 006, 007; `OrderLine.cs`, `PackageData.cs`, `CalcForWMS.cs`, `PiecesContainerCounter.cs`, `MixPickingContainer.cs`, `OrderFeedback.cs:21`; scene inventory Basic/Mixed/Complex. Theo xr-ux-reviewer (tính, chưa kiểm): góc nhìn, cỡ chữ theo độ, panel ngoài tầm tay.
+
+## Cập nhật 2026-11-03 (B14)
+Đọc lại dialog cũ: ghi chú kèm ảnh (`docs/requirements/old/WMS explanation.txt`, mục 13) giải thích `Picks 2/4` là số lượt lấy từ **cùng một thùng kho** trước khi thùng về kho, không phải position của đơn. Vì vậy dự trù ở dòng *Nếu giả định sai* („Mehrfachpick có "1/2" góc phải trên → thêm ở #21“) **không áp dụng** để đánh số position: app không hiện „1/2“ cho position. Nếu sau này mô phỏng một thùng kho phục vụ nhiều lượt pick thì „1/2“ mới có chỗ. Câu hỏi tiếp: D26.
