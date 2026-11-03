@@ -7,9 +7,9 @@ using UnityEngine.Serialization;
 /// </summary>
 public class PackageInfoOnGrab : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string MatNrFormat = "Mat.-Nr: {0} – die Materialnummer. Dieselbe Nummer steht im LVS.";     // concept.label.matnr
-    private const string VpeFormat = "VPE: {0} ST – so viele Stück sind in dieser Verpackung.";                 // concept.label.vpe
+    // Loc table UI (#54).
+    private const string MatNrKey = "concept.label.matnr";
+    private const string VpeKey = "concept.label.vpe";
 
     [Header("Panels")]
     [SerializeField] private PackageInfoDisplay packageInfoDisplay;
@@ -28,8 +28,8 @@ public class PackageInfoOnGrab : MonoBehaviour
             return;
 
         string description =
-            string.Format(MatNrFormat, package.MaterialNumber) + "\n\n" +
-            string.Format(VpeFormat, package.Vpe);
+            Loc.Get(MatNrKey, ("matnr", package.MaterialNumber)) + "\n\n" +
+            Loc.Get(VpeKey, ("vpe", package.Vpe));
 
         packageInfoDisplay.ShowPackageInfo(materialName, description);
     }

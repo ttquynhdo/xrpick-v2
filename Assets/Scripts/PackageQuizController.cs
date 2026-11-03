@@ -11,14 +11,14 @@ using UnityEngine.UI;
 /// </summary>
 public class PackageQuizController : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string ProgressKey = "concept.quiz.progress";   // Loc table UI (#11)
-    private const string SelectFirst = "<color=#F2C94C><b>Wählen Sie zuerst eine Antwort.</b></color>";    // concept.quiz.select_first
-    private const string Correct = "<color=#27AE60><b>Richtig!</b></color>";                    // concept.quiz.correct
-    private const string NextQuestion = "Beantworten Sie jetzt die nächste Frage.";              // concept.quiz.next_question
-    private const string AllDoneFormat = "Sie haben alle Fragen richtig beantwortet. Wählen Sie jetzt im Menü „{0}“.";  // concept.quiz.all_done
-    private const string Wrong = "<color=#EB5757><b>Nicht richtig</b></color>";                  // concept.quiz.wrong
-    private const string NextLesson = "3. Kommissionieren nach EKZ 3";                       // lesson.basic (LessonNames)
+    // Loc table UI (#11, #54). The rich text (colour, bold) is part of the table entries.
+    private const string ProgressKey = "concept.quiz.progress";
+    private const string SelectFirstKey = "concept.quiz.select_first";
+    private const string CorrectKey = "concept.quiz.correct";
+    private const string NextQuestionKey = "concept.quiz.next_question";
+    private const string AllDoneKey = "concept.quiz.all_done";        // {lesson} = menu label of the next lesson
+    private const string WrongKey = "concept.quiz.wrong";
+    private const string NextScene = "BasicPickingScene";
     private const string SelectedMark = "» ";
 
     // Decision 015: each toggle shows its letter and answer, so the trainee reads and presses in one place.
@@ -140,7 +140,7 @@ public class PackageQuizController : MonoBehaviour
 
         if (selected < 0)
         {
-            feedbackText.text = SelectFirst;
+            feedbackText.text = Loc.Get(SelectFirstKey);
             return;
         }
 
@@ -148,18 +148,22 @@ public class PackageQuizController : MonoBehaviour
 
         if (answer.key != question.correctKey)
         {
-            feedbackText.text = Wrong + "\n" + answer.wrongReason;
+            feedbackText.text = Loc.Get(WrongKey) + "\n" + answer.wrongReason;
             return;
         }
 
         if (current < questions.Length - 1)
         {
-            feedbackText.text = Correct + "\n" + NextQuestion;
+            feedbackText.text = Loc.Get(CorrectKey) + "\n" + Loc.Get(NextQuestionKey);
             ShowQuestion(current + 1);
         }
         else
         {
-            feedbackText.text = Correct + "\n" + string.Format(AllDoneFormat, NextLesson);
+            if (!LessonNames.TryGetDisplayName(NextScene, out string nextLesson))
+            {
+                Debug.LogError($"PackageQuizController: no lesson name for {NextScene}.", this);
+            }
+            feedbackText.text = Loc.Get(CorrectKey) + "\n" + Loc.Get(AllDoneKey, ("lesson", nextLesson));
         }
     }
 

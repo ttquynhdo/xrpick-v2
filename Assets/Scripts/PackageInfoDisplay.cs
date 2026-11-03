@@ -7,9 +7,9 @@ using UnityEngine;
 /// </summary>
 public class PackageInfoDisplay : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string DefaultTitle = "Etikett lesen";                                             // concept.label.default_title
-    private const string DefaultDescription = "Nehmen Sie eine Verpackung in die Hand. Hier sehen Sie, was auf dem Etikett steht.";  // concept.label.default_body
+    // Loc table UI (#54).
+    private const string DefaultTitleKey = "concept.label.default_title";
+    private const string DefaultDescriptionKey = "concept.label.default_body";
 
     [Header("Panel Text")]
     [SerializeField] private TMP_Text titleText;
@@ -28,8 +28,8 @@ public class PackageInfoDisplay : MonoBehaviour
 
     public void ShowDefaultInfo()
     {
-        SetText(titleText, DefaultTitle);
-        SetText(descriptionText, DefaultDescription);
+        SetText(titleText, Loc.Get(DefaultTitleKey));
+        SetText(descriptionText, Loc.Get(DefaultDescriptionKey));
     }
 
     private static void SetText(TMP_Text text, string value)

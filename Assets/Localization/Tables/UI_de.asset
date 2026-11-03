@@ -92,23 +92,23 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627342
-    m_Localized: "1. Einf\xFChrung"
+    m_Localized: "1.\_Einf\xFChrung"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627343
-    m_Localized: 2. Grundlagen
+    m_Localized: "2.\_Grundlagen"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627344
-    m_Localized: 3. Kommissionieren nach EKZ 3
+    m_Localized: "3.\_Kommissionieren nach EKZ 3"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627345
-    m_Localized: 4. Mehrere Positionen
+    m_Localized: "4.\_Mehrere Positionen"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627346
-    m_Localized: 5. Volle Kartons und loses Material
+    m_Localized: "5.\_Volle Kartons und loses Material"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627347
@@ -375,11 +375,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627406
-    m_Localized: "W\xE4hlen Sie zuerst eine Antwort."
+    m_Localized: "<color=#F2C94C><b>W\xE4hlen Sie zuerst eine Antwort.</b></color>"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627407
-    m_Localized: Richtig!
+    m_Localized: <color=#27AE60><b>Richtig!</b></color>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627408
@@ -392,7 +392,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627410
-    m_Localized: Nicht richtig
+    m_Localized: <color=#EB5757><b>Nicht richtig</b></color>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627411
@@ -612,21 +612,23 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627458
-    m_Localized: "Nicht richtig. Teilen Sie Soll durch VPE. Es z\xE4hlen nur volle
-      Kartons."
+    m_Localized: "<color=#EB5757><b>Nicht richtig.</b></color> Teilen Sie Soll durch
+      VPE. Es z\xE4hlen nur volle Kartons."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627459
-    m_Localized: "Nicht richtig. Lose Teile = Soll minus (volle Kartons \xD7 VPE)."
+    m_Localized: "<color=#EB5757><b>Nicht richtig.</b></color> Lose Teile = Soll
+      minus (volle Kartons \xD7 VPE)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627460
-    m_Localized: Richtig! Beantworten Sie jetzt die zweite Frage.
+    m_Localized: <color=#27AE60><b>Richtig!</b></color> Beantworten Sie jetzt die
+      zweite Frage.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627461
-    m_Localized: "Richtig! Nehmen Sie jetzt die vollen Kartons und die losen Teile
-      aus dem Lagerbeh\xE4lter."
+    m_Localized: "<color=#27AE60><b>Richtig!</b></color> Nehmen Sie jetzt die vollen
+      Kartons und die losen Teile aus dem Lagerbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627462
@@ -653,6 +655,10 @@ MonoBehaviour:
     m_Localized: 'Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge
       (Soll) und VPE (<nobr>Verp.-Einh.</nobr>). Beantworten Sie dann die Fragen
       unter dem Bildschirm.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15832974233600
+    m_Localized: "MEN\xDC"
     m_Metadata:
       m_Items: []
   references:

@@ -16,21 +16,18 @@ using UnityEngine.UI;
 /// </summary>
 public class RemainderQuizController : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string QuestionCartons = "Wie viele volle Kartons nehmen Sie für diese Position?";       // complex.quiz.q_cartons
-    private const string QuestionLoose = "Wie viele lose Teile nehmen Sie zusätzlich?";                    // complex.quiz.q_loose
-    private const string CartonOne = "1 Karton";                                                          // complex.quiz.option_carton_one
-    private const string CartonsFormat = "{0} Kartons";                                                   // complex.quiz.option_cartons
-    private const string PieceOne = "1 Teil";                                                             // complex.quiz.option_piece_one
-    private const string PiecesFormat = "{0} Teile";                                                      // complex.quiz.option_pieces
-    private const string WrongCartons =
-        "<color=#EB5757><b>Nicht richtig.</b></color> Teilen Sie Soll durch VPE. Es zählen nur volle Kartons."; // complex.quiz.wrong_cartons
-    private const string WrongLoose =
-        "<color=#EB5757><b>Nicht richtig.</b></color> Lose Teile = Soll minus (volle Kartons × VPE).";     // complex.quiz.wrong_loose
-    private const string NextQuestion = "<color=#27AE60><b>Richtig!</b></color> Beantworten Sie jetzt die zweite Frage."; // complex.quiz.next
-    private const string Done =
-        "<color=#27AE60><b>Richtig!</b></color> Nehmen Sie jetzt die vollen Kartons und die losen Teile aus dem Lagerbehälter."; // complex.quiz.done
-    private const string ProgressKey = "concept.quiz.progress";   // Loc table UI (#11)
+    // Loc table UI (#11, #54). The rich text (colour, bold) is part of the table entries. {count} = number.
+    private const string QuestionCartonsKey = "complex.quiz.q_cartons";
+    private const string QuestionLooseKey = "complex.quiz.q_loose";
+    private const string CartonOneKey = "complex.quiz.option_carton_one";
+    private const string CartonsKey = "complex.quiz.option_cartons";
+    private const string PieceOneKey = "complex.quiz.option_piece_one";
+    private const string PiecesKey = "complex.quiz.option_pieces";
+    private const string WrongCartonsKey = "complex.quiz.wrong_cartons";
+    private const string WrongLooseKey = "complex.quiz.wrong_loose";
+    private const string NextQuestionKey = "complex.quiz.next";
+    private const string DoneKey = "complex.quiz.done";
+    private const string ProgressKey = "concept.quiz.progress";
     private const string SelectedMark = "» ";
 
     private const string CartonsId = "cartons";
@@ -151,7 +148,7 @@ public class RemainderQuizController : MonoBehaviour
         question = index;
         OrderLine line = container.CurrentLine;
         options = index == 0 ? RemainderQuiz.CartonOptions(line) : RemainderQuiz.LooseOptions(line);
-        questionText.text = index == 0 ? QuestionCartons : QuestionLoose;
+        questionText.text = Loc.Get(index == 0 ? QuestionCartonsKey : QuestionLooseKey);
 
         if (progressText != null)
         {
@@ -198,20 +195,20 @@ public class RemainderQuizController : MonoBehaviour
 
         if (!right)
         {
-            feedbackText.text = question == 0 ? WrongCartons : WrongLoose;
+            feedbackText.text = Loc.Get(question == 0 ? WrongCartonsKey : WrongLooseKey);
             RefreshLabels();
             return;
         }
 
         if (question == 0)
         {
-            feedbackText.text = NextQuestion;
+            feedbackText.text = Loc.Get(NextQuestionKey);
             StartCoroutine(ShowSecondQuestionNextFrame());
             return;
         }
 
         IsAnswered = true;
-        feedbackText.text = Done;
+        feedbackText.text = Loc.Get(DoneKey);
         RefreshLabels();
         foreach (Toggle toggle in toggles)
         {
@@ -243,9 +240,9 @@ public class RemainderQuizController : MonoBehaviour
     private string AnswerText(int value)
     {
         if (question == 0)
-            return value == 1 ? CartonOne : string.Format(CartonsFormat, value);
+            return value == 1 ? Loc.Get(CartonOneKey) : Loc.Get(CartonsKey, ("count", value));
 
-        return value == 1 ? PieceOne : string.Format(PiecesFormat, value);
+        return value == 1 ? Loc.Get(PieceOneKey) : Loc.Get(PiecesKey, ("count", value));
     }
 
     private void OnLineAdvanced(int position)

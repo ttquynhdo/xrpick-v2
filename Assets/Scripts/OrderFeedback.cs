@@ -1,73 +1,54 @@
 using System.Collections.Generic;
 
-// Until #11/#12 the scenes are single-language German (#25); English is kept for the developer mode.
-public enum FeedbackLanguage
-{
-    English,
-    German
-}
-
 /// <summary>
 /// #14, docs/decisions/006 §7: the screen shows only the first error of an OrderResult (reason + what to do)
 /// and one generic line if there are more. Never prints target numbers. Material names come from the
-/// order lines (WMS/label names), never from keys or enum names.
+/// order lines (WMS/label names), never from keys or enum names. Texts come from the Loc table (#54).
 /// </summary>
 public static class OrderFeedback
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get. {name} = material name.
-    private static readonly Dictionary<OrderErrorCode, string> English = new()
+    // {name} = material name. german-reviewer (#14): "Material {name}" keeps "zu wenig" grammatical for any
+    // name; never "Rest" (WMS label).
+    private static readonly Dictionary<OrderErrorCode, string> Keys = new()
     {
-        { OrderErrorCode.Empty, "The order container is empty. Put the material of the order into the container." }, // order.feedback.empty
-        { OrderErrorCode.WrongMaterial, "The container holds wrong material. Take it out. Check the material number in the WMS." }, // order.feedback.wrong_material
-        { OrderErrorCode.TooFew, "Not enough {name}. Calculate again: order quantity ÷ VPE." },                       // order.feedback.too_few
-        { OrderErrorCode.TooMany, "Too much {name}. Calculate again: order quantity ÷ VPE." },                        // order.feedback.too_many
-        { OrderErrorCode.MissingLoose, "Not enough loose {name}. Calculate again: order quantity minus the pieces in the full cartons." }, // order.feedback.missing_loose
-        { OrderErrorCode.ExtraLoose, "Too much loose {name}. Calculate again: order quantity minus the pieces in the full cartons." }      // order.feedback.extra_loose
+        { OrderErrorCode.Empty, "order.feedback.empty" },
+        { OrderErrorCode.WrongMaterial, "order.feedback.wrong_material" },
+        { OrderErrorCode.TooFew, "order.feedback.too_few" },
+        { OrderErrorCode.TooMany, "order.feedback.too_many" },
+        { OrderErrorCode.MissingLoose, "order.feedback.missing_loose" },
+        { OrderErrorCode.ExtraLoose, "order.feedback.extra_loose" }
     };
 
-    // german-reviewer (#14): "Material {name}" keeps "zu wenig" grammatical for any name; never "Rest" (WMS label).
-    private static readonly Dictionary<OrderErrorCode, string> German = new()
-    {
-        { OrderErrorCode.Empty, "Der Auftragsbehälter ist leer. Legen Sie das Material des Auftrags hinein." },
-        { OrderErrorCode.WrongMaterial, "Im Auftragsbehälter liegt falsches Material. Nehmen Sie es heraus. Prüfen Sie die Materialnummer im LVS." },
-        { OrderErrorCode.TooFew, "Zu wenig Material {name}. Rechnen Sie nach: Sollmenge geteilt durch VPE." },
-        { OrderErrorCode.TooMany, "Zu viel Material {name}. Rechnen Sie nach: Sollmenge geteilt durch VPE." },
-        { OrderErrorCode.MissingLoose, "Zu wenig loses Material {name}. Rechnen Sie nach: Sollmenge minus Stückzahl der vollen Kartons." },
-        { OrderErrorCode.ExtraLoose, "Zu viel loses Material {name}. Rechnen Sie nach: Sollmenge minus Stückzahl der vollen Kartons." }
-    };
-
-    private const string MoreErrorsEnglish = "There are more errors.";   // order.feedback.more_errors
-    private const string MoreErrorsGerman = "Es gibt noch weitere Fehler.";
+    private const string MoreErrorsKey = "order.feedback.more_errors";
     // #41, decision 003: quantity is right but a carton lies loose (EKZ 3). No count, no place.
-    private const string Ekz3PlacementEnglish = "Not all cartons are placed in order. With Empf Kz 003, put the cartons in one by one and in order."; // order.feedback.ekz3_loose
-    private const string Ekz3PlacementGerman = "Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.";
-    private const string WrongTitleEnglish = "Not correct";                                // order.feedback.wrong_title
-    private const string WrongTitleGerman = "Nicht richtig";
+    private const string Ekz3PlacementKey = "order.feedback.ekz3_loose";
+    private const string WrongTitleKey = "order.feedback.wrong_title";
 
-    public static string Title(FeedbackLanguage language) =>
-        language == FeedbackLanguage.German ? WrongTitleGerman : WrongTitleEnglish;
+    public static string Title() => Loc.Get(WrongTitleKey);
 
     // Reason + what to do for the first error, plus the "more errors" line when needed. Empty when correct.
-    public static string Explain(OrderResult result, FeedbackLanguage language)
+    public static string Explain(OrderResult result)
     {
         if (result.Correct)
             return string.Empty;
 
         OrderError first = result.Errors[0];
-        Dictionary<OrderErrorCode, string> table = language == FeedbackLanguage.German ? German : English;
 
         // WRONG_TYPE is reserved (A2) and the quiz codes never come from OrderRule: show only the generic line.
-        if (!table.TryGetValue(first.Code, out string template))
+        if (!Keys.TryGetValue(first.Code, out string key))
         {
             UnityEngine.Debug.LogWarning($"OrderFeedback: no sentence for {OrderErrorCodes.ToLogName(first.Code)}.");
-            return language == FeedbackLanguage.German ? MoreErrorsGerman : MoreErrorsEnglish;
+            return Loc.Get(MoreErrorsKey);
         }
 
-        string sentence = template.Replace("{name}", NameOf(result, first.Item));
+        // EMPTY and WRONG_MATERIAL name no material ({name} only in the quantity sentences).
+        string sentence = NamesMaterial(first.Code)
+            ? Loc.Get(key, ("name", NameOf(result, first.Item)))
+            : Loc.Get(key);
 
         if (result.Errors.Count > 1)
         {
-            sentence += "\n" + (language == FeedbackLanguage.German ? MoreErrorsGerman : MoreErrorsEnglish);
+            sentence += "\n" + Loc.Get(MoreErrorsKey);
         }
 
         return sentence;
@@ -75,14 +56,15 @@ public static class OrderFeedback
 
     // #21: at a later position the container still holds the material of earlier positions, so "the container
     // is empty" would be wrong; say what is missing for this position instead (the result code stays EMPTY).
-    public static string ExplainEmptyPosition(OrderLine line, FeedbackLanguage language)
+    public static string ExplainEmptyPosition(OrderLine line)
     {
-        Dictionary<OrderErrorCode, string> table = language == FeedbackLanguage.German ? German : English;
-        return table[OrderErrorCode.TooFew].Replace("{name}", line != null ? line.materialName : string.Empty);
+        return Loc.Get(Keys[OrderErrorCode.TooFew], ("name", line != null ? line.materialName : string.Empty));
     }
 
-    public static string ExplainEkz3Placement(FeedbackLanguage language) =>
-        language == FeedbackLanguage.German ? Ekz3PlacementGerman : Ekz3PlacementEnglish;
+    public static string ExplainEkz3Placement() => Loc.Get(Ekz3PlacementKey);
+
+    private static bool NamesMaterial(OrderErrorCode code) =>
+        code != OrderErrorCode.Empty && code != OrderErrorCode.WrongMaterial;
 
     private static string NameOf(OrderResult result, string materialKey)
     {

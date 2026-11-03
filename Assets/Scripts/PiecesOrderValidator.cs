@@ -9,14 +9,12 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
 
     public event Action OrderCompleted;
 
-    // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get. Last lesson: the Congratulations panel
-    // tells the trainee what to do next. #25: German (Sie) like the cards.
-    private const string CorrectText = "Richtig! Volle Kartons und loses Material stimmen mit dem Auftrag überein."; // complex.feedback.correct
+    // Loc table UI (#54). Last lesson: the Congratulations panel tells the trainee what to do next.
+    private const string CorrectKey = "complex.feedback.correct";
 
-    // #19, decision 016: {0} = finished position, {1} = next position. The middle line is the Anbruchmenge
-    // reminder (Detail Description 5.12); it is not rated.
-    private const string PositionDoneFormat =
-        "Richtig! Position {0} ist erledigt.\nDer angebrochene Karton mit der Anbruchmenge bleibt im Modul im Lagerbehälter.\nLesen Sie im LVS die Angaben von Position {1} ab."; // complex.feedback.position_done
+    // #19, decision 016: {done} = finished position, {next} = next position. The middle line is the
+    // Anbruchmenge reminder (Detail Description 5.12); it is not rated.
+    private const string PositionDoneKey = "complex.feedback.position_done";
 
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
@@ -97,7 +95,7 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
             // Advancing raises ContentsChanged, which clears the card: write the result after it.
             containerCounter.AdvanceToNextLine();
             ShowCard();
-            feedbackText.text = string.Format(PositionDoneFormat, finished, containerCounter.CurrentPosition);
+            feedbackText.text = Loc.Get(PositionDoneKey, ("done", finished), ("next", containerCounter.CurrentPosition));
             feedbackText.color = Color.green;
             return;
         }
@@ -106,7 +104,7 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
 
         if (result.Correct)
         {
-            feedbackText.text = CorrectText;
+            feedbackText.text = Loc.Get(CorrectKey);
             feedbackText.color = Color.green;
             congratulationsPanel.SetActive(true);
             if (instructionText != null)
@@ -121,9 +119,9 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         // #14: the instruction stays visible; the feedback names the first error, never the target numbers.
         bool emptyLaterPosition = containerCounter.CurrentPosition > 1 && result.Errors[0].Code == OrderErrorCode.Empty;
         string reason = emptyLaterPosition
-            ? OrderFeedback.ExplainEmptyPosition(containerCounter.CurrentLine, FeedbackLanguage.German)
-            : OrderFeedback.Explain(result, FeedbackLanguage.German);
-        feedbackText.text = OrderFeedback.Title(FeedbackLanguage.German) + "\n" + reason;
+            ? OrderFeedback.ExplainEmptyPosition(containerCounter.CurrentLine)
+            : OrderFeedback.Explain(result);
+        feedbackText.text = OrderFeedback.Title() + "\n" + reason;
         feedbackText.color = Color.red;
         if (instructionText != null)
         {

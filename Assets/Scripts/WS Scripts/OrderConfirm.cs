@@ -79,12 +79,12 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
 
         if (!result.Correct)
         {
-            ShowIncorrect(OrderFeedback.Explain(result, FeedbackLanguage.German));
+            ShowIncorrect(OrderFeedback.Explain(result));
         }
         // Quantity errors come first; the placement is checked only once the quantity is right (decision 003, D6).
         else if (placementCheck != null && !placementCheck.AllPlaced(calc.PackagesInside))
         {
-            ShowIncorrect(OrderFeedback.ExplainEkz3Placement(FeedbackLanguage.German));
+            ShowIncorrect(OrderFeedback.ExplainEkz3Placement());
         }
         else
         {

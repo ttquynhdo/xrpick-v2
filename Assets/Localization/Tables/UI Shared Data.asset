@@ -587,6 +587,10 @@ MonoBehaviour:
     m_Key: complex.card.step1_body_position1
     m_Metadata:
       m_Items: []
+  - m_Id: 15832974233600
+    m_Key: menu.title
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

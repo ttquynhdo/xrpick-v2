@@ -6,10 +6,10 @@ using UnityEngine.UI;
 // disc opens a confirm panel; "Beenden" ends the session and returns to the keypad (decision 004 §9).
 public class FacilitatorEndControl : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string QuestionText = "Sitzung wirklich beenden?"; // end.confirm.question
-    private const string CancelText = "Fortsetzen";                  // end.confirm.cancel
-    private const string EndText = "Beenden";                        // end.confirm.end
+    // Loc table UI (#54).
+    private const string QuestionKey = "end.confirm.question";
+    private const string CancelKey = "end.confirm.cancel";
+    private const string EndKey = "end.confirm.end";
     private const string EndReason = "facilitator";
 
     private const double HoldSeconds = 3.0;
@@ -38,11 +38,11 @@ public class FacilitatorEndControl : MonoBehaviour
             return;
 
         if (questionLabel != null)
-            questionLabel.text = QuestionText;
+            questionLabel.text = Loc.Get(QuestionKey);
         if (cancelLabel != null)
-            cancelLabel.text = CancelText;
+            cancelLabel.text = Loc.Get(CancelKey);
         if (endLabel != null)
-            endLabel.text = EndText;
+            endLabel.text = Loc.Get(EndKey);
 
         confirmPanel.SetActive(false);
         SetProgressVisible(false);

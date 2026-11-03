@@ -10,10 +10,10 @@ using UnityEngine.UI;
 /// </summary>
 public class WmsFieldTour : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string ProgressFormat = "Schritt {0} von {1}";   // concept.tour.progress
-    private const string NextLabel = "Weiter";                     // concept.tour.next
-    private const string RestartLabel = "Von vorn";                // concept.tour.restart
+    // Loc table UI (#54).
+    private const string ProgressKey = "concept.tour.progress";
+    private const string NextKey = "concept.tour.next";
+    private const string RestartKey = "concept.tour.restart";
 
     [Serializable]
     public class Step
@@ -111,12 +111,12 @@ public class WmsFieldTour : MonoBehaviour
 
         if (progressText != null)
         {
-            progressText.text = string.Format(ProgressFormat, index + 1, steps.Length);
+            progressText.text = Loc.Get(ProgressKey, ("n", index + 1), ("total", steps.Length));
         }
 
         if (nextLabel != null)
         {
-            nextLabel.text = index == steps.Length - 1 ? RestartLabel : NextLabel;
+            nextLabel.text = Loc.Get(index == steps.Length - 1 ? RestartKey : NextKey);
         }
     }
 

@@ -7,12 +7,12 @@ using UnityEngine.UI;
 // research session has started for the typed code (decision 004).
 public class ParticipantEntryController : MonoBehaviour
 {
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    private const string ConfirmQuestionFormat = "Ist der Code {participant_id} richtig?";                // entry.confirm.question
-    private const string ResumeQuestionFormat = "Kurs von {participant_id} fortsetzen?";                 // entry.resume.question
-    private const string ResumeWhereFormat = "Unterbrochen in: {scene_name}";                           // entry.resume.where
-    private const string WarningFinishedFormat = "Für {participant_id} gibt es bereits eine abgeschlossene Sitzung."; // entry.warning.finished
-    private const string StartError = "Die Sitzung konnte nicht gestartet werden. Bitte starten Sie die App neu.";  // entry.error.start
+    // Loc table UI (#54).
+    private const string ConfirmQuestionKey = "entry.confirm.question";
+    private const string ResumeQuestionKey = "entry.resume.question";
+    private const string ResumeWhereKey = "entry.resume.where";
+    private const string WarningFinishedKey = "entry.warning.finished";
+    private const string StartErrorKey = "entry.error.start";
 
     [Header("Panels")]
     [SerializeField] private GameObject keypadPanel;
@@ -141,7 +141,7 @@ public class ParticipantEntryController : MonoBehaviour
             return;
 
         pendingCode = buffer.Code;
-        confirmText.text = ConfirmQuestionFormat.Replace("{participant_id}", pendingCode);
+        confirmText.text = Loc.Get(ConfirmQuestionKey, ("participant_id", pendingCode));
         SetBadges(ResearchIds.IsTestId(pendingCode));
         ShowOnly(confirmPanel);
     }
@@ -171,15 +171,15 @@ public class ParticipantEntryController : MonoBehaviour
             && Application.CanStreamedLevelBeLoaded(scene))
         {
             resumeScene = scene;
-            resumeText.text = ResumeQuestionFormat.Replace("{participant_id}", code)
-                + "\n" + ResumeWhereFormat.Replace("{scene_name}", lessonName);
+            resumeText.text = Loc.Get(ResumeQuestionKey, ("participant_id", code))
+                + "\n" + Loc.Get(ResumeWhereKey, ("scene_name", lessonName));
             ShowOnly(resumePanel);
             return;
         }
 
         if (!ResearchIds.IsTestId(code) && ResearchLogger.HasEndedSession(code))
         {
-            warningText.text = WarningFinishedFormat.Replace("{participant_id}", code);
+            warningText.text = Loc.Get(WarningFinishedKey, ("participant_id", code));
             ShowOnly(warningPanel);
             return;
         }
@@ -257,7 +257,7 @@ public class ParticipantEntryController : MonoBehaviour
         if (!ok)
         {
             // No retry loop: the session cannot be recovered without an app restart.
-            errorText.text = StartError;
+            errorText.text = Loc.Get(StartErrorKey);
             HideEntryPanels();
             SetCourseVisible(false);
             return;

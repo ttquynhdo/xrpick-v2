@@ -1986,6 +1986,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d79224fb9e4fc544abc22342cb3d454, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuCurrentLesson
+  menuTitle: {fileID: 690524610}
 --- !u!1 &150227138 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 15b812524550788439ebf77bb9ddf7f7, type: 3}

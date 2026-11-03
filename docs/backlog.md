@@ -583,15 +583,15 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
   - Ở `en`, các case hồi quy C4–C6, B1, B3–B5, M2–M6, X1–X7, W1 và các panel bàn phím/kết thúc phiên hiện câu tiếng Anh; ở `de` hiện đúng câu như trước #54.
   - Menu ở `en` hiện tên bài tiếng Anh, bài đang mở vẫn có „» “ và chữ đậm; panel tiếp tục ở Welcome hiện tên bài theo ngôn ngữ.
   - (code) Không còn chuỗi trainee thấy viết cứng trong `Assets/Scripts` (trừ tên ngôn ngữ „Deutsch“/„English“ và ký hiệu như „» “); `FeedbackLanguage` và các bản `…English` bị bỏ.
-  - (code) Không còn câu ghép từ mảnh (`"
-" + …`, `string.Format({0})`); số lượng và tên là placeholder có tên.
+  - (code) Không còn câu ghép từ mảnh (`string.Format({0})`, `Replace`); số lượng và tên là placeholder có tên. Nối hai câu trọn vẹn bằng xuống dòng (tiêu đề + lý do) vẫn được. *(làm rõ 2026-11-03)*
   - Mọi key mới/đổi có dòng trong `review-status.csv` và đã qua `german-reviewer`.
 - **Inspector work expected:** no
 - **Công:** M
 - **Test trên kính:** không
 - **Depends on:** #12 (bảng `UI` đã có các key từ CSV)
 - **Decision:** docs/decisions/002-localization-mechanism.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl54.md
+- **Status:** verified-mcp (11/11 ✅, không có case test tay; chờ commit)
 
 ### #55 [Feature] Chuỗi lưu trong Inspector sang key (tour WMS, quiz, PositionTexts)
 - **Type:** refactor

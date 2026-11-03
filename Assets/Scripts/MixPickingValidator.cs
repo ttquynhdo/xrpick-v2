@@ -9,15 +9,11 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
 
     public event Action OrderCompleted;
 
-    // Keys in docs/i18n/strings-todo.csv until #11/#12 move them to Loc.Get.
-    // #25: German (Sie) like the cards; English stays in the csv for the developer mode.
-    // {0} = next lesson name (menu label).
-    private const string CorrectFormat =
-        "Richtig! Alle Materialien und Mengen stimmen mit dem Auftrag überein.\nWählen Sie jetzt im Menü „{0}“."; // mixed.feedback.correct
+    // Loc table UI (#54). {next_lesson} = menu label of the next lesson.
+    private const string CorrectKey = "mixed.feedback.correct";
 
-    // #21, decision 012: {0} = finished position, {1} = next position.
-    private const string PositionDoneFormat =
-        "Richtig! Position {0} ist erledigt.\nLesen Sie im LVS die Angaben von Position {1} ab."; // mixed.feedback.position_done
+    // #21, decision 012: {position} = finished position, {next_position} = next position.
+    private const string PositionDoneKey = "mixed.feedback.position_done";
 
     private const string NextScene = "ComplexScene";
 
@@ -114,7 +110,8 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
 
             // Advancing raises ContentsChanged, which clears the card: write the result after it.
             container.AdvanceToNextLine();
-            ShowResult(string.Format(PositionDoneFormat, finished, container.CurrentPosition), Color.green);
+            ShowResult(Loc.Get(PositionDoneKey, ("position", finished), ("next_position", container.CurrentPosition)),
+                Color.green);
             return;
         }
 
@@ -124,7 +121,7 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
             {
                 Debug.LogError($"MixedPickingValidator: no lesson name for {NextScene}.", this);
             }
-            ShowResult(string.Format(CorrectFormat, nextLesson), Color.green);
+            ShowResult(Loc.Get(CorrectKey, ("next_lesson", nextLesson)), Color.green);
             IsCompleted = true;
             OrderCompleted?.Invoke();
             return;
@@ -132,10 +129,10 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
 
         bool emptyLaterPosition = container.CurrentPosition > 1 && result.Errors[0].Code == OrderErrorCode.Empty;
         string reason = emptyLaterPosition
-            ? OrderFeedback.ExplainEmptyPosition(container.CurrentLine, FeedbackLanguage.German)
-            : OrderFeedback.Explain(result, FeedbackLanguage.German);
+            ? OrderFeedback.ExplainEmptyPosition(container.CurrentLine)
+            : OrderFeedback.Explain(result);
 
-        ShowResult(OrderFeedback.Title(FeedbackLanguage.German) + "\n" + reason, Color.red);
+        ShowResult(OrderFeedback.Title() + "\n" + reason, Color.red);
     }
 
     private void ShowResult(string text, Color color)

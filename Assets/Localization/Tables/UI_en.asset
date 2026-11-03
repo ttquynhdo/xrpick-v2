@@ -91,23 +91,23 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627342
-    m_Localized: 1. Introduction
+    m_Localized: "1.\_Introduction"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627343
-    m_Localized: 2. Basics
+    m_Localized: "2.\_Basics"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627344
-    m_Localized: 3. Order picking by EKZ 3
+    m_Localized: "3.\_Order picking by EKZ 3"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627345
-    m_Localized: 4. Several positions
+    m_Localized: "4.\_Several positions"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627346
-    m_Localized: 5. Full cartons and loose material
+    m_Localized: "5.\_Full cartons and loose material"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627347
@@ -266,7 +266,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627383
     m_Localized: "Mat.-Nr: {matnr} \u2013 the material number. The same number is
-      in the LVS."
+      in the WMS."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627384
@@ -365,11 +365,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627406
-    m_Localized: Choose an answer first.
+    m_Localized: <color=#F2C94C><b>Choose an answer first.</b></color>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627407
-    m_Localized: Correct!
+    m_Localized: <color=#27AE60><b>Correct!</b></color>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627408
@@ -377,12 +377,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627409
-    m_Localized: "You answered all questions correctly. Now choose \u201E{lesson}\u201C
+    m_Localized: "You answered all questions correctly. Now choose \u201C{lesson}\u201D
       in the menu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627410
-    m_Localized: Not correct
+    m_Localized: <color=#EB5757><b>Not correct</b></color>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627411
@@ -597,20 +597,22 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627458
-    m_Localized: Not correct. Divide Soll by VPE. Only full cartons count.
+    m_Localized: <color=#EB5757><b>Not correct.</b></color> Divide Soll by VPE. Only
+      full cartons count.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627459
-    m_Localized: "Not correct. Loose pieces = Soll minus (full cartons \xD7 VPE)."
+    m_Localized: "<color=#EB5757><b>Not correct.</b></color> Loose pieces = Soll
+      minus (full cartons \xD7 VPE)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627460
-    m_Localized: Correct! Now answer the second question.
+    m_Localized: <color=#27AE60><b>Correct!</b></color> Now answer the second question.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627461
-    m_Localized: Correct! Now take the full cartons and the loose pieces from the
-      storage container.
+    m_Localized: <color=#27AE60><b>Correct!</b></color> Now take the full cartons
+      and the loose pieces from the storage container.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627462
@@ -640,6 +642,10 @@ MonoBehaviour:
   - m_Id: 7615942627466
     m_Localized: 'Read in the WMS: material number (Mat.-Nr), target quantity (Soll)
       and VPE (Verp.-Einh.). Then answer the questions below the screen.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15832974233600
+    m_Localized: MENU
     m_Metadata:
       m_Items: []
   references:

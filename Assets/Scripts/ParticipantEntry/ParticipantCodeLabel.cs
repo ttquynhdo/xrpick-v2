@@ -4,8 +4,8 @@ using UnityEngine;
 // Shows the participant code on the end-of-course panel (#27).
 public class ParticipantCodeLabel : MonoBehaviour
 {
-    // Key in docs/i18n/strings-todo.csv until #11/#12 move it to Loc.Get.
-    private const string CodeFormat = "Code: {participant_id}"; // complex.end.code
+    // Loc table UI (#54).
+    private const string CodeKey = "complex.end.code";
 
     [SerializeField] private TMP_Text label;
 
@@ -25,6 +25,6 @@ public class ParticipantCodeLabel : MonoBehaviour
             return;
         }
 
-        label.text = CodeFormat.Replace("{participant_id}", id);
+        label.text = Loc.Get(CodeKey, ("participant_id", id));
     }
 }
