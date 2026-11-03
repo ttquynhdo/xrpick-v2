@@ -56,7 +56,8 @@ public static class LocalizationBinder
         if (collection == null)
             return $"LocalizationBinder: no String Table Collection '{TableName}'.";
 
-        int added = 0, changed = 0, skipped = 0;
+        int added = 0, changed = 0, skipped = 0, removed = 0;
+        var csvKeys = new HashSet<string>();
         foreach (Row row in ReadRows())
         {
             if (!row.IsText)
@@ -64,6 +65,8 @@ public static class LocalizationBinder
                 skipped++;
                 continue;
             }
+
+            csvKeys.Add(row.Key);
 
             foreach (StringTable table in collection.StringTables)
             {
@@ -88,9 +91,21 @@ public static class LocalizationBinder
             }
         }
 
+        // The CSV is the source: a key renamed or deleted there leaves the table too (#55).
+        foreach (SharedTableData.SharedTableEntry shared in collection.SharedData.Entries.ToList())
+        {
+            if (csvKeys.Contains(shared.Key))
+                continue;
+
+            collection.RemoveEntry(shared.Key);
+            removed++;
+        }
+
         EditorUtility.SetDirty(collection.SharedData);
+        foreach (StringTable table in collection.StringTables)
+            EditorUtility.SetDirty(table);
         AssetDatabase.SaveAssets();
-        return $"LocalizationBinder: import added {added}, changed {changed} entries; skipped {skipped} non-text rows.";
+        return $"LocalizationBinder: import added {added}, changed {changed}, removed {removed} keys not in the CSV; skipped {skipped} non-text rows.";
     }
 
     /// <summary>

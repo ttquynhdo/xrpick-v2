@@ -29446,11 +29446,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PositionTexts
   container: {fileID: 1019723391}
   target: {fileID: 2002543170}
-  textPerPosition:
-  - "Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen
-    Karton in den Auftragsbeh\xE4lter."
-  - "Rechnen Sie aus, wie viele volle Kartons und lose Teile Sie brauchen. Legen
-    Sie zuerst die Kartons, dann die losen Teile in den Auftragsbeh\xE4lter."
+  keyPerPosition:
+  - complex.card.step2_body_position1
+  - complex.card.step2_body
 --- !u!1 &1752236014
 GameObject:
   m_ObjectHideFlags: 0
@@ -33721,12 +33719,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PositionTexts
   container: {fileID: 1019723391}
   target: {fileID: 1901445335}
-  textPerPosition:
-  - 'Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll)
-    und VPE (<nobr>Verp.-Einh.</nobr>). Beantworten Sie dann die Fragen unter dem
-    Bildschirm.'
-  - 'Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll)
-    und VPE (<nobr>Verp.-Einh.</nobr>).'
+  keyPerPosition:
+  - complex.card.step1_body_position1
+  - complex.card.step1_body
 --- !u!1 &1902984932
 GameObject:
   m_ObjectHideFlags: 0

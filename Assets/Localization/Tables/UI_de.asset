@@ -352,8 +352,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627401
-    m_Localized: 'Empf Kz zeigt die EKZ. Sie sagt, wie Sie die Teile einlegen. 003
-      ist EKZ 3: Legen Sie die Teile einzeln und geordnet ein.'
+    m_Localized: 'Empf Kz zeigt die EKZ. Die EKZ sagt, wie Sie die Teile einlegen.
+      003 ist EKZ 3: Legen Sie die Teile einzeln und geordnet ein.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627402
@@ -399,29 +399,12 @@ MonoBehaviour:
     m_Localized: 'Soll 100, VPE 25: Wie viele Kartons nehmen Sie?'
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627412
-    m_Localized: "2 Kartons | 2 Kartons sind nur 50 St\xFCck."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627413
-    m_Localized: 4 Kartons
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627414
-    m_Localized: "25 Kartons | 25 ist die VPE: die St\xFCckzahl in einem Karton.
-      Teilen Sie Soll durch VPE."
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627415
     m_Localized: Welches Material hat die Mat.-Nr 738190?
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627416
-    m_Localized: Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627417
-    m_Localized: "Empf Kz 003: Wie legen Sie die Teile in den Auftragsbeh\xE4lter?"
+    m_Localized: "Empf Kz 003: Wie geben Sie die Teile in den Auftragsbeh\xE4lter?"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627418
@@ -429,8 +412,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627419
-    m_Localized: "Ungeordnet einf\xFCllen | Bei 003 m\xFCssen die Teile einzeln und
-      geordnet liegen."
+    m_Localized: "Ungeordnet einf\xFCllen"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627420
@@ -439,8 +421,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627421
-    m_Localized: "Nur einzeln und geordnet einlegen | Bei 000 d\xFCrfen die Teile
-      ungeordnet liegen."
+    m_Localized: Nur einzeln und geordnet einlegen
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627422
@@ -659,6 +640,55 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 15832974233600
     m_Localized: "MEN\xDC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687593684992
+    m_Localized: 2 Kartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182464
+    m_Localized: "2 Kartons sind nur 50 St\xFCck."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182465
+    m_Localized: 4 Kartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182466
+    m_Localized: 25 Kartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182467
+    m_Localized: "25 ist die VPE: die St\xFCckzahl in einem Karton. Teilen Sie Soll
+      durch VPE."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182468
+    m_Localized: KABELVERBINDER A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182469
+    m_Localized: SCHRAUBE B
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182470
+    m_Localized: RING D
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182471
+    m_Localized: Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182472
+    m_Localized: Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182473
+    m_Localized: "Bei 003 m\xFCssen die Teile einzeln und geordnet liegen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182474
+    m_Localized: "Bei 000 d\xFCrfen die Teile ungeordnet liegen."
     m_Metadata:
       m_Items: []
   references:

@@ -286,12 +286,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627388
-    m_Localized: The LVS
+    m_Localized: The WMS
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627389
     m_Localized: On the screen you see an order in the warehouse management system
-      (LVS). Press "Weiter".
+      (WMS). Press "Weiter".
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627390
@@ -389,25 +389,8 @@ MonoBehaviour:
     m_Localized: 'Soll 100, VPE 25: how many cartons do you take?'
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627412
-    m_Localized: 2 cartons | 2 cartons are only 50 pieces.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627413
-    m_Localized: 4 cartons
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627414
-    m_Localized: '25 cartons | 25 is the VPE: the number of pieces in one carton.
-      Divide Soll by VPE.'
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627415
     m_Localized: Which material has Mat.-Nr 738190?
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627416
-    m_Localized: Compare the Mat.-Nr on the labels with 738190.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627417
@@ -419,8 +402,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627419
-    m_Localized: Pour in unordered | With 003 the parts must lie one by one and in
-      order.
+    m_Localized: Pour in unordered
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627420
@@ -428,7 +410,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627421
-    m_Localized: Only one by one and in order | With 000 the parts may lie unordered.
+    m_Localized: Only one by one and in order
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627422
@@ -646,6 +628,55 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 15832974233600
     m_Localized: MENU
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687593684992
+    m_Localized: 2 cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182464
+    m_Localized: 2 cartons are only 50 pieces.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182465
+    m_Localized: 4 cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182466
+    m_Localized: 25 cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182467
+    m_Localized: '25 is the VPE: the number of pieces in one carton. Divide Soll
+      by VPE.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182468
+    m_Localized: KABELVERBINDER A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182469
+    m_Localized: SCHRAUBE B
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182470
+    m_Localized: RING D
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182471
+    m_Localized: Compare the Mat.-Nr on the labels with 738190.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182472
+    m_Localized: Compare the Mat.-Nr on the labels with 738190.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182473
+    m_Localized: With 003 the parts must lie one by one and in order.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33687669182474
+    m_Localized: With 000 the parts may lie unordered.
     m_Metadata:
       m_Items: []
   references:

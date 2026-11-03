@@ -1,9 +1,10 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// #19, docs/decisions/016: an instruction card that shows only the text of the current position.
-/// Texts are typed per scene in the Inspector (German, keys in docs/i18n/strings-todo.csv).
+/// #55: each position names a Loc key (table UI, docs/i18n/strings-todo.csv), not the text itself.
 /// </summary>
 public class PositionTexts : MonoBehaviour
 {
@@ -12,9 +13,9 @@ public class PositionTexts : MonoBehaviour
 
     [SerializeField] private TMP_Text target;
 
-    [Tooltip("One text per order line; index 0 = position 1.")]
-    [TextArea]
-    [SerializeField] private string[] textPerPosition;
+    [Tooltip("One Loc key per order line; index 0 = position 1.")]
+    [FormerlySerializedAs("textPerPosition")]
+    [SerializeField] private string[] keyPerPosition;
 
     private IPositionedOrder order;
 
@@ -49,10 +50,10 @@ public class PositionTexts : MonoBehaviour
         if (RequiredReference.IsMissing(target, nameof(target), this))
             return;
 
-        int count = textPerPosition != null ? textPerPosition.Length : 0;
+        int count = keyPerPosition != null ? keyPerPosition.Length : 0;
         if (count != order.OrderLines.Count)
         {
-            Debug.LogError($"PositionTexts: {count} texts but {order.OrderLines.Count} order lines.", this);
+            Debug.LogError($"PositionTexts: {count} keys but {order.OrderLines.Count} order lines.", this);
         }
 
         Show(order.CurrentPosition);
@@ -61,9 +62,9 @@ public class PositionTexts : MonoBehaviour
     private void Show(int position)
     {
         int index = position - 1;
-        if (target == null || textPerPosition == null || index < 0 || index >= textPerPosition.Length)
+        if (target == null || keyPerPosition == null || index < 0 || index >= keyPerPosition.Length)
             return;
 
-        target.text = textPerPosition[index];
+        target.text = Loc.Get(keyPerPosition[index]);
     }
 }

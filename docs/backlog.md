@@ -599,7 +599,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Files:** Assets/Scripts/Concept/WmsFieldTour.cs (`Step.title/body`), Assets/Scripts/PackageQuizController.cs (`Question.text`, `Answer.label/wrongReason`), Assets/Scripts/PositionTexts.cs (`textPerPosition`), Assets/Scripts/PackageInfoOnGrab.cs (`materialName`, nếu là text trainee đọc)
 - **Problem:** Các chuỗi này nằm trong dữ liệu serialize của component, không phải hằng trong code, nên phải đổi cấu trúc dữ liệu sang key (giữ dữ liệu cũ bằng `[FormerlySerializedAs]` hoặc chuyển một lần).
 - **Done when:**
-  - Ở `en`, tour WMS 10 bước (C2), quiz 4 câu với đáp án và lý do sai (C5–C7), và thẻ 1/2 ở hai position của Mixed/Complex hiện tiếng Anh; ở `de` giống từng ký tự như trước #55.
+  - Ở `en`, tour WMS 10 bước (C2), quiz 4 câu với đáp án và lý do sai (C5–C7), và thẻ 1/2 ở hai position của Mixed/Complex hiện tiếng Anh; ở `de` giống từng ký tự như trước #55, trừ 2 câu người dùng chọn sửa theo german-reviewer (2026-11-03: `concept.tour.empf_kz_003.body`, `concept.quiz.ekz_003.q`).
   - (code) Các component trên lưu key, không lưu chữ; key thiếu thì `Loc` báo lỗi như #11.
   - Mọi key mới/đổi có dòng trong `review-status.csv` và đã qua `german-reviewer`.
 - **Inspector work expected:** no (chuyển dữ liệu bằng code)
@@ -607,7 +607,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** không
 - **Depends on:** #12, #54 (cùng sửa `PackageQuizController`/`WmsFieldTour`: làm sau để không đụng nhau)
 - **Decision:** docs/decisions/002-localization-mechanism.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl55.md
+- **Status:** verified-mcp (9/9 ✅, không có case test tay; chờ commit)
 
 ### #13 [Feature] File export EN–DE cho người bản ngữ duyệt
 - **Type:** feature

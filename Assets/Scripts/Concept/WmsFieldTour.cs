@@ -14,17 +14,14 @@ public class WmsFieldTour : MonoBehaviour
     private const string ProgressKey = "concept.tour.progress";
     private const string NextKey = "concept.tour.next";
     private const string RestartKey = "concept.tour.restart";
+    private const string StepKeyPrefix = "concept.tour.";
 
     [Serializable]
     public class Step
     {
-        [Tooltip("Stable id, e.g. soll (for #28 logging later).")]
+        // #55: the texts are the Loc keys concept.tour.<id>.title / .body.
+        [Tooltip("Stable id, e.g. soll (for #28 logging later); also names the Loc keys concept.tour.<id>.title/.body.")]
         public string id;
-
-        public string title;
-
-        [TextArea(2, 5)]
-        public string body;
 
         [Tooltip("Shown only during this step; placed outside the monitor border.")]
         public GameObject[] markers;
@@ -106,8 +103,8 @@ public class WmsFieldTour : MonoBehaviour
         SetMarkers(steps[index], true);
 
         Step step = steps[index];
-        titleText.text = step.title;
-        bodyText.text = step.body;
+        titleText.text = Loc.Get(StepKeyPrefix + step.id + ".title");
+        bodyText.text = Loc.Get(StepKeyPrefix + step.id + ".body");
 
         if (progressText != null)
         {

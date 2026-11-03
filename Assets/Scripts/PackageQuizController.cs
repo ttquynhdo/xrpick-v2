@@ -19,6 +19,8 @@ public class PackageQuizController : MonoBehaviour
     private const string AllDoneKey = "concept.quiz.all_done";        // {lesson} = menu label of the next lesson
     private const string WrongKey = "concept.quiz.wrong";
     private const string NextScene = "BasicPickingScene";
+    // #55: question concept.quiz.<id>.q, answer concept.quiz.<id>.<key>, reason concept.quiz.<id>.<key>.wrong.
+    private const string QuestionKeyPrefix = "concept.quiz.";
     private const string SelectedMark = "» ";
 
     // Decision 015: each toggle shows its letter and answer, so the trainee reads and presses in one place.
@@ -29,12 +31,6 @@ public class PackageQuizController : MonoBehaviour
     {
         [Tooltip("Short, language-independent answer key (for #28).")]
         public string key;
-
-        public string label;
-
-        [Tooltip("Shown after 'Nicht richtig' when this wrong answer is chosen.")]
-        [TextArea(1, 3)]
-        public string wrongReason;
     }
 
     [Serializable]
@@ -42,9 +38,6 @@ public class PackageQuizController : MonoBehaviour
     {
         [Tooltip("Stable question id (for #28).")]
         public string id;
-
-        [TextArea(2, 4)]
-        public string text;
 
         public string correctKey;
 
@@ -148,7 +141,7 @@ public class PackageQuizController : MonoBehaviour
 
         if (answer.key != question.correctKey)
         {
-            feedbackText.text = Loc.Get(WrongKey) + "\n" + answer.wrongReason;
+            feedbackText.text = Loc.Get(WrongKey) + "\n" + Loc.Get(OptionKey(question, answer) + ".wrong");
             return;
         }
 
@@ -213,7 +206,7 @@ public class PackageQuizController : MonoBehaviour
         current = index;
         Question question = questions[index];
 
-        questionText.text = question.text;
+        questionText.text = Loc.Get(QuestionKeyPrefix + question.id + ".q");
 
         if (progressText != null)
         {
@@ -239,6 +232,9 @@ public class PackageQuizController : MonoBehaviour
         RefreshLabels();
     }
 
+    private static string OptionKey(Question question, Option option) =>
+        QuestionKeyPrefix + question.id + "." + option.key;
+
     // #32/#52: the chosen answer is marked with a text prefix and bold type, not by colour only.
     private void RefreshLabels()
     {
@@ -249,7 +245,7 @@ public class PackageQuizController : MonoBehaviour
             if (labels[i] == null || options == null || i >= options.Length)
                 continue;
 
-            string answer = Letters[i] + ": " + options[i].label;
+            string answer = Letters[i] + ": " + Loc.Get(OptionKey(questions[current], options[i]));
             labels[i].text = toggles[i].isOn ? "<b>" + SelectedMark + answer + "</b>" : answer;
         }
     }
