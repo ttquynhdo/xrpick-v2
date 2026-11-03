@@ -846,7 +846,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Công:** S
 - **Test trên kính:** bắt buộc (đặt carton cuối bằng tay thật khi các ô bên cạnh đã có carton)
 - **Depends on:** #41, #47
-- **Status:** todo
+- **Test report:** docs/test-reports/bl56.md
+- **Status:** verified-mcp (16/18 ✅, chờ test tay H1, H2)
 
 ### #57 [Feature] ConceptScene: bảng tổng quan các EKZ
 - **Type:** feature
