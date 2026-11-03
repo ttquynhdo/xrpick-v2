@@ -352,7 +352,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627403
     m_Localized: '000 is EKZ 0: the parts may lie unordered. You may also pour the
-      parts in. There are more EKZ.'
+      parts in. All EKZ are on the board to the right.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -677,6 +677,46 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 33687669182474
     m_Localized: With 000 the parts may lie unordered.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914819719168
+    m_Localized: EKZ overview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245120
+    m_Localized: In the exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245121
+    m_Localized: Pouring in unordered is allowed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245122
+    m_Localized: Put in by hand, also several at a time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245123
+    m_Localized: Put in one by one and in order.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245124
+    m_Localized: Like EKZ 3; separate parts in one plane with a separator.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245125
+    m_Localized: Like EKZ 3; separate parts in two planes with a separator.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245126
+    m_Localized: Like EKZ 3; separate parts in all planes with a separator.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245127
+    m_Localized: ESD-protected parts. Do not open without instruction.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245128
+    m_Localized: Special packaging. Do not open without instruction.
     m_Metadata:
       m_Items: []
   references:

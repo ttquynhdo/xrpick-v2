@@ -623,6 +623,46 @@ MonoBehaviour:
     m_Key: concept.quiz.ekz_000.ordered.wrong
     m_Metadata:
       m_Items: []
+  - m_Id: 287914819719168
+    m_Key: concept.ekz.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245120
+    m_Key: concept.ekz.in_training
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245121
+    m_Key: concept.ekz.0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245122
+    m_Key: concept.ekz.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245123
+    m_Key: concept.ekz.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245124
+    m_Key: concept.ekz.4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245125
+    m_Key: concept.ekz.5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245126
+    m_Key: concept.ekz.6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245127
+    m_Key: concept.ekz.8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245128
+    m_Key: concept.ekz.9
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

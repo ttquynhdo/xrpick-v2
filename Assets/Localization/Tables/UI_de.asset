@@ -362,7 +362,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627403
     m_Localized: "000 ist EKZ 0: Die Teile d\xFCrfen ungeordnet liegen. Sie d\xFCrfen
-      die Teile auch einf\xFCllen. Es gibt weitere EKZ."
+      die Teile auch einf\xFCllen. Alle EKZ sehen Sie rechts daneben."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -689,6 +689,46 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 33687669182474
     m_Localized: "Bei 000 d\xFCrfen die Teile ungeordnet liegen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914819719168
+    m_Localized: "EKZ-\xDCbersicht"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245120
+    m_Localized: "In der \xDCbung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245121
+    m_Localized: "Ungeordnet einf\xFCllen ist erlaubt."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245122
+    m_Localized: Von Hand einlegen, auch mehrere auf einmal.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245123
+    m_Localized: Einzeln und geordnet einlegen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245124
+    m_Localized: Wie EKZ 3, Teile in einer Ebene mit Zwischenlage trennen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245125
+    m_Localized: Wie EKZ 3, Teile in zwei Ebenen mit Zwischenlage trennen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245126
+    m_Localized: Wie EKZ 3, Teile in allen Ebenen mit Zwischenlage trennen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245127
+    m_Localized: "ESD-gesch\xFCtzte Teile. Nicht ohne Anweisung \xF6ffnen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287914874245128
+    m_Localized: "Sonderverpackung. Nicht ohne Anweisung \xF6ffnen."
     m_Metadata:
       m_Items: []
   references:

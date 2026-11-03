@@ -130,7 +130,6 @@ concept.tour.rest.body,So viele Stück bleiben nach dem Auftrag im Lagerbehälte
 concept.tour.empf_kz_003.title,Empf Kz,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.empf_kz_003.body,"Empf Kz zeigt die EKZ. Die EKZ sagt, wie Sie die Teile einlegen. 003 ist EKZ 3: Legen Sie die Teile einzeln und geordnet ein.",proposed,german-reviewer (agent),2026-11-03,Agent: changed in #55 („Die EKZ sagt“)
 concept.tour.empf_kz_000.title,Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.empf_kz_000.body,000 ist EKZ 0: Die Teile dürfen ungeordnet liegen. Sie dürfen die Teile auch einfüllen. Es gibt weitere EKZ.,proposed,german-reviewer (agent),2026-11-03,Agent: OK; ask instructor: einfüllen or schütten
 concept.tour.not_used.title,Nicht in der Übung,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.not_used.body,Die markierten Bereiche brauchen Sie in der Übung nicht. Das Feld Anweisung bleibt in der Übung leer.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.q,"Soll 100, VPE 25: Wie viele Kartons nehmen Sie?",proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
@@ -153,3 +152,14 @@ concept.quiz.ekz_000.q,Empf Kz 000: Wie dürfen Sie die Teile in den Auftragsbeh
 concept.quiz.ekz_000.ordered,Nur einzeln und geordnet einlegen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.ekz_000.ordered.wrong,Bei 000 dürfen die Teile ungeordnet liegen.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.ekz_000.poured,Einfüllen ist erlaubt,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
+concept.ekz.title,EKZ-Übersicht,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.in_training,In der Übung,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.0,Ungeordnet einfüllen ist erlaubt.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.2,"Von Hand einlegen, auch mehrere auf einmal.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.3,Einzeln und geordnet einlegen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.4,"Wie EKZ 3, Teile in einer Ebene mit Zwischenlage trennen.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.5,"Wie EKZ 3, Teile in zwei Ebenen mit Zwischenlage trennen.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.6,"Wie EKZ 3, Teile in allen Ebenen mit Zwischenlage trennen.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.8,ESD-geschützte Teile. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.9,Sonderverpackung. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.tour.empf_kz_000.body,000 ist EKZ 0: Die Teile dürfen ungeordnet liegen. Sie dürfen die Teile auch einfüllen. Alle EKZ sehen Sie rechts daneben.,proposed,german-reviewer (agent),2026-11-03,#57: last sentence points to the EKZ board
