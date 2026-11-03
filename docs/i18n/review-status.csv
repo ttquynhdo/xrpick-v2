@@ -17,18 +17,18 @@ welcome.panel.duration,Dauer: etwa 5 Minuten pro Lektion,proposed,german-reviewe
 common.panel.see_cards,Ihre Aufgaben stehen links auf den Karten.,proposed,german-reviewer (agent),2026-11-02,#35
 welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-01,#25
 mixed.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Bearbeiten Sie die zwei Positionen nacheinander.",proposed,german-reviewer (agent),2026-11-01,#21
-mixed.card.step1_body,"Lesen Sie im LVS die Angaben der aktuellen Position ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).",proposed,german-reviewer (agent),2026-11-01,#21
+mixed.card.step1_body,"Lesen Sie für die aktuelle Position ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll), VPE (<nobr>Verp.-Einh.</nobr>) und EKZ (<nobr>Empf Kz</nobr>).",proposed,,2026-11-03,#62
 common.card.step2_pick_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
 mixed.card.step2_body,"Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie die Verpackungen in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#21
-mixed.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6). Danach zeigt das LVS die nächste Position an.,proposed,german-reviewer (agent),2026-11-01,#21
+mixed.card.step3_body,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,,2026-11-03,#62
 complex.card.task_body,"Kommissionieren Sie den Auftrag, der im Lagerverwaltungssystem (LVS) angezeigt wird. Der Auftrag hat zwei Positionen mit losem Material. Bearbeiten Sie beide nacheinander.",proposed,german-reviewer (agent),2026-11-02,#19: text changed (two positions)
-complex.card.step1_body,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>).",proposed,german-reviewer (agent),2026-11-01,#25
+complex.card.step1_body,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll), VPE (<nobr>Verp.-Einh.</nobr>) und EKZ (<nobr>Empf Kz</nobr>).",proposed,,2026-11-03,#62
 complex.card.step2_body,"Rechnen Sie aus, wie viele volle Kartons und lose Teile Sie brauchen. Legen Sie zuerst die Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#25
-complex.card.step3_body,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25
+complex.card.step3_body,"Zählen Sie die vollen Kartons und die losen Teile nach. Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,,2026-11-03,#62
 complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
 complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
 complex.end.summary,"• Das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n• Sollmenge : VPE = volle Kartons, übrige Teile lose\n• Jede Position einzeln kommissionieren und bestätigen\n• Der rote Knopf ersetzt das Bestätigen mit dem Fuß",proposed,german-reviewer (agent),2026-11-02,#23
-basic.step3.text,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25 verb
+basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,,2026-11-03,#62
 mixed.feedback.position_done,Richtig! Position {position} ist erledigt.\nLesen Sie im LVS die Angaben von Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-01,#21
 basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie die Kartons nach der EKZ in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#41
 order.feedback.ekz3_loose,Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.,proposed,german-reviewer (agent),2026-11-01,"#41, ""Nicht alle"" per reviewer"
@@ -52,7 +52,7 @@ complex.feedback.position_done,"Richtig! Position {done} ist erledigt.
 Der angebrochene Karton mit der Anbruchmenge bleibt im Modul im Lagerbehälter.
 Lesen Sie im LVS die Angaben von Position {next} ab.",proposed,german-reviewer (agent),2026-11-02,#19
 complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-02,#53 (quiz hint moved to card 1)
-complex.card.step1_body_position1,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll) und VPE (<nobr>Verp.-Einh.</nobr>). Beantworten Sie dann die Fragen unter dem Bildschirm.",proposed,german-reviewer (agent),2026-11-02,#53
+complex.card.step1_body_position1,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll), VPE (<nobr>Verp.-Einh.</nobr>) und EKZ (<nobr>Empf Kz</nobr>). Beantworten Sie dann die Fragen unter dem Bildschirm. Das „Beispiel“ rechts daneben hilft beim Rechnen.",proposed,,2026-11-03,#62
 basic.result.correct.text,Der Auftrag ist richtig. Wählen Sie jetzt im Menü „4. Mehrere Positionen“.,proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional '… auswählen', left to #13"
 basic.result.correct.title,"<color=""green"">Richtig!</color>",proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 basic.result.incorrect.title,"<color=""red"">Nicht richtig</color>",proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
@@ -184,3 +184,5 @@ concept.flow.step4_weigh,Teile wiegen,proposed,german-reviewer (agent),2026-11-0
 concept.flow.step5,Teile vorverpacken,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step7,Restmenge im Lagerbehälter sichern,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step8,Leere Kartons aus dem Lagerbehälter entfernen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+complex.card.step3_body_position1,"Zählen Sie die vollen Kartons und die losen Teile nach. Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6). Danach zeigt das LVS Position 2 an.",proposed,,2026-11-03,#62
+mixed.card.step3_body_position1,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6). Danach zeigt das LVS Position 2 an.",proposed,,2026-11-03,#62

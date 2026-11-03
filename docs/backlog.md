@@ -991,7 +991,8 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Công:** S
 - **Test trên kính:** nhanh (đọc thẻ)
 - **Depends on:** #53
-- **Status:** todo
+- **Test report:** docs/test-reports/bl62.md
+- **Status:** verified-mcp (17/17 MCP ✅, chờ test tay T10 đọc thẻ trên kính)
 
 ### #63 [P3] Welcome, Concept: thẻ cuối trên giá cùng cỡ, sát thẻ trên như ở Basic/Mixed/Complex
 - **Type:** cleanup

@@ -150,7 +150,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627356
-    m_Localized: Check the order. Then press the red button (F6).
+    m_Localized: Check in the WMS that Ist equals Soll. Then press the red button
+      (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627357
@@ -474,8 +475,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627437
-    m_Localized: 'Read the data of the current position in the WMS: material number
-      (Mat.-Nr), target quantity (Soll) and VPE (Verp.-Einh.).'
+    m_Localized: 'Read for the current position: material number (<nobr>Mat.-Nr</nobr>),
+      target quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>) and EKZ (<nobr>Empf
+      Kz</nobr>).'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627438
@@ -488,8 +490,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627440
-    m_Localized: Check the order. Then press the red button (F6). After that the
-      WMS shows the next position.
+    m_Localized: Check in the WMS that Ist equals Soll. Then press the red button
+      (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627441
@@ -498,8 +500,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627442
-    m_Localized: 'Read in the WMS: material number (Mat.-Nr), target quantity (Soll)
-      and VPE (Verp.-Einh.).'
+    m_Localized: 'Read in the WMS: material number (<nobr>Mat.-Nr</nobr>), target
+      quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>) and EKZ (<nobr>Empf Kz</nobr>).'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627443
@@ -508,7 +510,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627444
-    m_Localized: Check the order. Then press the red button (F6).
+    m_Localized: Count the full cartons and the loose pieces. Check in the WMS that
+      Ist equals Soll. Then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627445
@@ -617,8 +620,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627466
-    m_Localized: 'Read in the WMS: material number (Mat.-Nr), target quantity (Soll)
-      and VPE (Verp.-Einh.). Then answer the questions below the screen.'
+    m_Localized: 'Read in the WMS: material number (<nobr>Mat.-Nr</nobr>), target
+      quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>) and EKZ (<nobr>Empf Kz</nobr>).
+      Then answer the questions below the screen. The "Example" board to the right
+      of it helps with the calculation.'
     m_Metadata:
       m_Items: []
   - m_Id: 15832974233600
@@ -807,6 +812,17 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 340852011307029
     m_Localized: Remove empty cartons from the storage container
+    m_Metadata:
+      m_Items: []
+  - m_Id: 346260058804224
+    m_Localized: Check in the WMS that Ist equals Soll. Then press the red button
+      (F6). After that the WMS shows position 2.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 346260226576384
+    m_Localized: Count the full cartons and the loose pieces. Check in the WMS that
+      Ist equals Soll. Then press the red button (F6). After that the WMS shows position
+      2.
     m_Metadata:
       m_Items: []
   references:
