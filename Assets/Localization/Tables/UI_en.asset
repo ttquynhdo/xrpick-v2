@@ -719,6 +719,10 @@ MonoBehaviour:
     m_Localized: Special packaging. Do not open without instruction.
     m_Metadata:
       m_Items: []
+  - m_Id: 336383051698176
+    m_Localized: First answer the questions below the screen.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

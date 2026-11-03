@@ -34316,6 +34316,7 @@ MonoBehaviour:
   congratulationsPanel: {fileID: 2000697716}
   instructionText: {fileID: 0}
   resultCard: {fileID: 1840747968}
+  remainderQuiz: {fileID: 1933170183}
 --- !u!4 &1933170181
 Transform:
   m_ObjectHideFlags: 0

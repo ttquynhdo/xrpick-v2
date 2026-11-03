@@ -16,6 +16,9 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     // Anbruchmenge reminder (Detail Description 5.12); it is not rated.
     private const string PositionDoneKey = "complex.feedback.position_done";
 
+    // #58: red button before the questions below the screen are answered; not a wrong order.
+    private const string AnswerQuizFirstKey = "complex.feedback.answer_quiz_first";
+
     [Header("References")]
     [SerializeField] private PiecesContainerCounter containerCounter;
     [SerializeField] private TMP_Text feedbackText;
@@ -28,6 +31,10 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     // #10 (#33 Complex part): result card next to the red button; hidden until a confirm.
     [Tooltip("Optional card that holds feedbackText; shown on confirm, hidden when the container changes.")]
     [SerializeField] private GameObject resultCard;
+
+    // #58, decision 016: the storage container stays hidden until both questions are answered right.
+    [Tooltip("Optional. Questions below the screen that must be answered before position 1 is rated.")]
+    [SerializeField] private RemainderQuizController remainderQuiz;
 
     private string initialInstruction;
 
@@ -85,6 +92,15 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
 
         if (missing)
             return;
+
+        // #58: the order can't be picked yet, so tell the trainee what to do instead of rating an empty box.
+        if (containerCounter.CurrentPosition == 1 && remainderQuiz != null && !remainderQuiz.IsAnswered)
+        {
+            ShowCard();
+            feedbackText.text = Loc.Get(AnswerQuizFirstKey);
+            feedbackText.color = Color.yellow;
+            return;
+        }
 
         // #6: one rule decides right/wrong (docs/decisions/005, 006); #19: only the current position.
         OrderResult result = containerCounter.CheckOrder();
