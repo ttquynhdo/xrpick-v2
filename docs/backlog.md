@@ -3,7 +3,7 @@
 Nguồn: `/code-review` toàn bộ `Assets/Scripts` (2026-11-01), đã đối chiếu với code và scene (commit `db4160f`).
 Mục #14–#23: review thiết kế khóa học (`instructional-design-reviewer`, cả 5 scene, 2026-11-01, chưa có ảnh Play mode). Các mã A2, B8… là câu hỏi trong `docs/requirements/questions-for-instructor.md`.
 Mục #24–#25 và các dòng **Bổ sung (ảnh Play mode)**: review lần 2 có ảnh Play mode của 5 góc nhìn chuẩn ở cả 5 scene (`TestEvidence/<Scene>/views/`, chỉ có trên máy, không commit), 2026-11-01. Đã đối chiếu lại với code/scene.
-Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01). Mục #42: từ quyết định ở spec mục 9 (khoá Menu khi nghiên cứu), thêm khi rà backlog 2026-11-01. Mục #43: bài kiểm tra trong VR, ghi lại để sau khi bàn thiết kế #26 (không có bài kiểm tra trên giấy). Mục #44: nút kết thúc phiên, tách từ #27 theo decision 004.
+Mục #26–#31: log dữ liệu nghiên cứu theo từng người học, từ `docs/research-logging-spec.md` mục 8 (2026-11-01). Mục #42: từ quyết định ở spec mục 9 (khoá Menu khi nghiên cứu), thêm khi rà backlog 2026-11-01. Mục #56–#57 và case mới của #52: góp ý của người xem video demo (2026-11-03), đã đối chiếu với scene và slide 8 (bảng EKZ-Vorgabe). Mục #43: bài kiểm tra trong VR, ghi lại để sau khi bàn thiết kế #26 (không có bài kiểm tra trên giấy). Mục #44: nút kết thúc phiên, tách từ #27 theo decision 004.
 Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tải nhận thức (`xr-ux-reviewer`, cả 5 scene, ảnh `TestEvidence/<Scene>/views/`, 2026-11-01). Góc/khoảng cách tính từ mắt (0, 1.6, 0). Vị trí nút đỏ là suy ra từ cấu trúc cha–con, chưa đo trong Play mode.
 **Cập nhật 2026-11-01 theo câu trả lời B1–B10, C1–C4, D1–D3** trong file câu hỏi (trả lời của nhóm, chưa phải của người hướng dẫn): mọi scene dùng **dialog mới** (`F6 Bestätigen`); Rest = tồn kho thùng kho, Ist theo cách lấy thật (B6, B7, B7a); dữ liệu giả cùng định dạng thật (B10); #22 ngoài phạm vi (D2); giữ thông tin kiện sau khi thả làm quiz quá dễ (D3). Câu A1–A6 vẫn mở.
 **Cập nhật 2026-11-01 (decision 003):** nhóm trả lời A1 (đơn Basic = tổng 300 chiếc) và D4–D7 (EKZ khi đặt hàng); thêm #41, bỏ chặn #1, #24. Sau đó nhóm trả lời nốt A2, A3, A5, A6, B3, B5, D1, chọn phương án C cho #34 (decision 001) và chốt mục 9 của spec log: không còn mục nào `blocked`.
@@ -22,6 +22,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Sau #40 (2026-11-02):** #40 verified-mcp (decision 017), chờ test kính H1–H3 cùng buổi với #19, #21, #36, #39, #50–#52, #53. #53 verified-mcp (thẻ 1 nhắc quiz, giả định D20). #11 verified-mcp (2026-11-02, nền tảng DE/EN, chờ build ConceptScene trên Quest L9 + chạm nút L10). Tiếp theo: #12 done (20e0075) → #54 done (10d9db5) → #55 done (57068e7) → #13, rồi đợt 6. #12 được chia ba ngày 2026-11-02.
+- **Mới 2026-11-03 (góp ý của người xem video demo):** #56 (Basic, carton EKZ 3 sát nhau, S, không cần decision) và #57 (Concept, bảng tổng quan EKZ, M, cần `solution-decision` trước). Hai mục sửa hai scene khác nhau nên làm song song được với nhau; #57 không chạy song song với mục nào khác sửa ConceptScene. Có thể làm trước đợt 6 và trước #13 (#57 thêm chữ mới, nên export cho người duyệt sau #57). Test kính của #56 (bắt buộc), #57 (nhanh) và case mới của #52 gom vào buổi test kính tiếp theo.
 - **Chỉ còn chờ người hướng dẫn:** #17 (test tay ✅; thành `done` khi người hướng dẫn chốt A2).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
@@ -813,14 +814,14 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Scene(s):** ConceptScene
 - **Files:** ConceptScene `Interactables/NextButton`, `Interactables/AnswerOption` (PokeInteractable + PointableCanvas), Assets/Scripts/Concept/WmsFieldTour.cs, PackageQuizController
 - **Problem:** Người dùng báo trên kính (2026-11-02): bấm „Weiter“ và A/B/C rất khó. Đo trong Editor: mỗi nút chỉ 3,6 × 2,5 cm, nằm ở mép bàn (y 0,79, z 0,34), cách mắt ~0,88 m, phải cúi ~65°, chỉ ~0,34 m trước người nên tay phải co lại. Đồng thời phải nhìn thay đổi trên màn hình WMS (y 1,33) và bảng tour/quiz bên cạnh: mắt đi lên đi xuống giữa nút và chỗ đọc.
-- **Done when:** theo mục *Done when* của decision 015: tay phải duỗi thoải mái chạm „Weiter“ và từng nút đáp án, trúng ngay lần đầu; „Weiter“ cùng khung hình với bảng tour; đề, ba đáp án (ghi trên nút, „A: …“) và „Frage n von 4“ cùng khung hình, không chữ bị cắt; thẻ câu hỏi không còn trên giá và không liệt kê đáp án; nút không che dialog, bảng tour, `Info Panel`, kiện; cầm kiện không bấm nhầm; cách nút đỏ và Menu ≥ 15 cm; hover/nhấn thấy rõ, có âm thanh, đáp án chọn có „» “ + dấu hiệu thứ hai; tour 10 bước và quiz chấm như cũ; chữ mới qua `localize-strings` + `german-reviewer`; (code) logic tour/quiz không đổi.
+- **Done when:** theo mục *Done when* của decision 015: tay phải duỗi thoải mái chạm „Weiter“ và từng nút đáp án, trúng ngay lần đầu; „Weiter“ cùng khung hình với bảng tour; đề, ba đáp án (ghi trên nút, „A: …“) và „Frage n von 4“ cùng khung hình, không chữ bị cắt; thẻ câu hỏi không còn trên giá và không liệt kê đáp án; nút không che dialog, bảng tour, `Info Panel`, kiện; cầm kiện không bấm nhầm; cách nút đỏ và Menu ≥ 15 cm; hover/nhấn thấy rõ, có âm thanh, đáp án chọn có „» “ + dấu hiệu thứ hai; người chưa xem app lần nào, chỉ đọc đề, tự nhận ra phải chạm A/B/C để trả lời (góp ý của người xem video 2026-11-03: không thấy cách trả lời câu hỏi); tour 10 bước và quiz chấm như cũ; chữ mới qua `localize-strings` + `german-reviewer`; (code) logic tour/quiz không đổi.
 - **Inspector work expected:** có thể (dời/đổi cỡ canvas nút)
 - **Công:** S–M
 - **Test trên kính:** bắt buộc (tầm với, độ thoải mái của tay)
 - **Depends on:** #45, #35
 - **Decision:** docs/decisions/015-concept-buttons-next-to-reading.md
 - **Test report:** docs/test-reports/bl52.md
-- **Status:** verified-mcp (13/16 ✅, chờ test tay H1–H3 trên kính: tầm với, bấm trúng, không bấm nhầm khi cầm kiện)
+- **Status:** verified-mcp (13/16 ✅, chờ test tay H1–H3 trên kính: tầm với, bấm trúng, không bấm nhầm khi cầm kiện; thêm 2026-11-03 case người mới tự nhận ra nút A/B/C, chưa có trong `bl52.md`)
 
 ### #53 [Feature] ComplexScene: thẻ 1 nhắc trả lời câu hỏi dưới màn hình
 - **Type:** feature
@@ -834,6 +835,30 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #40 (cùng sửa thẻ ComplexScene); D20
 - **Test report:** docs/test-reports/bl53.md
 - **Status:** verified-mcp (9/9 ✅, chờ test tay T4-kính: đọc thẻ ở cả 2 position; theo giả định D20)
+
+### #56 [P1] BasicPickingScene: 6 carton EKZ 3 xếp sát nhau như pictogram EKZ 3
+- **Type:** logic
+- **Scene(s):** BasicPickingScene
+- **Files:** BasicPickingScene `BoxSnapper`, `BoxSnapper (1)`, `(4)`, `(5)`, `(6)`, `(8)` (con `SnapInteractable` dưới `PlasticBox_Order`), Assets/Scripts/EkzPlacementCheck.cs (chỉ đọc)
+- **Problem:** Góp ý của người xem video (2026-11-03): ở EKZ 3, các carton nên nằm sát nhau như pictogram và ảnh ví dụ EKZ 3 ở slide 8 (bảng EKZ-Vorgabe, không có khe giữa các kiện). Đo trong Editor (2026-11-03): carton 17,8 × 12,1 cm, ô snap ở x 0,240 / 0,429 và z 0,578 / 0,720 / 0,838, nên khe theo x khoảng 1 cm, theo z từ 0 đến 2 cm và không đều, cụm cách thành thùng khoảng 2 cm. Chưa kiểm hướng carton sau khi snap trong Play mode.
+- **Done when:** Khi cả 6 carton đã khớp ô, nhìn từ góc `container` không thấy khe giữa hai carton cạnh nhau, theo cả hai chiều. Cụm 6 carton nằm giữa thùng, khoảng cách tới thành thùng hai bên bằng nhau. Khi 5 ô đã có carton, thả carton thứ 6 gần ô trống thì nó khớp vào ô đó và không đẩy carton bên cạnh ra khỏi ô. Trên kính, dùng tay thật đặt được carton thứ 6 vào ô cuối, tối đa 2 lần thử. 6 carton khớp ô + xác nhận → `Correct`, băng lăn chở cả 6 đi. Một carton nằm lỏng + xác nhận → feedback `order.feedback.ekz3_loose` như trước. (code) Mọi ô snap nằm trong bounds trigger của `PlasticBox_Order`, và bounds của hai carton đã khớp không chồng lên nhau.
+- **Inspector work expected:** yes (dời 6 ô snap)
+- **Công:** S
+- **Test trên kính:** bắt buộc (đặt carton cuối bằng tay thật khi các ô bên cạnh đã có carton)
+- **Depends on:** #41, #47
+- **Status:** todo
+
+### #57 [Feature] ConceptScene: bảng tổng quan các EKZ
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene (bảng mới, hoặc thêm bước vào `Sample Description`/`WmsFieldTour`), docs/i18n/strings-todo.csv (`concept.tour.empf_kz_000.body` và key mới)
+- **Problem:** Góp ý của người xem video (2026-11-03): slide của Festo nói nên đưa EKZ vào các tình huống luyện tập khi làm được, còn không thì phải có danh sách EKZ và ý nghĩa của từng cấp. Hiện app chỉ dạy và cho luyện EKZ 0 (Mixed, Complex) và EKZ 3 (Basic). Bước tour `Empf Kz 000` chỉ nói „Es gibt weitere EKZ.“, không cấp nào khác được nêu tên. Bảng EKZ-Vorgabe ở slide 8 có các cấp 0, 2, 3, 4, 5, 6, 8, 9.
+- **Done when:** Ở ConceptScene có một bảng tổng quan liệt kê EKZ 0, 2, 3, 4, 5, 6, 8 và 9. Mỗi cấp có một pictogram đơn giản tự dựng và một câu tiếng Đức (Sie) nói cách đặt các Teile. EKZ 0 và EKZ 3 được đánh dấu là cấp có trong bài luyện, các cấp khác chỉ để biết. Từ chỗ đứng (0, 1.6, 0), trên kính đọc được mọi dòng, không chữ nào bị cắt. Bảng không che dialog WMS, bảng tour, `Info Panel`, nút „Weiter“, cụm A/B/C hay kiện. Bước tour `Empf Kz 000` chỉ tới bảng thay cho câu „Es gibt weitere EKZ.“. Tour 10 bước và quiz 4 câu chấm như trước. Chuyển sang English thì bảng hiện tiếng Anh. (code) Không dùng ảnh hay file nào từ `docs/requirements/`; chữ đi qua `localize-strings` + `german-reviewer` và nằm trong `docs/i18n/strings-todo.csv`; bảng không có raycast target.
+- **Inspector work expected:** yes (bảng mới trong scene)
+- **Công:** M
+- **Test trên kính:** nhanh (đọc bảng từ chỗ đứng)
+- **Depends on:** #55, #52 (cùng sửa bố cục ConceptScene); cần `solution-decision` trước (đặt bảng ở đâu, có thêm câu hỏi về EKZ khác không)
+- **Status:** todo
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
