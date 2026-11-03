@@ -24,8 +24,9 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
         public List<PackageData> packages = new();
     }
 
-    // #19: any container worked one position at a time (MixedPickingContainer, PiecesContainerCounter).
-    [Tooltip("Component implementing IPositionedOrder (MixedPickingContainer, PiecesContainerCounter).")]
+    // #19: any container worked one position at a time (MixedPickingContainer, PiecesContainerCounter; #72: CalcForWMS
+    // with a single position, whose storage container only leaves after the order).
+    [Tooltip("Component implementing IPositionedOrder (MixedPickingContainer, PiecesContainerCounter, CalcForWMS).")]
     [SerializeField] private MonoBehaviour container;
 
     [Tooltip("One set per order line, in the same order as the container's Order Lines.")]

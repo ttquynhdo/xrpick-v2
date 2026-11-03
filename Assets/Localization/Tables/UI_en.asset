@@ -159,8 +159,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627358
-    m_Localized: "The order is correct. Now choose \u201C4. Several positions\u201D
-      in the menu."
+    m_Localized: "The order is correct.\nThe order container moves onto the middle
+      lane and leaves.\nNow choose \u201C4.\_Several positions\u201D in the menu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359

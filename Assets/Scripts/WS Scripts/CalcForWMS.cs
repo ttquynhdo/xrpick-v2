@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CalcForWMS : MonoBehaviour, IWmsOrderSource, IOrderBoxContents
+// #72, decision 019: also an IPositionedOrder with a single position, so PositionStockSwitcher can send the storage
+// container away after the order is complete, as in Mixed/Complex.
+public class CalcForWMS : MonoBehaviour, IWmsOrderSource, IOrderBoxContents, IPositionedOrder
 {
     public int currentSize;
     public int necessarySize;
@@ -43,6 +45,28 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource, IOrderBoxContents
     int IWmsOrderSource.IstPieces => currentSize;
 
     int IWmsOrderSource.RestPieces => restSize;
+
+    IReadOnlyList<OrderLine> IPositionedOrder.OrderLines => new[] { OrderLine };
+
+    int IPositionedOrder.CurrentPosition => 1;
+
+    // One position only: the line never advances.
+    event Action<int> IPositionedOrder.LineAdvanced
+    {
+        add { }
+        remove { }
+    }
+
+    bool IPositionedOrder.Contains(PackageData package)
+    {
+        foreach (PackageData inside in PackagesInside)
+        {
+            if (inside == package)
+                return true;
+        }
+
+        return false;
+    }
 
     // Packages counted in Ist, as PackageData for OrderRule.
     public IEnumerable<PackageData> PackagesInside

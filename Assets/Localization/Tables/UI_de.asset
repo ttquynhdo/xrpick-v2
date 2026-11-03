@@ -161,8 +161,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627358
-    m_Localized: "Der Auftrag ist richtig. W\xE4hlen Sie jetzt im Men\xFC \u201E4.
-      Mehrere Positionen\u201C."
+    m_Localized: "Der Auftrag ist richtig.\nDer Auftragsbeh\xE4lter wechselt auf
+      die mittlere Bahn und f\xE4hrt weg.\nW\xE4hlen Sie jetzt im Men\xFC \u201E4.\_Mehrere
+      Positionen\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
