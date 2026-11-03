@@ -1161,7 +1161,8 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Test trên kính:** nhanh (đọc bảng tour và bảng 10 bước; người mới tự trả lời câu hỏi; có chạm nhầm A/B/C không)
 - **Depends on:** #57, #52; giả định D26 (ba làn), câu mới về việc tra bảng Empf Kz (kiểm ở buổi test, không chặn)
 - **Decision:** docs/decisions/019-station-three-lanes-flow.md (phần Concept), docs/decisions/020-concept-quiz-tap-to-answer.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl73.md
+- **Status:** verified-mcp (19/19 ✅, chờ test tay M1–M3)
 
 ## Feature – Log dữ liệu nghiên cứu
 

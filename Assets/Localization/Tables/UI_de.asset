@@ -258,11 +258,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627379
-    m_Localized: "W\xE4hlen Sie A, B oder C. Dr\xFCcken Sie dann den roten Knopf."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627380
-    m_Localized: Etikett
+    m_Localized: "Die Fragen stehen unter dem Bildschirm. Dr\xFCcken Sie A, B oder
+      C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627381
@@ -357,12 +354,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627402
-    m_Localized: Empf Kz 000
+    m_Localized: 'Anderer Wert: Empf Kz 000'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: "000 ist EKZ 0: Die Teile d\xFCrfen ungeordnet liegen. Sie d\xFCrfen
-      die Teile auch einf\xFCllen. Alle EKZ sehen Sie rechts daneben."
+    m_Localized: "Hier steht 003, also EKZ 3. Bei anderen Auftr\xE4gen kann hier
+      000 stehen, also EKZ 0: Die Teile d\xFCrfen ungeordnet liegen oder eingef\xFCllt
+      werden. Alle EKZ sehen Sie rechts daneben."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -372,10 +370,6 @@ MonoBehaviour:
   - m_Id: 7615942627405
     m_Localized: "Die markierten Bereiche brauchen Sie in der \xDCbung nicht. Das
       Feld Anweisung bleibt in der \xDCbung leer."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627406
-    m_Localized: "<color=#F2C94C><b>W\xE4hlen Sie zuerst eine Antwort.</b></color>"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627407
@@ -563,9 +557,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627451
-    m_Localized: "Die Rollenbahn bringt den Lagerbeh\xE4lter aus dem Lager. Nach
-      dem Best\xE4tigen f\xE4hrt der Auftragsbeh\xE4lter weiter. Es gibt mehrere
-      Kommissionierpl\xE4tze."
+    m_Localized: "Der Lagerbeh\xE4lter kommt von links. Nach jedem Best\xE4tigen
+      f\xE4hrt er \xFCber die mittlere Bahn weg. Der Auftragsbeh\xE4lter bleibt rechts,
+      bis der Auftrag erledigt ist. Dann f\xE4hrt er ebenfalls dort weg. Den ganzen
+      Ablauf sehen Sie ganz rechts."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -733,6 +728,97 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 336383051698176
     m_Localized: Beantworten Sie zuerst die Fragen unter dem Bildschirm.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340851944198144
+    m_Localized: Anzahl Kartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307008
+    m_Localized: 'Teilen Sie Soll durch Verp.-Einh.: 120 : 40 = 3. Sie nehmen 3 Kartons.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307009
+    m_Localized: "Die Fragen kommen nach der Erkl\xE4rung zum LVS."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307010
+    m_Localized: "Dr\xFCcken Sie A, B oder C, um zu antworten."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307011
+    m_Localized: Ablauf am Kommissionierplatz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307012
+    m_Localized: "Lagerbeh\xE4lter kommt an"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307013
+    m_Localized: "Beh\xE4lter fahren weg"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307014
+    m_Localized: "Auftragsbeh\xE4lter"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307015
+    m_Localized: "Das \xFCben Sie hier"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307016
+    m_Localized: "In der \xDCbung automatisch"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307018
+    m_Localized: Auftrag im LVS ablesen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307019
+    m_Localized: "Teile z\xE4hlen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307020
+    m_Localized: "Teile in den Auftragsbeh\xE4lter legen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307021
+    m_Localized: "Best\xE4tigen (F6)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307022
+    m_Localized: "Lagerbeh\xE4lter von links heranziehen \u2013 am echten Platz von
+      Hand"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307023
+    m_Localized: "Leeren Auftragsbeh\xE4lter von rechts heranziehen \u2013 am echten
+      Platz von Hand"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307024
+    m_Localized: "Lagerbeh\xE4lter f\xE4hrt weg, der n\xE4chste kommt von links"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307025
+    m_Localized: "Auftragsbeh\xE4lter auf die mittlere Bahn ziehen \u2013 am echten
+      Platz von Hand"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307026
+    m_Localized: Teile wiegen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307027
+    m_Localized: Teile vorverpacken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307028
+    m_Localized: "Restmenge im Lagerbeh\xE4lter sichern"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307029
+    m_Localized: "Leere Kartons aus dem Lagerbeh\xE4lter entfernen"
     m_Metadata:
       m_Items: []
   references:

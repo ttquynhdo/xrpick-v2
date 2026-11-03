@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// #45: the label board in ConceptScene. Shows the grabbed package's label explained, or a prompt when nothing
-/// is held, so the board is never empty. Quiz feedback has its own card (#32).
+/// is held, so the board is never empty. Quiz feedback is a line in the question cluster (#73).
 /// </summary>
 public class PackageInfoDisplay : MonoBehaviour
 {

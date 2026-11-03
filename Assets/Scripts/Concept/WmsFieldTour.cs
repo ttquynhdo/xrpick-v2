@@ -40,6 +40,11 @@ public class WmsFieldTour : MonoBehaviour
 
     private int current;
 
+    // Step id of the step just shown, raised on every step change incl. the first (#73: the quiz unlocks at a step).
+    public event Action<string> StepShown;
+
+    public string CurrentStepId => steps != null && steps.Length > 0 ? steps[current].id : null;
+
     private void OnEnable()
     {
         if (nextToggle != null)
@@ -115,6 +120,8 @@ public class WmsFieldTour : MonoBehaviour
         {
             nextLabel.text = Loc.Get(index == steps.Length - 1 ? RestartKey : NextKey);
         }
+
+        StepShown?.Invoke(step.id);
     }
 
     private static void SetMarkers(Step step, bool active)

@@ -29,12 +29,10 @@ complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026
 complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
 complex.end.summary,"• Das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n• Sollmenge : VPE = volle Kartons, übrige Teile lose\n• Jede Position einzeln kommissionieren und bestätigen\n• Der rote Knopf ersetzt das Bestätigen mit dem Fuß",proposed,german-reviewer (agent),2026-11-02,#23
 basic.step3.text,Prüfen Sie den Auftrag. Drücken Sie dann den roten Knopf (F6).,proposed,german-reviewer (agent),2026-11-01,#25 verb
-concept.card.step3_body,"Wählen Sie A, B oder C. Drücken Sie dann den roten Knopf.",proposed,german-reviewer (agent),2026-11-01,#25 verb
 mixed.feedback.position_done,Richtig! Position {position} ist erledigt.\nLesen Sie im LVS die Angaben von Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-01,#21
 basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie die Kartons nach der EKZ in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#41
 order.feedback.ekz3_loose,Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.,proposed,german-reviewer (agent),2026-11-01,"#41, ""Nicht alle"" per reviewer"
 concept.tour.material_flow.title,Weg der Behälter,proposed,german-reviewer (agent),2026-11-02,#49
-concept.tour.material_flow.body,Die Rollenbahn bringt den Lagerbehälter aus dem Lager. Nach dem Bestätigen fährt der Auftragsbehälter weiter. Es gibt mehrere Kommissionierplätze.,proposed,german-reviewer (agent),2026-11-02,"#49, variant B of the reviewer (fits: 5 lines, 114/160 px)"
 complex.quiz.q_cartons,Wie viele volle Kartons nehmen Sie für diese Position?,proposed,,2026-11-02,#19
 complex.quiz.q_loose,Wie viele lose Teile nehmen Sie zusätzlich?,proposed,,2026-11-02,#19
 complex.quiz.option_carton_one,1 Karton,proposed,,2026-11-02,#19
@@ -71,7 +69,6 @@ concept.card.step2_body,Lesen Sie die Erklärung rechts neben dem Bildschirm. Dr
 concept.card.step2_title,2. LVS kennenlernen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 concept.card.step3_title,3. Fragen beantworten,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 concept.card.task_body,Lernen Sie das Etikett und das Lagerverwaltungssystem (LVS) kennen. Beantworten Sie dann die Fragen.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-concept.label.header,Etikett,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.confirm.correct,Korrigieren,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.confirm.yes,Ja,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.keypad.delete,Löschen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
@@ -90,7 +87,6 @@ concept.quiz.all_done,Sie haben alle Fragen richtig beantwortet. Wählen Sie jet
 concept.quiz.correct,<color=#27AE60><b>Richtig!</b></color>,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.quiz.next_question,Beantworten Sie jetzt die nächste Frage.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.quiz.progress,Frage {n} von {total},proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-concept.quiz.select_first,<color=#F2C94C><b>Wählen Sie zuerst eine Antwort.</b></color>,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.quiz.wrong,<color=#EB5757><b>Nicht richtig</b></color>,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.tour.next,Weiter,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.tour.progress,Schritt {n} von {total},proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
@@ -129,7 +125,6 @@ concept.tour.rest.title,Rest,proposed,german-reviewer (agent),2026-11-03,Agent: 
 concept.tour.rest.body,So viele Stück bleiben nach dem Auftrag im Lagerbehälter.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.empf_kz_003.title,Empf Kz,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.empf_kz_003.body,"Empf Kz zeigt die EKZ. Die EKZ sagt, wie Sie die Teile einlegen. 003 ist EKZ 3: Legen Sie die Teile einzeln und geordnet ein.",proposed,german-reviewer (agent),2026-11-03,Agent: changed in #55 („Die EKZ sagt“)
-concept.tour.empf_kz_000.title,Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.not_used.title,Nicht in der Übung,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.not_used.body,Die markierten Bereiche brauchen Sie in der Übung nicht. Das Feld Anweisung bleibt in der Übung leer.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.q,"Soll 100, VPE 25: Wie viele Kartons nehmen Sie?",proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
@@ -162,5 +157,30 @@ concept.ekz.5,"Wie EKZ 3, Teile in zwei Ebenen mit Zwischenlage trennen.",propos
 concept.ekz.6,"Wie EKZ 3, Teile in allen Ebenen mit Zwischenlage trennen.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.8,ESD-geschützte Teile. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.9,Sonderverpackung. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
-concept.tour.empf_kz_000.body,000 ist EKZ 0: Die Teile dürfen ungeordnet liegen. Sie dürfen die Teile auch einfüllen. Alle EKZ sehen Sie rechts daneben.,proposed,german-reviewer (agent),2026-11-03,#57: last sentence points to the EKZ board
 complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen unter dem Bildschirm.,proposed,german-reviewer (agent),2026-11-03,#58; Agent: OK; wording as complex.card.step1_body_position1
+concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.tour.cartons.body,Teilen Sie Soll durch Verp.-Einh.: 120 : 40 = 3. Sie nehmen 3 Kartons.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.tour.empf_kz_000.body,"Hier steht 003, also EKZ 3. Bei anderen Aufträgen kann hier 000 stehen, also EKZ 0: Die Teile dürfen ungeordnet liegen oder eingefüllt werden. Alle EKZ sehen Sie rechts daneben.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.tour.material_flow.body,"Der Lagerbehälter kommt von links. Nach jedem Bestätigen fährt er über die mittlere Bahn weg. Der Auftragsbehälter bleibt rechts, bis der Auftrag erledigt ist. Dann fährt er ebenfalls dort weg. Den ganzen Ablauf sehen Sie ganz rechts.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.card.step3_body,"Die Fragen stehen unter dem Bildschirm. Drücken Sie A, B oder C.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.quiz.locked,Die Fragen kommen nach der Erklärung zum LVS.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.title,Ablauf am Kommissionierplatz,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.lane_left,Lagerbehälter kommt an,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.lane_middle,Behälter fahren weg,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.lane_right,Auftragsbehälter,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.group_practice,Das üben Sie hier,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.group_auto,In der Übung automatisch,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step2,Auftrag im LVS ablesen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step4_count,Teile zählen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step6,Teile in den Auftragsbehälter legen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step9,Bestätigen (F6),proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step1,Lagerbehälter von links heranziehen – am echten Platz von Hand,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step3,Leeren Auftragsbehälter von rechts heranziehen – am echten Platz von Hand,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step9_auto,"Lagerbehälter fährt weg, der nächste kommt von links",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step10,Auftragsbehälter auf die mittlere Bahn ziehen – am echten Platz von Hand,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step4_weigh,Teile wiegen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step5,Teile vorverpacken,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step7,Restmenge im Lagerbehälter sichern,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step8,Leere Kartons aus dem Lagerbehälter entfernen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied

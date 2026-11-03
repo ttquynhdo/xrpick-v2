@@ -249,11 +249,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627379
-    m_Localized: Choose A, B or C. Then press the red button.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627380
-    m_Localized: Label
+    m_Localized: The questions are below the screen. Press A, B or C.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627381
@@ -347,12 +343,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627402
-    m_Localized: Empf Kz 000
+    m_Localized: 'Other value: Empf Kz 000'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: '000 is EKZ 0: the parts may lie unordered. You may also pour the
-      parts in. All EKZ are on the board to the right.'
+    m_Localized: 'Here it shows 003, that is EKZ 3. Other orders can show 000 here,
+      that is EKZ 0: the parts may lie unordered or be poured in. All EKZ are on
+      the board to the right.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -362,10 +359,6 @@ MonoBehaviour:
   - m_Id: 7615942627405
     m_Localized: You don't need the marked areas in the exercise. The Anweisung field
       stays empty in the exercise.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627406
-    m_Localized: <color=#F2C94C><b>Choose an answer first.</b></color>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627407
@@ -550,8 +543,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627451
-    m_Localized: The roller conveyor brings the storage container from the warehouse.
-      After confirming, the order container moves on. There are several picking stations.
+    m_Localized: The storage container comes from the left. After each confirmation
+      it leaves over the middle lane. The order container stays on the right until
+      the order is done. Then it also leaves there. The whole process is on the board
+      on the far right.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -721,6 +716,97 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 336383051698176
     m_Localized: First answer the questions below the screen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340851944198144
+    m_Localized: Number of cartons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307008
+    m_Localized: 'Divide Soll by Verp.-Einh.: 120 : 40 = 3. You take 3 cartons.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307009
+    m_Localized: The questions come after the WMS explanation.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307010
+    m_Localized: Press A, B or C to answer.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307011
+    m_Localized: Process at the picking station
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307012
+    m_Localized: Storage container comes in
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307013
+    m_Localized: Containers leave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307014
+    m_Localized: Order container
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307015
+    m_Localized: You practise this here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307016
+    m_Localized: Automatic in the exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307018
+    m_Localized: Read the order in the WMS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307019
+    m_Localized: Count the parts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307020
+    m_Localized: Put the parts into the order container
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307021
+    m_Localized: Confirm (F6)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307022
+    m_Localized: "Pull the storage container in from the left \u2013 at the real
+      station by hand"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307023
+    m_Localized: "Pull the empty order container in from the right \u2013 at the
+      real station by hand"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307024
+    m_Localized: The storage container leaves, the next one comes from the left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307025
+    m_Localized: "Pull the order container onto the middle lane \u2013 at the real
+      station by hand"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307026
+    m_Localized: Weigh the parts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307027
+    m_Localized: Pre-pack the parts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307028
+    m_Localized: Secure the remaining quantity in the storage container
+    m_Metadata:
+      m_Items: []
+  - m_Id: 340852011307029
+    m_Localized: Remove empty cartons from the storage container
     m_Metadata:
       m_Items: []
   references:

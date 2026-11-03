@@ -82,10 +82,18 @@ Kommissionierplatz,der,picking station,Workstation where the trainee picks; plur
 angebrochener Karton,der,opened carton,Carton already opened; loose pieces are taken from it.,no,german-reviewer #19,proposed,Not 'offener/geöffneter Karton'.
 Bildschirm,der,screen,The LVS screen at the workstation.,no,german-reviewer #19,proposed,
 VR-Brille,die,headset,The VR headset the trainee wears.,no,team (#12),proposed,Used in complex.end.next; german-reviewer 2026-11-02.
-Menü,das,menu,The lesson menu right of the desk.,no,team (#12),proposed,"Use instead of Auswahl/Liste; german-reviewer 2026-11-02."
+Menü,das,menu,The lesson menu right of the desk.,no,team (#12),proposed,Use instead of Auswahl/Liste; german-reviewer 2026-11-02.
 Erklärung,die,explanation,The explanation boards next to the monitor in ConceptScene.,no,team (#12),proposed,german-reviewer 2026-11-02.
 Ebene,die,plane,Used in the EKZ table for EKZ 4/5/6 (parts must not touch in one/two/any Ebene). Exact meaning (direction or stacked layer) not confirmed.,no,requirements: Kommissionierung.pptx slide 8,proposed,Ask the instructor (D22).
 Zwischenlage,die,separator,Insert that keeps parts apart (EKZ 4/5/6).,no,requirements: Kommissionierung.pptx slide 8,proposed,"Ask whether the site says Zwischenlage, Trennlage or Trenner (D22)."
 ESD-geschützt,,ESD-protected,Parts protected against electrostatic discharge (EKZ 8); not opened without instruction.,no,requirements: Kommissionierung.pptx slide 8,proposed,ESD itself stays as is.
 Sonderverpackung,die,special packaging,Packaging with an individual instruction (EKZ 9); not opened or handled without instruction.,no,requirements: Kommissionierung.pptx slide 8,proposed,
 von Hand einlegen,,put in by hand,How parts are placed for EKZ 2 (several at a time allowed); between einfüllen (EKZ 0) and einzeln und geordnet einlegen (EKZ 3).,no,requirements: Kommissionierung.pptx slide 8,proposed,Meaning of EKZ 2 awaits the instructor (D21).
+Bahn,die,lane,"One of the three lanes of the Rollenbahn at the picking station (linke, mittlere, rechte Bahn).",no,"app (#73, decision 019); station photo",proposed,"Ask the instructor: Bahn, Spur or Strang (D26)."
+heranziehen,,to pull in,Pulling a container by hand along the Rollenbahn to the working place (real station; automatic in the app).,no,"OIS2 timing sheet steps 1, 3 (#73)",proposed,
+wegfahren,,to leave (move away),A container moving away on the Rollenbahn by itself.,no,"app (#73, decision 019)",proposed,
+vorverpacken,,to pre-pack,"Packing parts before putting them into the order container, depending on the order type (OIS2 step 5).",no,OIS2 timing sheet step 5 (#73),proposed,"Ask the instructor: vorverpacken, verpacken or eintüten."
+sichern,,to secure,"Fixing the remaining stock in the storage container, e.g. with a wedge (OIS2 step 7).",no,OIS2 timing sheet step 7 (#73),proposed,
+wiegen,,to weigh,Determining the quantity with a scale instead of counting.,no,requirements: Kommissionierung.pptx,proposed,
+Übung,die,exercise,The training in the app (In der Übung / Nicht in der Übung).,no,app,proposed,
+Ablauf,der,process,The sequence of steps at the picking station (board Ablauf am Kommissionierplatz).,no,app (#73),proposed,
