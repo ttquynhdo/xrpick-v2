@@ -7,7 +7,8 @@ using UnityEngine;
 /// #47/#50, docs/decisions/011 and 014: when the validator reports the whole order correct, the order container
 /// rides away along the order lane with the packages inside it: straight legs, a short stop at each right-angle
 /// transfer, no rotation. Sits on the order container, whose trigger is the counter's trigger, so packages and
-/// trigger move together and nothing is counted again.
+/// trigger move together and nothing is counted again. #71, decision 019: in Mixed/Complex it first waits until the
+/// last storage container has left the station, then slides sideways onto the middle lane.
 /// </summary>
 public class OrderBoxConveyor : MonoBehaviour
 {
@@ -36,12 +37,23 @@ public class OrderBoxConveyor : MonoBehaviour
     [Tooltip("Optional bodies that must move with the container, e.g. the EKZ snap places of #41.")]
     [SerializeField] private Rigidbody[] carriedWithContainer;
 
+    // #71, decision 019: the storage container leaves the station first.
+    [Tooltip("Optional. Storage containers on the station lanes (IStationStock); the order container waits while they move.")]
+    [SerializeField] private MonoBehaviour stationStock;
+
     private IOrderCompletion completion;
+    private IStationStock stock;
     private Coroutine slide;
 
     private void OnEnable()
     {
         completion = validator as IOrderCompletion;
+        stock = stationStock as IStationStock;
+
+        if (stationStock != null && stock == null)
+        {
+            Debug.LogError("OrderBoxConveyor: stationStock does not implement IStationStock.", this);
+        }
 
         if (completion == null)
         {
@@ -100,7 +112,7 @@ public class OrderBoxConveyor : MonoBehaviour
 
             Transform rider = other.attachedRigidbody != null ? other.attachedRigidbody.transform : package.transform;
 
-            if (rider == transform || rider.IsChildOf(transform) || riders.Contains(rider) || IsHeld(rider))
+            if (rider == transform || rider.IsChildOf(transform) || riders.Contains(rider) || LaneRide.IsHeld(rider))
                 continue;
 
             riders.Add(rider);
@@ -128,65 +140,19 @@ public class OrderBoxConveyor : MonoBehaviour
         return riders;
     }
 
-    // A package in the trainee's hand at confirm time stays in the hand (a snap place is not a hand).
-    private static bool IsHeld(Transform rider)
-    {
-        foreach (MonoBehaviour behaviour in rider.GetComponentsInChildren<MonoBehaviour>())
-        {
-            if (behaviour is IInteractable interactable && interactable.State == InteractableState.Select)
-                return true;
-        }
-
-        return false;
-    }
-
     private IEnumerator Slide(List<Transform> riders)
     {
-        Vector3 previous = Vector3.zero;
-
-        for (int i = 0; i < path.Length; i++)
+        if (stock != null)
         {
-            if (i > 0)
+            // The storage container starts leaving in the same OrderCompleted event; let it register first.
+            yield return null;
+            while (stock.IsMoving)
             {
-                yield return new WaitForSeconds(cornerPause);
+                yield return null;
             }
-
-            yield return Leg(riders, path[i] - previous);
-            previous = path[i];
         }
 
+        yield return LaneRide.Path(transform, riders, path, speed, cornerPause);
         slide = null;
-    }
-
-    private IEnumerator Leg(List<Transform> riders, Vector3 travel)
-    {
-        float duration = travel.magnitude / speed;
-        float elapsed = 0f;
-        float done = 0f;
-
-        while (done < 1f)
-        {
-            yield return new WaitForFixedUpdate();
-
-            elapsed += Time.fixedDeltaTime;
-            float next = duration > 0f ? Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration)) : 1f;
-            Vector3 step = travel * (next - done);
-            done = next;
-
-            // Container and riders move by the same step before the next physics step: no trigger exit.
-            transform.position += step;
-            foreach (Transform rider in riders)
-            {
-                if (rider == null)
-                    continue;
-
-                Vector3 target = rider.position + step;
-                rider.position = target;
-                if (rider.TryGetComponent(out Rigidbody body))
-                {
-                    body.position = target;
-                }
-            }
-        }
     }
 }

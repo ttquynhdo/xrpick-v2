@@ -32,6 +32,10 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
     [Tooltip("Optional. Left empty when the scene uses the WMS dialog.")]
     [SerializeField] private TMP_Text instructionText;
 
+    // #71, decision 019: while a storage container rides in or out, the red button does nothing.
+    [Tooltip("Optional. Storage containers on the station lanes (IStationStock).")]
+    [SerializeField] private MonoBehaviour stationStock;
+
     private string initialInstruction;
 
     private void Awake()
@@ -92,8 +96,8 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
 
     public void ConfirmOrder()
     {
-        // #47: the order is shipped; the result stays as it is.
-        if (IsCompleted)
+        // #47: the order is shipped; the result stays as it is. #71: nothing to rate while a container moves.
+        if (IsCompleted || (stationStock is IStationStock stock && stock.IsMoving))
             return;
 
         // Non-short-circuit | so every missing reference is logged at once.

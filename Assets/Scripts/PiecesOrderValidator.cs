@@ -41,6 +41,10 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     [Tooltip("Optional. Questions below the screen that must be answered before position 1 is rated.")]
     [SerializeField] private RemainderQuizController remainderQuiz;
 
+    // #71, decision 019: while a storage container rides in or out, the red button does nothing.
+    [Tooltip("Optional. Storage containers on the station lanes (IStationStock).")]
+    [SerializeField] private MonoBehaviour stationStock;
+
     private string initialInstruction;
 
     private void Awake()
@@ -85,8 +89,8 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
 
     public void ConfirmOrder()
     {
-        // #47: the order is shipped; the result stays as it is.
-        if (IsCompleted)
+        // #47: the order is shipped; the result stays as it is. #71: nothing to rate while a container moves.
+        if (IsCompleted || (stationStock is IStationStock stock && stock.IsMoving))
             return;
 
         // Non-short-circuit | so every missing reference is logged at once.

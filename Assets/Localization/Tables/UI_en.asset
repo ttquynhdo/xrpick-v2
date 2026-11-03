@@ -216,12 +216,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627371
-    m_Localized: "All materials and quantities match the order.\nNext, choose \u201C{next_lesson}\u201D
+    m_Localized: "All materials and quantities match the order.\nThe order container
+      moves onto the middle lane and leaves.\nNext, choose \u201C{next_lesson}\u201D
       in the menu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
-    m_Localized: The full cartons and the loose material match the order.
+    m_Localized: 'The full cartons and the loose material match the order.
+
+      The
+      order container moves onto the middle lane and leaves.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
@@ -532,7 +536,10 @@ MonoBehaviour:
   - m_Id: 7615942627448
     m_Localized: 'Position {position} is done.
 
-      Read the data of position {next_position}
+      The storage container leaves;
+      the next one comes from the left.
+
+      Then read the data of position {next_position}
       in the WMS.'
     m_Metadata:
       m_Items: []
@@ -622,8 +629,8 @@ MonoBehaviour:
   - m_Id: 7615942627466
     m_Localized: 'Read in the WMS: material number (<nobr>Mat.-Nr</nobr>), target
       quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>) and EKZ (<nobr>Empf Kz</nobr>).
-      Then answer the questions below the screen. The "Example" board to the right
-      of it helps with the calculation.'
+      Then answer the questions below the screen. The "Example" board directly below
+      them helps with the calculation.'
     m_Metadata:
       m_Items: []
   - m_Id: 15832974233600
@@ -821,8 +828,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 346260226576384
     m_Localized: Count the full cartons and the loose pieces. Check in the WMS that
-      Ist equals Soll. Then press the red button (F6). After that the WMS shows position
-      2.
+      Ist equals Soll. Then press the red button (F6). After that the storage container
+      leaves and the next one comes from the left. The WMS shows position 2.
     m_Metadata:
       m_Items: []
   - m_Id: 350226641457152

@@ -50,7 +50,13 @@ public class WmsDialogView : MonoBehaviour
     [Tooltip("Background of the F6 Bestätigen key; flashes when the red button (foot pedal) is pressed.")]
     [SerializeField] private Image confirmKey;
 
+    // #71, decision 019 (assumption D27): the LVS shows the next position once its storage container has stopped.
+    [Header("Station")]
+    [Tooltip("Optional. Storage containers on the station lanes (IStationStock); the dialog waits while they move.")]
+    [SerializeField] private MonoBehaviour stationStock;
+
     private IWmsOrderSource source;
+    private IStationStock stock;
     private Coroutine flash;
 
     private void Awake()
@@ -61,6 +67,12 @@ public class WmsDialogView : MonoBehaviour
         {
             Debug.LogError("WmsDialogView: orderSource is not assigned or does not implement IWmsOrderSource.", this);
         }
+
+        stock = stationStock as IStationStock;
+        if (stationStock != null && stock == null)
+        {
+            Debug.LogError("WmsDialogView: stationStock does not implement IStationStock.", this);
+        }
     }
 
     private void OnEnable()
@@ -69,6 +81,10 @@ public class WmsDialogView : MonoBehaviour
         {
             source.ContentsChanged += Refresh;
         }
+        if (stock != null)
+        {
+            stock.Settled += Refresh;
+        }
     }
 
     private void OnDisable()
@@ -76,6 +92,10 @@ public class WmsDialogView : MonoBehaviour
         if (source != null)
         {
             source.ContentsChanged -= Refresh;
+        }
+        if (stock != null)
+        {
+            stock.Settled -= Refresh;
         }
 
         // A disabled object stops its coroutines: don't leave F6 in the pressed colour.
@@ -128,7 +148,8 @@ public class WmsDialogView : MonoBehaviour
     {
         OrderLine line = source?.CurrentLine;
 
-        if (line == null)
+        // Settled redraws once the storage container has stopped.
+        if (line == null || (stock != null && stock.IsMoving))
             return;
 
         SetText(modusValue, Modus);

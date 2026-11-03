@@ -1,7 +1,7 @@
 # Quyết định 016: ComplexScene thành một đơn hai position, có ví dụ phép chia có dư, câu hỏi phép chia và chiếc lẻ lấy từ carton đã mở
 
 - **Backlog:** #19
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (sửa 2026-11-03 bởi 019/#71: thùng 1 chạy vào từ làn trái thay cho phóng to; theo giả định D12 mỗi thùng kho chỉ một mã: bỏ 2 carton KABELVERBINDER A gây nhiễu ở thùng position 2 (#66 gộp vào #71) và 6 carton KABELVERBINDER A ở thùng position 1 (người dùng chọn 2026-11-03))
 - **Ngày:** 2026-11-02
 - **Ý kiến đã xét:** unity-reviewer, requirements-analyst, data-analyst, instructional-design-reviewer, xr-ux-reviewer → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-02):** phương án A, với các chi tiết: position 2 = SCHLAUCHSCHELLE B (`training_b`, carton VPE 50), Soll 156 = 3 carton + 6 chiếc lẻ; ví dụ mẫu 64 / VPE 20 = 3 carton + 4 chiếc; thùng kho position 1 khoá đến khi trả lời đúng câu hỏi chia; carton RING D đã mở chứa 12 vòng. Câu nhắc Anbruchmenge nói rõ phần dư để trong Modul ở thùng kho (xem *Tài liệu*).

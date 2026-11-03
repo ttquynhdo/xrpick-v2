@@ -5,16 +5,15 @@ using Oculus.Interaction;
 using UnityEngine;
 
 /// <summary>
-/// #21, docs/decisions/012: one storage box per position, all at the same place. Only the box of the current
-/// position is shown; when the container advances, the old box shrinks away and the next one grows in.
-/// Packages already in the order container stay where they are.
+/// #21/#71, docs/decisions/012 and 019: one storage container per position, all worked at the same place (the work
+/// spot left of the middle lane). After a correct position the old container rides away with the packages still
+/// in it (sideways onto the middle lane, then back under the rear bench to the corner behind the monitor, where it
+/// is switched off) and the next one comes out of the hood on
+/// the left lane and turns into the work spot. After the last position the old container only leaves. Packages in
+/// the order container, in the trainee's hand or lying outside the storage container stay where they are.
 /// </summary>
-public class PositionStockSwitcher : MonoBehaviour
+public class PositionStockSwitcher : MonoBehaviour, IStationStock
 {
-    // Decision 012 asks for a short fade; the box and package materials are opaque, so the switch scales instead.
-    private const float TransitionSeconds = 0.35f;
-    private const float HiddenScale = 0.01f;
-
     [Serializable]
     private class StockSet
     {
@@ -33,24 +32,64 @@ public class PositionStockSwitcher : MonoBehaviour
     [SerializeField] private List<StockSet> sets = new();
 
     // #19, decision 016: in ComplexScene the first box appears only after the division question is answered.
-    [Tooltip("Hide the first set at start; RevealFirstSet shows it.")]
+    [Tooltip("Hide the first set at start; RevealFirstSet brings it in on the left lane.")]
     [SerializeField] private bool hideFirstUntilRevealed;
 
-    private IPositionedOrder order;
-    private bool firstRevealed;
+    // #71, decision 019: after the last position the last storage container leaves too.
+    [Tooltip("Validator of this scene (IOrderCompletion); when the whole order is done the last box leaves.")]
+    [SerializeField] private MonoBehaviour validator;
 
-    // State of a running switch, so OnDisable can finish it.
-    private Dictionary<GameObject, Vector3> leavingScales;
-    private Dictionary<GameObject, Vector3> comingScales;
-    private Dictionary<Rigidbody, bool> wasKinematic;
+    [Header("Lanes (offsets from the work spot, metres)")]
+    [Tooltip("Where a new box appears (hidden in the hood of the left lane), then each stop; the last one must be (0, 0, 0).")]
+    [SerializeField] private Vector3[] arrivalPath =
+    {
+        new(-0.40f, 0f, 0.90f),
+        new(-0.40f, 0f, 0f),
+        Vector3.zero,
+    };
+
+    // Onto the middle lane, then back to its corner at z 3.0, where the WMS monitor hides it from the standing spot.
+    [Tooltip("Stops of a leaving box, in order; it is switched off at the last one.")]
+    [SerializeField] private Vector3[] departurePath =
+    {
+        new(0.40f, 0f, 0f),
+        new(0.40f, 0f, 2.288f),
+    };
+
+    [Tooltip("Average speed on each leg in m/s.")]
+    [SerializeField] private float speed = 0.6f;
+
+    [Tooltip("Wait at each corner in seconds.")]
+    [SerializeField] private float cornerPause = 0.3f;
+
+    [Tooltip("Seconds between the confirm and the first movement, so the result card is read first.")]
+    [SerializeField] private float startDelay = 0.6f;
+
+    [Tooltip("A leaving box has left the station once it is this far from the work spot (metres).")]
+    [SerializeField] private float clearDistance = 0.7f;
+
+    private IPositionedOrder order;
+    private IOrderCompletion completion;
+    private bool firstRevealed;
+    private Vector3[] workSpots;
+
+    private readonly List<Ride> rides = new();
+    private int blockingRides;
+
+    public bool IsMoving => blockingRides > 0;
+
+    public event Action Settled;
 
     private void Awake()
     {
         order = container as IPositionedOrder;
+        completion = validator as IOrderCompletion;
         firstRevealed = !hideFirstUntilRevealed;
 
+        workSpots = new Vector3[sets.Count];
         for (int i = 0; i < sets.Count; i++)
         {
+            workSpots[i] = sets[i].box != null ? sets[i].box.transform.position : transform.position;
             SetVisible(sets[i], i == 0 && firstRevealed);
         }
     }
@@ -65,6 +104,15 @@ public class PositionStockSwitcher : MonoBehaviour
         {
             Debug.LogError("PositionStockSwitcher: container is not assigned or is not an IPositionedOrder.", this);
         }
+
+        if (completion != null)
+        {
+            completion.OrderCompleted += OnOrderCompleted;
+        }
+        else if (validator != null)
+        {
+            Debug.LogError("PositionStockSwitcher: validator does not implement IOrderCompletion.", this);
+        }
     }
 
     private void OnDisable()
@@ -73,9 +121,26 @@ public class PositionStockSwitcher : MonoBehaviour
         {
             order.LineAdvanced -= OnLineAdvanced;
         }
+        if (completion != null)
+        {
+            completion.OrderCompleted -= OnOrderCompleted;
+        }
 
-        // A disabled object stops its coroutines: never leave boxes tiny or packages stuck kinematic.
-        FinishSwitch();
+        // A disabled object stops its coroutines: put every box where its ride ends and give its packages back.
+        StopAllCoroutines();
+        foreach (Ride ride in rides)
+        {
+            ride.Finish();
+        }
+        rides.Clear();
+
+        // Listeners waiting for the box must not keep showing the old position.
+        bool wasMoving = blockingRides > 0;
+        blockingRides = 0;
+        if (wasMoving)
+        {
+            Settled?.Invoke();
+        }
     }
 
     private void Start()
@@ -84,27 +149,20 @@ public class PositionStockSwitcher : MonoBehaviour
         {
             Debug.LogError($"PositionStockSwitcher: {sets.Count} stock sets but {order.OrderLines.Count} order lines.", this);
         }
+        if (arrivalPath.Length == 0 || arrivalPath[^1] != Vector3.zero || departurePath.Length == 0 || speed <= 0f)
+        {
+            Debug.LogError("PositionStockSwitcher: arrivalPath must end at (0, 0, 0), departurePath must not be empty and speed must be positive.", this);
+        }
     }
 
-    // #19: grows the first box in once (after the division question). Does nothing when it is already shown.
+    // #19: brings the first box in once (after the division question). Does nothing when it is already shown.
     public void RevealFirstSet()
     {
         if (firstRevealed || sets.Count == 0)
             return;
 
         firstRevealed = true;
-        StopAllCoroutines();
-        FinishSwitch();
-
-        List<GameObject> coming = Members(sets[0], false);
-        Dictionary<GameObject, Vector3> comingScale = Freeze(coming);
-        ApplyScale(comingScale, HiddenScale);
-        foreach (GameObject member in coming)
-        {
-            member.SetActive(true);
-        }
-
-        StartCoroutine(Switch(new List<GameObject>(), comingScale));
+        StartArrival(0);
     }
 
     private void OnLineAdvanced(int position)
@@ -114,172 +172,135 @@ public class PositionStockSwitcher : MonoBehaviour
         if (next <= 0 || next >= sets.Count)
             return;
 
-        StopAllCoroutines();
-        FinishSwitch();
-
-        List<GameObject> leaving = Members(sets[next - 1], true);
-        List<GameObject> coming = Members(sets[next], false);
-
-        // Activate now (tiny, still): the container computes Rest right after this event from the active packages.
-        Dictionary<GameObject, Vector3> comingScale = Freeze(coming);
-        ApplyScale(comingScale, HiddenScale);
-        foreach (GameObject member in coming)
-        {
-            member.SetActive(true);
-        }
-
-        StartCoroutine(Switch(leaving, comingScale));
+        // Activate the next box now (hidden in the hood): the container computes Rest right after this event.
+        StartDeparture(next - 1);
+        StartArrival(next);
     }
 
-    // Packages already in the order container belong to the order now, not to the box.
-    private List<GameObject> Members(StockSet set, bool skipPicked)
+    private void OnOrderCompleted()
     {
-        var members = new List<GameObject>();
-
-        if (set.box != null)
+        if (order != null && order.CurrentPosition - 1 < sets.Count)
         {
-            members.Add(set.box);
+            StartDeparture(order.CurrentPosition - 1);
         }
+    }
+
+    private void StartArrival(int index)
+    {
+        StockSet set = sets[index];
+        var riders = new List<Transform>();
 
         foreach (PackageData package in set.packages)
         {
-            if (package == null || (skipPicked && order.Contains(package)))
-                continue;
-
-            members.Add(package.gameObject);
+            if (package != null)
+            {
+                riders.Add(package.transform);
+            }
         }
 
-        return members;
+        // Start at the work spot (where the scene keeps every set), jump into the hood, then ride to the spot.
+        SetVisible(set, true);
+        Vector3 offset = arrivalPath.Length > 0 ? arrivalPath[0] : Vector3.zero;
+        Transform box = set.box != null ? set.box.transform : null;
+        LaneRide.Move(box, riders, workSpots[index] + offset - (box != null ? box.position : workSpots[index]));
+
+        var path = new List<Vector3>();
+        for (int i = 1; i < arrivalPath.Length; i++)
+        {
+            path.Add(arrivalPath[i] - offset);
+        }
+
+        var ride = new Ride(box, riders, path, hideAtEnd: false);
+        StartRide(ride, () => ride.Done);
     }
 
-    private IEnumerator Switch(List<GameObject> leaving, Dictionary<GameObject, Vector3> comingScale)
+    private void StartDeparture(int index)
     {
-        leavingScales = Freeze(leaving);
-        comingScales = comingScale;
-        wasKinematic = SetKinematic(leaving, new List<GameObject>(comingScale.Keys));
+        StockSet set = sets[index];
 
-        yield return Scale(leavingScales, 1f, HiddenScale);
-
-        foreach (KeyValuePair<GameObject, Vector3> entry in leavingScales)
-        {
-            entry.Key.SetActive(false);
-            entry.Key.transform.localScale = entry.Value;
-        }
-        leavingScales = null;
-
-        yield return Scale(comingScales, HiddenScale, 1f);
-
-        FinishSwitch();
-    }
-
-    // Ends a running switch at once: old box hidden, new box at full size, kinematic flags restored.
-    private void FinishSwitch()
-    {
-        if (leavingScales != null)
-        {
-            foreach (KeyValuePair<GameObject, Vector3> entry in leavingScales)
-            {
-                if (entry.Key == null)
-                    continue;
-                entry.Key.SetActive(false);
-                entry.Key.transform.localScale = entry.Value;
-            }
-            leavingScales = null;
-        }
-
-        if (comingScales != null)
-        {
-            foreach (KeyValuePair<GameObject, Vector3> entry in comingScales)
-            {
-                if (entry.Key != null)
-                {
-                    entry.Key.transform.localScale = entry.Value;
-                    ResetGrabScale(entry.Key);
-                }
-            }
-            comingScales = null;
-        }
-
-        if (wasKinematic != null)
-        {
-            foreach (KeyValuePair<Rigidbody, bool> entry in wasKinematic)
-            {
-                if (entry.Key != null)
-                {
-                    entry.Key.isKinematic = entry.Value;
-                }
-            }
-            wasKinematic = null;
-        }
-    }
-
-    // A package first shown by this switch ran Grabbable.Start while tiny, and the SDK's grab transformer locks
-    // the scale it sees there: without this, grabbing the package shrinks it to the hidden size (#21 H1).
-    private static void ResetGrabScale(GameObject member)
-    {
-        var grabbable = member.GetComponent<Grabbable>();
-        if (grabbable == null)
+        if (set.box == null || !set.box.activeInHierarchy)
             return;
 
-        foreach (ITransformer transformer in member.GetComponents<ITransformer>())
-        {
-            transformer.Initialize(grabbable);
-        }
-    }
+        Transform box = set.box.transform;
+        Bounds footprint = BoxBounds(set.box);
+        var riders = new List<Transform>();
 
-    private static Dictionary<GameObject, Vector3> Freeze(List<GameObject> members)
-    {
-        var scales = new Dictionary<GameObject, Vector3>();
-
-        foreach (GameObject member in members)
+        foreach (PackageData package in set.packages)
         {
-            scales[member] = member.transform.localScale;
+            if (package == null || !package.gameObject.activeInHierarchy || order.Contains(package)
+                || LaneRide.IsHeld(package.transform) || !IsInside(package, footprint))
+                continue;
+
+            riders.Add(package.transform);
         }
 
-        return scales;
+        Vector3 start = box.position;
+        var ride = new Ride(box, riders, departurePath, hideAtEnd: true);
+        StartRide(ride, () => ride.Done || (box.position - start).magnitude >= clearDistance);
     }
 
-    // Moving a scaled object with a dynamic Rigidbody would launch the packages; keep them still until shown.
-    private static Dictionary<Rigidbody, bool> SetKinematic(List<GameObject> leaving, List<GameObject> coming)
+    private void StartRide(Ride ride, Func<bool> clearOfStation)
     {
-        var wasKinematic = new Dictionary<Rigidbody, bool>();
+        rides.Add(ride);
+        blockingRides++;
+        ride.Freeze();
+        StartCoroutine(RunRide(ride));
+        StartCoroutine(WaitUntilClear(clearOfStation));
+    }
 
-        foreach (List<GameObject> group in new[] { leaving, coming })
+    private IEnumerator RunRide(Ride ride)
+    {
+        if (startDelay > 0f)
         {
-            foreach (GameObject member in group)
-            {
-                foreach (Rigidbody body in member.GetComponentsInChildren<Rigidbody>())
-                {
-                    if (!wasKinematic.ContainsKey(body))
-                    {
-                        wasKinematic[body] = body.isKinematic;
-                        body.isKinematic = true;
-                    }
-                }
-            }
+            yield return new WaitForSeconds(startDelay);
         }
 
-        return wasKinematic;
+        yield return LaneRide.Path(ride.Box, ride.Riders, ride.Path, speed, cornerPause);
+
+        ride.Finish();
+        rides.Remove(ride);
     }
 
-    private static IEnumerator Scale(Dictionary<GameObject, Vector3> scales, float from, float to)
+    private IEnumerator WaitUntilClear(Func<bool> clearOfStation)
     {
-        for (float t = 0f; t < TransitionSeconds; t += Time.deltaTime)
+        while (!clearOfStation())
         {
-            float factor = Mathf.Lerp(from, to, Mathf.SmoothStep(0f, 1f, t / TransitionSeconds));
-            ApplyScale(scales, factor);
             yield return null;
         }
 
-        ApplyScale(scales, to);
+        blockingRides--;
+        if (blockingRides == 0)
+        {
+            Settled?.Invoke();
+        }
     }
 
-    private static void ApplyScale(Dictionary<GameObject, Vector3> scales, float factor)
+    // A package that the trainee put on the desk or the floor is not in the storage box any more.
+    private static bool IsInside(PackageData package, Bounds footprint)
     {
-        foreach (KeyValuePair<GameObject, Vector3> entry in scales)
+        Bounds bounds = BoxBounds(package.gameObject);
+        Vector3 centre = bounds.size == Vector3.zero ? package.transform.position : bounds.center;
+
+        return centre.x >= footprint.min.x && centre.x <= footprint.max.x
+            && centre.z >= footprint.min.z && centre.z <= footprint.max.z
+            && centre.y >= footprint.min.y - 0.05f && centre.y <= footprint.max.y + 0.30f;
+    }
+
+    private static Bounds BoxBounds(GameObject root)
+    {
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
+
+        if (renderers.Length == 0)
+            return new Bounds(root.transform.position, Vector3.zero);
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
         {
-            entry.Key.transform.localScale = entry.Value * factor;
+            bounds.Encapsulate(renderers[i].bounds);
         }
+
+        bounds.Expand(new Vector3(0.04f, 0f, 0.04f));
+        return bounds;
     }
 
     private static void SetVisible(StockSet set, bool visible)
@@ -294,6 +315,113 @@ public class PositionStockSwitcher : MonoBehaviour
             if (package != null)
             {
                 package.gameObject.SetActive(visible);
+            }
+        }
+    }
+
+    // One box on its way and the packages riding in it. While riding, packages can't be grabbed and have no
+    // colliders (nothing is counted on the way, nothing bumps into the rear bench).
+    private sealed class Ride
+    {
+        private readonly bool hideAtEnd;
+        private readonly Vector3 end;
+        private readonly List<Behaviour> switchedOff = new();
+        private readonly List<Collider> collidersOff = new();
+        private readonly Dictionary<Rigidbody, bool> wasKinematic = new();
+
+        public Ride(Transform box, List<Transform> riders, IReadOnlyList<Vector3> path, bool hideAtEnd)
+        {
+            Box = box;
+            Riders = riders;
+            Path = path;
+            this.hideAtEnd = hideAtEnd;
+            end = (box != null ? box.position : Vector3.zero) + (path.Count > 0 ? path[^1] : Vector3.zero);
+        }
+
+        public Transform Box { get; }
+        public List<Transform> Riders { get; }
+        public IReadOnlyList<Vector3> Path { get; }
+        public bool Done { get; private set; }
+
+        public void Freeze()
+        {
+            foreach (Transform rider in Riders)
+            {
+                foreach (MonoBehaviour behaviour in rider.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    if (behaviour is IInteractable && behaviour.enabled)
+                    {
+                        behaviour.enabled = false;
+                        switchedOff.Add(behaviour);
+                    }
+                }
+                foreach (Collider collider in rider.GetComponentsInChildren<Collider>())
+                {
+                    if (collider.enabled)
+                    {
+                        collider.enabled = false;
+                        collidersOff.Add(collider);
+                    }
+                }
+                foreach (Rigidbody body in rider.GetComponentsInChildren<Rigidbody>())
+                {
+                    if (!wasKinematic.ContainsKey(body))
+                    {
+                        wasKinematic[body] = body.isKinematic;
+                        body.isKinematic = true;
+                    }
+                }
+            }
+        }
+
+        // Puts the box at the end of its ride (also when the ride was cut short) and gives the packages back.
+        public void Finish()
+        {
+            if (Done)
+                return;
+
+            Done = true;
+
+            if (Box != null)
+            {
+                LaneRide.Move(Box, Riders, end - Box.position);
+            }
+
+            foreach (Behaviour behaviour in switchedOff)
+            {
+                if (behaviour != null)
+                {
+                    behaviour.enabled = true;
+                }
+            }
+            foreach (Collider collider in collidersOff)
+            {
+                if (collider != null)
+                {
+                    collider.enabled = true;
+                }
+            }
+            foreach (KeyValuePair<Rigidbody, bool> entry in wasKinematic)
+            {
+                if (entry.Key != null)
+                {
+                    entry.Key.isKinematic = entry.Value;
+                }
+            }
+
+            if (!hideAtEnd)
+                return;
+
+            if (Box != null)
+            {
+                Box.gameObject.SetActive(false);
+            }
+            foreach (Transform rider in Riders)
+            {
+                if (rider != null)
+                {
+                    rider.gameObject.SetActive(false);
+                }
             }
         }
     }

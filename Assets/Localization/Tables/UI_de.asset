@@ -221,12 +221,14 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627371
-    m_Localized: "Alle Materialien und Mengen stimmen mit dem Auftrag \xFCberein.\nW\xE4hlen
+    m_Localized: "Alle Materialien und Mengen stimmen mit dem Auftrag \xFCberein.\nDer
+      Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg.\nW\xE4hlen
       Sie jetzt im Men\xFC \u201E{next_lesson}\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
-    m_Localized: "Volle Kartons und loses Material stimmen mit dem Auftrag \xFCberein."
+    m_Localized: "Volle Kartons und loses Material stimmen mit dem Auftrag \xFCberein.\nDer
+      Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
@@ -541,10 +543,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
-    m_Localized: 'Position {position} ist erledigt.
-
-      Lesen Sie im LVS die Angaben
-      von Position {next_position} ab.'
+    m_Localized: "Position {position} ist erledigt.\nDer Lagerbeh\xE4lter f\xE4hrt
+      weg, der n\xE4chste kommt von links.\nLesen Sie dann im LVS die Angaben von
+      Position {next_position} ab."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
@@ -630,7 +631,7 @@ MonoBehaviour:
   - m_Id: 7615942627466
     m_Localized: "Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge
       (Soll), VPE (<nobr>Verp.-Einh.</nobr>) und EKZ (<nobr>Empf Kz</nobr>). Beantworten
-      Sie dann die Fragen unter dem Bildschirm. Das \u201EBeispiel\u201C rechts daneben
+      Sie dann die Fragen unter dem Bildschirm. Das \u201EBeispiel\u201C direkt darunter
       hilft beim Rechnen."
     m_Metadata:
       m_Items: []
@@ -830,7 +831,8 @@ MonoBehaviour:
   - m_Id: 346260226576384
     m_Localized: "Z\xE4hlen Sie die vollen Kartons und die losen Teile nach. Pr\xFCfen
       Sie im LVS, ob Ist und Soll gleich sind. Dr\xFCcken Sie dann den roten Knopf
-      (F6). Danach zeigt das LVS Position 2 an."
+      (F6). Danach f\xE4hrt der Lagerbeh\xE4lter weg, der n\xE4chste kommt von links.
+      Das LVS zeigt Position 2 an."
     m_Metadata:
       m_Items: []
   - m_Id: 350226641457152

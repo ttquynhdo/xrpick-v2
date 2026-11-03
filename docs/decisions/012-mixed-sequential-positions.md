@@ -1,7 +1,7 @@
 # Quyết định 012: MixedPickingScene làm từng position như dialog Kommissionierung thật
 
 - **Backlog:** #21
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (sửa 2026-11-03 bởi 019/#71: đổi thùng kho bằng chạy trên làn trái/giữa, không còn thu nhỏ/phóng to)
 - **Ngày:** 2026-11-01
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer, data-analyst → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-01):** phương án A. Nếu đến buổi demo 2026-11-02 phần đổi thùng chưa ổn định thì demo bản C (dự phòng), #21 chưa `done` ở mức đó. Bỏ hẳn hộp RING D (`VPE_OpenedPackage`) khỏi MixedPickingScene.

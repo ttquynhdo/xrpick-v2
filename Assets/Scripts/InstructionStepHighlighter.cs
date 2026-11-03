@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Oculus.Interaction;
 using TMPro;
@@ -31,6 +32,10 @@ public class InstructionStepHighlighter : MonoBehaviour
     [Tooltip("Validator of this scene; must implement IOrderCompletion.")]
     [SerializeField] private MonoBehaviour validator;
 
+    // #71, decision 019 (assumption D27): card 1 lights up when the next storage container has stopped.
+    [Tooltip("Optional. Storage containers on the station lanes (IStationStock); a new position starts when they stop.")]
+    [SerializeField] private MonoBehaviour stationStock;
+
     [Header("Look")]
     [Tooltip("Frame colour; same blue as the Menu's Next Lesson Highlight (#39).")]
     [SerializeField] private Color frameColor = new(0.012f, 0.569f, 0.867f, 1f);
@@ -57,6 +62,8 @@ public class InstructionStepHighlighter : MonoBehaviour
     private IOrderBoxContents contents;
     private IPositionedOrder positions;
     private IOrderCompletion completion;
+    private IStationStock stock;
+    private bool positionStartPending;
 
     private CardLook read;
     private CardLook pick;
@@ -67,6 +74,7 @@ public class InstructionStepHighlighter : MonoBehaviour
         contents = orderBox as IOrderBoxContents;
         positions = orderBox as IPositionedOrder;
         completion = validator as IOrderCompletion;
+        stock = stationStock as IStationStock;
 
         // Storage boxes of later positions are inactive at start; their packages must be tracked too.
         foreach (Grabbable grabbable in FindObjectsByType<Grabbable>(FindObjectsInactive.Include))
@@ -98,6 +106,10 @@ public class InstructionStepHighlighter : MonoBehaviour
         {
             completion.OrderCompleted += HandleOrderCompleted;
         }
+        if (stock != null)
+        {
+            stock.Settled += HandleStockSettled;
+        }
     }
 
     private void OnDisable()
@@ -121,6 +133,11 @@ public class InstructionStepHighlighter : MonoBehaviour
         {
             completion.OrderCompleted -= HandleOrderCompleted;
         }
+        if (stock != null)
+        {
+            stock.Settled -= HandleStockSettled;
+        }
+        positionStartPending = false;
     }
 
     private void Start()
@@ -178,10 +195,42 @@ public class InstructionStepHighlighter : MonoBehaviour
 
     private void HandleLineAdvanced(int position)
     {
+        if (stock != null)
+        {
+            // The storage containers may hear LineAdvanced after this script: look one frame later.
+            StartCoroutine(StartPositionWhenStockStopped());
+            return;
+        }
+
         if (tracker.PositionStarted())
         {
             Apply();
         }
+    }
+
+    private IEnumerator StartPositionWhenStockStopped()
+    {
+        yield return null;
+
+        positionStartPending = true;
+        if (!stock.IsMoving)
+        {
+            HandleStockSettled();
+        }
+    }
+
+    private void HandleStockSettled()
+    {
+        if (!positionStartPending)
+            return;
+
+        positionStartPending = false;
+        tracker.PositionStarted();
+        if (contents != null)
+        {
+            tracker.PackagesInBoxChanged(contents.PackageCount);
+        }
+        Apply();
     }
 
     private void HandleOrderCompleted()
