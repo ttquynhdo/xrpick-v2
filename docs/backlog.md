@@ -941,7 +941,8 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #19
-- **Status:** todo
+- **Test report:** docs/test-reports/bl58.md
+- **Status:** done (commit 6a108aa, test 18/18 ✅, không có case test tay)
 
 ### #59 [P1] Thẻ kết quả cạnh nút đỏ đọc được, cùng một mẫu ở 4 scene
 - **Type:** logic
