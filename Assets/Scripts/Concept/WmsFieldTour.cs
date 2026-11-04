@@ -6,7 +6,8 @@ using UnityEngine.UI;
 /// <summary>
 /// #20, docs/decisions/010: walks the trainee through the WMS dialog one field at a time on a board beside the
 /// monitor. Each step shows its markers outside the screen border; nothing is drawn on the dialog itself.
-/// The "Weiter" control is a poke toggle used as a push button.
+/// The "Weiter" control is a poke toggle used as a push button. #80, docs/decisions/024: a fixed bar below the
+/// screen holds [Zurück] "Schritt n von 11" [Weiter]; "Zurück" is dimmed and not pressable at step 1.
 /// </summary>
 public class WmsFieldTour : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class WmsFieldTour : MonoBehaviour
     private const string ProgressKey = "concept.tour.progress";
     private const string NextKey = "concept.tour.next";
     private const string RestartKey = "concept.tour.restart";
+    private const string BackKey = "concept.tour.back";
+    private const float DimmedAlpha = 0.5f;
     private const string StepKeyPrefix = "concept.tour.";
 
     [Serializable]
@@ -38,6 +41,13 @@ public class WmsFieldTour : MonoBehaviour
     [SerializeField] private Toggle nextToggle;
     [SerializeField] private TMP_Text nextLabel;
 
+    [Header("Back control (decision 024)")]
+    [SerializeField] private Toggle backToggle;
+    [SerializeField] private TMP_Text backLabel;
+
+    [Tooltip("Dimmed at step 1, where Zurück does nothing.")]
+    [SerializeField] private CanvasGroup backGroup;
+
     private int current;
 
     // Step id of the step just shown, raised on every step change incl. the first (#73: the quiz unlocks at a step).
@@ -51,6 +61,11 @@ public class WmsFieldTour : MonoBehaviour
         {
             nextToggle.onValueChanged.AddListener(OnNextToggled);
         }
+
+        if (backToggle != null)
+        {
+            backToggle.onValueChanged.AddListener(OnBackToggled);
+        }
     }
 
     private void OnDisable()
@@ -59,14 +74,25 @@ public class WmsFieldTour : MonoBehaviour
         {
             nextToggle.onValueChanged.RemoveListener(OnNextToggled);
         }
+
+        if (backToggle != null)
+        {
+            backToggle.onValueChanged.RemoveListener(OnBackToggled);
+        }
     }
 
     private void Start()
     {
         if (RequiredReference.IsMissing(titleText, nameof(titleText), this)
             | RequiredReference.IsMissing(bodyText, nameof(bodyText), this)
-            | RequiredReference.IsMissing(nextToggle, nameof(nextToggle), this))
+            | RequiredReference.IsMissing(nextToggle, nameof(nextToggle), this)
+            | RequiredReference.IsMissing(backToggle, nameof(backToggle), this))
             return;
+
+        if (backLabel != null)
+        {
+            backLabel.text = Loc.Get(BackKey);
+        }
 
         if (steps == null || steps.Length == 0)
         {
@@ -86,6 +112,15 @@ public class WmsFieldTour : MonoBehaviour
         ShowStep((current + 1) % steps.Length);
     }
 
+    // Decision 024: back one step; does nothing at step 1 (no step change, no log).
+    public void PreviousStep()
+    {
+        if (steps == null || steps.Length == 0 || current == 0)
+            return;
+
+        ShowStep(current - 1);
+    }
+
     private void OnNextToggled(bool isOn)
     {
         if (!isOn)
@@ -94,6 +129,15 @@ public class WmsFieldTour : MonoBehaviour
         // Push button: release at once so the next poke counts again.
         nextToggle.SetIsOnWithoutNotify(false);
         NextStep();
+    }
+
+    private void OnBackToggled(bool isOn)
+    {
+        if (!isOn)
+            return;
+
+        backToggle.SetIsOnWithoutNotify(false);
+        PreviousStep();
     }
 
     private void ShowStep(int index)
@@ -119,6 +163,13 @@ public class WmsFieldTour : MonoBehaviour
         if (nextLabel != null)
         {
             nextLabel.text = Loc.Get(index == steps.Length - 1 ? RestartKey : NextKey);
+        }
+
+        bool canGoBack = index > 0;
+        backToggle.interactable = canGoBack;
+        if (backGroup != null)
+        {
+            backGroup.alpha = canGoBack ? 1f : DimmedAlpha;
         }
 
         ResearchLogger.LogTourStep(step.id, index + 1);

@@ -840,6 +840,10 @@ MonoBehaviour:
     m_Localized: Richtig!
     m_Metadata:
       m_Items: []
+  - m_Id: 652255544872960
+    m_Localized: "Zur\xFCck"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

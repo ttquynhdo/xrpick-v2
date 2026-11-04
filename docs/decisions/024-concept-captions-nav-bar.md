@@ -47,7 +47,7 @@ Cả bốn đồng ý: ẩn hẳn quiz đến `material_flow`; bỏ mũi tên c�
 6. **✓ trên thẻ** (badge `Done Check` như Welcome, góc thẻ, không tắt): thẻ 1 sau khi đã cầm cả 3 kiện; thẻ 2 khi tour tới bước 11 lần đầu; thẻ 3 khi `LessonCompleted`.
 7. **Khung xanh bước hiện tại** (cách của 017, theo thao tác): vào scene → thẻ 1; lần đầu bấm Weiter/Zurück hoặc thẻ 1 xong → thẻ 2; quiz mở → thẻ 3; xong câu 4 → tắt.
 8. **Điểm bắt đầu.** `Info Panel` (≈ −34°, trong tầm nhìn) có tiêu đề „1. Etikett lesen“ như thẻ 1; giữ nguyên chỗ.
-9. **Log.** Không thêm event/trường (data PA 1). Back gọi `ShowStep` → đúng một `tour_step`; `quiz_unlocked` một lần (`!IsUnlocked`). Đổi `layout_version` thành "024" (C# `ResearchEventData.cs`, spec, ghi chú `analyse_set.R`). Spec thêm: „Back = `step_index` giảm 1; chạm trong lúc giữ ‚Richtig!‘ không được chấm“. `make_fake_data.R` sinh chuỗi Back, `selftest.R` xanh, `data-analyst` duyệt. Chỉ số tour trong R là mục riêng (#82).
+9. **Log.** Không thêm event/trường (data PA 1). Back gọi `ShowStep` → đúng một `tour_step`; `quiz_unlocked` một lần (`!IsUnlocked`). Đổi `layout_version` thành "024" (→ "025" theo phần bổ sung của decision 025, mục 7: 024 và 025 ra cùng một build) (C# `ResearchEventData.cs`, spec, ghi chú `analyse_set.R`). Spec thêm: „Back = `step_index` giảm 1; chạm trong lúc giữ ‚Richtig!‘ không được chấm“. `make_fake_data.R` sinh chuỗi Back, `selftest.R` xanh, `data-analyst` duyệt. Chỉ số tour trong R là mục riêng (#82).
 
 **Được:** đọc chữ cùng lúc với ô; quiz không che WMS; nút có nghĩa nhờ cạnh số bước, đi thành cặp, đứng yên; ít tấm lúc vào; lời báo trước của 020 vẫn còn; format log giữ; đổi chỗ chú thích chỉ là transform.
 

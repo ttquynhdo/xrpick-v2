@@ -91,6 +91,7 @@ concept.quiz.wrong,<color=#EB5757><b>Nicht richtig</b></color>,proposed,german-r
 concept.tour.next,Weiter,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.tour.progress,Schritt {n} von {total},proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.tour.restart,Von vorn,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
+concept.tour.back,Zurück,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#80)
 entry.confirm.question,Ist der Code {participant_id} richtig?,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 entry.error.start,Die Sitzung konnte nicht gestartet werden. Bitte starten Sie die App neu.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 entry.resume.question,Kurs von {participant_id} fortsetzen?,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)

@@ -386,10 +386,11 @@ start_session <- function(person, build, start_utc, start_mode = "manual",
   device$sessions <- c(device$sessions, list(s))
 
   # Header and session_start: t = 0, scene_visit null. Schema 2 adds
-  # layout_version (three-lane station, decision 019) and event_groups (the
+  # layout_version ("025": three-lane station + Concept tour with Zurück,
+  # decisions 019/024/025) and event_groups (the
   # groups this build emits; R reads a missing group as NA, not 0).
   header <- if (schema == 2) {
-    json_obj(schema_version = 2, layout_version = "019",
+    json_obj(schema_version = 2, layout_version = "025",
              event_groups = json_arr(c("session", "outcome", if (s$interaction) "interaction")),
              app_version = "0.2.0", build = build,
              device_model = "Oculus Quest", os_version = "Android OS 14 / API-34",
@@ -902,14 +903,37 @@ run_welcome <- function(s, practice = TRUE) {
 }
 
 # ConceptScene: 11 tour steps ("Weiter"), the quiz opens at material_flow,
-# then the 4 questions in order, each touched until right.
+# then the 4 questions in order, each touched until right. Layout "025"
+# (#80, decision 024): some trainees press "Zurück" (step_index - 1) to
+# reread a step, or press it by mistake right after "Weiter" (< 2 s), then
+# go on with "Weiter". The quiz opens once, also after 11 -> 10 -> 11.
 run_concept <- function(s, person) {
-  for (i in seq_along(tour_steps)) {
-    advance(s, runif(1, 5, 15))  # read the step, press "Weiter"
+  unlocked <- FALSE
+  show_step <- function(i) {
     emit(s, "tour_step", json_obj(step_id = tour_steps[i], step_index = i))
-    if (tour_steps[i] == "material_flow") {
+    if (tour_steps[i] == "material_flow" && !unlocked) {
       advance(s, 0.001)
       emit(s, "quiz_unlocked")
+      unlocked <<- TRUE
+    }
+  }
+  for (i in seq_along(tour_steps)) {
+    advance(s, runif(1, 5, 15))  # read the step, press "Weiter"
+    show_step(i)
+    # Back presses draw from the side stream, so the rest of the fake data
+    # (and the fixed values in selftest.R) stay the same. Mostly one step back;
+    # sometimes two (e.g. 9 -> 8 -> 7) before going on with "Weiter".
+    if (i >= 2 && side_chance(0.15)) {
+      advance(s, if (side_chance(0.3)) side_runif(0.4, 1.8) else side_runif(3, 10))
+      n_back <- if (i >= 3 && side_chance(0.25)) 2 else 1
+      for (k in seq_len(n_back)) {
+        if (k > 1) advance(s, side_runif(2, 6))
+        show_step(i - k)         # "Zurück"
+      }
+      for (k in rev(seq_len(n_back)) - 1) {
+        advance(s, side_runif(2, 8))
+        show_step(i - k)         # "Weiter" again
+      }
     }
     if (i == 5) maybe_pause(s)
   }

@@ -7,8 +7,9 @@ public static class ResearchEventData
     // 2 = log contract v2 (decision 021).
     public const int SchemaVersion = 2;
 
-    // Station layout of decision 019 (three lanes); R assigns head-direction zones per layout.
-    public const string LayoutVersion = "019";
+    // Station layout: "019" = three lanes (decision 019); "025" = plus the ConceptScene of decisions 024/025
+    // (three lanes in Concept, tour with Zurück, #80). R tells logs apart by it.
+    public const string LayoutVersion = "025";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
     public static readonly string[] EventGroups = { "session", "outcome", "interaction" };

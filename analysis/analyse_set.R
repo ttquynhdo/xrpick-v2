@@ -303,7 +303,7 @@ if (length(unknown_events) > 0) {
 # language (#11): "DE" / "EN", fixed for the whole session (chosen on the
 # keypad before the code; there is no language_change event). NA = a log from
 # a build before #11, which wrote null.
-# Schema 2 adds layout_version ("019" = three-lane station, decision 019) and
+# Schema 2 adds layout_version ("019" = three-lane station, decision 019; "025" = same plus the Concept tour with Zurück, decisions 024/025) and
 # event_groups (the groups this build emits). A group missing from
 # event_groups means "not measured" (NA), never 0. Logs without the key
 # (schema 1) keep event_groups NA.
