@@ -191,3 +191,4 @@ order.feedback.correct_title,Richtig!,proposed,,2026-11-03,#59
 concept.lane.storage,Lagerbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 concept.lane.middle,Mittlere Bahn,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 concept.lane.order,Auftragsbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
+complex.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-04,Same text as concept.quiz.how_to (Agent: OK) (#85)

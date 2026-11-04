@@ -12,7 +12,10 @@ using UnityEngine.UI;
 /// how many loose pieces the order line needs. A/B/C toggles show the answers (decision 015 style) and are
 /// rated as soon as one is switched on; the red button stays F6 for the order. Both answers right → the
 /// first storage box grows in. Answers come from the order line (RemainderQuiz), so the numbers live only
-/// in orderLines. Every rated touch is logged as quiz_answer (#28, decision 021).
+/// in orderLines. Every rated touch is logged as quiz_answer (#28, decision 021). #85, decision 024 (5) as in
+/// ConceptScene: after the right first answer „Richtig!“ stays under question 1 for
+/// PackageQuizController.CorrectHoldSeconds with the toggles not interactable, then question 2 comes with the
+/// neutral how-to line.
 /// </summary>
 public class RemainderQuizController : MonoBehaviour
 {
@@ -27,6 +30,7 @@ public class RemainderQuizController : MonoBehaviour
     private const string WrongLooseKey = "complex.quiz.wrong_loose";
     private const string NextQuestionKey = "complex.quiz.next";
     private const string DoneKey = "complex.quiz.done";
+    private const string HowToKey = "complex.quiz.how_to";
     private const string ProgressKey = "concept.quiz.progress";
     private const string SelectedMark = "» ";
 
@@ -116,7 +120,11 @@ public class RemainderQuizController : MonoBehaviour
         }
 
         // A disabled object stops its coroutines: never stay locked between the two questions.
-        switching = false;
+        if (switching)
+        {
+            switching = false;
+            SetTogglesInteractable(true);
+        }
     }
 
     private void Start()
@@ -125,8 +133,8 @@ public class RemainderQuizController : MonoBehaviour
         if (!isSetUp)
             return;
 
-        feedbackText.text = string.Empty;
         ShowQuestion(0);
+        feedbackText.text = Loc.Get(HowToKey);
     }
 
     private bool HasMissingReferences()
@@ -205,7 +213,7 @@ public class RemainderQuizController : MonoBehaviour
         if (question == 0)
         {
             feedbackText.text = Loc.Get(NextQuestionKey);
-            StartCoroutine(ShowSecondQuestionNextFrame());
+            StartCoroutine(ShowSecondQuestionAfterHold());
             return;
         }
 
@@ -221,12 +229,27 @@ public class RemainderQuizController : MonoBehaviour
 
     // We are inside the pressed toggle's onValueChanged(true). The SDK's AnimatorOverrideLayerWeight listens after us,
     // so switching that toggle off here would reach it before the outer "true" and leave it looking selected.
-    private IEnumerator ShowSecondQuestionNextFrame()
+    // #85: the wait is the "Richtig!" hold; touches meanwhile are not rated and not logged.
+    private IEnumerator ShowSecondQuestionAfterHold()
     {
         switching = true;
-        yield return null;
+        SetTogglesInteractable(false);
+        yield return new WaitForSeconds(PackageQuizController.CorrectHoldSeconds);
         switching = false;
+        SetTogglesInteractable(true);
         ShowQuestion(1);
+        feedbackText.text = Loc.Get(HowToKey);
+    }
+
+    private void SetTogglesInteractable(bool interactable)
+    {
+        foreach (Toggle toggle in toggles)
+        {
+            if (toggle != null)
+            {
+                toggle.interactable = interactable;
+            }
+        }
     }
 
     // #32/#52: the chosen answer is marked with a text prefix and bold type, not by colour only.

@@ -851,6 +851,10 @@ MonoBehaviour:
     m_Localized: Order container
     m_Metadata:
       m_Items: []
+  - m_Id: 668799050059776
+    m_Localized: Press A, B or C to answer.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
