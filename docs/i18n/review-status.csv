@@ -163,7 +163,7 @@ concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-
 concept.tour.cartons.body,120 : 40 = 3 Kartons,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#83)
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, also EKZ 0. Dann dürfen die Teile ungeordnet liegen oder eingefüllt werden.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
-concept.tour.material_flow.body,"Der Lagerbehälter kommt von links und fährt über die mittlere Bahn weg; der Auftragsbehälter fährt erst weg, wenn der Auftrag erledigt ist. Beantworten Sie jetzt die Fragen unter dem Bildschirm.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
+concept.tour.material_flow.body,"Der Lagerbehälter kommt von links und fährt über die mittlere Bahn weg, der Auftragsbehälter erst, wenn der Auftrag fertig ist. Am echten Kommissionierplatz bewegen Sie die Behälter von Hand.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 concept.card.step3_body,"Die Fragen kommen nach der Erklärung zum LVS. Drücken Sie dann A, B oder C.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.quiz.locked,Die Fragen kommen nach der Erklärung zum LVS.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
@@ -188,3 +188,6 @@ concept.flow.step8,Leere Kartons aus dem Lagerbehälter entfernen,proposed,germa
 complex.card.step3_body_position1,"Zählen Sie die vollen Kartons und die losen Teile nach. Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6). Danach zeigt das LVS Position 2 an.",proposed,,2026-11-03,#62
 mixed.card.step3_body_position1,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6). Danach zeigt das LVS Position 2 an.",proposed,,2026-11-03,#62
 order.feedback.correct_title,Richtig!,proposed,,2026-11-03,#59
+concept.lane.storage,Lagerbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
+concept.lane.middle,Mittlere Bahn,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
+concept.lane.order,Auftragsbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)

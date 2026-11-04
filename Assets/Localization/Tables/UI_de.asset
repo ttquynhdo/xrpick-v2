@@ -558,8 +558,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627451
     m_Localized: "Der Lagerbeh\xE4lter kommt von links und f\xE4hrt \xFCber die mittlere
-      Bahn weg; der Auftragsbeh\xE4lter f\xE4hrt erst weg, wenn der Auftrag erledigt
-      ist. Beantworten Sie jetzt die Fragen unter dem Bildschirm."
+      Bahn weg, der Auftragsbeh\xE4lter erst, wenn der Auftrag fertig ist. Am echten
+      Kommissionierplatz bewegen Sie die Beh\xE4lter von Hand."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -839,6 +839,18 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 652255544872960
     m_Localized: "Zur\xFCck"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 663146915041280
+    m_Localized: "Lagerbeh\xE4lter"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 663146990538752
+    m_Localized: Mittlere Bahn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 663146990538753
+    m_Localized: "Auftragsbeh\xE4lter"
     m_Metadata:
       m_Items: []
   references:

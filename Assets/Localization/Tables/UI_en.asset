@@ -554,8 +554,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627451
     m_Localized: The storage container comes from the left and leaves over the middle
-      lane, the order container only when the order is done. Now answer the questions
-      below the screen.
+      lane, the order container only when the order is done. At the real picking
+      station you move the containers by hand.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -837,6 +837,18 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 652255544872960
     m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 663146915041280
+    m_Localized: Storage container
+    m_Metadata:
+      m_Items: []
+  - m_Id: 663146990538752
+    m_Localized: Middle lane
+    m_Metadata:
+      m_Items: []
+  - m_Id: 663146990538753
+    m_Localized: Order container
     m_Metadata:
       m_Items: []
   references:
