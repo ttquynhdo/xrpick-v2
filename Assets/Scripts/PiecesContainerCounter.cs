@@ -83,6 +83,7 @@ public class PiecesContainerCounter : MonoBehaviour, IWmsOrderSource, IPositione
 
         if (objectsInside.Add(item))
         {
+            OrderContainerLog.Changed(this, true, item, objectsInside.Count);
             Recalculate();
             ContentsChanged?.Invoke();
         }
@@ -97,6 +98,7 @@ public class PiecesContainerCounter : MonoBehaviour, IWmsOrderSource, IPositione
 
         if (objectsInside.Remove(item))
         {
+            OrderContainerLog.Changed(this, false, item, objectsInside.Count);
             Recalculate();
             ContentsChanged?.Invoke();
         }

@@ -1,6 +1,6 @@
 /// <summary>
-/// One row of the per-visit summary CSV: the #26 session columns and the #28 outcome columns
-/// (null = empty cell). The remaining CSV columns stay empty until #29, #30 and #74 fill them.
+/// One row of the per-visit summary CSV: the #26 session columns, the #28 outcome columns and the #29
+/// interaction counts (null = empty cell). The remaining CSV columns stay empty until #30 and #74 fill them.
 /// </summary>
 public sealed class VisitSummary
 {
@@ -26,4 +26,9 @@ public sealed class VisitSummary
     public double? TimeToCorrectS;
     public bool? Completed;
     public string ErrorCodesAll;
+
+    // #29, research-logging-spec §5.
+    public int? Grabs;
+    public int? ContainerEnters;
+    public int? ContainerExits;
 }

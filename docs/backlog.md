@@ -1302,7 +1302,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
   - Đặt một kiện vào thùng bằng code qua MCP → `container_enter` với `material_key`; collider thứ hai của cùng vật thể vào trigger → không có dòng thứ hai.
   - Trong lúc thùng chạy trên băng → không có `container_exit` nào.
   - `Grabbable.ProcessPointerEvent` Select rồi Unselect trên một kiện → `grab_start` / `grab_end` với `object_id` ổn định giữa các lần chạy, `duration_s`; không có `GrabLogger` nào gắn trong Inspector.
-  - Mở scene qua Menu → `scene_enter.via` = `menu`; `Beenden` của người điều phối → `via` = `facilitator_end`.
+  - Mở scene qua Menu → `scene_enter.via` = `menu`; `Beenden` của người điều phối → `session_end` `facilitator`, không có `scene_enter` sau đó; phiên kế bắt đầu bằng `via` `start` (bỏ `facilitator_end`, data-analyst 2026-11-04).
   - Mở rồi `Fortsetzen` panel người điều phối → `end_control_opened` rồi `end_control_cancelled`.
   - Chọn một mục Menu đang mở → `menu_select` có `target_scene`, không có `item_label` (`blocked` chỉ khi relay pointer làm được, xem 021).
   - Không có `button_touch`, `info_shown`.
@@ -1313,7 +1313,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** #26. API sự kiện grab/tracking của Meta SDK phải kiểm tra trong project trước (spec mới ghi theo hiểu biết, chưa xác minh).
 - **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (vd. `input_mode_change` ban đầu, đăng ký `GrabLogger`): `activeSceneChanged` chạy sau các hàm đó nên sự kiện rơi vào lượt scene trước. Ghi từ `Start` trở đi.
 - **Decision:** docs/decisions/021-research-log-catalogue-v2.md (rút gọn: grab đăng ký lúc chạy, không `GrabLogger` trong Inspector; tay/tracking/rơi sàn sang #74)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl29.md
+- **Status:** verified-mcp (19/21 ✅, chờ test tay H1 cầm thật, H2 chạm mục Menu khoá trên kính)
 
 ### #30 [Feature] Hướng nhìn (theo đầu), luồng tư thế và hiệu năng
 - **Type:** feature

@@ -208,6 +208,67 @@ local({
   cx_atc <- left_join(cx_tc, cx_cp, by = c("session_id", "scene_visit"))
   stopifnot(nrow(cx_atc) > 0, all(cx_atc$atc == cx_atc$n_confirm))
 
+  # 8n. Interaction events (#29). P104 ran a build before #29 (header
+  #     event_groups without "interaction"): every interaction number is NA,
+  #     never 0, and its empty summary cells match (seam check in 8b).
+  rw <- function(col, pid) wide[[col]][wide$participant_id == pid]
+  dq <- function(col, pid) data_quality[[col]][data_quality$participant_id == pid]
+  v104 <- visits[visits$participant_id == "P104", ]
+  stopifnot(nrow(v104) == 5, !any(v104$interaction_logged))
+  stopifnot(all(is.na(v104$grabs)), all(is.na(v104$container_enters)), all(is.na(v104$container_exits)),
+            all(is.na(v104$menu_blocked)), all(is.na(v104$end_control_opened)))
+  stopifnot(isFALSE(dq("interaction_logged", "P104")), is.na(dq("end_control_opens", "P104")),
+            is.na(rw("grabs_BasicPickingScene", "P104")), is.na(rw("menu_blocked", "P104")))
+  # Where a scene can't produce the event it is NA, also in measuring sessions:
+  # WelcomeScene grabs (its box has no PackageData), container counts in
+  # Welcome and Concept (no order container). wide.csv has no such columns.
+  vi <- visits[visits$interaction_logged, ]
+  stopifnot(all(is.na(vi$grabs[vi$scene == "WelcomeScene"])),
+            all(is.na(vi$container_enters[vi$scene %in% c("WelcomeScene", "ConceptScene")])))
+  stopifnot(!anyNA(vi$grabs[vi$scene %in% grab_scenes]),
+            !anyNA(vi$container_enters[vi$scene %in% container_scenes]))
+  stopifnot(!any(c("grabs_WelcomeScene", "container_enters_ConceptScene", "container_exits_WelcomeScene")
+                 %in% names(wide)),
+            all(c("grabs_ConceptScene", "grabs_ComplexScene", "container_exits_MixedPickingScene",
+                  "read_s_MixedPickingScene_p2", "check_s_ComplexScene_p2") %in% names(wide)))
+  # Measured 0, not NA: P107 never confirmed in ComplexScene, so nothing went
+  # into the order container.
+  stopifnot(identical(visits$container_enters[visits$participant_id == "P107" &
+                                                         visits$scene == "ComplexScene"], 0L))
+  # No contract warnings on the fake data (count_after, via, grab durations).
+  stopifnot(!any(grepl("count_after|scene_enter.via|duration_s differ|without a menu_select|lacks \"interaction\"",
+                       warn_lines)))
+  # Blocked menu touches (#42 lock) are counted.
+  stopifnot(sum(data_quality$menu_blocked, na.rm = TRUE) > 0)
+  # count_after counts the whole container, finished positions included: just
+  # before P113's EMPTY press at Mixed position 2, the 3 cartons of position 1
+  # are still in it.
+  first_p2 <- presses %>% filter(participant_id == "P113", scene == "MixedPickingScene", position == 2) %>%
+    slice_min(t, n = 1)
+  last_count <- container_rows %>% filter(participant_id == "P113", scene == "MixedPickingScene",
+                                          t < first_p2$t) %>% slice_max(t, n = 1)
+  stopifnot(nrow(last_count) == 1, last_count$count_after == 3, isTRUE("EMPTY" %in% first_p2$codes[[1]]))
+  # P114 held a package when the app crashed: one open grab, no duration.
+  stopifnot(visits$open_grabs[visits$participant_id == "P114" & visits$scene == "ComplexScene"] == 1,
+            dq("open_grabs", "P114") == 1)
+  # Re-grabs: grabs of an object already grabbed in the visit exist somewhere.
+  stopifnot(any(visits$regrabs > 0, na.rm = TRUE))
+  # P107: the end control was opened twice (one cancelled), and the 1.5 s
+  # from the last open to the session end are the facilitator's.
+  stopifnot(dq("end_control_opens", "P107") == 2, abs(dq("facilitator_tail_s", "P107") - 1.5) < 0.002)
+  stopifnot(all(is.na(visits$facilitator_tail_s[visits$participant_id != "P107"])))
+  # Q3 phases add up to the position's active time and never include the
+  # box-change wait (a later position starts when its storage box arrived).
+  proc <- read_csv(file.path(output_dir, "process_by_position.csv"), show_col_types = FALSE)
+  done <- proc %>% filter(completed, !is.na(pick_s))
+  stopifnot(nrow(done) > 0, all(abs(done$read_s + done$pick_s + done$check_s - done$position_s) < 0.003),
+            all(done$read_s >= 0), all(done$pick_s >= 0), all(done$check_s >= 0))
+  stopifnot(!any(proc$participant_id == "P104"), file.exists(file.path(output_dir, "time_by_phase.png")))
+  # P114 Complex position 2 was never completed: no pick/check time, but read_s
+  # (box arrived -> the grab that was open at the crash) is measured.
+  p114_p2 <- proc %>% filter(participant_id == "P114", scene == "ComplexScene", position == 2)
+  stopifnot(nrow(p114_p2) == 1, !p114_p2$completed, !is.na(p114_p2$read_s), is.na(p114_p2$pick_s))
+
   # 8d. Pauses: P102's pause spans Mixed visit 1 -> Basic visit 2: it counts in
   #     Mixed 1, its time is split (4.5 s + 7.25 s). P104 quits while paused:
   #     the open 12.5 s are in ComplexScene's paused_s without an app_resume.
@@ -324,6 +385,20 @@ local({
   }
   rewrite_session_start("P106", function(l) sub("\"data\":\\{[^}]*\\}", "\"data\":{}", l))
   rewrite_session_start("P109", function(l) sub(",\"ended_session_warning\":(true|false)", "", l))
+  # #29: a summary.csv that writes 0 grabs for WelcomeScene (not measured
+  # there) must be reported as a mismatch, not read as a measured 0.
+  p101_sum <- list.files(file.path(old_logs, "research"), pattern = "^P101_.*_summary\\.csv$", full.names = TRUE)
+  stopifnot(length(p101_sum) == 1)
+  sl <- readLines(p101_sum, encoding = "UTF-8")
+  wl <- grep(",WelcomeScene,", sl)
+  cells <- strsplit(sl[wl], ",", fixed = TRUE)[[1]]
+  cells <- c(cells, rep("", 26 - length(cells)))
+  stopifnot(cells[18] == "")
+  cells[18] <- "0"
+  sl[wl] <- paste(cells, collapse = ",")
+  con <- file(p101_sum, open = "wb")
+  writeLines(sl, con, sep = "\n")
+  close(con)
   data_dir <- old_logs
   output_dir <- file.path(tempdir(), "selftest_old_logs_out")
   source("analysis/analyse.R", local = TRUE)
@@ -335,6 +410,7 @@ local({
   stopifnot(identical(data_quality$ended_session_override, wide$ended_session_override))
   old_warn <- readLines(file.path(output_dir, "warnings.txt"), encoding = "UTF-8")
   stopifnot(!any(grepl("inconsistent", old_warn)))
+  stopifnot(any(grepl("P101 WelcomeScene visit 1 grabs events=NA summary=0", old_warn, fixed = TRUE)))
   unlink(c(old_logs, output_dir), recursive = TRUE)
 
   # 9. Without allow_fake, analyse.R must refuse the fake folder.

@@ -34,6 +34,9 @@ public static class SummaryCsv
         cells[14] = Number(v.TimeToCorrectS);
         cells[15] = Bool(v.Completed);
         cells[16] = v.ErrorCodesAll;
+        cells[17] = Number(v.Grabs);
+        cells[19] = Number(v.ContainerEnters);
+        cells[20] = Number(v.ContainerExits);
         cells[21] = Number(v.Pauses);
         cells[22] = Number(v.HmdRemovedCount);
         cells[25] = Number(v.UnityErrors);

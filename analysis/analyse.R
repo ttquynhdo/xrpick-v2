@@ -1,8 +1,9 @@
 # analyse.R
 #
 # Turns research logs from the xpick app into charts and tables for
-# research questions 1 (improvement per skill), 2 (hard scenes, common errors)
-# and 6 (data quality). Rules: docs/superpowers/specs/2026-11-01-research-logger-design.md
+# research questions 1 (improvement per skill), 2 (hard scenes, common errors),
+# 3 (where the time of a position goes, from the #29 interaction events) and
+# 6 (data quality). Rules: docs/superpowers/specs/2026-11-01-research-logger-design.md
 # section 8. Log format: docs/research-logging-spec.md, schema_version 2
 # (decision 021). Logs with schema_version 1 are read for sessions, visits and
 # pauses, but their outcome events (v1 catalogue) are not: NA, not measured.
@@ -110,6 +111,14 @@ position_skill_default <- "picking"
 # Scenes with the red button (rated presses, confirm_ignored, station rides).
 # ConceptScene has only the quiz (no red button since #73), WelcomeScene neither.
 red_button_scenes <- c("BasicPickingScene", "MixedPickingScene", "ComplexScene")
+
+# #29 interaction events. grab_start/_end exist only for packages with
+# PackageData: ConceptScene (label board) and the picking scenes. The
+# WelcomeScene practice box has none, so its grabs are NA (not measured),
+# never 0. container_enter/_exit exist only where there is an order
+# container: the picking scenes (the red-button scenes).
+grab_scenes <- c("ConceptScene", red_button_scenes)
+container_scenes <- red_button_scenes
 
 # ---- 3. Read every events file -----------------------------------------------
 
@@ -862,6 +871,169 @@ session_outcome <- sessions %>%
               TRUE ~ session_id %in% presses$session_id))
 outcome_sessions <- session_outcome$session_id[session_outcome$outcome_measured]
 
+# ---- 7b. Interaction events (#29): grabs, order container, menu, end control --
+
+# Which sessions logged the interaction group, same rule as for outcomes:
+# schema 1 no; with event_groups in the header: "interaction" listed; no
+# event_groups key (no header line): yes when the session has any of its events.
+# A session without the group has NA interaction numbers, never 0.
+interaction_event_names <- c("grab_start", "grab_end", "container_enter", "container_exit",
+                             "menu_select", "end_control_opened", "end_control_cancelled")
+session_interaction <- sessions %>%
+  transmute(session_id, participant_id,
+            interaction_measured = case_when(
+              schema_version %in% 1L ~ FALSE,
+              groups_logged %in% TRUE ~ str_detect(coalesce(event_groups, ""), "(^|;)interaction(;|$)"),
+              TRUE ~ session_id %in% events$session_id[events$event %in% interaction_event_names]))
+interaction_sessions <- session_interaction$session_id[session_interaction$interaction_measured]
+# Interaction events in a session whose header doesn't list the group: the
+# header is wrong (contract break). They are not read.
+stray_interaction <- events %>%
+  filter(event %in% interaction_event_names, !session_id %in% interaction_sessions) %>%
+  distinct(participant_id, session_id)
+for (i in seq_len(nrow(stray_interaction))) {
+  warn("interaction events in session ", stray_interaction$session_id[i], " (",
+       stray_interaction$participant_id[i], ") whose header event_groups lacks \"interaction\" (not read)")
+}
+ix_events <- visit_events %>% filter(session_id %in% interaction_sessions)
+
+# Grabs: one grab_start per package grab (two hands on one package = one grab).
+# Pair each grab_end with the open grab_start of the same object_id in the
+# same visit. grab_no counts the object's starts, so an end belongs to the
+# latest start; grab_no 0 = an end without a start in this visit (logged
+# duration_s null). A start without an end is an open grab (crash, scene
+# change or session end while holding): censored, no duration.
+grab_rows <- ix_events %>% filter(event %in% c("grab_start", "grab_end")) %>%
+  transmute(participant_id, session_id, scene, scene_visit, t, line, event,
+            object_id = map_chr(data, ~ as_chr(.x$object_id)),
+            material_key = map_chr(data, ~ as_chr(.x$material_key)),
+            logged_duration_s = map_dbl(data, ~ as_num(.x$duration_s))) %>%
+  arrange(session_id, scene, scene_visit, t, line) %>%
+  group_by(session_id, scene, scene_visit, object_id) %>%
+  mutate(grab_no = cumsum(event == "grab_start")) %>%
+  ungroup()
+no_object <- grab_rows %>% filter(is.na(object_id))
+if (nrow(no_object) > 0) warn(nrow(no_object), " grab event(s) without object_id (cannot be paired)")
+grabs <- grab_rows %>% filter(grab_no > 0, !is.na(object_id)) %>%
+  group_by(participant_id, session_id, scene, scene_visit, object_id, grab_no) %>%
+  summarise(material_key = first(material_key),
+            start_t = first_or_na(t[event == "grab_start"]),
+            end_t = first_or_na(t[event == "grab_end"]),
+            logged_duration_s = first_or_na(logged_duration_s[event == "grab_end"]),
+            .groups = "drop") %>%
+  mutate(open = is.na(end_t),
+         # Active hold time (pauses removed), the rule for every _s field.
+         hold_s = if_else(open, NA_real_,
+                          round(end_t - start_t - paused_between(session_id, start_t, end_t), 3)))
+orphan_ends <- grab_rows %>% filter(event == "grab_end", grab_no == 0)
+if (nrow(orphan_ends) > 0) {
+  message("Note: ", nrow(orphan_ends), " grab_end without a grab_start in the same visit (duration_s null)")
+}
+# The logger's duration_s must equal the active time between start and end.
+# A difference usually means the grab spanned a pause and the logger wrote
+# wall time (spec section 3: _s fields are active time).
+bad_hold <- grabs %>% filter(!open, !is.na(logged_duration_s),
+                             abs(logged_duration_s - hold_s) > time_tolerance_s)
+if (nrow(bad_hold) > 0) {
+  warn(nrow(bad_hold), " grab_end.duration_s differ from the active time between grab_start and grab_end ",
+       "(e.g. ", bad_hold$participant_id[1], " ", bad_hold$scene[1], " ", bad_hold$object_id[1],
+       ": logged ", bad_hold$logged_duration_s[1], ", active ", bad_hold$hold_s[1], "); hold_s uses the active time")
+}
+
+# Order container: count_after must equal the running count of enters minus
+# exits in the visit (the container is empty at scene start). It counts every
+# package in the container, finished positions included.
+container_rows <- ix_events %>% filter(event %in% c("container_enter", "container_exit")) %>%
+  transmute(participant_id, session_id, scene, scene_visit, t, line, event,
+            container = map_chr(data, ~ as_chr(.x$container)),
+            object_id = map_chr(data, ~ as_chr(.x$object_id)),
+            material_key = map_chr(data, ~ as_chr(.x$material_key)),
+            count_after = map_int(data, ~ as_int(.x$count_after))) %>%
+  arrange(session_id, scene, scene_visit, t, line) %>%
+  group_by(session_id, scene, scene_visit) %>%
+  mutate(running = cumsum(if_else(event == "container_enter", 1L, -1L))) %>%
+  ungroup()
+bad_count <- container_rows %>% filter(is.na(count_after) | count_after != running) %>%
+  distinct(participant_id, session_id, scene, scene_visit, .keep_all = TRUE)
+for (i in seq_len(nrow(bad_count))) {
+  r <- bad_count[i, ]
+  warn("container count_after disagrees with enters - exits: ", r$participant_id, " ", r$scene,
+       " visit ", r$scene_visit, " at t = ", r$t, " (logged ", r$count_after, ", events ", r$running, ")")
+}
+other_container <- container_rows %>% filter(!container %in% "order")
+if (nrow(other_container) > 0) warn(nrow(other_container), " container event(s) with container other than \"order\"")
+
+# Menu touches (menu_select, written in the visit being left) and the
+# facilitator end control (#44).
+menu_rows <- ix_events %>% filter(event == "menu_select") %>%
+  transmute(session_id, scene, scene_visit, t,
+            target_scene = map_chr(data, ~ as_chr(.x$target_scene)),
+            blocked = map_lgl(data, ~ as_lgl(.x$blocked)))
+end_control_rows <- ix_events %>% filter(event %in% c("end_control_opened", "end_control_cancelled")) %>%
+  select(session_id, scene, scene_visit, t, event)
+
+interaction_visit <- enters %>% select(session_id, scene, scene_visit, enter_t) %>%
+  filter(session_id %in% interaction_sessions) %>%
+  left_join(grabs %>% group_by(session_id, scene, scene_visit) %>%
+              summarise(ev_grabs = n(),
+                        # A re-grab = a grab of a package already grabbed in this visit.
+                        ev_regrabs = n() - n_distinct(object_id),
+                        ev_open_grabs = sum(open),
+                        ev_hold_s = round(sum(hold_s, na.rm = TRUE), 3),
+                        first_grab_t = min(start_t), .groups = "drop"),
+            by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(container_rows %>% group_by(session_id, scene, scene_visit) %>%
+              summarise(ev_container_enters = sum(event == "container_enter"),
+                        ev_container_exits = sum(event == "container_exit"), .groups = "drop"),
+            by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(menu_rows %>% group_by(session_id, scene, scene_visit) %>%
+              summarise(ev_menu_blocked = sum(blocked %in% TRUE), .groups = "drop"),
+            by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(end_control_rows %>% group_by(session_id, scene, scene_visit) %>%
+              summarise(ev_end_control_opened = sum(event == "end_control_opened"),
+                        last_opened_t = last_or_na(t[event == "end_control_opened"]), .groups = "drop"),
+            by = c("session_id", "scene", "scene_visit")) %>%
+  mutate(across(c(ev_grabs, ev_regrabs, ev_open_grabs, ev_container_enters, ev_container_exits,
+                  ev_menu_blocked, ev_end_control_opened), ~ coalesce(as.integer(.x), 0L)),
+         ev_hold_s = coalesce(ev_hold_s, 0),
+         # Active seconds from scene enter to the first grab (NA = no grab).
+         ev_time_to_first_grab_s = round(first_grab_t - enter_t -
+                                           paused_between(session_id, enter_t, first_grab_t), 3)) %>%
+  select(-enter_t)
+
+# scene_enter.via (#29): "start" on the first entry of a session, then "menu"
+# (Menu item) or "resume" (keypad resume after a crash). "facilitator_end" is
+# never written (the facilitator's Beenden ends the session before WelcomeScene
+# loads), null = the load came from somewhere else (a bug, or test code).
+via_rows <- ix_events %>% filter(event == "scene_enter") %>%
+  arrange(session_id, t, line) %>%
+  transmute(participant_id, session_id, scene, scene_visit, t,
+            via = map_chr(data, ~ as_chr(.x$via))) %>%
+  group_by(session_id) %>% mutate(entry_no = row_number()) %>% ungroup() %>%
+  left_join(sessions %>% select(session_id, resume_accepted), by = "session_id")
+bad_via <- via_rows %>%
+  filter((entry_no == 1 & !via %in% "start") |
+           (entry_no > 1 & !via %in% c("menu", "resume")) |
+           (via %in% "resume" & !resume_accepted %in% TRUE))
+for (i in seq_len(nrow(bad_via))) {
+  r <- bad_via[i, ]
+  warn("scene_enter.via '", coalesce(r$via, "null"), "' unexpected: ", r$participant_id, " ", r$scene,
+       " visit ", r$scene_visit, " (entry ", r$entry_no, " of the session",
+       if (r$via %in% "resume") ", but session_start has no accepted resume" else "", ")")
+}
+# A menu entry should follow a menu_select (blocked false) for that scene in
+# the visit just left.
+menu_entries <- via_rows %>% filter(via %in% "menu") %>%
+  left_join(menu_rows %>% filter(blocked %in% FALSE) %>%
+              select(session_id, target_scene, menu_t = t),
+            by = c("session_id", "scene" = "target_scene"), relationship = "many-to-many") %>%
+  group_by(session_id, scene, scene_visit, t) %>%
+  summarise(has_select = any(menu_t <= t & menu_t >= t - 30, na.rm = TRUE), .groups = "drop") %>%
+  filter(!has_select)
+if (nrow(menu_entries) > 0) {
+  warn(nrow(menu_entries), " scene_enter with via 'menu' without a menu_select for that scene just before it")
+}
+
 # ---- 8. Merge sessions per participant and number visits across them ----------
 
 visits <- visits_base %>%
@@ -873,6 +1045,7 @@ visits <- visits_base %>%
   left_join(rated_counts, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(ignored_counts, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(wait_stats, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(interaction_visit, by = c("session_id", "scene", "scene_visit")) %>%
   mutate(
     # Outcome numbers exist only for scenes with a confirm or quiz in sessions
     # that measured outcomes; everywhere else they stay NA (not measured).
@@ -896,6 +1069,21 @@ visits <- visits_base %>%
     # Error rate per visit: share of presses with >= 1 code; NA when 0 presses.
     error_rate = if_else(!is.na(confirm_count) & confirm_count > 0,
                          presses_with_error / confirm_count, NA_real_),
+    # #29 interaction numbers: NA unless the session logged the group AND the
+    # scene can produce the event (grabs: packages with PackageData;
+    # container_*: an order container). Inside that, a visit without events is 0.
+    interaction_logged = session_id %in% interaction_sessions,
+    grab_logged = interaction_logged & scene %in% grab_scenes,
+    container_logged = interaction_logged & scene %in% container_scenes,
+    grabs = if_else(grab_logged, ev_grabs, NA_integer_),
+    regrabs = if_else(grab_logged, ev_regrabs, NA_integer_),
+    open_grabs = if_else(grab_logged, ev_open_grabs, NA_integer_),
+    hold_s = if_else(grab_logged, ev_hold_s, NA_real_),
+    time_to_first_grab_s = if_else(grab_logged, ev_time_to_first_grab_s, NA_real_),
+    container_enters = if_else(container_logged, ev_container_enters, NA_integer_),
+    container_exits = if_else(container_logged, ev_container_exits, NA_integer_),
+    menu_blocked = if_else(interaction_logged, ev_menu_blocked, NA_integer_),
+    end_control_opened = if_else(interaction_logged, ev_end_control_opened, NA_integer_),
     scene = factor(scene, levels = union(scene_levels, unique(scene)))) %>%
   arrange(participant_id, session_no, enter_t) %>%
   group_by(participant_id, scene) %>%
@@ -914,6 +1102,25 @@ visits <- visits_base %>%
     }) %>%
   ungroup()
 
+# Facilitator tail (#44): in the last visit of a session the facilitator
+# ended, the time from the last end_control_opened to the end is the
+# facilitator's, not the trainee's (active seconds). NA everywhere else and
+# when the group was not logged.
+visits <- visits %>%
+  group_by(session_id) %>%
+  mutate(last_of_session = enter_t == max(enter_t)) %>%
+  ungroup() %>%
+  mutate(facilitator_tail_s = if_else(
+    interaction_logged & end_status %in% "facilitator" & last_of_session & !is.na(last_opened_t),
+    round(end_t - last_opened_t - paused_between(session_id, last_opened_t, end_t), 3), NA_real_),
+    trainee_active_s = if_else(is.na(facilitator_tail_s), duration_s, round(duration_s - facilitator_tail_s, 3)))
+no_open <- visits %>% filter(interaction_logged, end_status %in% "facilitator", last_of_session,
+                             is.na(last_opened_t))
+for (i in seq_len(nrow(no_open))) {
+  warn("session ", no_open$session_id[i], " (", no_open$participant_id[i], ") ended by the facilitator ",
+       "without end_control_opened in its last visit: facilitator time can't be cut")
+}
+
 unknown_scenes <- setdiff(levels(visits$scene), scene_levels)
 if (length(unknown_scenes) > 0) {
   warn("scene(s) missing from scenes.csv (put last in charts): ", paste(unknown_scenes, collapse = ", "))
@@ -928,7 +1135,8 @@ if (!grepl("fake", data_dir)) summary_files <- summary_files[!grepl("/fake/", su
 # confirm_ignored) reads without errors; a missing column becomes NA below.
 summary_num_cols <- c("schema_version", "scene_visit", "duration_s", "paused_s", "confirm_count",
                       "confirm_ignored", "attempts_to_correct", "time_to_first_confirm_s",
-                      "time_to_correct_s", "pauses", "hmd_removed_count", "unity_errors")
+                      "time_to_correct_s", "pauses", "hmd_removed_count", "unity_errors",
+                      "grabs", "container_enters", "container_exits")
 summary_lgl_cols <- c("first_attempt_correct", "completed")
 read_summary <- function(path) {
   read_csv(path, show_col_types = FALSE, na = "", col_types = cols(.default = col_character())) %>%
@@ -957,8 +1165,12 @@ norm_codes <- function(x) map_chr(x, ~ if (is.na(.x)) NA_character_ else
 outcome_compare_cols <- c("confirm_count", "confirm_ignored", "first_attempt_correct",
                           "attempts_to_correct", "time_to_first_confirm_s", "time_to_correct_s",
                           "completed", "error_codes_all")
+# Interaction columns (#29): grabs = grab_start lines; container_* = enter /
+# exit lines. Empty (NA) where the scene can't produce them and in builds
+# before #29.
+interaction_compare_cols <- c("grabs", "container_enters", "container_exits")
 compare_cols <- c("duration_s", "paused_s", "pauses", "hmd_removed_count", "unity_errors",
-                  outcome_compare_cols)
+                  outcome_compare_cols, interaction_compare_cols)
 if (nrow(summary_rows) > 0) {
   # A column this summary.csv schema doesn't have is "not measured".
   for (cl in setdiff(compare_cols, names(summary_rows))) {
@@ -968,7 +1180,8 @@ if (nrow(summary_rows) > 0) {
   # Schema 1 rows: their outcome columns follow the v1 catalogue and are not
   # read (same rule as for the events, section 5), so they are not compared.
   summary_rows <- summary_rows %>%
-    mutate(across(all_of(outcome_compare_cols), ~ if_else(schema_version %in% 1, NA, .x)))
+    mutate(across(all_of(c(outcome_compare_cols, interaction_compare_cols)),
+                  ~ if_else(schema_version %in% 1, NA, .x)))
 }
 summary_mismatches <- tibble(participant_id = character(), session_id = character(),
                              scene = character(), scene_visit = integer(), column = character(),
@@ -1078,6 +1291,12 @@ data_quality <- sessions %>%
                         unity_errors = sum(unity_errors, na.rm = TRUE),
                         outcome_logged = any(outcome_logged),
                         total_confirms = if (any(outcome_logged)) sum(confirm_count, na.rm = TRUE) else NA_integer_,
+                        # #29: NA when no session of the person logged the interaction group.
+                        interaction_logged = any(interaction_logged),
+                        end_control_opens = if (any(interaction_logged)) sum(end_control_opened, na.rm = TRUE) else NA_integer_,
+                        menu_blocked = if (any(interaction_logged)) sum(menu_blocked, na.rm = TRUE) else NA_integer_,
+                        open_grabs = if (any(grab_logged)) sum(open_grabs, na.rm = TRUE) else NA_integer_,
+                        facilitator_tail_s = if (any(!is.na(facilitator_tail_s))) sum(facilitator_tail_s, na.rm = TRUE) else NA_real_,
                         .groups = "drop"),
             by = "participant_id") %>%
   left_join(invariant_breaks %>% count(participant_id, name = "invariant_breaks"), by = "participant_id") %>%
@@ -1093,7 +1312,8 @@ data_quality <- sessions %>%
          mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
-         unity_errors, error_cap_reached, outcome_logged, total_confirms, invariant_breaks,
+         unity_errors, error_cap_reached, outcome_logged, total_confirms, interaction_logged,
+         end_control_opens, menu_blocked, open_grabs, facilitator_tail_s, invariant_breaks,
          unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
          first_start_utc) %>%
   arrange(participant_id)
@@ -1123,6 +1343,9 @@ dq_long <- data_quality %>%
             unity_err = as.character(unity_errors),
             error_cap = as.character(error_cap_reached),
             outcome = as.character(outcome_logged),
+            # Empty = not measured (build before #29).
+            interaction = as.character(interaction_logged),
+            end_ctrl_opens = coalesce(as.character(end_control_opens), ""),
             invariant = as.character(invariant_breaks),
             unknown_code = as.character(unknown_codes),
             summary_diff = as.character(summary_mismatches),
@@ -1139,7 +1362,9 @@ dq_long <- data_quality %>%
            column == "gap_h" ~ value != "",
            column == "language" ~ str_starts(value, "!"),
            column %in% c("censored", "error_cap", "resume_declined", "ended_override") ~ value == "TRUE",
-           column == "outcome" ~ value == "FALSE",
+           column %in% c("outcome", "interaction") ~ value == "FALSE",
+           # One open is the facilitator's own Beenden; more = accidental opens.
+           column == "end_ctrl_opens" ~ value != "" & value != "0" & value != "1",
            TRUE ~ !value %in% c("0", "")),
          column = factor(column, levels = unique(column)),
          participant_id = factor(participant_id, levels = rev(sort(unique(participant_id)))))
@@ -1459,6 +1684,118 @@ if (!any(ttc_people$reached)) {
 }
 ggsave(file.path(output_dir, "time_to_correct_by_scene.png"), p_ttc, width = 10, height = 6, dpi = 150, bg = "white")
 
+# ---- 13b. Where the time of a position goes (question 3, #29) ------------------
+
+# One row per order position of a picking-scene visit that logged the
+# interaction group. The position's active time (pauses removed) is split at
+# two moments taken from the interaction events:
+#   start        position 1: scene enter (Complex: storage box 1 arrived, after
+#                the remainder quiz); position p > 1: storage box p arrived
+#                (station_move_arrived storage_in), so the box-change wait
+#                (wait_s) is never part of it
+#   first grab   the first grab_start after the start
+#   last change  the last container_enter / _exit before position_completed
+#   done         position_completed (the correct press)
+# read_s = start -> first grab (reading the WMS line and the cards),
+# pick_s = first grab -> last change (picking, incl. wrong presses and fixing
+# the box), check_s = last change -> done (looking at the box and the WMS,
+# then the correct press). They add up to position_s. A position that was
+# never completed keeps read_s (if a grab happened) and NA for the rest.
+title_q3 <- "Where does the time of an order position go: reading, picking or checking?"
+first_after <- function(x, from, to) {
+  x <- x[!is.na(x) & x > from & x <= to]
+  if (length(x) == 0) NA_real_ else min(x)
+}
+last_before <- function(x, from, to) {
+  x <- x[!is.na(x) & x > from & x <= to]
+  if (length(x) == 0) NA_real_ else max(x)
+}
+active_between <- function(sid, from_t, to_t) {
+  if_else(is.na(from_t) | is.na(to_t), NA_real_,
+          round(to_t - from_t - paused_between(sid, from_t, to_t), 3))
+}
+proc_visits <- visits %>% filter(container_logged) %>%
+  transmute(participant_id, session_id, scene = as.character(scene), scene_visit, enter_t,
+            visit_end_t = end_t, counting, repeat_visit)
+# Positions of each visit: position 1 always, plus every position that was
+# pressed at or whose storage box arrived.
+proc_positions <- bind_rows(
+  proc_visits %>% transmute(session_id, scene, scene_visit, position = 1L),
+  presses %>% filter(event == "confirm_pressed", !is.na(position)) %>%
+    transmute(session_id, scene, scene_visit, position),
+  storage_in %>% filter(!is.na(arrived_t)) %>% transmute(session_id, scene, scene_visit, position)) %>%
+  distinct() %>%
+  inner_join(proc_visits, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(storage_in %>% select(session_id, scene, scene_visit, position, box_arrived_t = arrived_t),
+            by = c("session_id", "scene", "scene_visit", "position")) %>%
+  left_join(pos_done_t %>% rename(position = done_position),
+            by = c("session_id", "scene", "scene_visit", "position")) %>%
+  mutate(start_t = case_when(position == 1L & scene != "ComplexScene" ~ enter_t,
+                             TRUE ~ box_arrived_t),
+         window_end_t = coalesce(done_t, visit_end_t),
+         completed = !is.na(done_t))
+grab_t <- grabs %>% select(session_id, scene, scene_visit, g_t = start_t)
+change_t <- container_rows %>% select(session_id, scene, scene_visit, c_t = t)
+press_t <- presses %>% filter(event == "confirm_pressed") %>%
+  select(session_id, scene, scene_visit, position, p_t = t)
+process <- proc_positions %>%
+  rowwise() %>%
+  mutate(
+    first_grab_t = first_after(grab_t$g_t[grab_t$session_id == session_id & grab_t$scene == scene &
+                                             grab_t$scene_visit == scene_visit], start_t, window_end_t),
+    last_change_t = last_before(change_t$c_t[change_t$session_id == session_id & change_t$scene == scene &
+                                               change_t$scene_visit == scene_visit], start_t, window_end_t),
+    presses = sum(press_t$session_id == session_id & press_t$scene == scene &
+                    press_t$scene_visit == scene_visit & press_t$position == position)) %>%
+  ungroup() %>%
+  mutate(
+    read_s = active_between(session_id, start_t, first_grab_t),
+    pick_s = if_else(completed, active_between(session_id, first_grab_t, last_change_t), NA_real_),
+    check_s = if_else(completed, active_between(session_id, last_change_t, done_t), NA_real_),
+    position_s = if_else(completed, active_between(session_id, start_t, done_t), NA_real_),
+    item = paste0("position_", position)) %>%
+  left_join(item_skills %>% select(scene, item, scaffolded), by = c("scene", "item")) %>%
+  mutate(scaffolded = coalesce(scaffolded, FALSE),
+         scene = factor(scene, levels = levels(visits$scene))) %>%
+  arrange(participant_id, scene, scene_visit, position)
+write_csv(process %>% select(participant_id, session_id, scene, scene_visit, counting, repeat_visit,
+                             position, scaffolded, completed, presses, read_s, pick_s, check_s, position_s),
+          file.path(output_dir, "process_by_position.csv"), na = "")
+
+proc_long <- process %>% filter(counting, completed) %>%
+  select(participant_id, scene, position, read_s, pick_s, check_s) %>%
+  pivot_longer(c(read_s, pick_s, check_s), names_to = "phase", values_to = "seconds") %>%
+  filter(!is.na(seconds)) %>%
+  mutate(phase = factor(phase, levels = c("read_s", "pick_s", "check_s"),
+                        labels = c("read (start -> first grab)", "pick (first grab -> last box change)",
+                                   "check (last box change -> correct press)")),
+         slot = paste0(str_remove(as.character(scene), "PickingScene|Scene"), "\nposition ", position))
+if (nrow(proc_long) == 0) {
+  p_q3 <- empty_chart(title_q3)
+  warn("no completed positions with interaction events: time_by_phase.png is empty")
+} else {
+  slot_levels <- proc_long %>% distinct(scene, position, slot) %>% arrange(scene, position) %>% pull(slot)
+  proc_long <- proc_long %>% mutate(slot = factor(slot, levels = slot_levels))
+  proc_n <- proc_long %>% group_by(slot) %>%
+    summarise(n = n_distinct(participant_id), y = max(seconds), .groups = "drop")
+  p_q3 <- ggplot(proc_long, aes(slot, seconds, colour = phase)) +
+    geom_point(position = position_jitterdodge(jitter.width = 0.15, dodge.width = 0.7, seed = 29),
+               size = 2, alpha = 0.75) +
+    stat_summary(fun = median, geom = "crossbar", width = 0.2, linewidth = 0.4,
+                 position = position_dodge(width = 0.7), show.legend = FALSE) +
+    geom_text(data = proc_n, aes(x = slot, y = y, label = paste0("n=", n)), inherit.aes = FALSE,
+              vjust = -0.6, size = 3, colour = "grey20") +
+    scale_colour_manual(values = unname(okabe_ito[c(2, 1, 3)]), name = "Phase") +
+    scale_y_continuous(expand = expansion(mult = c(0.02, 0.15))) +
+    labs(title = title_q3,
+         subtitle = paste0("Completed positions of counting visits; active seconds (pauses and box-change ",
+                           "waits removed). Bar = median, point = one participant."),
+         x = "Scene and order position (build order)", y = "Active time (s)") +
+    theme_minimal(base_size = 11) +
+    theme(legend.position = "bottom", legend.direction = "vertical")
+}
+ggsave(file.path(output_dir, "time_by_phase.png"), p_q3, width = 10, height = 6.5, dpi = 150, bg = "white")
+
 # ---- 14. Wide file: one row per participant (for SPSS and paper forms) ---------
 
 # Per-scene columns come from the counting visit only (repeat visits stay in
@@ -1471,7 +1808,9 @@ per_scene <- visits %>% filter(counting) %>%
             errors = presses_with_error, error_rate = error_rate,
             first_correct = first_attempt_correct, attempts_to_correct = attempts_to_correct,
             time_to_correct_s = time_to_correct_s, completed = completed,
-            visit_censored = duration_censored)
+            visit_censored = duration_censored,
+            grabs = grabs, regrabs = regrabs, container_enters = container_enters,
+            container_exits = container_exits, time_to_first_grab_s = time_to_first_grab_s)
 visit_counts <- visits %>% mutate(scene = as.character(scene)) %>% count(participant_id, scene, name = "visits")
 per_scene <- full_join(visit_counts, per_scene, by = c("participant_id", "scene"))
 
@@ -1481,7 +1820,8 @@ wide_scene <- per_scene %>%
   pivot_wider(id_cols = participant_id, names_from = scene, names_glue = "{.value}_{scene}",
               values_from = c(visits, active_s, paused_s, confirms, confirm_ignored, wait_s, wait_after_done_s, errors,
                               error_rate, first_correct, attempts_to_correct, time_to_correct_s,
-                              completed, visit_censored))
+                              completed, visit_censored, grabs, regrabs, container_enters,
+                              container_exits, time_to_first_grab_s))
 # Scenes without a confirm or quiz (WelcomeScene) never have outcome values:
 # drop those always-empty columns.
 no_outcome_cols <- as.vector(outer(outcome_measures, setdiff(unique(per_scene$scene), outcome_scenes),
@@ -1489,7 +1829,20 @@ no_outcome_cols <- as.vector(outer(outcome_measures, setdiff(unique(per_scene$sc
 # Ignored presses and station waits exist only in scenes with a red button.
 no_button_cols <- as.vector(outer(c("confirm_ignored", "wait_s", "wait_after_done_s"),
                                   setdiff(unique(per_scene$scene), red_button_scenes), paste, sep = "_"))
-wide_scene <- wide_scene %>% select(-any_of(c(no_outcome_cols, no_button_cols)))
+# Grabs exist only where packages have PackageData, container counts only
+# where there is an order container (both NA elsewhere, always).
+no_grab_cols <- as.vector(outer(c("grabs", "regrabs", "time_to_first_grab_s"),
+                                setdiff(unique(per_scene$scene), grab_scenes), paste, sep = "_"))
+no_container_cols <- as.vector(outer(c("container_enters", "container_exits"),
+                                     setdiff(unique(per_scene$scene), container_scenes), paste, sep = "_"))
+wide_scene <- wide_scene %>% select(-any_of(c(no_outcome_cols, no_button_cols, no_grab_cols, no_container_cols)))
+
+# Q3 phases of the counting visit, one column per scene and position,
+# e.g. read_s_MixedPickingScene_p2.
+wide_process <- process %>% filter(counting) %>%
+  transmute(participant_id, key = paste0(scene, "_p", position), read_s, pick_s, check_s) %>%
+  pivot_wider(id_cols = participant_id, names_from = key, names_glue = "{.value}_{key}",
+              values_from = c(read_s, pick_s, check_s))
 
 wide_skill <- skill_rates %>%
   transmute(participant_id, name = paste0("error_rate_", scene, "_", skill), error_rate) %>%
@@ -1509,10 +1862,12 @@ participant_cols <- c("participant_id", "end_status", "course_finished", "multi_
                       "mixed_build", "builds", "schema_versions", "layout_versions", "gap_h", "n_sessions",
                       "resume_offered", "resume_declined", "ended_session_override",
                       "duration_censored", "active_s", "paused_s", "pauses",
-                      "hmd_removed_count", "unity_errors", "total_confirms")
+                      "hmd_removed_count", "unity_errors", "total_confirms", "interaction_logged",
+                      "end_control_opens", "menu_blocked", "open_grabs", "facilitator_tail_s")
 wide <- data_quality %>%
   select(all_of(participant_cols)) %>%
   left_join(wide_scene, by = "participant_id") %>%
+  left_join(wide_process, by = "participant_id") %>%
   left_join(wide_skill, by = "participant_id")
 # A scene nobody had a counting visit for still gets its error-rate column
 # (added before sorting, so it lands in build order).

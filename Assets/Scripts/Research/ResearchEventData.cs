@@ -11,7 +11,7 @@ public static class ResearchEventData
     public const string LayoutVersion = "019";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
-    public static readonly string[] EventGroups = { "session", "outcome" };
+    public static readonly string[] EventGroups = { "session", "outcome", "interaction" };
 
     /// <summary>Header value when ResearchSettings.autoStart started the session.</summary>
     public const string StartModeAuto = "auto";

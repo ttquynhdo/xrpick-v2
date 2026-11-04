@@ -95,7 +95,7 @@ namespace XRPick.Research.Tests
         {
             string json = ResearchEventData.Header("0.1.0", "868fea7", "Quest", "Android", "P101", "s1",
                 ResearchEventData.StartModeManual, "DE", "controllers", 72).ToJson();
-            StringAssert.Contains("\"event_groups\":[\"session\",\"outcome\"]", json);
+            StringAssert.Contains("\"event_groups\":[\"session\",\"outcome\",\"interaction\"]", json);
         }
 
         [Test]

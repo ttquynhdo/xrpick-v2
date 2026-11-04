@@ -49,6 +49,17 @@ namespace XRPick.Research.Tests
         }
 
         [Test]
+        public void FormatRow_WritesInteractionCounts()
+        {
+            var v = Sample();
+            v.Grabs = 7;
+            v.ContainerEnters = 4;
+            v.ContainerExits = 1;
+            var cells = SummaryCsv.FormatRow(v).Split(',');
+            Assert.AreEqual(new[] { "7", "", "4", "1" }, new[] { cells[17], cells[18], cells[19], cells[20] });
+        }
+
+        [Test]
         public void FormatRow_LeavesLaterColumnsEmptyAndUsesDotDecimal()
         {
             var old = CultureInfo.CurrentCulture;

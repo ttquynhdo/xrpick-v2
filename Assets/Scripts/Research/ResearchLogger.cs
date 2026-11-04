@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Research log of one session (#26): header, scene visits, pauses and Unity errors as JSON
-/// lines, plus one summary CSV row per scene visit. The outcome events (#28) are in ResearchLogger.Outcome.cs. Scene scripts call the static API
+/// lines, plus one summary CSV row per scene visit. The outcome events (#28) are in ResearchLogger.Outcome.cs,
+/// the interaction events (#29) in ResearchLogger.Interaction.cs. Scene scripts call the static API
 /// unconditionally; without a running session every call is a silent no-op.
 /// </summary>
 public sealed partial class ResearchLogger : MonoBehaviour
@@ -71,6 +72,7 @@ public sealed partial class ResearchLogger : MonoBehaviour
     private int visitEnterHmdCount;
     private int visitUnityErrors;
     private VisitOutcome outcome;
+    private VisitInteraction interaction;
 
     public static bool IsSessionActive => instance != null && instance.sessionActive;
 
@@ -197,6 +199,7 @@ public sealed partial class ResearchLogger : MonoBehaviour
     private static void ResetStatics()
     {
         instance = null;
+        pendingVia = null;
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -364,7 +367,7 @@ public sealed partial class ResearchLogger : MonoBehaviour
         WriteLine(SessionFiles.EventLine(0, UtcNow(), participantId, sessionId, activeScene, null, "session_start",
             ResearchEventData.SessionStart(resumeOfferedScene, resumeAccepted, endedSessionWarning)));
 
-        OpenVisit(activeScene, null, "start");
+        OpenVisit(activeScene, null, InteractionEvents.ViaStart);
     }
 
     private void FinishSession(string reason)
@@ -373,6 +376,7 @@ public sealed partial class ResearchLogger : MonoBehaviour
         CloseVisit();
         WriteEvent("session_end", new JsonFields().Add("reason", reason));
         sessionActive = false;
+        pendingVia = null;
     }
 
     private void HandleActiveSceneChanged(Scene previous, Scene next)
@@ -387,7 +391,7 @@ public sealed partial class ResearchLogger : MonoBehaviour
             // The previous Scene struct is often already unloaded (empty name); use the tracked name.
             string from = sceneName;
             CloseVisit();
-            OpenVisit(next.name, from, null);
+            OpenVisit(next.name, from, TakePendingVia());
         }
         catch (Exception e)
         {
@@ -412,6 +416,7 @@ public sealed partial class ResearchLogger : MonoBehaviour
         visitEnterHmdCount = pauses.HmdRemovedCount;
         visitUnityErrors = 0;
         outcome = new VisitOutcome(scene);
+        interaction = new VisitInteraction(scene);
 
         WriteEvent("scene_enter", new JsonFields()
             .Add("from_scene", fromScene)
@@ -458,6 +463,7 @@ public sealed partial class ResearchLogger : MonoBehaviour
             UnityErrors = visitUnityErrors
         };
         outcome.FillSummary(row);
+        interaction.FillSummary(row);
         if (!writeFailed && !files.AppendSummary(SummaryCsv.FormatRow(row)))
         {
             ReportWriteFailure();

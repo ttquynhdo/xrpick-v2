@@ -5,8 +5,12 @@
 # decision 021): the session events of #26/#27 plus the outcome events that
 # #28 step 2 will add (confirm_pressed per position, confirm_ignored,
 # position_completed, task_completed, quiz_answer, quiz_unlocked, tour_step,
-# station_move_start/_arrived, welcome_practice_done). Header event_groups =
-# ["session","outcome"]: no #29/#30 events (grabs, pose, perf) are faked.
+# station_move_start/_arrived, welcome_practice_done) and the interaction
+# events of #29 (grab_start/_end, container_enter/_exit, menu_select,
+# end_control_opened/_cancelled, scene_enter.via). Header event_groups =
+# ["session","outcome","interaction"]; P104 ran a build before #29 (no
+# "interaction" group: its interaction numbers must be NA, not 0). No #30
+# events (pose, perf) are faked.
 # One participant (P115) is written in the old schema-1 shape on purpose, to
 # test that analyse.R warns about mixed schema versions.
 # Why: analyse.R must be tested before real participants exist, and the
@@ -18,6 +22,20 @@
 #
 # Base R only (no packages), so it runs right after installing R.
 # If the logger format changes, change this script in the same commit.
+
+# The #29 interaction events (grabs, container changes, menu touches) draw
+# from their own random stream, taken here before set.seed(26). So adding
+# them changes no other fake value: presses, pauses and rides stay the same
+# draws (selftest.R checks some of them by value). They only add time.
+side <- new.env()
+side$u <- local({ set.seed(29); runif(200000) })
+side$i <- 0
+side_runif <- function(a, b) {
+  side$i <- side$i + 1
+  a + (b - a) * side$u[side$i]
+}
+side_chance <- function(p) side_runif(0, 1) < p
+side_pick <- function(x) x[min(length(x), floor(side_runif(0, 1) * length(x)) + 1)]
 
 set.seed(26)  # same fake data on every run
 
@@ -314,15 +332,18 @@ active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s - open_pause_part
 # keypad forces "DE" for research IDs; test IDs keep the chosen one. NULL =
 # a log written before #11 (header language null).
 # schema: 2 (current); 1 only for the legacy P115 file (section 7b).
+# interaction: FALSE = a build before #29 (no "interaction" in event_groups,
+# no interaction events, via null after the first scene, empty summary columns).
 start_session <- function(person, build, start_utc, start_mode = "manual",
                           resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
-                          language = "DE", schema = 2) {
+                          language = "DE", schema = 2, interaction = TRUE) {
   if (is.null(resume_scene)) resume_accepted <- NULL
   s <- new.env()
   s$pid <- person$pid
   s$sid <- make_uuid()
   s$build <- build
   s$schema <- schema
+  s$interaction <- schema == 2 && interaction
   s$language <- language
   s$start <- to_epoch(start_utc)
   s$t <- 0
@@ -359,7 +380,7 @@ start_session <- function(person, build, start_utc, start_mode = "manual",
   # groups this build emits; R reads a missing group as NA, not 0).
   header <- if (schema == 2) {
     json_obj(schema_version = 2, layout_version = "019",
-             event_groups = json_arr(c("session", "outcome")),
+             event_groups = json_arr(c("session", "outcome", if (s$interaction) "interaction")),
              app_version = "0.2.0", build = build,
              device_model = "Oculus Quest", os_version = "Android OS 14 / API-34",
              participant_id = s$pid, session_id = s$sid, session_start_mode = start_mode,
@@ -396,7 +417,15 @@ enter_scene <- function(s, scene, from, via) {
               pauses = 0, hmd = 0, errors = 0, attempts = 0, ignored = 0,
               quiz_attempts = 0,
               codes = character(0), first_correct = NA, correct_at = NA,
-              t_first = NA, t_correct = NA)
+              t_first = NA, t_correct = NA,
+              # #29: grab_start count, container changes, open grabs (object_id
+              # -> active time at grab_start), packages in the order container
+              # (one row per package: object_id, material, position, form) and
+              # how many packages of each kind were taken so far (for new ids).
+              grabs = 0, c_enter = 0, c_exit = 0, grab_open = list(),
+              box = data.frame(obj = character(0), item = character(0), pos = integer(0),
+                               form = character(0), stringsAsFactors = FALSE),
+              taken = list())
   emit(s, "scene_enter", json_obj(from_scene = from, via = via))
 }
 
@@ -433,11 +462,18 @@ exit_scene <- function(s) {
 
   # Outcome columns (#28) only where the scene has a confirm or quiz;
   # confirm_ignored only where there is a red button (picking scenes);
-  # #29/#30 columns stay empty (not measured, never 0).
+  # #29 grabs where the scene has packages with PackageData (not Welcome:
+  # its practice box has none), container counts where there is an order
+  # container (picking scenes); both empty in a build before #29.
+  # drops_floor (#74) and the #30 columns stay empty (not measured, never 0).
   v <- s$v
   has_outcome <- s$scene != "WelcomeScene"
   outcome <- function(x) if (has_outcome) x else ""
   ignored <- if (s$scene %in% picking_scenes) cell(v$ignored) else ""
+  grabs <- if (s$interaction && s$scene %in% grab_scenes) cell(v$grabs) else ""
+  has_box <- s$interaction && s$scene %in% picking_scenes
+  c_enter <- if (has_box) cell(v$c_enter) else ""
+  c_exit <- if (has_box) cell(v$c_exit) else ""
   identity <- c(s$pid, s$sid, s$build, as.character(s$schema), s$scene, cell(s$visit),
                 v$enter_utc, cell(duration), cell(v$paused_s))
   results <- c(outcome(cell(v$first_correct)), outcome(cell(v$correct_at)),
@@ -445,7 +481,7 @@ exit_scene <- function(s) {
                outcome(cell(!is.na(v$correct_at))), outcome(codes_tally(v$codes)))
   row <- if (s$schema == 2) {
     c(identity, outcome(cell(v$attempts)), ignored, results,
-      "", "", "", "",                       # grabs .. container_exits (#29)
+      grabs, "", c_enter, c_exit,           # grabs, drops_floor (#74), container_* (#29)
       cell(v$pauses), cell(v$hmd), "", "", cell(v$errors))
   } else {
     # Legacy schema 1: no confirm_ignored, two (empty) dwell columns.
@@ -458,12 +494,24 @@ exit_scene <- function(s) {
 }
 
 # via: "menu" (normal), "resume" (the scene the keypad offered after a crash).
-# Schema 1 wrote null for every entry after the first one.
+# Schema 1 and builds before #29 wrote null for every entry after the first one.
+# A menu change writes menu_select (blocked false) in the visit being left,
+# then the scene loads (SceneMenuController.OpenFromMenu). Now and then a
+# research trainee first touches a locked item (blocked true, no load).
 go_to_scene <- function(s, scene, via = "menu") {
   from <- s$scene
+  if (s$interaction && identical(via, "menu")) {
+    if (side_chance(0.12)) {
+      emit(s, "menu_select", json_obj(target_scene = side_pick(setdiff(scene_order, c(scene, from))),
+                                      blocked = TRUE))
+      advance(s, round(side_runif(1, 3), 3))
+    }
+    emit(s, "menu_select", json_obj(target_scene = scene, blocked = FALSE))
+    advance(s, round(side_runif(0.3, 0.9), 3))  # the scene loads
+  }
   exit_scene(s)
   advance(s, 0.001)
-  if (s$schema == 1) via <- NULL
+  if (s$schema == 1 || !s$interaction) via <- NULL
   enter_scene(s, scene, from, via)
 }
 
@@ -645,6 +693,136 @@ ask_question <- function(s, person, quiz, question_id, q) {
   practise(person, q$skill)
 }
 
+# ---- 5b2. Interaction events (#29, spec 4.4) -------------------------------
+
+# Scenes whose packages carry PackageData (grab_start/_end are logged there).
+# WelcomeScene's practice box has no PackageData: no grab events, grabs empty.
+grab_scenes <- c("ConceptScene", picking_scenes)
+
+# Stable object_id (hierarchy path of the PackageData GameObject, like
+# ResearchObjectId.cs) of the n-th package of a kind taken in a visit. Names
+# follow the scenes (Basic "GG_Package (18)/SM_box_1", Mixed
+# "Interactables/GG_Package (2)", Complex "Interactables/ring (3)"); the
+# Complex carton names are made up.
+object_id <- function(scene, item, form, n) {
+  if (scene == "BasicPickingScene") return(sprintf("GG_Package (%d)/SM_box_1", 17 + n))
+  if (scene == "MixedPickingScene" && item == "connector_a") {
+    return(if (n == 1) "Interactables/GG_Package" else sprintf("Interactables/GG_Package (%d)", n - 1))
+  }
+  if (scene == "MixedPickingScene") return(sprintf("Interactables/PlasticBag_GG_%d", n))
+  if (item == "ring_d" && form == "loose") {
+    return(if (n == 1) "Interactables/ring" else sprintf("Interactables/ring (%d)", n - 1))
+  }
+  if (item == "ring_d") return(sprintf("Interactables/RingD_Carton (%d)", n))
+  if (form == "loose") return(if (n == 1) "Interactables/clamp" else sprintf("Interactables/clamp (%d)", n - 1))
+  sprintf("Interactables/SB_Carton (%d)", n)
+}
+
+# A new package of this kind (never one already in the box).
+next_object <- function(s, item, form) {
+  key <- paste(item, form)
+  n <- if (is.null(s$v$taken[[key]])) 1 else s$v$taken[[key]] + 1
+  s$v$taken[[key]] <- n
+  object_id(s$scene, item, form, n)
+}
+
+grab_start <- function(s, obj, item) {
+  force(obj)  # evaluate a lazy argument before s$v is replaced below
+  s$v$grabs <- s$v$grabs + 1
+  s$v$grab_open[[obj]] <- active_s(s)
+  emit(s, "grab_start", json_obj(object_id = obj, material_key = item, hand = NULL, input = NULL))
+}
+
+# duration_s = active time since this object's grab_start in the visit.
+grab_end <- function(s, obj, item) {
+  start <- s$v$grab_open[[obj]]
+  s$v$grab_open[[obj]] <- NULL
+  dur <- if (is.null(start)) NULL else round(active_s(s) - start, 3)
+  emit(s, "grab_end", json_obj(object_id = obj, material_key = item, hand = NULL, input = NULL,
+                               duration_s = dur))
+}
+
+# The order container's set changed. count_after = every package in it now,
+# finished positions included (the counter's whole set, like the C# counters).
+container_change <- function(s, entered, obj, item, pos, form) {
+  if (entered) {
+    s$v$box <- rbind(s$v$box, data.frame(obj = obj, item = item, pos = pos, form = form,
+                                         stringsAsFactors = FALSE))
+    s$v$c_enter <- s$v$c_enter + 1
+  } else {
+    s$v$box <- s$v$box[s$v$box$obj != obj, , drop = FALSE]
+    s$v$c_exit <- s$v$c_exit + 1
+  }
+  emit(s, if (entered) "container_enter" else "container_exit",
+       json_obj(container = "order", object_id = obj, material_key = item,
+                count_after = nrow(s$v$box)))
+}
+
+# Grab a package in the storage box, carry it into the order container (the
+# trigger sees it while it is still held), let go.
+put_in <- function(s, item, pos, form) {
+  obj <- next_object(s, item, form)
+  advance(s, round(side_runif(1, 3), 3))      # find the package
+  grab_start(s, obj, item)
+  advance(s, round(side_runif(0.8, 2.5), 3))  # carry it over
+  container_change(s, TRUE, obj, item, pos, form)
+  advance(s, round(side_runif(0.2, 0.8), 3))
+  grab_end(s, obj, item)
+}
+
+# Take the last package of this kind out of the order container again.
+take_out <- function(s, item, pos, form) {
+  rows <- which(s$v$box$item == item & s$v$box$pos == pos & s$v$box$form == form)
+  obj <- s$v$box$obj[rows[length(rows)]]
+  advance(s, round(side_runif(1, 3), 3))
+  grab_start(s, obj, item)
+  advance(s, round(side_runif(0.3, 1.2), 3))
+  container_change(s, FALSE, obj, item, pos, form)
+  advance(s, round(side_runif(0.5, 1.5), 3))
+  grab_end(s, obj, item)
+}
+
+# Picked up and put back where it was (hesitation, a re-grab): no container change.
+pick_and_drop <- function(s, obj, item) {
+  advance(s, round(side_runif(1, 3), 3))
+  grab_start(s, obj, item)
+  advance(s, round(side_runif(0.5, 2.5), 3))
+  grab_end(s, obj, item)
+}
+
+# Before a rated press: bring the current position's packages in the order
+# container to what the press reports (placed_full cartons, placed_loose
+# pieces). Packages of finished positions stay in the box untouched.
+place_to <- function(s, pos_no, placed_full, placed_loose) {
+  if (!s$interaction) return(invisible())
+  item <- order_positions[[s$scene]][[pos_no]]$item
+  # Sometimes a package is picked up and put back first (hesitation). It is
+  # one the trainee did not take, so it gets an id of its own kind.
+  # (The id is taken before the call: next_object changes s$v, so it must not
+  # run lazily inside another replacement of s$v.)
+  if (side_chance(0.2)) {
+    wrong_one <- next_object(s, item, "full")
+    pick_and_drop(s, wrong_one, item)
+  }
+  changed <- FALSE
+  targets <- c(full = placed_full, loose = if (is.null(placed_loose)) 0 else placed_loose)
+  for (form in names(targets)) {
+    repeat {
+      have <- sum(s$v$box$item == item & s$v$box$pos == pos_no & s$v$box$form == form)
+      if (have == targets[[form]]) break
+      changed <- TRUE
+      if (have < targets[[form]]) put_in(s, item, pos_no, form) else take_out(s, item, pos_no, form)
+    }
+  }
+  # Basic, same contents as before (after EKZ_PLACEMENT): a carton inside is
+  # straightened, a grab without a container change.
+  if (!changed && s$scene == "BasicPickingScene" && nrow(s$v$box) > 0) {
+    last <- nrow(s$v$box)
+    pick_and_drop(s, s$v$box$obj[last], s$v$box$item[last])
+  }
+  advance(s, round(side_runif(1, 4), 3))  # look at the box and the WMS, then press
+}
+
 # ---- 5c. Station rides (decision 019) --------------------------------------
 
 # Wait for a ride (~3 s). The trainee may press the red button meanwhile: the
@@ -733,6 +911,16 @@ run_concept <- function(s, person) {
     }
   }
   maybe_unity_error(s)
+  # #29: a few packages picked up at the label board (no container here).
+  if (s$interaction) {
+    for (k in seq_len(floor(side_runif(1, 5)))) {
+      if (side_chance(0.5)) {
+        pick_and_drop(s, sprintf("Interactables/VPE_OpenedPackage/Rings/ring (%d)", k), "ring_d")
+      } else {
+        pick_and_drop(s, sprintf("Interactables/GG_Package (%d)", k), "connector_a")
+      }
+    }
+  }
   for (qid in names(concept_questions)) {
     advance(s, runif(1, 5, 15))  # read the question and the three answers
     ask_question(s, person, "concept", qid, concept_questions[[qid]])
@@ -791,10 +979,12 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
         f <- fixed[[k]]
         attempt <- list(pos = positions[[pos_no]], placed_full = f$placed_full,
                         placed_loose = f$placed_loose, codes = f$codes)
+        place_to(s, pos_no, attempt$placed_full, attempt$placed_loose)
         pos_done <- press_confirm(s, pos_no, k, attempt, f$correct)
       } else {
         attempt <- draw_attempt(scene, pos_no, person, k, force_wrong = give_up,
                                 force_right = (k >= 8 && !give_up))
+        place_to(s, pos_no, attempt$placed_full, attempt$placed_loose)
         pos_done <- press_confirm(s, pos_no, k, attempt)
       }
       if (pos_done) break
@@ -811,6 +1001,13 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
       ride_between_positions(s, pos_no)
       if (!is.null(crash_after_position) && crash_after_position == pos_no) {
         advance(s, runif(1, 5, 15))  # starts reading position 2, then the crash
+        # Holding a position-2 package when the app dies: a grab_start
+        # without grab_end (an open grab, censored).
+        if (s$interaction) {
+          item <- positions[[pos_no + 1]]$item
+          grab_start(s, next_object(s, item, "full"), item)
+          advance(s, 0.8)
+        }
         return(invisible(FALSE))
       }
       advance(s, runif(1, 20, 50))  # read the new WMS line and pick
@@ -992,9 +1189,11 @@ end_session(s, "completed")
 # P104: gives up in ComplexScene (remainder quiz done, two wrong confirms at
 # position 1), takes the headset off and the app is closed while still paused
 # (quit callback runs: reason "quit", no app_resume; scene_exit.paused_s
-# includes the open pause).
+# includes the open pause). P104 ran a build before #29: event_groups without
+# "interaction", no grab/container/menu events, via null after the first
+# scene, empty grabs/container_* cells. analyse.R must give NA, not 0.
 p104 <- new_person("P104")
-s <- start_session(p104, "aaa1111", "2026-11-03T14:00:00Z")
+s <- start_session(p104, "aaa1111", "2026-11-03T14:00:00Z", interaction = FALSE)
 run_welcome(s)
 for (scene in c("ConceptScene", "BasicPickingScene", "MixedPickingScene")) {
   go_to_scene(s, scene); run_visit(s, p104)

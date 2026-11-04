@@ -98,6 +98,7 @@ public class FacilitatorEndControl : MonoBehaviour
             gesture.Release();
             SetProgressVisible(false);
             confirmPanel.SetActive(true);
+            ResearchLogger.LogEndControl(true);
             return;
         }
 
@@ -114,6 +115,9 @@ public class FacilitatorEndControl : MonoBehaviour
             return;
 
         gesture.Release();
+        // #29: only a real Fortsetzen on the open panel is logged.
+        if (confirmPanel.activeSelf)
+            ResearchLogger.LogEndControl(false);
         confirmPanel.SetActive(false);
         SetProgressVisible(false);
     }

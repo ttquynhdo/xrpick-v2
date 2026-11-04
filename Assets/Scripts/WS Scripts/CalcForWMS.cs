@@ -143,6 +143,7 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource, IOrderBoxContents, IPo
 
         if (count == 0)
         {
+            OrderContainerLog.Changed(this, true, box.GetComponent<PackageData>(), collidersInside.Count);
             currentSize += box.packageSize;
             ContentsChanged?.Invoke();
         }
@@ -162,6 +163,7 @@ public class CalcForWMS : MonoBehaviour, IWmsOrderSource, IOrderBoxContents, IPo
         }
 
         collidersInside.Remove(box);
+        OrderContainerLog.Changed(this, false, box.GetComponent<PackageData>(), collidersInside.Count);
         currentSize -= box.packageSize;
         ContentsChanged?.Invoke();
     }

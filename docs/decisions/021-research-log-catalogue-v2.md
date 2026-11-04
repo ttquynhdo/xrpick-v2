@@ -34,6 +34,7 @@ Thêm `layout_version` (011, 019) và một trường liệt kê nhóm sự ki�
 
 ### Phiên và điều hướng
 - `scene_enter.via`: `start` / `menu` / `resume` / `facilitator_end`. Ghi từ `Start` trở đi.
+  - **Ghi chú khi làm #29 (2026-11-04, data-analyst):** bỏ `facilitator_end`. `Beenden` kết thúc phiên (`session_end.reason` `facilitator`) trước khi nạp WelcomeScene, nên không có `scene_enter` nào sau đó; phiên kế bắt đầu bằng `start`. Giá trị này chưa từng được ghi, nên không cần bump schema.
 - `menu_select`: giữ `target_scene`, bỏ `item_label`, thêm `blocked` (chỉ khi relay pointer lúc chạy làm được không cần Inspector/sửa SDK; không thì bỏ trường, chỉ cộng thêm nên không chặn).
 - Thêm `end_control_opened`, `end_control_cancelled` (#44).
 

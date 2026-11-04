@@ -68,7 +68,17 @@ public class MenuCurrentLesson : MonoBehaviour
                 continue;
 
             SetOpen(toggle, MenuLockRule.IsOpen(participantId, current, BuildIndexOf(scene), lessonDone));
+            EnsureLockedTouchRelay(toggle, scene);
         }
+    }
+
+    // #29: a touch on a locked item is logged as menu_select with blocked = true.
+    private static void EnsureLockedTouchRelay(Toggle toggle, string scene)
+    {
+        if (!toggle.TryGetComponent(out LockedMenuItemRelay relay))
+            relay = toggle.gameObject.AddComponent<LockedMenuItemRelay>();
+
+        relay.Init(scene);
     }
 
     // One per scene: WelcomePracticeFeedback, PackageQuizController or a validator. Found, not wired, so the
@@ -137,7 +147,7 @@ public class MenuCurrentLesson : MonoBehaviour
     }
 
     // A CanvasGroup with interactable off also turns the toggle off; raycasts stay blocked, so a touch on a
-    // locked item does nothing.
+    // locked item does nothing but the LockedMenuItemRelay log line.
     private static void SetOpen(Toggle toggle, bool open)
     {
         CanvasGroup group = toggle.GetComponent<CanvasGroup>();

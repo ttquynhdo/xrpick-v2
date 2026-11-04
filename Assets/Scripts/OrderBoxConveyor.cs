@@ -45,6 +45,12 @@ public class OrderBoxConveyor : MonoBehaviour
     private IStationStock stock;
     private Coroutine slide;
 
+    /// <summary>
+    /// #29: true from OrderCompleted on. The riders are fixed then and the container never comes back, so the
+    /// counters stop logging container_enter/exit (a ride or a held package left behind is not a trainee action).
+    /// </summary>
+    public bool IsShipped { get; private set; }
+
     private void OnEnable()
     {
         completion = validator as IOrderCompletion;
@@ -92,6 +98,7 @@ public class OrderBoxConveyor : MonoBehaviour
         if (slide != null)
             return;
 
+        IsShipped = true;
         slide = StartCoroutine(Slide(CollectRiders()));
     }
 

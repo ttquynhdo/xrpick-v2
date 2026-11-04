@@ -77,6 +77,7 @@ public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositioned
 
         if (packagesInside.Add(package))
         {
+            OrderContainerLog.Changed(this, true, package, packagesInside.Count);
             Recalculate();
             ContentsChanged?.Invoke();
         }
@@ -91,6 +92,7 @@ public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositioned
 
         if (packagesInside.Remove(package))
         {
+            OrderContainerLog.Changed(this, false, package, packagesInside.Count);
             Recalculate();
             ContentsChanged?.Invoke();
         }
