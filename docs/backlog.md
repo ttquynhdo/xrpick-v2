@@ -1233,7 +1233,8 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Test trên kính:** nhanh (thấy dấu khi xong từng việc)
 - **Depends on:** #78 (cùng scene, làm sau #78 và #80), #84 (chỗ của 4 kiện); decision 024; giả định D31 (hỏi người hướng dẫn, không chặn)
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl79.md
+- **Status:** verified-mcp (14/14 ✅, chờ test tay H1 trên kính; theo giả định D31)
 
 
 ### #80 [Feature] ConceptScene: nút „Next“ đặt ở chỗ tự nói nghĩa, thêm nút „Zurück“ trong tour

@@ -2,9 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Oculus.Interaction;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// #40, docs/decisions/017: marks the current step on the instruction shelf. The current card gets a thick
@@ -65,9 +63,9 @@ public class InstructionStepHighlighter : MonoBehaviour
     private IStationStock stock;
     private bool positionStartPending;
 
-    private CardLook read;
-    private CardLook pick;
-    private CardLook confirm;
+    private InstructionCardLook read;
+    private InstructionCardLook pick;
+    private InstructionCardLook confirm;
 
     private void Awake()
     {
@@ -157,9 +155,9 @@ public class InstructionStepHighlighter : MonoBehaviour
         if (missing)
             return;
 
-        read = new CardLook(readCard, frameOutset);
-        pick = new CardLook(pickCard, frameOutset);
-        confirm = new CardLook(confirmCard, frameOutset);
+        read = new InstructionCardLook(readCard, frameOutset);
+        pick = new InstructionCardLook(pickCard, frameOutset);
+        confirm = new InstructionCardLook(confirmCard, frameOutset);
 
         if (contents != null)
         {
@@ -258,63 +256,5 @@ public class InstructionStepHighlighter : MonoBehaviour
         Color hint = frameColor;
         hint.a *= hintAlpha;
         confirm.Show(tracker.ConfirmReady ? hint : Color.clear, hintFrameThinness, dimmed: !done, dimFactor);
-    }
-
-    // One instruction card: its frame and the original colours of its texts.
-    private sealed class CardLook
-    {
-        private readonly Image frame;
-        private readonly TMP_Text[] texts;
-        private readonly Color[] baseColors;
-
-        public CardLook(RectTransform card, float outset)
-        {
-            texts = card.GetComponentsInChildren<TMP_Text>(true);
-            baseColors = new Color[texts.Length];
-
-            for (int i = 0; i < texts.Length; i++)
-            {
-                baseColors[i] = texts[i].color;
-            }
-
-            var frameObject = new GameObject("Step Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
-            frameObject.layer = card.gameObject.layer;
-
-            var rect = (RectTransform)frameObject.transform;
-            rect.SetParent(card, false);
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = new Vector2(-outset, -outset);
-            rect.offsetMax = new Vector2(outset, outset);
-
-            frameObject.GetComponent<LayoutElement>().ignoreLayout = true;
-
-            Image cardImage = card.GetComponent<Image>();
-            frame = frameObject.GetComponent<Image>();
-            frame.sprite = cardImage != null ? cardImage.sprite : null;
-            frame.type = Image.Type.Sliced;
-            frame.fillCenter = false;
-            frame.raycastTarget = false;
-            frame.enabled = false;
-        }
-
-        public void Show(Color frameColor, float thinness, bool dimmed, float dimFactor)
-        {
-            frame.enabled = frameColor.a > 0f;
-            frame.color = frameColor;
-            frame.pixelsPerUnitMultiplier = thinness;
-
-            for (int i = 0; i < texts.Length; i++)
-            {
-                Color color = baseColors[i];
-
-                if (dimmed)
-                {
-                    color.a *= dimFactor;
-                }
-
-                texts[i].color = color;
-            }
-        }
     }
 }
