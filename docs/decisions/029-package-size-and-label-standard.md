@@ -53,3 +53,10 @@ Test kính P801 (`docs/review-notes-p801.md` R3, R13, R15): ở Concept kiện n
 - P801 R3, R13, R15: `docs/review-notes-p801.md`.
 - Kiện là instance prefab `Assets/GVOZDY/Cardboard Boxes with Tape/Prefabs/box_1_*`; `Assets/Prefabs/` không có prefab kiện (unity-reviewer).
 - Bounds thật của carton Mixed và độ vừa 2 × 3 ở Basic: chưa đo, đo trước khi làm.
+
+## Bổ sung 2026-11-04: cỡ chuẩn là carton Basic (người dùng chọn sau khi đo)
+Đo trong Editor khi bắt đầu #88 (ảnh `TestEvidence/review-88/size_compare_now_1.png`): carton Concept và Mixed đều là `SM_box_1` 14,9 × 7,7 × 7,7 cm, nhỏ nhất khoá; carton Basic `SM_box_1` 17,8 × 9,2 × 12,3 cm; carton Complex dùng mesh khác `CardboardBox06` 13,0 × 9,3 × 13,1 cm; túi Mixed 14,3 × 14,9 × 12,9 cm, túi Concept gần bằng (sâu 10,3 cm); thùng kho và thùng đơn 40 × 40 × 20 cm. Giả định „Concept nhỏ hơn Mixed“ ở mục Bài toán là sai: Concept đã bằng Mixed, R3 so với carton Basic/Complex. Lấy cỡ Mixed sẽ thu nhỏ carton Basic và Complex, ngược với R3.
+
+**Thay mục 1:** cỡ carton chuẩn = carton Basic (mesh `SM_box_1`, 17,8 × 9,2 × 12,3 cm) ở Concept, Basic, Mixed, Complex; carton Complex đổi sang cùng mesh `SM_box_1`. Cỡ túi chuẩn = túi Mixed phóng to 25 % (người dùng chọn sau khi thử: túi hình quả lê chỉ rộng ~10 cm ở thân, nhãn đủ chữ không vừa; giữ một cỡ chữ chung thì túi phải to lên, không thu chữ). Carton đã mở (Concept, Complex) giữ cỡ hiện nay: là đồ chứa chi tiết rời (giả định, ghi ở #88). Lưới 6 ô của Basic giữ nguyên. Phải đo lại khi làm: thùng kho Mixed chứa 6 carton, thùng đơn Mixed chứa 3 ô EKZ (#94) + chỗ đổ túi, thùng kho Complex chứa carton + carton đã mở + chi tiết rời, hàng trước bàn Concept và `Carton Count Demo`. Không vừa thì dời/xếp lại, không thu nhỏ carton (như mục „Nếu giả định sai“).
+
+**Cỡ nhãn và chữ (2026-11-04, khi làm #88):** người dùng chọn nhãn nắp phủ **60 %** nắp (thay „khoảng 80 %“ ở mục 2). Một cỡ chữ chung cho mọi nhãn, do tên dài nhất trên nhãn nắp quyết định (lề 8 %): chữ hoa ≈ 5 mm. Nhãn túi 10 × 6 cm ở giữa thân túi to hơn. Nếu trên kính không đọc được từ chỗ đứng (H2 của #88): nhãn nắp to hơn, hoặc thêm nhãn mặt bên (phương án B).

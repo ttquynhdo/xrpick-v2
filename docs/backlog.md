@@ -40,6 +40,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   1. **#88** trước (cỡ carton quyết ô EKZ Mixed, carton đếm Concept, thùng mẫu EKZ, vòng trên carton Complex; có thể dựng lại lưới 6 ô Basic). **#95** xen vào lúc nào cũng được (chỉ prefab và mesh).
   2. Concept: **#89** (mở đầu bằng bước đo bố cục bàn học cho mọi vật mới, như #84) → **#90** → **#91** → **#94 phần Concept** → **#92** (cần thùng mẫu mới) → **#93 phần Concept**.
   3. **#94 phần Mixed** → **#93 phần Complex** → **#96** → **#92 phần Complex** (carton đã mở, người dùng chốt 2026-11-04: quy tắc vật chỉ để xem cho mọi scene).
+  3c. **#99** (chờ 12 s trước khi thùng chạy, Basic/Mixed/Complex): sau chuỗi Mixed/Complex ở bước 3, trước #87.
   4. **#87** (sau mọi mục đổi chữ thẻ, chạy công cụ slot một lần) → **#86** → **#97**.
   5. Hợp đồng log: các mục trên **không** tự đổi `layout_version`; cuối đợt đổi một lần "025" → "029" (build có 026–029), `data-analyst` sửa spec + `make_fake_data.R` + `analyse_set.R` một lần (tách Concept, Complex `position_1`, Mixed theo layout), `selftest.R` xanh.
   6. `german-reviewer` duyệt mọi chữ mới một lần → #36 đóng (thay bằng #88) → #13 export → một build → một buổi test kính; các mục ở trạng thái `verified-mcp` tới buổi đó. Đo lại thời lượng khoá (quy tắc 25 phút).
@@ -1375,13 +1376,14 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** prefab/kiện carton và túi ở 4 scene (sticker `Cube`, `Label Top`, nhãn túi), `BoxSnapper*` ở Basic, `Carton Count Demo`, `Stock STECKER C`
 - **Problem:** (R3, R13, R15) Kiện ở Concept nhỏ, khó cầm, trong khi ở Mixed/Complex to hơn. Chữ nhãn auto-size phủ kín sticker, nên carton to có chữ to sát mép, còn trong cùng Concept nhãn KABELVERBINDER A chữ nhỏ (tên dài) và STECKER C chữ to. Nhãn túi SCHRAUBE B chìa ra ngoài túi. Mỗi carton có hai nhãn (trước + nắp, #36), rối mắt.
-- **Done when:** Cùng một loại kiện (carton, túi) có cùng kích thước ở mọi scene (đo bounds trong Editor). Carton ở Concept to bằng carton ở Mixed. Mỗi carton chỉ có một nhãn, trên nắp; không còn sticker mặt trước. Mọi nhãn cùng một cỡ chữ cố định (không auto-size) với lề quanh chữ; tên dài nhất (SCHLAUCHSCHELLE B) vẫn nằm trong nhãn. Nhãn túi nằm trong mép túi. Cảnh `labels` ở 4 scene: đọc được Mat.-Nr và VPE trên nắp carton trong thùng kho từ chỗ đứng. Basic: 6 carton vẫn vừa 6 ô `BoxSnapper` 2 × 3 và EKZ 3 vẫn chấm đúng. Mixed và Complex: thùng kho vẫn chứa đủ carton như hiện nay. Concept: 3 carton của `Carton Count Demo` vẫn vừa thùng đơn. (code) Nhãn vẫn khớp `PackageData` (tên, Mat.-Nr, VPE). Trong thùng kho ở Basic, Mixed, Complex và Concept, mọi carton nằm ngửa nắp lên. Trên Quest đọc được Mat.-Nr và VPE trên nắp carton trong thùng kho từ chỗ đứng (≈ 1,15 m). (code) Một EditMode test hoặc lệnh kiểm qua MCP báo lỗi khi bounds của một carton hoặc túi lệch cỡ chuẩn, hoặc khi chữ nhãn khác `PackageData`.
+- **Done when:** Cùng một loại kiện (carton, túi) có cùng kích thước ở mọi scene (đo bounds trong Editor). Mọi carton dùng mesh `SM_box_1` cỡ carton Basic 17,8 × 9,2 × 12,3 cm (± 2 mm), kể cả carton ở Complex (trước đây mesh `CardboardBox06`); mọi túi cỡ túi Mixed phóng to 25 % (mesh `PlasticBag02` × 0,375; người dùng chọn để nhãn túi dùng được cùng cỡ chữ với carton). Mixed: 6 carton vẫn nằm trong thùng kho, thùng chạy đi như #71. Mỗi carton chỉ có một nhãn, trên nắp; không còn sticker mặt trước. Mọi nhãn cùng một cỡ chữ cố định (không auto-size) với lề quanh chữ; tên dài nhất (SCHLAUCHSCHELLE B) vẫn nằm trong nhãn. Nhãn túi nằm trong mép túi. Cảnh `labels` ở 4 scene: đọc được Mat.-Nr và VPE trên nắp carton trong thùng kho từ chỗ đứng. Basic: 6 carton vẫn vừa 6 ô `BoxSnapper` 2 × 3 và EKZ 3 vẫn chấm đúng. Mixed và Complex: thùng kho vẫn chứa đủ carton như hiện nay. Concept: 3 carton của `Carton Count Demo` vẫn vừa thùng đơn. Concept: 4 kiện cầm được ở hàng trước bàn vẫn nằm ngoài hai thùng và các làn, không chạm nhau (như #84 T3). (giả định: carton đã mở là đồ chứa chi tiết rời, không phải „carton“ của quy tắc cỡ) Carton đã mở ở Concept và Complex giữ cỡ hiện nay; vòng rời vẫn nằm trong nó. (code) Nhãn vẫn khớp `PackageData` (tên, Mat.-Nr, VPE). Trong thùng kho ở Basic, Mixed, Complex và Concept, mọi carton nằm ngửa nắp lên. Trên Quest đọc được Mat.-Nr và VPE trên nắp carton trong thùng kho từ chỗ đứng (≈ 1,15 m). (code) Một EditMode test hoặc lệnh kiểm qua MCP báo lỗi khi bounds của một carton hoặc túi lệch cỡ chuẩn, hoặc khi chữ nhãn khác `PackageData`.
 - **Inspector work expected:** yes (scale kiện, nhãn, ô snap)
 - **Công:** M–L
 - **Test trên kính:** bắt buộc (cầm kiện bằng tay thật, đọc nhãn trên nắp từ chỗ đứng và khi cầm)
 - **Depends on:** thay #36 khi xong; A14 (giả định, không chặn)
 - **Decision:** docs/decisions/029-package-size-and-label-standard.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl88.md
+- **Status:** verified-mcp (16/16 ✅ MCP/code; nhãn nắp 60 %, chữ hoa ≈ 5 mm; S5 đọc nhãn từ chỗ đứng chuyển sang H2; chờ test tay H1–H2 trên kính)
 
 ### #89 [Feature] ConceptScene: một thanh tour ở giữa, sát dưới màn hình, chứa chữ của bước và Back/Next, hiện từ thẻ 2
 - **Type:** feature
@@ -1508,6 +1510,18 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Công:** S
 - **Test trên kính:** nhanh (đọc thẻ ở bài 4–5)
 - **Depends on:** #87; dữ liệu pilot; `solution-decision` (xr-ux-reviewer khuyên không đổi nội dung bước)
+- **Status:** todo
+
+### #99 [Feature] Sau khi bấm nút đỏ đúng: chờ 10–15 s cho người học đọc phản hồi rồi thùng mới chạy
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Scripts/PositionStockSwitcher.cs (`startDelay`, giá trị trong 3 scene đang là 0,6 s), Assets/Scripts/OrderBoxConveyor.cs, docs/i18n/strings-todo.csv (`basic.result.correct.text`, `mixed.feedback.position_done`, `mixed.feedback.correct`, `complex.feedback.position_done`, `complex.feedback.correct`), docs/research-logging-spec.md, analysis/
+- **Problem:** (người dùng 2026-11-04) Bấm nút đỏ đúng xong thì 0,6 s sau thùng kho đã chạy, người học vừa đọc thẻ kết quả vừa phải nhìn thùng chạy, không có khoảng thở. Kết quả vị trí 1 ở Complex không nói thùng sẽ chạy (chỉ thẻ kệ 3 nói).
+- **Done when:** (giả định: chờ 12 s, chỉnh được trong Inspector, không có nút bỏ qua) Basic: 6 carton đúng, bấm nút đỏ → thẻ `Correct` hiện ngay và nói thùng sẽ chạy; trong 12 s không thùng nào chuyển động; sau đó thùng kho chạy, rồi thùng đơn như #72. Mixed vị trí 1 đúng → thẻ `Result` nói thùng kho sắp đi và thùng mới đến; 12 s đứng yên, rồi đổi thùng như #71; dialog vẫn ở vị trí 1 cho tới khi thùng mới dừng. Mixed vị trí 2 và Complex vị trí 2 đúng → 12 s rồi thùng kho đi, rồi thùng đơn. Complex vị trí 1 đúng → thẻ `Result` cũng nói thùng kho sắp đi; 12 s rồi đổi thùng. Trong lúc chờ: bấm nút đỏ không chấm (như lúc thùng chạy), kiện trong thùng kho cũ không cầm được (như lúc chạy), kiện đã nằm ngoài thùng vẫn cầm được. Complex cuối: `Congratulations` hiện ngay, không chờ. Sai đơn → không có gì chờ hay chạy. (code) Thời gian chờ là một trường serialized, cùng giá trị ở 3 scene. (code) `station_move_start` ghi lúc thùng bắt đầu chạy (sau khi chờ); spec ghi rõ khoảng chờ; `data-analyst` kiểm các chỉ số thời gian (`wait_s`, `read_s`/`pick_s`) không tính nhầm khoảng chờ; `selftest.R` xanh. (code) Chữ đổi qua `localize-strings` + `german-reviewer`.
+- **Inspector work expected:** yes (`startDelay` ở 3 scene, hoặc đổi qua code Editor)
+- **Công:** S
+- **Test trên kính:** nhanh (đọc kịp thẻ kết quả, 12 s có quá dài không, có ai cố cầm kiện trong thùng đang chờ không)
+- **Depends on:** — ; nằm trong cùng build "029" (đổi thời gian của sự kiện `station_move_*`). Mỗi lần đổi thùng thêm ~12 s, cả khoá thêm ~1 phút (5 lần), kiểm với quy tắc 25 phút ở buổi test
 - **Status:** todo
 
 ## Feature – Log dữ liệu nghiên cứu
