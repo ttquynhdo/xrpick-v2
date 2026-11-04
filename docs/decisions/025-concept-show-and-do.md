@@ -68,4 +68,25 @@
 - Quan sát: người mới có tự cầm carton STECKER C không; cả bài còn ≤ ~5 phút không.
 
 ## Thứ tự làm và công
-#76 (S) → #78 + #80 (M–L, theo 024) → #79 (S–M) → #83 (M) → #81 (M–L); #83 và #81 đổi chỗ được. Tổng ~6–8 ngày, chưa tính test kính.
+#76 (S) → #78 + #80 (M–L, theo 024) → #79 (S–M) → #83 (M) → #81 (M–L); #83 và #81 đổi chỗ được. Tổng ~6–8 ngày, chưa tính test kính. *Thay bằng thứ tự ở mục Bổ sung 2026-11-04.*
+
+## Bổ sung 2026-11-04 (đo bố cục ConceptScene trong Editor)
+Người dùng chấp nhận 2026-11-04. Phương án B giữ nguyên; chỉ đổi thứ tự làm và chốt chỗ đặt vật.
+
+**Đo được:**
+- Chỗ của băng đang có kiện: 14 vòng RING D ở (0,47–0,57; 0,9; 0,7) đúng chỗ thùng đơn (0,453; 0,768; 0,712); KABELVERBINDER A ở (−0,62; 0,77; 0,80) trên làn trái; SCHRAUBE B ở (0,23; 0,76; 0,62).
+- Menu chiếm x 0,42–0,62, y 1,07–1,23, z 0,21–0,32, tức đúng chỗ „bên phải trong tầm tay“ mà 024 mục 4 dành cho cụm câu hỏi.
+- Giữa `Info Panel` (x ≤ −0,49) và viền trái dialog (x ≥ −0,38) chỉ có 11 cm, nên chú thích trái phải dùng ngay phương án dự phòng của 024 (dời `Info Panel`).
+- Màn hình ở z ≈ 1,07, tay không với tới. Thanh điều hướng ở z ≈ 0,5 chỉ không che dialog từ mắt (0; 1,6; 0) khi cạnh trên thấp hơn y ≈ 1,22 (cụm quiz hiện tại lên tới 1,28 nên che hàng dưới).
+
+**Sửa:**
+1. Bố cục làm trước, một lần, ở mục mới #84 (băng, thùng, kiện, chỗ thùng mẫu EKZ, chỗ thanh và cụm câu hỏi, dời `Info Panel`). Vị trí trong #78–#83 lấy từ test report của #84.
+2. Cụm câu hỏi ở bước 11 nằm ở dải giữa, cạnh thanh điều hướng, bên trái Menu, không đặt bên phải. Menu giữ chỗ như ở 5 scene.
+3. Thùng kho chứa carton STECKER C tĩnh (vật tư của đơn mẫu). 3 carton của bước `cartons` hiện trong thùng đơn. Như vậy ở bước 11 người học thấy thùng kho mang STECKER C đi và thùng đơn mang 3 carton đi. 4 kiện cầm được nằm ngoài cả hai thùng, nên demo không bao giờ mang chúng theo.
+4. Các vòng RING D lẻ chuyển thành vật tĩnh trong thùng mẫu EKZ (#83), hoặc bỏ.
+5. Thẻ 1 (#79) đếm theo 4 `MaterialKey` khác nhau (carton RING D hay một vòng lẻ đều tính là RING D).
+6. Thanh điều hướng: mỗi nút có vùng chạm riêng, vừa với nút (bài học của #76).
+7. Một build duy nhất, `layout_version` "025" (không build nào ghi "024"). R (#82) chỉ tính Back với log "025"; "019" hoặc không có trường thì không tính.
+8. ComplexScene `Remainder Quiz` cũng có „Richtig!“ nằm dưới câu sau (và đè lên „Frage 2 von 2“): mục mới #85, cách giữ 1,5 s giống 024 mục 5.
+
+**Thứ tự mới:** #76 (merge sau test tay H1–H3) → #84 → #80 → #78 (+ #85, khác scene, song song được) → #79 → #83 → #81 → #82. #84, #78–#81 và #83 làm tuần tự trên một nhánh, mỗi mục có test report riêng; `german-reviewer` duyệt mọi chuỗi mới một lần; một buổi test kính chung.
