@@ -2,7 +2,8 @@
     "name": "XRPick.Research",
     "rootNamespace": "",
     "references": [
-        "Oculus.VR"
+        "Oculus.VR",
+        "XRPick.Orders"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,6 +1,6 @@
 /// <summary>
-/// One row of the per-visit summary CSV. Only the fields #26 measures live here;
-/// the remaining CSV columns stay empty until later items fill them.
+/// One row of the per-visit summary CSV: the #26 session columns and the #28 outcome columns
+/// (null = empty cell). The remaining CSV columns stay empty until #29, #30 and #74 fill them.
 /// </summary>
 public sealed class VisitSummary
 {
@@ -16,4 +16,14 @@ public sealed class VisitSummary
     public int Pauses;
     public int HmdRemovedCount;
     public int UnityErrors;
+
+    // #28 step 2, research-logging-spec §5.
+    public int? ConfirmCount;
+    public int? ConfirmIgnored;
+    public bool? FirstAttemptCorrect;
+    public int? AttemptsToCorrect;
+    public double? TimeToFirstConfirmS;
+    public double? TimeToCorrectS;
+    public bool? Completed;
+    public string ErrorCodesAll;
 }

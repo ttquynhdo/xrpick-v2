@@ -12,7 +12,7 @@ using UnityEngine.UI;
 /// how many loose pieces the order line needs. A/B/C toggles show the answers (decision 015 style) and are
 /// rated as soon as one is switched on; the red button stays F6 for the order. Both answers right → the
 /// first storage box grows in. Answers come from the order line (RemainderQuiz), so the numbers live only
-/// in orderLines. No logging yet (#28 reads AnswerChosen).
+/// in orderLines. Every rated touch is logged as quiz_answer (#28, decision 021).
 /// </summary>
 public class RemainderQuizController : MonoBehaviour
 {
@@ -191,7 +191,9 @@ public class RemainderQuizController : MonoBehaviour
         bool right = answer == correct;
 
         LastAnswerKey = answer.ToString(CultureInfo.InvariantCulture);
-        AnswerChosen?.Invoke(question == 0 ? CartonsId : LooseId, LastAnswerKey, right);
+        string questionId = question == 0 ? CartonsId : LooseId;
+        ResearchLogger.LogQuizAnswer(OutcomeEvents.QuizComplexRemainder, questionId, LastAnswerKey, right);
+        AnswerChosen?.Invoke(questionId, LastAnswerKey, right);
 
         if (!right)
         {

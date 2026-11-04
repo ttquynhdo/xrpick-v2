@@ -98,7 +98,12 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
     {
         // #47: the order is shipped; the result stays as it is. #71: nothing to rate while a container moves.
         if (IsCompleted || (stationStock is IStationStock stock && stock.IsMoving))
+        {
+            ResearchLogger.LogConfirmIgnored(
+                IsCompleted ? OutcomeEvents.IgnoredCompleted : OutcomeEvents.IgnoredStationMoving,
+                container != null ? container.CurrentPosition : 0);
             return;
+        }
 
         // Non-short-circuit | so every missing reference is logged at once.
         bool missing =
@@ -110,6 +115,13 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
 
         // #6: one rule decides right/wrong (docs/decisions/005, 006); #21: only the current position.
         OrderResult result = container.CheckOrder();
+
+        // #28, decision 021: logged before the position advances.
+        ResearchLogger.LogConfirmPressed(result, container.CurrentPosition, container.PositionCount);
+        if (result.Correct)
+        {
+            ResearchLogger.LogPositionCompleted(container.CurrentPosition);
+        }
 
         // #14: the instruction stays visible in both cases; the feedback never prints target numbers.
         if (result.Correct && !container.IsLastPosition)
@@ -131,6 +143,7 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
             }
             ShowResult(OrderFeedback.CorrectTitle(), ResultCardStyle.Correct, Loc.Get(CorrectKey, ("next_lesson", nextLesson)));
             IsCompleted = true;
+            ResearchLogger.LogTaskCompleted();
             OrderCompleted?.Invoke();
             return;
         }

@@ -7,10 +7,10 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Research log of one session (#26): header, scene visits, pauses and Unity errors as JSON
-/// lines, plus one summary CSV row per scene visit. Scene scripts call the static API
+/// lines, plus one summary CSV row per scene visit. The outcome events (#28) are in ResearchLogger.Outcome.cs. Scene scripts call the static API
 /// unconditionally; without a running session every call is a silent no-op.
 /// </summary>
-public sealed class ResearchLogger : MonoBehaviour
+public sealed partial class ResearchLogger : MonoBehaviour
 {
     private const int SchemaVersion = ResearchEventData.SchemaVersion;
     private const string ResearchFolder = "research";
@@ -70,6 +70,7 @@ public sealed class ResearchLogger : MonoBehaviour
     private int visitEnterPauseCount;
     private int visitEnterHmdCount;
     private int visitUnityErrors;
+    private VisitOutcome outcome;
 
     public static bool IsSessionActive => instance != null && instance.sessionActive;
 
@@ -410,6 +411,7 @@ public sealed class ResearchLogger : MonoBehaviour
         visitEnterPauseCount = pauses.PauseCount;
         visitEnterHmdCount = pauses.HmdRemovedCount;
         visitUnityErrors = 0;
+        outcome = new VisitOutcome(scene);
 
         WriteEvent("scene_enter", new JsonFields()
             .Add("from_scene", fromScene)
@@ -455,6 +457,7 @@ public sealed class ResearchLogger : MonoBehaviour
             HmdRemovedCount = visitHmdRemoved,
             UnityErrors = visitUnityErrors
         };
+        outcome.FillSummary(row);
         if (!writeFailed && !files.AppendSummary(SummaryCsv.FormatRow(row)))
         {
             ReportWriteFailure();
@@ -621,6 +624,13 @@ public sealed class ResearchLogger : MonoBehaviour
     private double Now()
     {
         return Time.realtimeSinceStartupAsDouble - sessionStartRealtime;
+    }
+
+    // Active seconds since the open visit's scene_enter (pauses subtracted).
+    private double SceneActiveSeconds()
+    {
+        double t = Now();
+        return (t - visitEnterT) - (pauses.PausedSeconds(t) - visitEnterPausedS);
     }
 
     private static string UtcNow()

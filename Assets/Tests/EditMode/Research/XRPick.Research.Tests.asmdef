@@ -3,6 +3,7 @@
     "rootNamespace": "",
     "references": [
         "XRPick.Research",
+        "XRPick.Orders",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

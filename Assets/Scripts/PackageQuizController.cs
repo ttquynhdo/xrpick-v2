@@ -11,7 +11,7 @@ using UnityEngine.UI;
 /// to three answer toggles (A–C) that show the answer text. A toggle switched on is rated at once, as in ComplexScene's
 /// RemainderQuizController: a wrong answer names its reason, a correct one moves on to the next question. Feedback is a
 /// line inside the cluster. The cluster stays locked until the WMS tour reaches its last step and stays open after that.
-/// No logging yet (#28 reads AnswerChosen).
+/// Logs quiz_unlocked, quiz_answer and task_completed (#28, decision 021).
 /// </summary>
 public class PackageQuizController : MonoBehaviour, ILessonCompletion
 {
@@ -241,6 +241,7 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         }
         ShowQuestion(current);
         feedbackText.text = Loc.Get(HowToKey);
+        ResearchLogger.LogQuizUnlocked();
         Unlocked?.Invoke();
     }
 
@@ -294,6 +295,7 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
 
         Option answer = question.options[index];
         bool right = answer.key == question.correctKey;
+        ResearchLogger.LogQuizAnswer(OutcomeEvents.QuizConcept, question.id, answer.key, right);
         AnswerChosen?.Invoke(question.id, answer.key, right);
 
         if (!right)
@@ -323,6 +325,7 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
             toggle.interactable = false;
         }
 
+        ResearchLogger.LogTaskCompleted();
         LessonCompleted?.Invoke();
     }
 

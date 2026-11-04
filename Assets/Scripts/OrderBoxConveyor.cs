@@ -152,7 +152,23 @@ public class OrderBoxConveyor : MonoBehaviour
             }
         }
 
+        // #28, decision 021: logged when the box really starts; Complex has ended the session by then (spec 4.2).
+        int position = LastPosition();
+        ResearchLogger.LogStationMove(false, OutcomeEvents.MoveOrderBox, position);
         yield return LaneRide.Path(transform, riders, path, speed, cornerPause);
+        ResearchLogger.LogStationMove(true, OutcomeEvents.MoveOrderBox, position);
         slide = null;
+    }
+
+    // The order box leaves after the last position; the conveyor has no Inspector link to the order.
+    private static int LastPosition()
+    {
+        foreach (MonoBehaviour behaviour in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
+        {
+            if (behaviour is IPositionedOrder order)
+                return order.CurrentPosition;
+        }
+
+        return 1;
     }
 }

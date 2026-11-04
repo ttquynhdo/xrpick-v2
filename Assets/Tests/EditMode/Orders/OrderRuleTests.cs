@@ -172,6 +172,7 @@ namespace XRPick.Orders.Tests
             Assert.AreEqual("EXTRA_LOOSE", OrderErrorCodes.ToLogName(OrderErrorCode.ExtraLoose));
             Assert.AreEqual("NO_ANSWER", OrderErrorCodes.ToLogName(OrderErrorCode.NoAnswer));
             Assert.AreEqual("WRONG_ANSWER", OrderErrorCodes.ToLogName(OrderErrorCode.WrongAnswer));
+            Assert.AreEqual("EKZ_PLACEMENT", OrderErrorCodes.ToLogName(OrderErrorCode.EkzPlacement));
         }
 
         [Test]
@@ -197,7 +198,8 @@ namespace XRPick.Orders.Tests
             Assert.AreEqual(4, OrderRule.FindLineProblems(lines, true).Count);
         }
 
-        // Every code has a row in analysis/skill_map.csv, otherwise analyse.R warns "unknown error code".
+        // Every logged code has a row in analysis/skill_map.csv, otherwise analyse.R warns "unknown error code".
+        // WRONG_TYPE and NO_ANSWER are reserved and never logged (decision 021), so they have no row.
         [Test]
         public void LogNames_AllInSkillMap()
         {
@@ -207,7 +209,10 @@ namespace XRPick.Orders.Tests
                 known.Add(row.Split(',')[0]);
 
             foreach (OrderErrorCode code in System.Enum.GetValues(typeof(OrderErrorCode)))
-                Assert.IsTrue(known.Contains(OrderErrorCodes.ToLogName(code)), OrderErrorCodes.ToLogName(code));
+            {
+                bool reserved = code == OrderErrorCode.WrongType || code == OrderErrorCode.NoAnswer;
+                Assert.AreEqual(!reserved, known.Contains(OrderErrorCodes.ToLogName(code)), OrderErrorCodes.ToLogName(code));
+            }
         }
     }
 }

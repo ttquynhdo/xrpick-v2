@@ -80,7 +80,10 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
     {
         // #47: the order is shipped; the result stays as it is.
         if (IsCompleted)
+        {
+            ResearchLogger.LogConfirmIgnored(OutcomeEvents.IgnoredCompleted, 1);
             return;
+        }
 
         // Non-short-circuit | so every missing reference is logged at once.
         bool missing =
@@ -95,12 +98,17 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
         // #14: the same rule as Mixed/Complex decides (docs/decisions/006); Soll is still CalcForWMS.necessarySize.
         OrderResult result = OrderRule.Check(new[] { calc.OrderLine }, OrderContents.From(calc.PackagesInside), false);
 
+        // Quantity errors come first; the placement is checked only once the quantity is right (decision 003, D6).
+        bool placementWrong = result.Correct && placementCheck != null && !placementCheck.AllPlaced(calc.PackagesInside);
+
+        // #28, decision 021: Basic is one position; EKZ_PLACEMENT follows the OrderRule codes.
+        ResearchLogger.LogConfirmPressed(result, 1, 1, placementWrong);
+
         if (!result.Correct)
         {
             ShowIncorrect(OrderFeedback.Explain(result));
         }
-        // Quantity errors come first; the placement is checked only once the quantity is right (decision 003, D6).
-        else if (placementCheck != null && !placementCheck.AllPlaced(calc.PackagesInside))
+        else if (placementWrong)
         {
             ShowIncorrect(OrderFeedback.ExplainEkz3Placement());
         }
@@ -109,6 +117,8 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
             correct.SetActive(true);
             incorrect.SetActive(false);
             IsCompleted = true;
+            ResearchLogger.LogPositionCompleted(1);
+            ResearchLogger.LogTaskCompleted();
             OrderCompleted?.Invoke();
         }
     }

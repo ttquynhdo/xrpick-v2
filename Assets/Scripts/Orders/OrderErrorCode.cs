@@ -13,7 +13,10 @@ public enum OrderErrorCode
     MissingLoose,
     ExtraLoose,
     NoAnswer,
-    WrongAnswer
+    WrongAnswer,
+    // #41, decision 021: Basic cartons not lying ordered in the 6 snap places (EKZ 3). Decided by
+    // OrderConfirm + EkzPlacementCheck, not by OrderRule; logged after the OrderRule codes.
+    EkzPlacement
 }
 
 public static class OrderErrorCodes
@@ -31,6 +34,7 @@ public static class OrderErrorCodes
             case OrderErrorCode.ExtraLoose: return "EXTRA_LOOSE";
             case OrderErrorCode.NoAnswer: return "NO_ANSWER";
             case OrderErrorCode.WrongAnswer: return "WRONG_ANSWER";
+            case OrderErrorCode.EkzPlacement: return "EKZ_PLACEMENT";
             default: return code.ToString();
         }
     }
@@ -47,6 +51,7 @@ public static class OrderErrorCodes
             case OrderErrorCode.TooMany: return 3;
             case OrderErrorCode.MissingLoose:
             case OrderErrorCode.ExtraLoose: return 4;
+            case OrderErrorCode.EkzPlacement: return 6;
             default: return 5;
         }
     }

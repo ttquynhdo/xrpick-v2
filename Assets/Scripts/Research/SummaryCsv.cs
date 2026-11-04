@@ -7,11 +7,11 @@ public static class SummaryCsv
 {
     public const string Header =
         "participant_id,session_id,build,schema_version,scene,scene_visit,enter_utc,duration_s,paused_s," +
-        "confirm_count,first_attempt_correct,attempts_to_correct,time_to_first_confirm_s,time_to_correct_s," +
-        "completed,error_codes_all,grabs,drops_floor,container_enters,container_exits,dwell_wms_s," +
-        "dwell_instructions_s,pauses,hmd_removed_count,fps_avg,dropped_frames,unity_errors";
+        "confirm_count,confirm_ignored,first_attempt_correct,attempts_to_correct,time_to_first_confirm_s," +
+        "time_to_correct_s,completed,error_codes_all,grabs,drops_floor,container_enters,container_exits," +
+        "pauses,hmd_removed_count,fps_avg,dropped_frames,unity_errors";
 
-    private const int ColumnCount = 27;
+    private const int ColumnCount = 26;
 
     public static string FormatRow(VisitSummary v)
     {
@@ -26,9 +26,17 @@ public static class SummaryCsv
         cells[6] = v.EnterUtc;
         cells[7] = Number(v.DurationS);
         cells[8] = Number(v.PausedS);
-        cells[22] = Number(v.Pauses);
-        cells[23] = Number(v.HmdRemovedCount);
-        cells[26] = Number(v.UnityErrors);
+        cells[9] = Number(v.ConfirmCount);
+        cells[10] = Number(v.ConfirmIgnored);
+        cells[11] = Bool(v.FirstAttemptCorrect);
+        cells[12] = Number(v.AttemptsToCorrect);
+        cells[13] = Number(v.TimeToFirstConfirmS);
+        cells[14] = Number(v.TimeToCorrectS);
+        cells[15] = Bool(v.Completed);
+        cells[16] = v.ErrorCodesAll;
+        cells[21] = Number(v.Pauses);
+        cells[22] = Number(v.HmdRemovedCount);
+        cells[25] = Number(v.UnityErrors);
 
         var sb = new StringBuilder();
         for (int i = 0; i < cells.Length; i++)
@@ -47,6 +55,22 @@ public static class SummaryCsv
     private static string Number(int value)
     {
         return value.ToString(CultureInfo.InvariantCulture);
+    }
+
+    private static string Number(int? value)
+    {
+        return value.HasValue ? Number(value.Value) : string.Empty;
+    }
+
+    private static string Number(double? value)
+    {
+        return value.HasValue ? Number(value.Value) : string.Empty;
+    }
+
+    // R reads TRUE/FALSE and true/false alike; lowercase matches the JSON events.
+    private static string Bool(bool? value)
+    {
+        return value.HasValue ? (value.Value ? "true" : "false") : string.Empty;
     }
 
     // NaN/Infinity would be an invalid value in R; an empty cell means "not measured".

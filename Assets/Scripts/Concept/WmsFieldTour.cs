@@ -121,6 +121,7 @@ public class WmsFieldTour : MonoBehaviour
             nextLabel.text = Loc.Get(index == steps.Length - 1 ? RestartKey : NextKey);
         }
 
+        ResearchLogger.LogTourStep(step.id, index + 1);
         StepShown?.Invoke(step.id);
     }
 

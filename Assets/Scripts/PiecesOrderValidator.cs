@@ -91,7 +91,12 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     {
         // #47: the order is shipped; the result stays as it is. #71: nothing to rate while a container moves.
         if (IsCompleted || (stationStock is IStationStock stock && stock.IsMoving))
+        {
+            ResearchLogger.LogConfirmIgnored(
+                IsCompleted ? OutcomeEvents.IgnoredCompleted : OutcomeEvents.IgnoredStationMoving,
+                containerCounter != null ? containerCounter.CurrentPosition : 0);
             return;
+        }
 
         // Non-short-circuit | so every missing reference is logged at once.
         bool missing =
@@ -107,11 +112,19 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         {
             ShowCard();
             ResultCardStyle.ShowPlain(titleText, feedbackText, Loc.Get(AnswerQuizFirstKey), ResultCardStyle.Reminder);
+            ResearchLogger.LogConfirmIgnored(OutcomeEvents.IgnoredQuizFirst, containerCounter.CurrentPosition);
             return;
         }
 
         // #6: one rule decides right/wrong (docs/decisions/005, 006); #19: only the current position.
         OrderResult result = containerCounter.CheckOrder();
+
+        // #28, decision 021: logged before the position advances.
+        ResearchLogger.LogConfirmPressed(result, containerCounter.CurrentPosition, containerCounter.PositionCount);
+        if (result.Correct)
+        {
+            ResearchLogger.LogPositionCompleted(containerCounter.CurrentPosition);
+        }
 
         if (result.Correct && !containerCounter.IsLastPosition)
         {
@@ -136,7 +149,11 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
                 instructionText.text = string.Empty;
             }
             IsCompleted = true;
+            ResearchLogger.LogTaskCompleted();
             OrderCompleted?.Invoke();
+            // After the listeners, so the menu lock still sees the session; Congratulations is already active,
+            // so ParticipantCodeLabel has read the code (#27). Rides that start later are not logged (spec 4.2).
+            ResearchLogger.EndSession("completed");
             return;
         }
 

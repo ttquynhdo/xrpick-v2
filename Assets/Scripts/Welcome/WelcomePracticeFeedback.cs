@@ -61,6 +61,7 @@ public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
             return;
 
         buttonPressed = true;
+        ResearchLogger.LogWelcomePracticeDone(OutcomeEvents.PracticeButton);
         Show(buttonCheck);
         UpdateNextLesson();
     }
@@ -71,6 +72,7 @@ public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
             return;
 
         boxGrabbed = true;
+        ResearchLogger.LogWelcomePracticeDone(OutcomeEvents.PracticeGrab);
         Show(boxCheck);
         UpdateNextLesson();
     }

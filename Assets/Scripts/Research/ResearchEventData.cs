@@ -4,7 +4,14 @@
 /// </summary>
 public static class ResearchEventData
 {
-    public const int SchemaVersion = 1;
+    // 2 = log contract v2 (decision 021).
+    public const int SchemaVersion = 2;
+
+    // Station layout of decision 019 (three lanes); R assigns head-direction zones per layout.
+    public const string LayoutVersion = "019";
+
+    // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
+    public static readonly string[] EventGroups = { "session", "outcome" };
 
     /// <summary>Header value when ResearchSettings.autoStart started the session.</summary>
     public const string StartModeAuto = "auto";
@@ -18,6 +25,8 @@ public static class ResearchEventData
     {
         return new JsonFields()
             .Add("schema_version", SchemaVersion)
+            .Add("layout_version", LayoutVersion)
+            .AddStringList("event_groups", EventGroups)
             .Add("app_version", appVersion)
             .Add("build", build)
             .Add("device_model", deviceModel)

@@ -212,7 +212,7 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
         }
 
         var ride = new Ride(box, riders, path, hideAtEnd: false);
-        StartRide(ride, () => ride.Done);
+        StartRide(ride, () => ride.Done, OutcomeEvents.MoveStorageIn, index + 1);
     }
 
     private void StartDeparture(int index)
@@ -237,26 +237,31 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
 
         Vector3 start = box.position;
         var ride = new Ride(box, riders, departurePath, hideAtEnd: true);
-        StartRide(ride, () => ride.Done || (box.position - start).magnitude >= clearDistance);
+        StartRide(ride, () => ride.Done || (box.position - start).magnitude >= clearDistance,
+            OutcomeEvents.MoveStorageOut, index + 1);
     }
 
-    private void StartRide(Ride ride, Func<bool> clearOfStation)
+    // what and position go into station_move_start / _arrived (#28, decision 021): the position just finished
+    // for a box leaving, the new one for a box arriving.
+    private void StartRide(Ride ride, Func<bool> clearOfStation, string what, int position)
     {
         rides.Add(ride);
         blockingRides++;
         ride.Freeze();
-        StartCoroutine(RunRide(ride));
+        StartCoroutine(RunRide(ride, what, position));
         StartCoroutine(WaitUntilClear(clearOfStation));
     }
 
-    private IEnumerator RunRide(Ride ride)
+    private IEnumerator RunRide(Ride ride, string what, int position)
     {
         if (startDelay > 0f)
         {
             yield return new WaitForSeconds(startDelay);
         }
 
+        ResearchLogger.LogStationMove(false, what, position);
         yield return LaneRide.Path(ride.Box, ride.Riders, ride.Path, speed, cornerPause);
+        ResearchLogger.LogStationMove(true, what, position);
 
         ride.Finish();
         rides.Remove(ride);
