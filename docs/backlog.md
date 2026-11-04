@@ -1298,7 +1298,8 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Test trên kính:** nhanh (tầm với của thanh và cụm câu hỏi, có thấy đủ băng không; gom với buổi test chung)
 - **Depends on:** #76; decision 024, 025
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md (mục *Bổ sung 2026-11-04*)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl84.md
+- **Status:** verified-mcp (15/18 ✅, chờ test tay H1–H3 trên kính)
 
 ### #85 [P2] ComplexScene: „Richtig!“ của câu 1 không nằm dưới câu 2 của `Remainder Quiz`
 - **Type:** logic
