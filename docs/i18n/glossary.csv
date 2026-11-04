@@ -72,7 +72,7 @@ Verpackung,die,package,Generic word for the physical packaging of a material (ca
 Teil,das,part,One single item of a material; used in the EKZ explanations (die Teile).,no,requirements: Kommissionierung.pptx slide 8,proposed,"'lose Teile' = loose items counted in lesson 5 (quiz, card, example); the WMS unit stays ST, Stück only after a number."
 Feld,das,field,One field of the LVS dialog (e.g. das Feld Anweisung).,no,app (#20),proposed,
 einfüllen,,pour in,Putting parts into the container without order (allowed for EKZ 0).,no,app (#20),proposed,Ask the instructor whether the warehouse says einfüllen or schütten.
-STECKER C,,plug C,"Fake material name for the ConceptScene sample order only, key stecker_c, Mat.-Nr 625417, VPE 40, Empf Kz 003.",yes,"app (#20, decision 010)",proposed,Fake master data; no package of it exists in any scene.
+STECKER C,,plug C,"Fake material name for the ConceptScene sample order only, key stecker_c, Mat.-Nr 625417, VPE 40, Empf Kz 003.",yes,"app (#20, decision 010)",proposed,Fake master data; ConceptScene has one grabbable carton (#84) and static cartons (#83), label STECKER C / Mat.-Nr: 625417 / VPE: 40 ST.
 Lektion,die,lesson,One of the five lessons of the course (menu items 1-5).,no,app (#25),proposed,Not Lerneinheit/Kapitel.
 Karte,die,card,"Instruction card (Aufgabe, steps 1-3) on the upright board left of the workspace (#35).",no,app (#25),proposed,Not Kärtchen/Tafel.
 erledigt,,done,A position (order line) that is picked and confirmed: Position 1 ist erledigt.,no,app (#21),proposed,Not 'fertig'.

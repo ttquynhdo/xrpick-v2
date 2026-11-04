@@ -307,8 +307,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627391
-    m_Localized: Materialnummer und Bezeichnung des Materials. Vergleichen Sie beides
-      mit dem Etikett.
+    m_Localized: Materialnummer und Bezeichnung. Nehmen Sie den Karton STECKER C
+      in die Hand und vergleichen Sie beides mit seinem Etikett.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627392
@@ -316,7 +316,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627393
-    m_Localized: "St\xFCck pro Karton. Auf dem Etikett steht daf\xFCr VPE."
+    m_Localized: "St\xFCck pro Karton. Auf dem Etikett des Kartons STECKER C steht
+      daf\xFCr VPE."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627394
@@ -734,7 +735,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307008
-    m_Localized: 'Soll : Verp.-Einh. = 120 : 40 = 3. Sie nehmen 3 Kartons.'
+    m_Localized: '120 : 40 = 3 Kartons'
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307009

@@ -1288,7 +1288,8 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Test trên kính:** bắt buộc (người mới có tự cầm carton STECKER C không; giơ nhãn cạnh màn hình đọc được không; phân biệt hai thùng mẫu)
 - **Depends on:** #84 (chỗ carton và thùng mẫu), #78, #80; #79 dùng carton này cho thẻ 1; giả định D4/D5 (EKZ 3 cho carton là đơn giản hoá)
 - **Decision:** docs/decisions/025-concept-show-and-do.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl83.md
+- **Status:** verified-mcp (12/12 ✅, chờ test tay H1–H2 trên kính; theo giả định D4/D5)
 
 ### #84 [Feature] ConceptScene: đặt băng ba làn và mọi vật mới vào bố cục một lần, đo trước khi làm phần chạy
 - **Type:** feature

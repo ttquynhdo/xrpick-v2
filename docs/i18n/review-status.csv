@@ -115,9 +115,9 @@ order.feedback.wrong_title,Nicht richtig,proposed,german-reviewer (agent),2026-1
 concept.tour.intro.title,Das LVS,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.intro.body,Das ist ein Auftrag im Lagerverwaltungssystem (LVS). Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.tour.material.title,Mat.-Nr und Bez.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.material.body,Materialnummer und Bezeichnung des Materials. Vergleichen Sie beides mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
+concept.tour.material.body,Materialnummer und Bezeichnung. Nehmen Sie den Karton STECKER C in die Hand und vergleichen Sie beides mit seinem Etikett.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#83)
 concept.tour.verp_einh.title,Verp.-Einh.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.verp_einh.body,Stück pro Karton. Auf dem Etikett steht dafür VPE.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
+concept.tour.verp_einh.body,Stück pro Karton. Auf dem Etikett des Kartons STECKER C steht dafür VPE.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#83)
 concept.tour.soll.title,Soll,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.soll.body,So viele Stück müssen Sie kommissionieren.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.ist.title,Ist,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
@@ -160,7 +160,7 @@ concept.ekz.8,ESD-geschützte Teile. Nicht ohne Anweisung öffnen.,proposed,germ
 concept.ekz.9,Sonderverpackung. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen unter dem Bildschirm.,proposed,german-reviewer (agent),2026-11-03,#58; Agent: OK; wording as complex.card.step1_body_position1
 concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.tour.cartons.body,Soll : Verp.-Einh. = 120 : 40 = 3. Sie nehmen 3 Kartons.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
+concept.tour.cartons.body,120 : 40 = 3 Kartons,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#83)
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, also EKZ 0. Dann dürfen die Teile ungeordnet liegen oder eingefüllt werden.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.tour.material_flow.body,"Der Lagerbehälter kommt von links und fährt über die mittlere Bahn weg; der Auftragsbehälter fährt erst weg, wenn der Auftrag erledigt ist. Beantworten Sie jetzt die Fragen unter dem Bildschirm.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)

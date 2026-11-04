@@ -301,8 +301,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627391
-    m_Localized: Material number and description of the material. Compare both with
-      the label.
+    m_Localized: Material number and description. Pick up the STECKER C carton and
+      compare both with its label.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627392
@@ -310,7 +310,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627393
-    m_Localized: Pieces per carton. On the label this is VPE.
+    m_Localized: Pieces per carton. On the label of the STECKER C carton this is
+      VPE.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627394
@@ -733,7 +734,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307008
-    m_Localized: 'Soll : Verp.-Einh. = 120 : 40 = 3. You take 3 cartons.'
+    m_Localized: '120 : 40 = 3 cartons'
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307009
