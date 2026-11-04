@@ -1249,11 +1249,23 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** Assets/Scripts/PackageQuizController.cs:25, Assets/Scripts/WS Scripts/OrderConfirm.cs:27, Assets/Scripts/MixPickingValidator.cs:18, Assets/Scripts/PiecesOrderValidator.cs:24; helper mới tính mã lỗi; spec mục 4.2, 4.3, 5
 - **Problem:** Validator chỉ có đúng/sai và chữ hiển thị, không ghi lại số lần thử, thời gian, trong thùng có gì hay loại lỗi.
-- **Done when:** Mỗi lần bấm xác nhận có một `confirm_pressed` (số lần thử, số đếm từng loại so với yêu cầu, `correct`, `error_codes`), quiz có `quiz_answer`, lần đúng đầu tiên có `task_completed`. Rời scene thì có thêm một dòng trong `_summary.csv`. Thử các trường hợp: thùng trống, thiếu, thừa, vật tư không thuộc đơn, thiếu hoặc thừa hàng lẻ, đủ → mã lỗi đúng. Chữ phản hồi trên màn hình **không đổi** (nếu #14 chưa làm). `PackageCounter.CheckOrder` không còn được gọi sau #1 nên không log. Thêm (decision 006):
-  - `confirm_pressed` theo dạng dòng đơn (`{item, soll, vpe, required_full, required_loose, placed_full, placed_loose}` + danh sách vật tư lạ `{item, count}`), `error_codes.item` là khoá vật tư; spec, `make_fake_data.R`, `schema_version` và `scene_skills.csv` (`BasicPickingScene,check_material`) đổi trong cùng commit, data-analyst duyệt, `selftest.R` xanh.
-  - ComplexScene: đặt 2 carton GGA thay cho 2 carton Ring D thì `error_codes` gồm `WRONG_MATERIAL` (khoá của vật tư lạ) rồi `TOO_FEW` (khoá Ring D), đúng thứ tự.
-  - Thùng trống chỉ cho đúng một mã `EMPTY`. Không `confirm_pressed` nào chứa `WRONG_TYPE`.
+- **Done when (decision 021, thay Done when cũ; các Bổ sung bên dưới đã được hợp nhất vào 021, chỉ còn là lịch sử):**
+  - Spec v2 (`schema_version` 2) cho toàn bộ danh mục của 021 (cả trường của #29/#30), `skill_map.csv`, `scene_skills.csv`, `item_skills.csv` (mới), `make_fake_data.R`, `analyse.R` đổi trong cùng một commit, `selftest.R` xanh, data-analyst duyệt **trước** khi sửa code scene.
+  - Dữ liệu giả không còn dòng nào chứa `WRONG_TYPE`, `NO_ANSWER`, khoá `gg`/`vpe`, cũng không có dòng `check_material` cho Mixed/Complex.
+  - Header có `layout_version`.
+  - Mixed: đặt 2 carton KABELVERBINDER A rồi bấm nút đỏ → một `confirm_pressed` với `position` 1, `position_count` 2, `attempt_in_position` 1, `error_codes` = `TOO_FEW` (item `connector_a`), `placed_full` 2, `required_full` 3.
+  - Mixed: đặt đủ 3 carton rồi bấm → theo thứ tự `confirm_pressed` đúng, `position_completed` 1, `station_move_start`, `station_move_arrived`.
+  - Mixed: bấm nút đỏ trong lúc thùng đang chạy → một `confirm_ignored` với `reason` `station_moving`; `attempt_no` không tăng.
+  - Complex: bấm nút đỏ khi chưa trả lời đúng cả hai câu quiz → `confirm_ignored` với `reason` `quiz_first`, không có `confirm_pressed`.
+  - Complex: chạm đáp án sai rồi đáp án đúng của câu `cartons` → hai `quiz_answer` (`quiz` `complex_remainder`), `attempt_in_question` 1 rồi 2, `correct` false rồi true.
+  - Complex: thêm 1 RING D lẻ ở position 1 → `error_codes` có `EXTRA_LOOSE` (item `ring_d`).
+  - Complex: position 2 đúng → theo thứ tự `confirm_pressed`, `position_completed` 2, `task_completed`, `session_end` `completed`, và dòng `Code: P…` hiện trên `Congratulations`.
+  - Basic: đủ 6 carton nhưng 1 carton nằm ngoài ô → `error_codes` = `EKZ_PLACEMENT`, `correct` false. Thùng trống → chỉ đúng một `EMPTY`.
+  - Concept: bấm „Weiter“ hết tour → mỗi bước một `tour_step`, rồi đúng một `quiz_unlocked` ở bước `material_flow`. Trả lời đúng cả 4 câu → `task_completed` với `attempts_to_correct` bằng số `quiz_answer`.
+  - Welcome: cầm thùng rồi bấm nút đỏ → `welcome_practice_done` `grab` rồi `button`.
+  - Rời scene → một dòng `_summary.csv` có `confirm_count` (chỉ lần được chấm) và `confirm_ignored`.
   - Ở mọi scene, `correct` là true khi và chỉ khi `error_codes` rỗng.
+  - Chữ trên màn hình và hành vi huấn luyện không đổi; các ca hồi quy trong `testing.md` vẫn xanh.
 - **Inspector work expected:** no
 - **Công:** M
 - **Test trên kính:** không
@@ -1264,9 +1276,9 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp: `SceneManager.activeSceneChanged` (nơi logger mở lượt scene mới) chạy **sau** các hàm đó, nên sự kiện sẽ rơi vào lượt scene trước. Ghi từ `Start` trở đi hoặc từ thao tác của người học.
 - **Bổ sung (review cuối #27, 2026-11-01):** chốt lý do kết thúc nào được tính là "abgeschlossen" cho cảnh báo của bàn phím #27. Hôm nay `ResearchLogger.HasEndedSession` coi mọi `session_end` là hoàn tất, kể cả `quit`: người học thoát app sạch giữa khoá rồi quay lại sẽ thấy cảnh báo, không được hỏi tiếp tục (fake P112 trong `make_fake_data.R` là ca này). Cân nhắc chỉ tính `completed` (và có thể `facilitator`), hoặc hiện lý do kết thúc trong cảnh báo; nếu đổi thì sửa chuỗi `entry.warning.finished`, spec 4.1 và `analyse.R` cùng lúc.
 - **Bổ sung (review cuối #44, 2026-11-01):** (a) `analyse.R` mất lần kết thúc `facilitator` nếu cùng mã được nhập lại, vì `end_status` chỉ lấy phiên cuối. Thêm `n_facilitator_ends` (hoặc chuỗi `end_status` theo phiên) vào `data_quality`/file rộng, kèm ca selftest "facilitator rồi nhập lại". (b) Ý kiến data-analyst cho câu "lý do kết thúc nào được tính là abgeschlossen": ràng buộc cứng là mọi lần kết thúc giữa khóa phải còn thấy được trong phân tích; ưu tiên là chỉ `completed` tính là xong, còn `facilitator`/`quit` được hỏi tiếp tục như sau crash (`TryFindResumePoint` theo lý do). Việc kèm theo: R (`prev_crash` thành "lần kết thúc trước không phải completed", `repeat_after_crash` thành `repeat_after_interrupt`), spec 4.1, trường cộng thêm `session_start.previous_end_reason`, chuỗi `entry.warning.finished`, các ca trong `make_fake_data.R`. Cho đến khi sửa, chữ cảnh báo "đã hoàn tất" là sai sự thật sau `facilitator`/`quit`.
-- **Decision:** docs/decisions/006-validator-result-format.md
+- **Decision:** docs/decisions/006-validator-result-format.md, docs/decisions/021-research-log-catalogue-v2.md
 - **Bổ sung (2026-11-03, decision 019, 020):** (1) mỗi chuyển động do máy (thùng kho rời/tới, thùng đơn sang làn giữa và chạy, thùng 1 Complex tới sau quiz) có mốc start và arrived, thứ tự `confirm_pressed` → `LineAdvanced` → start → arrived; header có `layout_version`; không thu dữ liệu thật trên hai build khác nhau trong cùng một đợt. (2) `quiz_answer` của Concept ghi lúc chạm toggle (không còn `CheckAnswer` bằng nút đỏ), bỏ `NO_ANSWER` ở Concept (sửa `skill_map.csv` và spec), thêm `quiz` (`concept_package` / `complex_remainder`), `question_id`, `selected` (khoá đáp án), `attempt_in_question`, event `quiz_unlocked`; nên có `tour_step`. Cả hai chốt trước người tham gia thật đầu tiên.
-- **Depends on:** #26, #6 (rule và kết quả trong `XRPick.Orders`). Dùng chung object kết quả với #14.
+- **Depends on:** #26, #6 (rule và kết quả trong `XRPick.Orders`). Dùng chung object kết quả với #14. D28, D29 (map kỹ năng; không chặn bước 1, chốt trước thu dữ liệu thật).
 - **Bổ sung (2026-11-01, decision 011):** scene inventory (`BasicPickingScene.md:82,84`, `MixedPickingScene.md:73–74`) liệt kê hàm xác nhận hai lần trong `_whenSelect` của nút đỏ, nhưng đó là dữ liệu override cũ nằm ngoài `Array.size`. Đọc lúc chạy (MCP, 2026-11-01) thấy Basic, Mixed, Complex đều gọi đúng **một** lần (`PlayAudio` + validator, + `FlashConfirmKey` ở Basic/Complex), nên `confirm_count` không bị nhân đôi. Khi viết test log vẫn nên đếm số dòng `confirm_pressed` sau một lần bấm. Sau khi đơn đúng, nút đỏ không tính thêm lần xác nhận (#47). Log tại sự kiện đúng chung của validator (#47, #40).
 - **Bổ sung (2026-11-01, decision 007):** `quiz_answer` theo quiz mới của #45: thêm `question_id`, `selected` là khoá đáp án ngắn (thay `gg/vpe/both`); cách nối câu hỏi với kỹ năng do data-analyst quyết (có thể cho `calculate_quantity` một điểm đo từ Concept). Xoá `WRONG_TYPE` khỏi enum và `skill_map.csv` nếu A2 đã được người hướng dẫn chốt. Chỉ thêm `BasicPickingScene,check_material` nếu #18 giữ vật gây nhiễu ở Basic. Trường `package_type` của #29 (spec §4.4) đổi thành khoá vật tư ở #29.
 - **Bổ sung (2026-11-01, review data-analyst của #6):**
@@ -1277,20 +1289,28 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
   - Mô tả `WRONG_TYPE` / `WRONG_MATERIAL` trong `analysis/skill_map.csv` còn theo mô hình GG/VPE: sửa cùng spec.
 - **Bổ sung (review data-analyst #21, 2026-11-01):** Mixed giờ xác nhận từng position (decision 012). Khi làm #28: (1) `confirm_pressed` thêm `position` (từ 1), `position_count`, `attempt_in_position` (Basic/Complex: 1/1); `attempt_no` vẫn đếm theo lượt scene. (2) `task_completed` chỉ phát khi position cuối đúng (hoặc thêm `order_complete`); R tính `completed`, `attempts_to_correct`, `time_to_correct_s` theo đó, không theo `correct` của từng lần bấm. (3) Ghi `confirm_pressed` **trước** `MixedPickingContainer.AdvanceToNextLine()`; nếu log đổi position (`LineAdvanced`) thì sự kiện đó đứng sau. (4) `EMPTY` ở position 2 nghĩa là „không có gói nào của position hiện tại“ (màn hình hiện câu TOO_FEW, mã giữ EMPTY): sửa định nghĩa trong spec và `skill_map.csv`. (5) `MixedPickingScene,check_material` trong `scene_skills.csv` gần như không thể sai nữa (thùng kho chỉ chứa vật tư của position hiện tại, RING D đã bỏ): người phụ trách nghiên cứu quyết bỏ dòng hay ghi chú. (6) `container`/`required` chỉ chứa gói của position hiện tại; `make_fake_data.R` + `selftest.R` mô phỏng Mixed 2 position (gồm sai ở position 2 rồi đúng, EMPTY ở position 2).
 - **Bổ sung (#41, 2026-11-02):** Basic có thêm lỗi cách đặt EKZ 3 (đủ số nhưng có carton không khớp ô). Lỗi này không nằm trong `OrderRule` (nó do `OrderConfirm` + `EkzPlacementCheck` quyết định), nên #28 cần một mã lỗi riêng cho nó, và phải cập nhật spec log, `make_fake_data.R`, `analyse.R` cùng lúc.
-- **Status:** todo
+- **Status:** in progress (nhánh `feat/28-research-log-v2`, bước 1: spec v2 + R)
 
 ### #29 [Feature] Log thao tác: cầm/thả, thùng, nút, kiểu điều khiển
 - **Type:** feature
 - **Scene(s):** cả 5 scene
 - **Files:** component mới `GrabLogger` gắn vào prefab/package (sự kiện grab của Interaction SDK), Assets/Scripts/PackageCounter.cs:29, :61, Assets/Scripts/MixPickingContainer.cs:27, :44, Assets/Scripts/PiecesContainerCounter.cs:30, :46, Assets/Scripts/PackageInfoOnGrab.cs:24, Assets/Scripts/SceneMenuController.cs:6–44; spec mục 4.1 (`menu_select`), 4.4
 - **Problem:** Không biết học viên thao tác ra sao: cầm nhầm, đặt vào rồi lấy ra, làm rơi, mất tracking tay.
-- **Done when:** Trong Play mode (đặt kiện bằng code qua MCP) thấy `container_enter`/`container_exit` chỉ khi HashSet thật sự đổi; trên Quest thấy `grab_start`/`grab_end` có tay L/R và thời gian cầm, `object_dropped_floor`, `button_touch`, `menu_select`, `input_mode_change`, `tracking_lost`. `object_id` ổn định giữa các lần chạy.
+- **Done when (decision 021, rút gọn; tay/tracking/rơi sàn tách sang #74):**
+  - Đặt một kiện vào thùng bằng code qua MCP → `container_enter` với `material_key`; collider thứ hai của cùng vật thể vào trigger → không có dòng thứ hai.
+  - Trong lúc thùng chạy trên băng → không có `container_exit` nào.
+  - `Grabbable.ProcessPointerEvent` Select rồi Unselect trên một kiện → `grab_start` / `grab_end` với `object_id` ổn định giữa các lần chạy, `duration_s`; không có `GrabLogger` nào gắn trong Inspector.
+  - Mở scene qua Menu → `scene_enter.via` = `menu`; `Beenden` của người điều phối → `via` = `facilitator_end`.
+  - Mở rồi `Fortsetzen` panel người điều phối → `end_control_opened` rồi `end_control_cancelled`.
+  - Chọn một mục Menu đang mở → `menu_select` có `target_scene`, không có `item_label` (`blocked` chỉ khi relay pointer làm được, xem 021).
+  - Không có `button_touch`, `info_shown`.
 - **Inspector work expected:** yes (gắn `GrabLogger` vào các package, gán layer/tag sàn)
 - **Công:** L
 - **Test trên kính:** bắt buộc (cầm tay trái/phải, mất tracking)
 - **Bổ sung (review cuối #44, 2026-11-01):** ghi thêm `end_control_opened` (panel hiện) và `end_control_cancelled` (bấm `Fortsetzen`) từ `FacilitatorEndControl`, là sự kiện cộng thêm; R dùng `t` của lần mở cuối để loại thời gian của người điều phối khỏi lượt cuối và đếm số lần mở nhầm; sửa `make_fake_data.R` và `analyse.R` cùng lúc. Từ reviewer cuối: nhả giữ khi `OnApplicationPause`/`OnApplicationFocus(false)`; có thể theo dõi `pointerId` đã bắt đầu giữ; nếu Q1 cho thấy giữ bị rớt thì tắt `_recoilAssist` chỉ trên `PokeInteractable` của prefab.
 - **Depends on:** #26. API sự kiện grab/tracking của Meta SDK phải kiểm tra trong project trước (spec mới ghi theo hiểu biết, chưa xác minh).
 - **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (vd. `input_mode_change` ban đầu, đăng ký `GrabLogger`): `activeSceneChanged` chạy sau các hàm đó nên sự kiện rơi vào lượt scene trước. Ghi từ `Start` trở đi.
+- **Decision:** docs/decisions/021-research-log-catalogue-v2.md (rút gọn: grab đăng ký lúc chạy, không `GrabLogger` trong Inspector; tay/tracking/rơi sàn sang #74)
 - **Status:** todo
 
 ### #30 [Feature] Hướng nhìn (theo đầu), luồng tư thế và hiệu năng
@@ -1298,12 +1318,31 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Scene(s):** cả 5 scene
 - **Files:** script mới (gaze proxy + pose sampler + perf sampler), collider/tag cho bảng WMS, thẻ hướng dẫn, thùng, menu; spec mục 4.5, 4.6 (`perf_sample`), 4.7
 - **Problem:** Cần dữ liệu về chú ý (đọc WMS bao lâu), độ thoải mái (rớt khung hình, cử động đầu) để đối chiếu với SSQ/NASA-TLX trên giấy.
-- **Done when:** Có `_pose.csv` 10 Hz; `gaze_target_enter/exit` khi đầu hướng vào bảng WMS ≥ 200 ms; `perf_sample` mỗi 5 s (FPS, khung hình rớt, pin). Trên Quest 3, FPS khi bật logger không thấp hơn khi tắt (so bằng chính `perf_sample`). Ghi rõ trong spec/báo cáo: đây là hướng đầu, không phải eye tracking.
-- **Inspector work expected:** yes (gắn tag/collider cho các vùng nhìn)
+- **Done when (decision 021; không còn `gaze_target_*` trong app, R gán vùng từ `_pose.csv`):**
+  - Trên Quest 3 có `_pose.csv` 10 Hz (±10 %) ghi qua một stream mở sẵn; tắt kính đột ngột thì file còn tới dòng ≤ 1 s trước đó.
+  - Có `perf_sample` mỗi 5 s (FPS, khung hình rớt, pin); FPS khi bật logger không thấp hơn khi tắt (so bằng `perf_sample`).
+  - Bộ lấy mẫu nằm ngoài `Research/`; `Research/` không có `Update`/`LateUpdate`/`FixedUpdate`.
+  - Một người cố ý nhìn lần lượt WMS → quiz → thẻ kệ → thẻ kết quả → Menu, mỗi chỗ 5 s → R gán đúng thứ tự các vùng thô từ `_pose.csv` của lần ghi đó.
+  - Spec và báo cáo ghi rõ: đây là hướng đầu, không phải eye tracking.
+- **Decision:** docs/decisions/021-research-log-catalogue-v2.md
+- **Inspector work expected:** no (decision 021: không collider vùng nhìn mới; sampler gắn lúc chạy hoặc trên logger scene)
 - **Công:** L
 - **Test trên kính:** bắt buộc (đo FPS trên Quest 3)
 - **Depends on:** #26. Spec mục 9 (2026-11-01): chỉ ghi hướng đầu, không ghi vị trí tay. #35, #47 trước (decision 011, người dùng 2026-11-01: không thu dữ liệu nhìn theo bố cục cũ; mỗi vùng nhìn có collider riêng trên prefab giá; thêm phiên bản bố cục vào header log).
 - **Bổ sung (review cuối #26, 2026-11-01):** dữ liệu 10 Hz (`_pose.csv`) phải ghi qua một stream mở sẵn suốt phiên (đóng/flush khi pause, đổi scene, kết thúc phiên). `SessionFiles` hiện mở file cho mỗi dòng: ổn cho sự kiện thưa, không ổn cho 10 dòng/giây (cấp phát và ghi đĩa liên tục). Không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (sự kiện rơi vào lượt scene trước).
+- **Status:** todo
+
+### #74 [Feature] Log tay, tracking và rơi sàn (tách từ #29)
+- **Type:** feature
+- **Scene(s):** cả 5 scene
+- **Files:** sự kiện grab của #29, `OVRInput` / trạng thái tracking tay và controller, va chạm sàn; spec mục 4.4
+- **Problem:** #29 rút gọn (decision 021) không còn ghi tay nào cầm, kiểu điều khiển, mất tracking và vật rơi sàn, vì những thứ này chỉ test được trên Quest và cần kiểm API Meta SDK.
+- **Done when:** Trên Quest: `grab_start`/`grab_end` có `hand` L/R; đổi từ tay sang controller → `input_mode_change {from, to}`; che một tay khỏi camera → `tracking_lost` rồi `tracking_regained` với `what` đúng; thả một kiện xuống sàn → `object_dropped_floor` với `fall_from_height_m`. Trường cộng thêm vào hợp đồng v2 (không bump schema), spec + `make_fake_data.R` + `analyse.R` cùng lúc, `selftest.R` xanh.
+- **Inspector work expected:** có thể (layer/tag sàn)
+- **Công:** M
+- **Test trên kính:** bắt buộc
+- **Depends on:** #29. Không chặn thu dữ liệu thật (decision 021).
+- **Decision:** docs/decisions/021-research-log-catalogue-v2.md
 - **Status:** todo
 
 ### #31 [Feature] Hướng dẫn lấy log về máy + script gộp với phiếu giấy

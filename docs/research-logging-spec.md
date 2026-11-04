@@ -1,6 +1,6 @@
 # Research data logging – specification (draft)
 
-Status: 2026-11-01. The session core (sections 1, 3, 4.1, `unity_error` and `crash_recovered` in 4.6, 5) is implemented by backlog #26; the participant keypad, resume offer and the `session_start` fields (section 2, 4.1) by #27; the other events are still planned (#28-#30). Design and decisions: `docs/superpowers/specs/2026-11-01-research-logger-design.md`.
+Status: v2 per decision 021 (2026-11-04), `schema_version` 2. The session core (sections 1, 3, 4.1, `unity_error` and `crash_recovered` in 4.6, 5) is implemented by backlog #26; the participant keypad, resume offer and the `session_start` fields (section 2, 4.1) by #27; the outcome, interaction and pose events are planned in #28 step 2, #29, #30 and #74 (the v1 catalogue of 2026-11-01 is replaced; decision: `docs/decisions/021-research-log-catalogue-v2.md`). Design and decisions: `docs/superpowers/specs/2026-11-01-research-logger-design.md`.
 
 Goal: record, per learner and per session, how trainees perform and experience the VR order-picking course on Meta Quest 3, so the logs can later be analysed and joined with the paper questionnaires (SSQ before and after, NASA-TLX at the end) via a pseudonymous participant ID. There is no paper test of the course content and no control group, so improvement is read from error rates per skill across scenes (an indication, not proof).
 
@@ -10,7 +10,7 @@ Goal: record, per learner and per session, how trainees perform and experience t
 - **Offline, append-only.** Every event is written to disk immediately (flush per line), so a crash keeps everything up to the crash. No network.
 - **One logger, many emitters.** A single `ResearchLogger` (DontDestroyOnLoad, created at app start by `RuntimeInitializeOnLoadMethod`) owns the files; scene scripts only call `ResearchLogger.Log(eventType, payload)` (one way: the logger never calls scene code). Scripts must work unchanged if the logger is absent (null-safe static API), so scenes stay testable on their own.
 - **Logging never changes training behaviour.** It observes; it doesn't alter feedback, timing or scene flow.
-- **Versioned schema.** Every file header carries `schema_version` (now 1); adding fields is fine, renaming/removing bumps the version.
+- **Versioned schema.** Every file header carries `schema_version` (now 2: one bump for the whole v2 catalogue of #28–#30); adding fields is fine, renaming/removing bumps the version.
 
 ## 2. Participant ID entry and session lifecycle
 
@@ -28,7 +28,7 @@ Location: `Application.persistentDataPath/research/` → on Quest `/sdcard/Andro
 | File | Content |
 |---|---|
 | `<participant_id>_<session_id>_events.jsonl` | One JSON object per line, every event in time order |
-| `<participant_id>_<session_id>_pose.csv` | Head pose samples at 10 Hz (planned, #30) |
+| `<participant_id>_<session_id>_pose.csv` | Head pose samples at 10 Hz (planned, #30). Head-direction zones are assigned from it in R |
 | `<participant_id>_<session_id>_summary.csv` | One row per scene visit, appended when the scene is left (and for the open scene at `session_end`); ready for SPSS/R/Excel. A convenience copy: the events file is the source of truth |
 
 `session_id` is a UUID generated at session start. File names never contain anything but the IDs. Format: UTF-8, LF line endings, comma separator, dot decimal, ISO 8601 UTC timestamps.
@@ -44,11 +44,11 @@ Location: `Application.persistentDataPath/research/` → on Quest `/sdcard/Andro
 - `utc` – wall-clock time, only for matching with paper forms.
 - `scene_visit` – counter per scene within the session, starting at 1 in each session, so revisiting a scene is distinguishable. `null` on `header`, `session_start` and `session_end`.
 - `scene` – the active scene; `null` on the header.
-- Every time or length field carries its unit (`_s`, `_m`) and is active time (pauses subtracted) unless named `_wall_s`.
+- Every time or length field carries its unit (`_s`, `_m`) and is active time (pauses subtracted) unless named `_wall_s`. A key that doesn't apply is `null`, not 0.
 
 ### Header (first line of the events file)
 
-The first line has `"event":"header"` (so R can recognise it), `t` 0, and `data`: `schema_version`, `app_version`, `build` (7-digit git short hash, plus `-dirty` with uncommitted changes, baked at build by `git describe --always --dirty --abbrev=7 --exclude=*`; `"editor"` in Play mode; `"unknown"` when git failed at build time; `null` when the `ResearchBuildInfo` resource is missing from the build), `device_model`, `os_version`, `participant_id`, `session_id`, `session_start_mode` (`auto` = started by `ResearchSettings.autoStart`, `manual` = `StartSession` called by other code, e.g. the #27 keypad; a real participant's session should be `manual`), `language` (`DE` / `EN`, #11; fixed for the whole session: chosen on the WelcomeScene keypad before the code is entered, research IDs always `DE`; `null` only in logs written before #11), `input_mode_at_start` (`hands` / `controllers` / `none`; `none` when no input is active yet, always in the Editor without a headset; `null` when the Meta SDK can't be read), `target_refresh_rate` (`null` without a headset).
+The first line has `"event":"header"` (so R can recognise it), `t` 0, and `data`: `schema_version` (2), `layout_version` (string; `"019"` = the three-lane station of decision 019; R assigns head-direction zones per layout), `event_groups` (array of `"session"`, `"outcome"`, `"interaction"`, `"pose"`, `"perf"`: the groups this build emits; R treats a missing group as NA, not 0), `app_version`, `build` (7-digit git short hash, plus `-dirty` with uncommitted changes, baked at build by `git describe --always --dirty --abbrev=7 --exclude=*`; `"editor"` in Play mode; `"unknown"` when git failed at build time; `null` when the `ResearchBuildInfo` resource is missing from the build), `device_model`, `os_version`, `participant_id`, `session_id`, `session_start_mode` (`auto` = started by `ResearchSettings.autoStart`, `manual` = `StartSession` called by other code, e.g. the #27 keypad; a real participant's session should be `manual`), `language` (`DE` / `EN`, #11; fixed for the whole session: chosen on the WelcomeScene keypad before the code is entered, research IDs always `DE`; `null` only in logs written before #11), `input_mode_at_start` (`hands` / `controllers` / `none`; `none` when no input is active yet, always in the Editor without a headset; `null` when the Meta SDK can't be read), `target_refresh_rate` (`null` without a headset).
 
 ## 4. Event catalogue
 
@@ -58,64 +58,83 @@ Emitted by #26 unless noted.
 
 | Event | Data | Source |
 |---|---|---|
-| `session_start` / `session_end` | `session_start` (#27): `resume_offered_scene` = build scene name the keypad offered to resume at (from `TryFindResumePoint`, i.e. the newest earlier session of this ID crashed in that scene), `null` when nothing was offered; `resume_accepted` = `true` / `false` for the answer, `null` exactly when `resume_offered_scene` is `null` (so "declined" and "never asked" stay apart). Logs from before #27 lack both keys (R: NA, not measured). A crash while WelcomeScene was the last scene offers no resume (WelcomeScene is never a resume point). `ended_session_warning` (#27 fix wave) = `true` when the keypad showed the "already finished" warning (a real ID with an earlier session that has `session_end`) and the facilitator pressed `Trotzdem starten`, otherwise `false` (also for `auto` starts); logs written before it lack the key (R: NA). Additive, `schema_version` stays 1. `session_end`: `reason` completed / facilitator / quit. `scene_visit` is `null` on both | logger |
-| `scene_enter` | `from_scene` (`null` on first entry), `via`: `"start"` on the first entry, otherwise `null` until #29 knows menu / auto | `SceneManager.activeSceneChanged` |
+| `session_start` / `session_end` | `session_start` (#27): `resume_offered_scene` = build scene name the keypad offered to resume at (from `TryFindResumePoint`, i.e. the newest earlier session of this ID crashed in that scene), `null` when nothing was offered; `resume_accepted` = `true` / `false` for the answer, `null` exactly when `resume_offered_scene` is `null` (so "declined" and "never asked" stay apart). Logs from before #27 lack both keys (R: NA, not measured). A crash while WelcomeScene was the last scene offers no resume (WelcomeScene is never a resume point). `ended_session_warning` (#27 fix wave) = `true` when the keypad showed the "already finished" warning (a real ID with an earlier session that has `session_end`) and the facilitator pressed `Trotzdem starten`, otherwise `false` (also for `auto` starts); logs written before it lack the key (R: NA). Additive. `session_end`: `reason` completed / facilitator / quit. `scene_visit` is `null` on both | logger |
+| `scene_enter` | `from_scene` (`null` on first entry), `via`: `start` \| `menu` \| `resume` \| `facilitator_end` (`start` on the first entry; written from `Start` onwards, #29) | `SceneManager.activeSceneChanged` |
 | `scene_exit` | `duration_s` (active), `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors` (all `unity_error` lines of the visit incl. folded and post-cap), so every summary column #26 fills can be rebuilt from events | logger |
-| `menu_select` | `target_scene`, `item_label` (#29) | `SceneMenuController.Open*` |
+| `menu_select` | `target_scene`, `blocked` (bool: the item was locked by the research lock #42; only if a runtime pointer relay can do it without Inspector or SDK changes, otherwise the key is dropped; additive) (#29). No `item_label` | `SceneMenuController.Open*` |
+| `end_control_opened` / `end_control_cancelled` | `{}` (facilitator end control, #44: the 3 s hold opened the confirmation / `Fortsetzen` was pressed) | `FacilitatorEndControl` |
 | `app_pause` | `causes`: list of `focus_lost` / `pause` / `hmd_unmounted` | logger |
 | `app_resume` | `paused_s`, `causes`: union of the causes seen during this pause | logger |
 
 Pause handling: four internal sources are tracked separately (app focus, OVR input focus, `OnApplicationPause`, HMD mounted) and mapped to the three labels. `app_pause` is written when the state goes from active to paused, `app_resume` when every source is active again, so overlapping signals never double-count. `pauses` counts these transitions, `hmd_removed_count` those whose causes include `hmd_unmounted`. A pause that spans a scene change counts in the visit where it started (its `paused_s` is split by visit); a pause still open at a crash ends at the file's last event. On quit during a pause no `app_resume` is written; the open part is included in `scene_exit.paused_s`.
 
-### 4.2 Learning outcomes (one event per confirm press)
+### 4.2 Learning outcomes and process milestones (#28 step 2)
+
+Positions: Basic 1 position, Mixed 2, Complex 2 (decisions 012, 016); Concept has none. Orders: Basic 1 position `training_b` 300/50; Mixed pos 1 `connector_a` 150/50, pos 2 `screw_b` 60/20; Complex pos 1 `ring_d` 55/25, pos 2 `training_b` 156/50. Only Complex counts loose pieces. Item keys are material keys: `connector_a`, `screw_b`, `ring_d`, `training_b`.
 
 | Event | Data | Source |
 |---|---|---|
-| `confirm_pressed` | `attempt_no` (per scene visit), `container`: counts per type (`gg`, `vpe`, `gga`, `ggb`, `loose`, `other`, `total_pieces`), `required`: the same keys, `correct` (bool), `error_codes` (list of `{code, item}`, see 4.3), `time_since_scene_enter_s` | `OrderConfirm.OrderConfirmation`, `MixedPickingValidator.ConfirmOrder`, `PiecesOrderValidator.ConfirmOrder` |
-| `quiz_answer` | `selected`: gg / vpe / both, or `null` when nothing was chosen (with `NO_ANSWER`); `correct`, `attempt_no`, `error_codes` | `PackageQuizController.CheckAnswer` |
-| `task_completed` | `attempts_to_correct`, `time_to_first_confirm_s`, `time_to_correct_s` | validators (first correct confirm per visit) |
+| `confirm_pressed` | One per **rated** press only, written before the position advances. `attempt_no` (per scene visit), `position`, `position_count`, `attempt_in_position`, `line`: `{item, soll, vpe, required_full, required_loose, placed_full, placed_loose}` (current position only; `required_loose` / `placed_loose` are `null` outside Complex), `foreign`: `[{item, count}]` (materials not in the order, `[]` if none), `correct` (bool), `error_codes` (list of `{code, item}`, see 4.3), `time_since_scene_enter_s` | `OrderConfirm.OrderConfirmation`, `MixedPickingValidator.ConfirmOrder`, `PiecesOrderValidator.ConfirmOrder` |
+| `confirm_ignored` | `reason`: `station_moving` \| `completed` \| `quiz_first` (the early returns, incl. the #58 reminder), `position`, `time_since_scene_enter_s`. Not an attempt, not in `confirm_count` | the same validators |
+| `position_completed` | `position`, `attempts_in_position` (from `LineAdvanced`, and once for the last position at `OrderCompleted`) | validators |
+| `task_completed` | `attempts_to_correct` (sum of rated attempts), `time_to_first_confirm_s`, `time_to_correct_s`. Picking scenes: at `OrderCompleted`; Concept: when all 4 questions are right (`LessonCompleted`). Complex then calls `EndSession("completed")` | validators, `PackageQuizController` |
+| `quiz_answer` | `attempt_no` (per visit), `quiz`: `concept` \| `complex_remainder`, `question_id`, `selected` (answer key), `correct`, `attempt_in_question`, `error_codes`, `time_since_scene_enter_s`. Every rated touch (a touched toggle is rated at once, decision 020) | `PackageQuizController.AnswerChosen`, `RemainderQuizController.AnswerChosen` |
+| `quiz_unlocked` | `{}` (Concept quiz opens at tour step `material_flow`) | `PackageQuizController.Unlocked` |
+| `tour_step` | `step_id`, `step_index` (1–11; „Von vorn“ = back to 1) | `WmsFieldTour.StepShown` |
+| `station_move_start` / `station_move_arrived` | `what`: `storage_out` \| `storage_in` \| `order_box`, `position` (the position just completed for `storage_out` / `order_box`, the new one for `storage_in`; Complex box 1 arrives after the remainder quiz) | `PositionStockSwitcher`, `OrderBoxConveyor` (new events, logging only) |
+| `welcome_practice_done` | `action`: `grab` \| `button` (first time each, #39) | `WelcomePracticeFeedback` |
 
-BasicPickingScene logs only the result of `OrderConfirm` (total-pieces rule).
+Order rule: `confirm_pressed` → `position_completed` → `station_move_start` → `station_move_arrived`.
 
-The exact shapes are fixed in section 6.
+Question ids: Concept `cartons_from_soll` {`2`, `4` (right), `25`}, `material_by_matnr` {`connector_a`, `screw_b` (right), `ring_d`}, `ekz_003` {`ordered` (right), `poured`}, `ekz_000` {`ordered`, `poured` (right)}; Complex position-1 remainder quiz `cartons` {`"1"`, `"2"` (right), `"3"`}, `loose` {`"5"` (right), `"20"`, `"55"`}. The Concept tour has 11 steps and unlocks the quiz at step id `material_flow`.
+
+Basic logs the result of `OrderConfirm` as one position (`position_count` 1); `EKZ_PLACEMENT` is added after the `OrderRule` codes. The exact shapes are fixed in section 6.
 
 ### 4.3 Error codes
 
-Derived from container contents vs. order, independent of the text shown to the trainee:
+Derived from container contents vs. order, independent of the text shown to the trainee. Eight codes are logged:
 
 | Code | Meaning |
 |---|---|
-| `WRONG_TYPE` | a package type not in the order is inside (e.g. VPE where only GG is ordered) |
-| `WRONG_MATERIAL` | right package form but wrong material (e.g. GGA in ComplexScene) |
-| `TOO_FEW` / `TOO_MANY` | per ordered item, with `item` |
-| `MISSING_LOOSE` / `EXTRA_LOOSE` | loose pieces short/over (ComplexScene) |
-| `EMPTY` | confirm with an empty container |
-| `NO_ANSWER` | quiz confirm without selection |
-| `WRONG_ANSWER` | quiz answered, but wrongly (ConceptScene) |
+| `EMPTY` | confirm with nothing of the **current position** in the box (at position > 1, packages of finished positions don't count) |
+| `WRONG_MATERIAL` | a material (`item` = material key) not in the order, or not of the current position, is inside |
+| `TOO_FEW` / `TOO_MANY` | full cartons short/over for the ordered `item` |
+| `MISSING_LOOSE` / `EXTRA_LOOSE` | loose pieces short/over (Complex only) |
+| `WRONG_ANSWER` | quiz touch rated wrong (Concept, Complex remainder quiz); `item` is `null`, the question is in `question_id` of the event |
+| `EKZ_PLACEMENT` | Basic: cartons not lying ordered in the 6 snap places (EKZ 3, #41); always after the `OrderRule` codes |
 
-Validators get one shared helper that computes these codes; the visible feedback text can then be built from the same codes (backlog #14).
+`WRONG_TYPE` and `NO_ANSWER` are reserved in the enum and never logged (no package types, decisions 006/007; a quiz touch is always an answer). `EMPTY` is logged alone, without an extra `TOO_FEW`.
 
-### 4.4 Interaction process
+**Skill mapping** is done in R, not in the app, so the study lead can edit it without a rebuild. Three files in `analysis/`:
+
+- `skill_map.csv` (`error_code, skill, description`): skill of each error code (`WRONG_MATERIAL` → `check_material`, `TOO_FEW` / `TOO_MANY` → `calculate_quantity`, `MISSING_LOOSE` / `EXTRA_LOOSE` → `calculate_loose`, `EKZ_PLACEMENT` → `ekz_placement`). `WRONG_ANSWER` has no fixed skill: it comes from `item_skills.csv` by `question_id`.
+- `scene_skills.csv` (`scene, skill`): which scene tests which skill (Concept `calculate_quantity`, `check_material`, `ekz_placement`; Basic `calculate_quantity`, `ekz_placement`; Mixed `calculate_quantity`; Complex `calculate_quantity`, `calculate_loose`). Mixed and Complex don't test `check_material`: the storage box holds only the current position's material (D12, #71).
+- `item_skills.csv` (new, `analysis/item_skills.csv`; columns `scene,item,skill,scaffolded`): `item` is a `question_id` or `position_<n>`; `scaffolded` is `true` where the app hands the trainee the numbers (Complex `position_1`, via the remainder quiz) and `false` at `position_2`. Initial content is pending the study lead (D28, D29).
+
+Main Q1 measure: share correct at the **first attempt per item** (question / position). The error rate per press is secondary (the A/B/C quiz has a 33 % guess rate).
+
+### 4.4 Interaction process (#29)
 
 | Event | Data | Source |
 |---|---|---|
-| `grab_start` / `grab_end` | `object_id` (stable name), `package_type`, `hand` (L/R), `input` (hand/controller), `duration_s` (on end), `end_pos` | Interaction SDK grabbable `WhenPointerEventRaised` (Select/Unselect), via a small `GrabLogger` component on each package prefab |
-| `object_dropped_floor` | `object_id`, `fall_from_height_m` | collision with floor layer |
-| `container_enter` / `container_exit` | `container`: order/storage, `object_id`, `package_type`, `count_after` | counters' `OnTriggerEnter/Exit` (only when the HashSet actually changes) |
-| `info_shown` | `object_id`, `panel` | `PackageInfoOnGrab.ShowInfo` (ConceptScene) |
-| `button_touch` | `button`: confirm / menu item / quiz toggle, `hand` | poke interactable events |
-| `input_mode_change` | `from`, `to` | `OVRInput.GetActiveController` change |
-| `tracking_lost` / `tracking_regained` | `what`: hand_L / hand_R / controller | OVR hand/controller tracking state |
+| `grab_start` | `object_id` (stable name), `material_key`, `hand` (`L`/`R`), `input` (`hand`/`controller`); `hand` and `input` may be `null` until #74 | runtime registration on every `Grabbable` with `PackageData` (pattern of `InstructionStepHighlighter`; no `GrabLogger` in the Inspector), `WhenPointerEventRaised` Select |
+| `grab_end` | `object_id`, `material_key`, `hand`, `input` (as above), `duration_s` | the same, Unselect |
+| `container_enter` / `container_exit` | `container`: `order`, `object_id`, `material_key`, `count_after` | counters' `OnTriggerEnter/Exit`, only when the HashSet actually changes; a package riding the conveyor produces no false `exit` |
+| `object_dropped_floor` (#74) | `object_id`, `fall_from_height_m` | collision with floor layer |
+| `input_mode_change` (#74) | `from`, `to` | `OVRInput.GetActiveController` change |
+| `tracking_lost` / `tracking_regained` (#74) | `what`: `hand_L` / `hand_R` / `controller` | OVR hand/controller tracking state |
+
+Removed from v1: `button_touch`, `info_shown`, `end_pos`; there is no `step_changed` / `first_grab` (R rebuilds the steps from `grab_start` + `position_completed`). Filling `hand` for real is #74.
 
 ### 4.5 Attention proxy (Quest 3 has no eye tracking)
 
-`gaze_target_enter` / `gaze_target_exit` with `target`: wms_panel / instruction_cards / order_box / storage_box / menu, computed from a ray along the head forward vector against tagged colliders, minimum dwell 200 ms. This is **head direction**, not eye gaze – state it as such in any publication.
+There is no `gaze_target_*` event. Head-direction zones are assigned in R from `_pose.csv` per `layout_version` (an angle table per layout; the 200 ms minimum dwell is an R parameter). Picking scenes: `screen_column` (WMS + quiz + Beispiel), `shelf`, `desk_left`, `desk_right`, `confirm_area` (red button + result card), `menu`. Concept: `tour`, `ekz`, `flow`, `labelboard`. There is no `order_box` / `storage_box` zone. This is **head direction**, not eye gaze – state it as such in any publication, and treat it as "reading" only after the headset check of #30.
 
 ### 4.6 Comfort and technical
 
 | Event / data | Data | Source |
 |---|---|---|
-| `perf_sample` (every 5 s) | `fps_avg`, `frame_ms_p95`, `dropped_frames`, `battery_level`, `cpu_level`/`gpu_level` if available | `FrameTimingManager` / `OVRPlugin.GetAppPerfStats`, `SystemInfo.batteryLevel` |
+| `perf_sample` (every 5 s, #30) | `fps_avg`, `frame_ms_p95`, `dropped_frames`, `battery_level`, `cpu_level`/`gpu_level` if available | `FrameTimingManager` / `OVRPlugin.GetAppPerfStats`, `SystemInfo.batteryLevel` |
 | `unity_error` | `type` (lowercase `error` / `exception` / `assert`), `message` (rooted file paths cut to the file name), `stack` (first lines; `null` on a line that only reports folded repeats), `folded_count` (repeats of the same message folded in before this line), `n_errors` (how many errors the line stands for: 1 for a first occurrence, `folded_count` + 1 for a line written after the 5 s window, `folded_count` for a line written at visit close that only reports folded repeats; the sum over a visit's lines equals `scene_exit.unity_errors` unless the cap was reached) | `Application.logMessageReceived` (warnings and known OVRPlugin XR start-up noise filtered by a list; the logger's own errors are not logged) |
 | `crash_recovered` | `last_event_t`, `recovered_by_session_id`; written into the old file with its old `session_id`, `t`, `scene` and `scene_visit` `null`, `utc` = time of detection | on next start, any earlier events file without `session_end` |
 
@@ -125,45 +144,52 @@ Clean end vs crash: `session_end` with reason `quit` is written by Unity's quit 
 
 ### 4.7 Pose stream (`_pose.csv`)
 
-10 Hz, head pose only (no hand positions): `t, scene, head_px, head_py, head_pz, head_rx, head_ry, head_rz, head_rw`. Enables path length and head movement (comfort). Planned, #30.
+10 Hz, head pose only (no hand positions): `t, scene, head_px, head_py, head_pz, head_rx, head_ry, head_rz, head_rw`. Enables path length, head movement (comfort) and the zone assignment of 4.5. Written through an open stream, flushed and closed on pause, scene change and session end. The sampler (timer/coroutine) lives outside `Research/` (in `Assembly-CSharp`) and calls the logger one way; `Research/` has no per-frame method. Planned, #30. If 10 Hz costs FPS on Quest, drop to 5 Hz and note it here.
 
 ## 5. Summary CSV (one row per scene visit)
 
-`participant_id, session_id, build, schema_version, scene, scene_visit, enter_utc, duration_s, paused_s, confirm_count, first_attempt_correct, attempts_to_correct, time_to_first_confirm_s, time_to_correct_s, completed, error_codes_all, grabs, drops_floor, container_enters, container_exits, dwell_wms_s, dwell_instructions_s, pauses, hmd_removed_count, fps_avg, dropped_frames, unity_errors`
+`participant_id, session_id, build, schema_version, scene, scene_visit, enter_utc, duration_s, paused_s, confirm_count, confirm_ignored, first_attempt_correct, attempts_to_correct, time_to_first_confirm_s, time_to_correct_s, completed, error_codes_all, grabs, drops_floor, container_enters, container_exits, pauses, hmd_removed_count, fps_avg, dropped_frames, unity_errors`
 
-`duration_s` is active time (pauses subtracted), `paused_s` the paused time of the visit. #26 fills identity, `build`, `schema_version`, `enter_utc`, `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`; the rest stay empty (NA in R) until #28-#30. `error_codes_all` is semicolon-separated `CODE:n` (e.g. `TOO_FEW:2;EMPTY:1`). The events file is the source of truth; `analyse.R` rebuilds the table from events and compares it with `summary.csv` (tolerance 0.002 s for `_s` columns).
+`duration_s` is active time (pauses subtracted), `paused_s` the paused time of the visit. #26 fills identity, `build`, `schema_version`, `enter_utc`, `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`; the rest stay empty (NA in R) until #28 step 2, #29 and #30. `confirm_count` counts rated presses only; `confirm_ignored` counts the ignored ones (the v1 dwell columns are gone: R computes dwell in the wide file). `error_codes_all` is semicolon-separated `CODE:n` (e.g. `TOO_FEW:2;EMPTY:1`). The events file is the source of truth; `analyse.R` rebuilds the table from events and compares it with `summary.csv` (tolerance 0.002 s for `_s` columns).
 
-## 6. Contract for outcome events (#27/#28) and analysis
+## 6. Contract for outcome events (#28) and analysis
 
-These shapes are fixed now; the fake data in `analysis/` already uses them. The in-code validator result type can be shaped freely as long as it maps 1:1 onto this format.
+These shapes are fixed now; the fake data in `analysis/` follows them (task 3 of the v2 plan). The in-code validator result type can be shaped freely as long as it maps 1:1 onto this format.
 
-**`confirm_pressed`** (one per press):
+**`confirm_pressed`** (one per rated press; Mixed position 1, 2 of 3 cartons placed):
 ```json
 {"event":"confirm_pressed","data":{
-  "attempt_no":2,
-  "container":{"gg":4,"vpe":0,"gga":null,"ggb":null,"loose":null,"other":0,"total_pieces":200},
-  "required":{"gg":6,"vpe":0,"gga":null,"ggb":null,"loose":null,"other":0,"total_pieces":300},
+  "attempt_no":1,"position":1,"position_count":2,"attempt_in_position":1,
+  "line":{"item":"connector_a","soll":150,"vpe":50,"required_full":3,"required_loose":null,"placed_full":2,"placed_loose":null},
+  "foreign":[],
   "correct":false,
-  "error_codes":[{"code":"TOO_FEW","item":"gg"}],
+  "error_codes":[{"code":"TOO_FEW","item":"connector_a"}],
   "time_since_scene_enter_s":41.2}}
 ```
-`container`/`required` always carry the same fixed keys; a key that doesn't apply in a scene is `null`, not 0. `item` is `null` for codes without an item (`EMPTY`, `WRONG_TYPE`, `NO_ANSWER`, `WRONG_ANSWER`).
+A key that doesn't apply in a scene is `null`, not 0. `item` is `null` for codes without an item (`EMPTY`, `WRONG_ANSWER`, `EKZ_PLACEMENT`).
 
-**`quiz_answer`**: `{"attempt_no":1,"selected":"vpe","correct":false,"error_codes":[{"code":"WRONG_ANSWER","item":null}]}`.
+**`quiz_answer`** (Complex position-1 remainder quiz, full cartons answered `"1"` instead of `"2"`):
+```json
+{"event":"quiz_answer","data":{
+  "attempt_no":1,"quiz":"complex_remainder","question_id":"cartons","selected":"1",
+  "correct":false,"attempt_in_question":1,
+  "error_codes":[{"code":"WRONG_ANSWER","item":null}],
+  "time_since_scene_enter_s":22.8}}
+```
 
-**`task_completed`** (first correct confirm per visit): `{"attempts_to_correct":3,"time_to_first_confirm_s":38.0,"time_to_correct_s":95.5}`. Times are active time.
+**`task_completed`** (at order completion; Concept: all 4 questions right): `{"attempts_to_correct":3,"time_to_first_confirm_s":38.0,"time_to_correct_s":95.5}`. Times are active time.
 
 **Invariant:** `correct == (error_codes is empty)`. One shared helper decides both; `analyse.R` reports any row that breaks it.
 
-**Error codes:** section 4.3 including `WRONG_ANSWER`. `EMPTY` is logged alone, without an extra `TOO_FEW`. Every code has a row in `analysis/skill_map.csv` (`error_code, skill, description`), which maps it to the skill it tests (e.g. `WRONG_MATERIAL` to check material, `TOO_FEW`/`TOO_MANY` to calculate quantity); the study lead can edit it without a rebuild. `analysis/scene_skills.csv` lists which scene tests which skill.
+**Error codes and skills:** section 4.3 (`skill_map.csv` + `scene_skills.csv` + `item_skills.csv`).
 
-**Session end:** #28 calls `ResearchLogger.EndSession("completed")` on the first correct confirm in ComplexScene; #44 adds a hidden facilitator control (decision 004 §9) for `EndSession("facilitator")`. `analyse.R` derives `end_status` (completed / facilitator / quit / crash) and `course_finished` (a `task_completed` in ComplexScene) itself.
+**Session end:** #28 calls `ResearchLogger.EndSession("completed")` at `OrderCompleted` in ComplexScene; #44 adds the hidden facilitator control (decision 004 §9) for `EndSession("facilitator")`. `analyse.R` derives `end_status` (completed / facilitator / quit / crash) and `course_finished` (a `task_completed` in ComplexScene) itself.
 
-**Derived measures (computed later, not logged):** task time, error rate per skill across scenes (share of confirm presses per visit with at least one code of that skill; also first attempts only), attempts to correct, error profile per scene, hesitation (enter to exit of the same object), re-grabs, time spent reading WMS before first grab, head movement per minute, frame drops vs SSQ change, NASA-TLX vs attempts and active time. Which visit counts: the first visit of a scene with at least one confirm; later visits are flagged `repeat_visit`.
+**Derived measures (computed later, not logged):** task time, share correct at first attempt per item (main) and error rate per skill (secondary: share of rated presses per visit with at least one code of that skill), attempts to correct, error profile per scene, hesitation (enter to exit of the same object), re-grabs, time spent reading WMS before first grab (minus station-move time), head movement per minute, dwell per head-direction zone, frame drops vs SSQ change, NASA-TLX vs attempts and active time. Which visit counts: the first visit of a scene with at least one rated confirm; later visits are flagged `repeat_visit`.
 
 ## 7. Dependencies and validity notes
 
-- **Feedback reveals the answer** in MixedPickingScene and ComplexScene (failure text prints targets) and ComplexScene's counters show `/ 2`, `/ 55` (backlog #14, #15). `attempts_to_correct` then measures trial-and-error, not calculation. Fix before real data collection, or record which build each participant used (`build` in the header) and analyse separately.
+- **Complex position 1 is scaffolded by the remainder quiz**: the quiz hands the trainee the numbers (full cartons, loose pieces) before the first pick, so position 1 measures picking, not calculation; position 2 is unscaffolded (`item_skills.csv`, `scaffolded`). Don't pool the two positions as one `calculate_quantity` measure without this flag.
 - Language (#11): the header's `language` is `DE` or `EN`. The Deutsch / English buttons sit on the WelcomeScene keypad and are hidden once a session runs, so the language cannot change inside a session and there is no `language_change` event. Research IDs (not `P000`, `P900`–`P999`) always run in `DE`: choosing English and then typing a research code switches back to German before the session starts.
 - Improvement is an indication only: fixed scene order confounds difficulty with improvement, the Concept quiz has a 33 % guess rate, and there is no control group.
 - A session that ended in a crash has its last visit cut at the last event (`duration_censored`).
@@ -185,3 +211,4 @@ These shapes are fixed now; the fake data in `analysis/` already uses them. The 
 - ~~Should trainees be able to skip scenes freely during the study, or should the menu be locked to the build order?~~ Decided 2026-11-01: the menu is locked to the build order during the study.
 - ~~Pose stream at 10 Hz and hand positions: needed for the research questions, or is head pose enough?~~ Decided 2026-11-01: head pose only, no hand positions.
 - ~~Retention: how long logs stay on the headset; who deletes them after transfer.~~ Decided 2026-11-01: the facilitator deletes the logs on the headset right after copying them and checking that all files are complete.
+- D28: map of question / position to skill (does Complex position 1 count for `calculate_quantity`?); D29: is `ekz_placement` its own skill in Q1 with only 2 measuring points? (decision 021)
