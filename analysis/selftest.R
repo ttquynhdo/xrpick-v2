@@ -105,7 +105,8 @@ local({
   stopifnot(all(visits$confirm_count == visits$rated_presses, na.rm = TRUE))
   stopifnot(any(visits$confirm_ignored > 0, na.rm = TRUE))
   # Review Focus 3: Mixed/Complex completed only after the last position.
-  stopifnot(!any(wide$completed_ComplexScene[wide$participant_id == "P114"] %in% TRUE))
+  # Measured FALSE, not NA: isFALSE fails on a missing value.
+  stopifnot(isFALSE(wide$completed_ComplexScene[wide$participant_id == "P114"]))
   # Review Focus 5: no check_material rate for Mixed/Complex; tested skills present.
   stopifnot(!any(skill_rates$scene %in% c("MixedPickingScene", "ComplexScene") & skill_rates$skill == "check_material"))
   stopifnot(all(c("calculate_quantity", "calculate_loose", "ekz_placement") %in% skill_rates$skill))
@@ -157,6 +158,45 @@ local({
                                                                 paste(visits$session_id, visits$scene, visits$scene_visit))]))
   stopifnot(all(c("wait_after_done_s_MixedPickingScene") %in% names(wide)),
             !"wait_after_done_s_ConceptScene" %in% names(wide))
+
+  # Per-item skill denominators (final fix wave): a Concept skill's rate counts
+  # only touches on its own questions, and its first attempt is the first
+  # touch on one of them, not the quiz's first touch (always cartons_from_soll).
+  # So Concept check_material equals material_by_matnr in items.csv.
+  cq <- presses %>% filter(scene == "ConceptScene", counted) %>%
+    count(session_id, scene_visit, item, name = "n_item")
+  cm <- skill_rates %>% filter(scene == "ConceptScene", skill == "check_material") %>%
+    left_join(cq %>% filter(item == "material_by_matnr"), by = c("session_id", "scene_visit"))
+  stopifnot(nrow(cm) > 0, all(cm$skill_presses == cm$n_item))
+  mat <- items %>% filter(scene == "ConceptScene", item == "material_by_matnr") %>%
+    select(participant_id, session_id, scene_visit, first_attempt_correct)
+  cm_mat <- inner_join(cm, mat, by = c("participant_id", "session_id", "scene_visit"))
+  stopifnot(nrow(cm_mat) == nrow(cm),
+            all(cm_mat$first_attempt_skill_error == !cm_mat$first_attempt_correct))
+  # Not structurally 0: someone is wrong at the first material question.
+  stopifnot(any(cm$first_attempt_skill_error))
+  # ekz_placement in Concept = touches on ekz_003 + ekz_000 only.
+  ce <- skill_rates %>% filter(scene == "ConceptScene", skill == "ekz_placement") %>%
+    left_join(cq %>% filter(item %in% c("ekz_003", "ekz_000")) %>%
+                group_by(session_id, scene_visit) %>% summarise(n_ekz = sum(n_item), .groups = "drop"),
+              by = c("session_id", "scene_visit"))
+  stopifnot(nrow(ce) > 0, all(ce$skill_presses == ce$n_ekz))
+  # Picking scenes: a position without a skill tests every scene skill, so the
+  # denominator is every counted press (Basic: both skills, same count).
+  bs <- skill_rates %>% filter(scene == "BasicPickingScene")
+  stopifnot(nrow(bs) > 0, all(bs$skill_presses == visits$confirm_count[match(
+    paste(bs$session_id, "BasicPickingScene", bs$scene_visit),
+    paste(visits$session_id, visits$scene, visits$scene_visit))]))
+
+  # Complex attempts_to_correct = red-button presses (confirm_pressed) of the
+  # visit; remainder-quiz touches are not counted. If the C# logger counts
+  # them, this fails and the rule must be decided, not drifted into.
+  cx_tc <- v2_events %>% filter(scene == "ComplexScene", event == "task_completed") %>%
+    transmute(session_id, scene_visit, atc = map_int(data, ~ as.integer(.x$attempts_to_correct)))
+  cx_cp <- v2_events %>% filter(scene == "ComplexScene", event == "confirm_pressed") %>%
+    count(session_id, scene_visit, name = "n_confirm")
+  cx_atc <- left_join(cx_tc, cx_cp, by = c("session_id", "scene_visit"))
+  stopifnot(nrow(cx_atc) > 0, all(cx_atc$atc == cx_atc$n_confirm))
 
   # 8d. Pauses: P102's pause spans Mixed visit 1 -> Basic visit 2: it counts in
   #     Mixed 1, its time is split (4.5 s + 7.25 s). P104 quits while paused:

@@ -1223,36 +1223,56 @@ if (nrow(item_shares) == 0) {
 ggsave(file.path(output_dir, "first_attempt_by_item.png"), p_items, width = 11, height = 7, dpi = 150, bg = "white")
 
 # Secondary measure: error rate per skill. Only the attempts counted in
-# confirm_count (red-button presses; quiz touches in ConceptScene) are in the
-# numerator and the denominator; the Complex remainder quiz is in items above.
+# confirm_count (red-button presses; quiz touches in ConceptScene) can enter;
+# the Complex remainder quiz is in items above.
 counting_visits <- visits %>% filter(counting, confirm_count > 0)
 
+# Which skills does an attempt test? The skill of its item, per item_skills.csv
+# (a Concept quiz question tests exactly one skill). An order position without
+# a skill there tests every skill its scene tests (scene_skills.csv): a press
+# can fail on any of them. Why: the Concept quiz asks its questions in a fixed
+# order, so "all presses of the visit" as denominator would dilute each skill
+# with touches on the other questions, and "the visit's first press" would
+# always be the first question (other skills 0 % by construction).
 # Presses of scaffolded items (Complex position 1: the remainder quiz handed
 # the trainee the numbers) measure picking, not calculation (decision 021),
-# so they are left out of the skill rates: numerator AND denominator.
-# skill_presses = the counted, unscaffolded presses of the visit.
-skill_press_base <- presses %>%
-  filter(counted, !scaffolded) %>%
+# so they are left out: numerator AND denominator.
+press_skill_tests <- presses %>%
+  filter(counted, !scaffolded, !is.na(item)) %>%
+  select(participant_id, session_id, scene, scene_visit, t, line, press_id, event, item) %>%
+  left_join(item_skills %>% filter(!is.na(skill)) %>% select(scene, item, item_skill = skill),
+            by = c("scene", "item")) %>%
+  left_join(skill_pairs %>% rename(scene_skill = skill), by = "scene", relationship = "many-to-many") %>%
+  # Item with a skill: only that skill. Position without one: every scene skill.
+  filter(if_else(is.na(item_skill), event == "confirm_pressed", scene_skill == item_skill)) %>%
+  transmute(participant_id, session_id, scene, scene_visit, t, line, press_id, skill = scene_skill)
+
+# Per visit and skill: skill_presses = attempts that tested the skill (the
+# denominator); first_skill_press_id = the first of them (the first attempt
+# at an item of that skill).
+skill_press_base <- press_skill_tests %>%
   arrange(session_id, scene, scene_visit, t, line) %>%
-  group_by(session_id, scene, scene_visit) %>%
+  group_by(session_id, scene, scene_visit, skill) %>%
   summarise(skill_presses = n(), first_skill_press_id = press_id[1], .groups = "drop")
 
-# Per counting visit and per skill the scene tests: share of unscaffolded
-# presses with a code of that skill. A tested but error-free skill gives 0 %,
-# not missing. A visit with only scaffolded presses has no skill rate.
+# Per counting visit and per skill it tested: share of those attempts with a
+# code of that skill. A tested but error-free skill gives 0 %, not missing; a
+# skill with no attempt in the visit (question never reached, only scaffolded
+# presses) has no rate.
 skill_rates <- counting_visits %>%
   mutate(scene = as.character(scene)) %>%
   select(participant_id, session_id, scene, scene_visit) %>%
   inner_join(skill_press_base, by = c("session_id", "scene", "scene_visit")) %>%
-  inner_join(skill_pairs, by = "scene", relationship = "many-to-many") %>%
-  left_join(press_codes %>% filter(counted, !scaffolded, !is.na(skill)) %>%
+  left_join(press_codes %>% filter(!is.na(skill)) %>%
               distinct(session_id, scene, scene_visit, press_id, skill) %>%
+              # Only codes on attempts that tested the skill (same set as the denominator).
+              semi_join(press_skill_tests, by = c("press_id", "skill")) %>%
               group_by(session_id, scene, scene_visit, skill) %>%
               summarise(presses_with_skill_error = n(),
                         skill_error_press_ids = list(press_id), .groups = "drop"),
             by = c("session_id", "scene", "scene_visit", "skill")) %>%
   mutate(presses_with_skill_error = coalesce(presses_with_skill_error, 0L),
-         # The visit's first unscaffolded counted attempt carried a code of this skill.
+         # The first attempt at an item of this skill carried a code of this skill.
          first_attempt_skill_error = map2_lgl(skill_error_press_ids, first_skill_press_id,
                                               ~ !is.null(.x) && .y %in% .x),
          error_rate = presses_with_skill_error / skill_presses,
@@ -1283,9 +1303,12 @@ if (nrow(skill_rates) == 0) {
     scale_y_continuous(limits = c(-12, 105), breaks = seq(0, 100, 25)) +
     labs(title = title_q1,
          subtitle = paste0("Dots = one participant's first visit with >= 1 confirm; diamond = mean. ",
+                           "Denominator = attempts at items of this skill (Concept: touches on its questions;
+",
+                           "picking: every press, a position tests all skills of its scene). ",
                            "Scaffolded Complex position 1 left out. ",
                            "Indication only: fixed scene order, no control group."),
-         x = "Scene (build order)", y = "Confirm presses with an error of this skill (%)") +
+         x = "Scene (build order)", y = "Attempts at this skill with its error (%)") +
     theme_minimal(base_size = 11) +
     theme(axis.text.x = element_text(angle = 25, hjust = 1))
 }
@@ -1308,7 +1331,10 @@ if (nrow(skill_rates) == 0) {
     scale_x_discrete(limits = skill_scene_limits) +
     scale_y_continuous(limits = c(0, 110), breaks = seq(0, 100, 25)) +
     labs(title = title_q1b,
-         subtitle = "Label = participants with this error on attempt 1 / participants with a counting visit.",
+         subtitle = paste0("Attempt 1 = the first attempt at an item of this skill (Concept: its first question, ",
+                           "not the quiz's first touch).
+Label = participants with this error on that attempt / ",
+                           "participants who attempted the skill. Scaffolded Complex position 1 left out."),
          x = "Scene (build order)", y = "Participants with the error on attempt 1 (%)") +
     theme_minimal(base_size = 11) +
     theme(axis.text.x = element_text(angle = 25, hjust = 1))

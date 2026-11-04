@@ -1,7 +1,8 @@
-# analysis/: R analysis of the research logs (backlog #26)
+# analysis/: R analysis of the research logs (backlog #26, log contract v2 since #28)
 
 The xpick app writes one events file and one summary file per session
-(`docs/research-logging-spec.md`, design `docs/superpowers/specs/2026-11-01-research-logger-design.md`).
+(`docs/research-logging-spec.md`, design `docs/superpowers/specs/2026-11-01-research-logger-design.md`,
+log contract v2: `docs/decisions/021-research-log-catalogue-v2.md`).
 The scripts here turn those files into charts and tables for research questions
 1 (improvement per skill), 2 (hard scenes, common errors) and 6 (data quality),
 plus a wide per-participant file for SPSS and the paper questionnaires.
@@ -14,10 +15,11 @@ plus a wide per-participant file for SPSS and the paper questionnaires.
 | `scenes.csv` | `scene, build_order`: scene order in every chart (survives scene renames). |
 | `skill_map.csv` | `error_code, skill, description`: which skill each error code tests. |
 | `scene_skills.csv` | `scene, skill`: which skills each scene tests (an error-free tested skill shows 0 %, not missing). |
+| `item_skills.csv` | `scene, item, skill, scaffolded`: the skill of each quiz question (`question_id`) and order position (`position_<n>`), and which items are scaffolded (Complex `position_1`). A position with an empty skill tests every skill of its scene. |
 | `data/` | Copied logs. **Git-ignored, never commit.** |
 | `output/` | Charts and tables. Git-ignored. |
 
-The study lead may edit the three CSVs without touching code.
+The study lead may edit the four CSVs without touching code.
 
 ## Setup (once)
 
@@ -65,15 +67,24 @@ RStudio. Without Rscript on PATH use the full path, e.g.
 
 | Output | Question | Reads as |
 |---|---|---|
-| `error_rate_by_skill.png` | 1 | Per skill and scene: share of confirm presses with an error of that skill. Dot = one participant (first visit of the scene with ≥ 1 confirm), diamond = mean, `n` under each scene. |
-| `error_rate_by_skill_first_attempt.png` | 1 | Same skills, first press only: `k/n` participants made that error on attempt 1. |
+| `first_attempt_by_item.png` | 1 (**main chart**) | Per item (quiz question or order position) in build order: share of participants right at their **first attempt** at that item, with a 95 % Wilson interval and `right/participants`. One panel per skill. Hollow point = scaffolded (Complex position 1). Guess rate 33 % (A/B/C) or 50 % (EKZ questions): a quiz share near that level says little. |
+| `items.csv` | 1 | One row per participant, scene and item (the first visit with an attempt at that item). `attempts` = all touches / red-button presses at that item in that visit (rated ones only; ignored presses are never attempts). `first_attempt_correct` = the first of them was right (right only on a later touch counts as wrong). `reached_correct` = any of them was right. `scaffolded` = the app gave the numbers (from `item_skills.csv`). `repeat_visit` = this visit was not the participant's first visit of the scene (e.g. after a crash): a second exposure. `first_attempt_codes` = error codes of the first attempt. |
+| `error_rate_by_skill.png` | 1 (secondary) | Per skill and scene: share of the attempts **at items of that skill** that had an error of that skill (see *Per-skill rule* below). Dot = one participant (first visit of the scene with ≥ 1 counted attempt), diamond = mean, `n` under each scene. |
+| `error_rate_by_skill_first_attempt.png` | 1 (secondary) | Same skills, first attempt at an item of that skill only: `k/n` participants made that error there. |
 | `error_codes_by_scene.png` | 2 | Which error codes occur in which scene (counting visits). Unknown codes are marked `(unknown)`. |
 | `time_to_correct_by_scene.png` | 2 | Active time to the first correct confirm per scene; `never` counts the people who didn't get there (survivor bias). |
 | `data_quality.csv` / `.png` | 6 | One row per participant: `end_status` (completed / facilitator / quit / crash), `course_finished` (empty = no outcome events logged), `multi_session`, `mixed_build`, `builds`, `gap_h`, `resume_offered` / `resume_declined` (#27: a resume after a crash was offered / declined in any session; empty = log from before #27), `ended_session_override` (a session was started with "Trotzdem starten" although the ID already had a finished session; empty = log from before the #27 fix wave), `duration_censored`, repeat visits, `paused_s` (seconds), pauses, headset removals, Unity errors, `error_cap_reached`, invariant breaks, unknown codes, mismatches with `summary.csv`, `exit_disagreements` (visits whose `scene_exit` numbers differ from their events), `duplicate_files` (copies of a session's files that were dropped). Orange = check. |
-| `wide.csv` | all | One row per real participant for SPSS. Per-scene columns (`active_s_<Scene>`, `paused_s_<Scene>`, `time_to_correct_s_<Scene>`, `confirms_<Scene>`, `error_rate_<Scene>`, `error_rate_<Scene>_<skill>`, …) come from the counting visit; scenes without a confirm or quiz (WelcomeScene) have no outcome columns. Join the paper forms (SSQ, NASA-TLX, #31) on `participant_id`. |
+| `wide.csv` | all | One row per real participant for SPSS. Per-scene columns (`active_s_<Scene>`, `paused_s_<Scene>`, `time_to_correct_s_<Scene>`, `confirms_<Scene>`, `error_rate_<Scene>`, `error_rate_<Scene>_<skill>`, …) come from the counting visit; scenes without a confirm or quiz (WelcomeScene) have no outcome columns. `confirm_ignored_<Scene>` = red-button presses the app ignored (box still riding, order already done, Complex quiz not answered yet): counted, never an attempt, never in a rate. `wait_s_<Scene>` = seconds the trainee waited for station rides **before** `task_completed` (the union of overlapping rides, not their sum, minus pauses; the whole visit when there is no `task_completed`); `wait_after_done_s_<Scene>` = ride time after it (the boxes leaving at the end; empty when the task was never completed). These three exist only for the red-button scenes (Basic, Mixed, Complex). Join the paper forms (SSQ, NASA-TLX, #31) on `participant_id`. |
 | `warnings.txt` | 6 | Everything the script found odd, then the validity limits. Read it first. |
 
-Rules the script applies (design §8): `events.jsonl` is the source of truth;
+Rules the script applies (design §8, decision 021): `events.jsonl` is the source of truth;
+`confirm_count` (and every per-visit rate) counts only **rated attempts**: in
+ConceptScene the quiz touches, in Basic/Mixed/Complex the red-button presses
+(`confirm_pressed`); the Complex remainder quiz touches are not in
+`confirm_count` (they are in `items.csv` as items `cartons` and `loose`), and
+ignored presses (`confirm_ignored`) never count;
+`completed` = the visit has a `task_completed` event (Mixed and Complex only
+after the **last** position, so position 1 right is not "completed");
 per-visit rates are NA (never 0 %) when a visit has 0 confirms; the counting
 visit of a scene is the first one with ≥ 1 confirm (scenes without confirms, or
 logs without outcome events: the first visit); a participant's sessions are
@@ -85,7 +96,24 @@ visit after a crashed session; times are active time (pauses removed).
 confirm with `correct: true` in any session, even if that session later
 crashed or ended without `session_end`. A session with no `confirm_pressed` /
 `quiz_answer` at all counts as "outcome not logged" (NA), because logs from
-before #28 have no outcome events.
+before #28 have no outcome events. A file with `schema_version` 1 (before
+decision 021) is warned, not fatal: it stays in the data-quality table, but
+its outcome columns are NA (not measured) and it is not in `items.csv`.
+
+**Per-skill rule** (`error_rate_by_skill*.png`, `error_rate_<Scene>_<skill>`):
+an attempt tests the skill of its item in `item_skills.csv`; an order position
+without a skill there tests every skill its scene lists in `scene_skills.csv`.
+The denominator of a skill in a visit = the counted attempts that tested it;
+the numerator = those of them with an error code of that skill; the "first
+attempt" = the first of them. Example: ConceptScene `check_material` counts
+only the touches on question `material_by_matnr`, and its first attempt is the
+first touch on that question (the quiz always starts with `cartons_from_soll`,
+so "the visit's first touch" would make the other skills 0 % by
+construction). In Basic, Mixed and Complex every counted press tests every
+skill of the scene. Presses at the scaffolded Complex `position_1` are left
+out of the skill rates (numerator and denominator): there the remainder quiz
+gave the trainee the numbers, so it measures picking, not calculation. A
+Complex visit that never reached position 2 has no Complex skill rate.
 
 Data checks (all end in `warnings.txt`): the same `session_id` in two files
 (e.g. a backup copy) keeps the longest file and names both paths; Unity
@@ -111,7 +139,9 @@ that trainee saw non-German texts.
 ## Validity limits (state them with every result)
 
 - Fixed scene order: a lower error rate in a later scene mixes learning with scene difficulty. It is an indication of improvement, not proof (no control group, no pre/post test).
-- ConceptScene quiz: the feedback reveals the answer and a guess is right 33 % of the time.
+- Quizzes (ConceptScene, Complex remainder quiz): a guess is right 33 % of the time (A/B/C; 50 % for the two EKZ questions) and a touch is rated at once, so later touches are trial-and-error. Use the first attempt per item (`items.csv`, `first_attempt_by_item.png`), not the number of touches.
+- Complex position 1 is scaffolded (see above): don't pool it with position 2 as one calculation measure.
+- Schema 1 logs have no outcome (NA): don't read them as 0 errors.
 - Data recorded before backlog #14 (feedback printing target numbers) measure trial-and-error, not skill. Keep builds before and after #14 apart (`builds` column).
 - Small N, one run per person: describe distributions first; any test is exploratory.
 - Time-to-correct only covers visits that reached correct; read it with the `never` counts.
@@ -141,5 +171,7 @@ removed field bumps `schema_version`.
    thư mục. Nếu `data_dir` chứa chữ `fake`, script dừng và báo lỗi (dữ liệu giả).
 6. Kết quả nằm trong `analysis/output/`. Đọc `warnings.txt` trước, rồi
    `data_quality.png` (ai có dữ liệu cần kiểm tra lại), sau đó mới xem các biểu đồ.
+   Biểu đồ chính cho câu hỏi 1 là `first_attempt_by_item.png` (lần thử đầu tiên ở
+   mỗi câu hỏi / mỗi vị trí); hai biểu đồ `error_rate_by_skill*.png` chỉ là phụ.
 7. Khi trình bày kết quả, luôn ghi kèm các giới hạn ở mục *Validity limits*: chỉ là
    **dấu hiệu** tiến bộ, không chứng minh khoá học gây ra tiến bộ.
