@@ -857,12 +857,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810624
-    m_Localized: Pick up the STECKER C carton. Compare Mat.-Nr and Bez. with its
-      label.
+    m_Localized: Pick up the STECKER C carton.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810625
-    m_Localized: Find the VPE on the label of the STECKER C carton.
+    m_Localized: Pick up the STECKER C carton.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810626
@@ -896,6 +895,23 @@ MonoBehaviour:
   - m_Id: 727156763004928
     m_Localized: Watch the containers on the roller conveyor. Then answer the questions
       below the screen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 735937718784000
+    m_Localized: "Mat.-Nr: {matnr} \u2013 material number"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 735937823641600
+    m_Localized: "VPE: {vpe} ST \u2013 pieces per carton or bag"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 735937823641601
+    m_Localized: Compare Mat.-Nr and Bez. in the WMS with the label.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 735937823641602
+    m_Localized: Read the VPE on the label and compare it with Verp.-Einh. in the
+      WMS.
     m_Metadata:
       m_Items: []
   references:

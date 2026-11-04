@@ -193,8 +193,8 @@ concept.lane.middle,Mittlere Bahn,proposed,german-reviewer (agent),2026-11-04,Ag
 concept.lane.order,Auftragsbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 complex.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-04,Same text as concept.quiz.how_to (Agent: OK) (#85)
 concept.tour.intro.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.material.action,Nehmen Sie den Karton STECKER C in die Hand. Vergleichen Sie Mat.-Nr und Bez. mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.verp_einh.action,Suchen Sie die VPE auf dem Etikett des Kartons STECKER C.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.material.action,Nehmen Sie den Karton STECKER C in die Hand.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK (#90, split pick-up / compare)"
+concept.tour.verp_einh.action,Nehmen Sie den Karton STECKER C in die Hand.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK (#90, split pick-up / compare)"
 concept.tour.soll.action,Lesen Sie die Zahl im Feld Soll ab. Drücken Sie dann „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.cartons.action,Schauen Sie in den Auftragsbehälter rechts.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.ist.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
@@ -203,3 +203,7 @@ concept.tour.empf_kz_003.action,Sehen Sie sich das Beispiel „Empf Kz 003“ zw
 concept.tour.empf_kz_000.action,Vergleichen Sie die beiden Beispiele zwischen den Behältern.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.not_used.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu. Beantworten Sie dann die Fragen unter dem Bildschirm.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.label.tag.matnr,Mat.-Nr: {matnr} – Materialnummer,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
+concept.label.tag.vpe,VPE: {vpe} ST – Stück pro Karton oder Tüte,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
+concept.tour.material.action_held,Vergleichen Sie Mat.-Nr und Bez. im LVS mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
+concept.tour.verp_einh.action_held,Lesen Sie die VPE auf dem Etikett ab und vergleichen Sie sie mit Verp.-Einh. im LVS.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"

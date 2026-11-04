@@ -11,7 +11,8 @@ using UnityEngine.UI;
 /// #89, decision 026: one bar centred below the screen holds the step text of the steps without a caption, the
 /// "what to do" line with a hand icon for every step, and [Zurück] "Schritt n von 11" [Weiter] (poke toggles used as
 /// push buttons, #80). The bar is hidden at the start and opens through <see cref="Open"/> (card 1 done) or after
-/// <see cref="autoOpenSeconds"/>; step 1 is shown and logged only then.
+/// <see cref="autoOpenSeconds"/>; step 1 is shown and logged only then. #90: a step with a held material shows a
+/// second action line while that material is held (pick up → compare).
 /// </summary>
 public class WmsFieldTour : MonoBehaviour
 {
@@ -38,6 +39,10 @@ public class WmsFieldTour : MonoBehaviour
         public TMP_Text captionTitle;
 
         public TMP_Text captionBody;
+
+        // #90, decision 026 (2): while a package of this material is held, the bar shows .action_held instead.
+        [Tooltip("Material key (e.g. stecker_c); while it is held the bar shows concept.tour.<id>.action_held. Empty = never.")]
+        public string heldMaterialKey;
     }
 
     [SerializeField] private Step[] steps;
@@ -53,6 +58,9 @@ public class WmsFieldTour : MonoBehaviour
     [SerializeField] private TMP_Text actionText;
 
     [SerializeField] private TMP_Text progressText;
+
+    [Tooltip("Held packages (#90); lets a step change its action line while its material is held.")]
+    [SerializeField] private HeldLabelTags heldPackages;
 
     [Tooltip("The tour opens by itself after this many seconds if card 1 is not done yet; 0 = never.")]
     [SerializeField] private float autoOpenSeconds = 60f;
@@ -90,6 +98,11 @@ public class WmsFieldTour : MonoBehaviour
         {
             backToggle.onValueChanged.AddListener(OnBackToggled);
         }
+
+        if (heldPackages != null)
+        {
+            heldPackages.HeldChanged += ShowAction;
+        }
     }
 
     private void OnDisable()
@@ -102,6 +115,11 @@ public class WmsFieldTour : MonoBehaviour
         if (backToggle != null)
         {
             backToggle.onValueChanged.RemoveListener(OnBackToggled);
+        }
+
+        if (heldPackages != null)
+        {
+            heldPackages.HeldChanged -= ShowAction;
         }
     }
 
@@ -230,7 +248,7 @@ public class WmsFieldTour : MonoBehaviour
             barText.text = $"<b>{title}:</b> {body}";
         }
 
-        actionText.text = Loc.Get(StepKeyPrefix + step.id + ".action");
+        ShowAction();
 
         if (progressText != null)
         {
@@ -251,6 +269,18 @@ public class WmsFieldTour : MonoBehaviour
 
         ResearchLogger.LogTourStep(step.id, index + 1);
         StepShown?.Invoke(step.id);
+    }
+
+    // The "what to do" line of the current step; also called when a package is grabbed or released (#90).
+    private void ShowAction()
+    {
+        if (!IsOpen || !ready)
+            return;
+
+        Step step = steps[current];
+        bool held = heldPackages != null && !string.IsNullOrEmpty(step.heldMaterialKey)
+                    && heldPackages.IsMaterialHeld(step.heldMaterialKey);
+        actionText.text = Loc.Get(StepKeyPrefix + step.id + (held ? ".action_held" : ".action"));
     }
 
     private static void SetMarkers(Step step, bool active)

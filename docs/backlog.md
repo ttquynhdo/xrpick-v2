@@ -1410,7 +1410,8 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** bắt buộc (đọc khi tay cầm, xoay kiện; có nhận ra phải cầm STECKER C không)
 - **Depends on:** decision 026; #88 (cỡ kiện và nhãn)
 - **Decision:** docs/decisions/026-concept-study-desk.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl90.md
+- **Status:** verified-mcp (10/10 MCP/code ✅, chờ test tay H1–H3 trên kính; nhánh `feat/90-label-card-near-package`)
 
 ### #91 [Feature] ConceptScene bước `cartons`: phép tính đặt cạnh ô Soll/Verp.-Einh. và carton đếm
 - **Type:** feature

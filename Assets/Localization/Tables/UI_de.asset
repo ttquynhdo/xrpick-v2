@@ -858,12 +858,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810624
-    m_Localized: Nehmen Sie den Karton STECKER C in die Hand. Vergleichen Sie Mat.-Nr
-      und Bez. mit dem Etikett.
+    m_Localized: Nehmen Sie den Karton STECKER C in die Hand.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810625
-    m_Localized: Suchen Sie die VPE auf dem Etikett des Kartons STECKER C.
+    m_Localized: Nehmen Sie den Karton STECKER C in die Hand.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810626
@@ -898,6 +897,23 @@ MonoBehaviour:
   - m_Id: 727156763004928
     m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu. Beantworten Sie
       dann die Fragen unter dem Bildschirm."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 735937718784000
+    m_Localized: "Mat.-Nr: {matnr} \u2013 Materialnummer"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 735937823641600
+    m_Localized: "VPE: {vpe} ST \u2013 St\xFCck pro Karton oder T\xFCte"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 735937823641601
+    m_Localized: Vergleichen Sie Mat.-Nr und Bez. im LVS mit dem Etikett.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 735937823641602
+    m_Localized: Lesen Sie die VPE auf dem Etikett ab und vergleichen Sie sie mit
+      Verp.-Einh. im LVS.
     m_Metadata:
       m_Items: []
   references:
