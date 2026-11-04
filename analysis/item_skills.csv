@@ -1,0 +1,9 @@
+scene,item,skill,scaffolded
+ConceptScene,cartons_from_soll,calculate_quantity,
+ConceptScene,material_by_matnr,check_material,
+ConceptScene,ekz_003,ekz_placement,
+ConceptScene,ekz_000,ekz_placement,
+ComplexScene,cartons,calculate_quantity,
+ComplexScene,loose,calculate_loose,
+ComplexScene,position_1,,true
+ComplexScene,position_2,,false

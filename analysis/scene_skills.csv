@@ -1,8 +1,9 @@
 scene,skill
-ConceptScene,package_concept
+ConceptScene,calculate_quantity
+ConceptScene,check_material
+ConceptScene,ekz_placement
 BasicPickingScene,calculate_quantity
+BasicPickingScene,ekz_placement
 MixedPickingScene,calculate_quantity
-MixedPickingScene,check_material
 ComplexScene,calculate_quantity
-ComplexScene,check_material
 ComplexScene,calculate_loose

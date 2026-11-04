@@ -1,8 +1,14 @@
 # make_fake_data.R
 #
 # Writes fake research logs in exactly the format of the C# ResearchLogger
-# (Assets/Scripts/Research/), plus the outcome events that #28 will add
-# (confirm_pressed, quiz_answer, task_completed; design section 6).
+# (Assets/Scripts/Research/), schema_version 2 (docs/research-logging-spec.md,
+# decision 021): the session events of #26/#27 plus the outcome events that
+# #28 step 2 will add (confirm_pressed per position, confirm_ignored,
+# position_completed, task_completed, quiz_answer, quiz_unlocked, tour_step,
+# station_move_start/_arrived, welcome_practice_done). Header event_groups =
+# ["session","outcome"]: no #29/#30 events (grabs, pose, perf) are faked.
+# One participant (P115) is written in the old schema-1 shape on purpose, to
+# test that analyse.R warns about mixed schema versions.
 # Why: analyse.R must be tested before real participants exist, and the
 # fake files are the contract between the C# logger and R.
 #
@@ -104,7 +110,16 @@ event_line <- function(t, utc, pid, sid, scene, visit, event, data) {
 
 # ---- 3. Summary CSV (same columns and formats as SummaryCsv.cs) -------------
 
+# Schema 2 (spec section 5): confirm_ignored after confirm_count, no dwell columns.
 summary_header <- paste(
+  "participant_id,session_id,build,schema_version,scene,scene_visit,enter_utc,duration_s,paused_s",
+  "confirm_count,confirm_ignored,first_attempt_correct,attempts_to_correct,time_to_first_confirm_s",
+  "time_to_correct_s,completed,error_codes_all,grabs,drops_floor,container_enters,container_exits",
+  "pauses,hmd_removed_count,fps_avg,dropped_frames,unity_errors",
+  sep = ",")
+
+# Legacy schema 1 columns (only for P115, the mixed-schema test).
+summary_header_v1 <- paste(
   "participant_id,session_id,build,schema_version,scene,scene_visit,enter_utc,duration_s,paused_s",
   "confirm_count,first_attempt_correct,attempts_to_correct,time_to_first_confirm_s,time_to_correct_s",
   "completed,error_codes_all,grabs,drops_floor,container_enters,container_exits,dwell_wms_s",
@@ -125,91 +140,118 @@ scene_order <- c("WelcomeScene", "ConceptScene", "BasicPickingScene",
                  "MixedPickingScene", "ComplexScene")
 picking_scenes <- c("BasicPickingScene", "MixedPickingScene", "ComplexScene")
 
-# Required counts per scene (current validators). Keys that don't apply in a
-# scene are left out here and become null in the log (design section 6).
-order_required <- list(
-  BasicPickingScene = list(gg = 6, vpe = 0, other = 0),
-  MixedPickingScene = list(vpe = 0, gga = 2, ggb = 2, other = 0),
-  ComplexScene      = list(gga = 0, ggb = 2, loose = 5, other = 0))
-
-# Total pieces as the WMS "Ist" shows it (Basic: GG x 50; Complex: GGA x 50 +
-# GGB x 25 + loose). MixedPickingScene has no piece total -> null.
-total_pieces <- function(scene, box) {
-  if (scene == "BasicPickingScene") return(50 * box$gg)
-  if (scene == "ComplexScene") return(50 * box$gga + 25 * box$ggb + box$loose)
-  NULL
+# One order position: material key, Soll (pieces), VPE (pieces per carton).
+# required_full = full cartons, required_loose = loose pieces. Only ComplexScene
+# counts loose pieces; elsewhere required_loose stays NULL (null in the log,
+# "doesn't apply", never 0).
+make_position <- function(item, soll, vpe, counts_loose = FALSE) {
+  list(item = item, soll = soll, vpe = vpe, required_full = soll %/% vpe,
+       required_loose = if (counts_loose) soll %% vpe else NULL)
 }
 
-# The fixed keys of container/required, in the agreed order.
-counts_obj <- function(box) {
-  json_obj(gg = box$gg, vpe = box$vpe, gga = box$gga, ggb = box$ggb,
-           loose = box$loose, other = box$other, total_pieces = box$total_pieces)
+# The orders of the current scenes (spec 4.2; decisions 012, 016, #67).
+order_positions <- list(
+  BasicPickingScene = list(make_position("training_b", 300, 50)),
+  MixedPickingScene = list(make_position("connector_a", 150, 50),
+                           make_position("screw_b", 60, 20)),
+  ComplexScene      = list(make_position("ring_d", 55, 25, counts_loose = TRUE),
+                           make_position("training_b", 156, 50, counts_loose = TRUE)))
+
+# The "line" object of confirm_pressed: the current position only, with what
+# lies in the box. placed_loose is NULL wherever required_loose is NULL.
+line_obj <- function(pos, placed_full, placed_loose) {
+  json_obj(item = pos$item, soll = pos$soll, vpe = pos$vpe,
+           required_full = pos$required_full, required_loose = pos$required_loose,
+           placed_full = placed_full,
+           placed_loose = if (is.null(pos$required_loose)) NULL else placed_loose)
 }
 
-# Skills each scene tests (same content as scene_skills.csv).
-scene_skill_list <- list(
-  ConceptScene      = "package_concept",
-  BasicPickingScene = "calculate_quantity",
-  MixedPickingScene = c("calculate_quantity", "check_material"),
-  ComplexScene      = c("calculate_quantity", "check_material", "calculate_loose"))
+# Skills a red-button press can fail on, per picking scene. Same skills as
+# scene_skills.csv, minus check_material: no scene has foreign material in its
+# storage box (D12, #71), so WRONG_MATERIAL is never drawn.
+picking_skill_list <- list(
+  BasicPickingScene = c("calculate_quantity", "ekz_placement"),
+  MixedPickingScene = "calculate_quantity",
+  ComplexScene      = c("calculate_quantity", "calculate_loose"))
+
+# Quiz questions: answer keys, the right key, and the skill (same content as
+# item_skills.csv). Answer keys are always strings, also the numbers.
+concept_questions <- list(
+  cartons_from_soll = list(keys = c("2", "4", "25"), right = "4", skill = "calculate_quantity"),
+  material_by_matnr = list(keys = c("connector_a", "screw_b", "ring_d"), right = "screw_b",
+                           skill = "check_material"),
+  ekz_003           = list(keys = c("ordered", "poured"), right = "ordered", skill = "ekz_placement"),
+  ekz_000           = list(keys = c("ordered", "poured"), right = "poured", skill = "ekz_placement"))
+remainder_questions <- list(
+  cartons = list(keys = c("1", "2", "3"), right = "2", skill = "calculate_quantity"),
+  loose   = list(keys = c("5", "20", "55"), right = "5", skill = "calculate_loose"))
+
+# The 11 steps of the Concept field tour (WmsFieldTour; keys concept.tour.<id>).
+# The quiz opens at the last one, material_flow.
+tour_steps <- c("intro", "material", "verp_einh", "soll", "cartons", "ist", "rest",
+                "empf_kz_003", "empf_kz_000", "not_used", "material_flow")
 
 # Chance of an error on attempt k: lower for able trainees, for later attempts
-# in the same visit, and for skills practised in earlier visits. This gives
+# at the same item, for skills practised before, and for a scaffolded item
+# (Complex position 1: the remainder quiz hands over the numbers). This gives
 # the fake data a visible "improvement" signal to test the charts with.
-skill_base_logit <- c(package_concept = 0.3, calculate_quantity = 0.2,
-                      check_material = 0.0, calculate_loose = 0.4)
+skill_base_logit <- c(calculate_quantity = 0.2, check_material = 0.0,
+                      calculate_loose = 0.4, ekz_placement = -0.3)
 
-p_error <- function(person, skill, k) {
+p_error <- function(person, skill, k, scaffolded = FALSE) {
   practised <- person$seen[[skill]]
   if (is.null(practised)) practised <- 0
-  plogis(skill_base_logit[[skill]] - person$ability - 0.9 * (k - 1) - 0.6 * practised)
+  help <- if (scaffolded) 1.0 else 0
+  plogis(skill_base_logit[[skill]] - person$ability - 0.9 * (k - 1) - 0.6 * practised - help)
+}
+
+# One more practised round of a skill (used after a question / position).
+practise <- function(person, skill) {
+  person$seen[[skill]] <- c(person$seen[[skill]], 0)[1] + 1
 }
 
 err <- function(code, item = NULL) list(code = code, item = item)
 
-# One confirm press: what is in the container and which error codes it gets.
-# force_wrong makes sure the press is wrong (for "gave up"/crash cases);
-# force_right is the safety stop after many attempts.
-draw_attempt <- function(scene, person, k, force_wrong = FALSE, force_right = FALSE) {
-  req <- order_required[[scene]]
-  box <- req
+# One rated press at position pos_no: what lies in the box and which error
+# codes it gets. k = attempt at this position. force_wrong makes sure the
+# press is wrong (for "gave up"/crash cases); force_right is the safety stop.
+draw_attempt <- function(scene, pos_no, person, k, force_wrong = FALSE, force_right = FALSE) {
+  pos <- order_positions[[scene]][[pos_no]]
+  full <- pos$required_full
+  loose <- pos$required_loose  # NULL outside ComplexScene
   codes <- list()
+  scaffolded <- scene == "ComplexScene" && pos_no == 1
 
   if (!force_right && runif(1) < 0.03) {
-    # EMPTY is logged alone, without an extra TOO_FEW (design section 6).
-    for (key in names(box)) box[[key]] <- 0
+    # EMPTY is logged alone, without an extra TOO_FEW (spec 4.3).
+    full <- 0
+    if (!is.null(loose)) loose <- 0
     codes <- list(err("EMPTY"))
   } else if (!force_right) {
-    skills <- scene_skill_list[[scene]]
-    wrong <- vapply(skills, function(sk) runif(1) < p_error(person, sk, k), logical(1))
+    skills <- picking_skill_list[[scene]]
+    wrong <- vapply(skills, function(sk) runif(1) < p_error(person, sk, k, scaffolded), logical(1))
     if (force_wrong && !any(wrong)) wrong[1] <- TRUE
 
+    # Codes in OrderRule order: quantity, loose pieces, then (Basic) EKZ 3.
     if (wrong["calculate_quantity"]) {
-      item <- switch(scene, BasicPickingScene = "gg", ComplexScene = "ggb",
-                     MixedPickingScene = sample(c("gga", "ggb"), 1))
       delta <- sample(c(-2, -1, 1, 2), 1)
-      box[[item]] <- req[[item]] + delta
-      codes <- c(codes, list(err(if (delta < 0) "TOO_FEW" else "TOO_MANY", item)))
-    }
-    if (isTRUE(wrong["check_material"])) {
-      if (scene == "MixedPickingScene") {
-        box$vpe <- 1  # VPE is not in the order
-        codes <- c(codes, list(err("WRONG_TYPE")))
-      } else {
-        box$gga <- 1  # GGA instead of / next to the ordered GGB
-        codes <- c(codes, list(err("WRONG_MATERIAL", "gga")))
-      }
+      full <- full + delta
+      codes <- c(codes, list(err(if (delta < 0) "TOO_FEW" else "TOO_MANY", pos$item)))
     }
     if (isTRUE(wrong["calculate_loose"])) {
       delta <- sample(c(-3, -2, -1, 1, 2), 1)
-      box$loose <- req$loose + delta
-      codes <- c(codes, list(err(if (delta < 0) "MISSING_LOOSE" else "EXTRA_LOOSE", "loose")))
+      loose <- loose + delta
+      codes <- c(codes, list(err(if (delta < 0) "MISSING_LOOSE" else "EXTRA_LOOSE", pos$item)))
     }
+    # EKZ_PLACEMENT only when the 6 cartons are there but one lies loose.
+    if (isTRUE(wrong["ekz_placement"]) && !wrong["calculate_quantity"]) {
+      codes <- c(codes, list(err("EKZ_PLACEMENT")))
+    }
+    # Nothing left in the box after the deltas: that is EMPTY, alone.
+    if (full == 0 && (is.null(loose) || loose == 0)) codes <- list(err("EMPTY"))
   }
 
-  box$total_pieces <- total_pieces(scene, box)
-  req$total_pieces <- total_pieces(scene, req)
-  list(box = box, req = req, codes = codes)
+  list(pos = pos, placed_full = full, placed_loose = loose, codes = codes)
 }
 
 # Error texts as the logger would capture them (paths cut to the file name).
@@ -271,14 +313,16 @@ active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s - open_pause_part
 # language: header language (#11), "DE" or "EN", fixed for the session. The
 # keypad forces "DE" for research IDs; test IDs keep the chosen one. NULL =
 # a log written before #11 (header language null).
+# schema: 2 (current); 1 only for the legacy P115 file (section 7b).
 start_session <- function(person, build, start_utc, start_mode = "manual",
                           resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
-                          language = "DE") {
+                          language = "DE", schema = 2) {
   if (is.null(resume_scene)) resume_accepted <- NULL
   s <- new.env()
   s$pid <- person$pid
   s$sid <- make_uuid()
   s$build <- build
+  s$schema <- schema
   s$language <- language
   s$start <- to_epoch(start_utc)
   s$t <- 0
@@ -310,13 +354,25 @@ start_session <- function(person, build, start_utc, start_mode = "manual",
   device$open <- list()
   device$sessions <- c(device$sessions, list(s))
 
-  # Header and session_start: t = 0, scene_visit null.
-  s$lines <- event_line(0, fmt_utc(s$start, 0), s$pid, s$sid, NULL, NULL, "header",
+  # Header and session_start: t = 0, scene_visit null. Schema 2 adds
+  # layout_version (three-lane station, decision 019) and event_groups (the
+  # groups this build emits; R reads a missing group as NA, not 0).
+  header <- if (schema == 2) {
+    json_obj(schema_version = 2, layout_version = "019",
+             event_groups = json_arr(c("session", "outcome")),
+             app_version = "0.2.0", build = build,
+             device_model = "Oculus Quest", os_version = "Android OS 14 / API-34",
+             participant_id = s$pid, session_id = s$sid, session_start_mode = start_mode,
+             language = s$language,
+             input_mode_at_start = "controllers", target_refresh_rate = 72)
+  } else {
     json_obj(schema_version = 1, app_version = "0.1.0", build = build,
              device_model = "Oculus Quest", os_version = "Android OS 14 / API-34",
              participant_id = s$pid, session_id = s$sid, session_start_mode = start_mode,
              language = s$language,
-             input_mode_at_start = "controllers", target_refresh_rate = 72))
+             input_mode_at_start = "controllers", target_refresh_rate = 72)
+  }
+  s$lines <- event_line(0, fmt_utc(s$start, 0), s$pid, s$sid, NULL, NULL, "header", header)
   s$scene <- "WelcomeScene"
   emit(s, "session_start", json_obj(resume_offered_scene = resume_scene,
                                     resume_accepted = resume_accepted,
@@ -332,14 +388,19 @@ enter_scene <- function(s, scene, from, via) {
   s$scene <- scene
   s$visit <- n
   s$visit_open <- TRUE
+  # attempts = rated attempts that summary.csv counts in confirm_count (red
+  # button presses in picking scenes, quiz touches in ConceptScene); codes =
+  # the error codes of exactly those attempts; ignored = confirm_ignored;
+  # quiz_attempts = quiz touches (attempt_no of quiz_answer).
   s$v <- list(enter_t = s$t, enter_utc = fmt_utc(s$start, s$t), paused_s = 0,
-              pauses = 0, hmd = 0, errors = 0, attempts = 0,
+              pauses = 0, hmd = 0, errors = 0, attempts = 0, ignored = 0,
+              quiz_attempts = 0,
               codes = character(0), first_correct = NA, correct_at = NA,
               t_first = NA, t_correct = NA)
   emit(s, "scene_enter", json_obj(from_scene = from, via = via))
 }
 
-# Error code tally for summary.csv, e.g. "TOO_FEW:2;WRONG_TYPE:1".
+# Error code tally for summary.csv, e.g. "TOO_FEW:2;EMPTY:1".
 codes_tally <- function(codes) {
   if (length(codes) == 0) return("")
   tab <- table(codes)
@@ -371,29 +432,39 @@ exit_scene <- function(s) {
                                  unity_errors = s$v$errors))
 
   # Outcome columns (#28) only where the scene has a confirm or quiz;
-  # #29/#30 columns stay empty.
+  # confirm_ignored only where there is a red button (picking scenes);
+  # #29/#30 columns stay empty (not measured, never 0).
   v <- s$v
   has_outcome <- s$scene != "WelcomeScene"
-  row <- c(s$pid, s$sid, s$build, "1", s$scene, cell(s$visit), v$enter_utc,
-           cell(duration), cell(v$paused_s),
-           if (has_outcome) cell(v$attempts) else "",
-           if (has_outcome) cell(v$first_correct) else "",
-           if (has_outcome) cell(v$correct_at) else "",
-           if (has_outcome) cell(v$t_first) else "",
-           if (has_outcome) cell(v$t_correct) else "",
-           if (has_outcome) cell(!is.na(v$correct_at)) else "",
-           if (has_outcome) codes_tally(v$codes) else "",
-           "", "", "", "", "", "",
-           cell(v$pauses), cell(v$hmd), "", "", cell(v$errors))
+  outcome <- function(x) if (has_outcome) x else ""
+  ignored <- if (s$scene %in% picking_scenes) cell(v$ignored) else ""
+  identity <- c(s$pid, s$sid, s$build, as.character(s$schema), s$scene, cell(s$visit),
+                v$enter_utc, cell(duration), cell(v$paused_s))
+  results <- c(outcome(cell(v$first_correct)), outcome(cell(v$correct_at)),
+               outcome(cell(v$t_first)), outcome(cell(v$t_correct)),
+               outcome(cell(!is.na(v$correct_at))), outcome(codes_tally(v$codes)))
+  row <- if (s$schema == 2) {
+    c(identity, outcome(cell(v$attempts)), ignored, results,
+      "", "", "", "",                       # grabs .. container_exits (#29)
+      cell(v$pauses), cell(v$hmd), "", "", cell(v$errors))
+  } else {
+    # Legacy schema 1: no confirm_ignored, two (empty) dwell columns.
+    c(identity, outcome(cell(v$attempts)), results,
+      "", "", "", "", "", "",
+      cell(v$pauses), cell(v$hmd), "", "", cell(v$errors))
+  }
   s$summary <- c(s$summary, paste(row, collapse = ","))
   s$visit_open <- FALSE
 }
 
-go_to_scene <- function(s, scene) {
+# via: "menu" (normal), "resume" (the scene the keypad offered after a crash).
+# Schema 1 wrote null for every entry after the first one.
+go_to_scene <- function(s, scene, via = "menu") {
   from <- s$scene
   exit_scene(s)
   advance(s, 0.001)
-  enter_scene(s, scene, from, NULL)
+  if (s$schema == 1) via <- NULL
+  enter_scene(s, scene, from, via)
 }
 
 end_session <- function(s, reason) {
@@ -489,85 +560,216 @@ maybe_unity_error <- function(s) {
   }
 }
 
-# Shared bookkeeping for confirm_pressed and quiz_answer; writes task_completed
-# on the first correct press of the visit. Returns TRUE when correct.
-record_outcome <- function(s, k, correct, codes, at) {
-  if (k == 1) {
-    s$v$first_correct <- correct
-    s$v$t_first <- at
-  }
-  s$v$codes <- c(s$v$codes, vapply(codes, function(e) e$code, character(1)))
-  if (correct && is.na(s$v$correct_at)) {
-    s$v$correct_at <- k
-    s$v$t_correct <- at
-    advance(s, 0.001)
-    emit(s, "task_completed", json_obj(attempts_to_correct = k,
-                                       time_to_first_confirm_s = s$v$t_first,
-                                       time_to_correct_s = at))
-  }
-  correct
-}
+# ---- 5b. Outcome events (#28 step 2, spec 4.2 and section 6) ---------------
 
 codes_json <- function(codes) {
   json_arr(lapply(codes, function(e) json_obj(code = e$code, item = e$item)))
 }
 
-# correct is normally "no error codes" (the invariant). Passing correct
-# explicitly lets one fake press break the invariant on purpose (P110).
-press_confirm <- function(s, attempt, correct = length(attempt$codes) == 0) {
+# Bookkeeping for one rated attempt that summary.csv counts in confirm_count
+# (picking scenes: a rated red-button press; ConceptScene: a quiz touch). The
+# first one sets first_attempt_correct and time_to_first_confirm_s.
+note_attempt <- function(s, correct, codes, at) {
   s$v$attempts <- s$v$attempts + 1
-  k <- s$v$attempts
+  if (s$v$attempts == 1) {
+    s$v$first_correct <- correct
+    s$v$t_first <- at
+  }
+  s$v$codes <- c(s$v$codes, vapply(codes, function(e) e$code, character(1)))
+  s$v$last_at <- at
+}
+
+# task_completed: the whole task of the visit is done (picking scenes: the
+# last position is correct, OrderCompleted; Concept: all 4 questions right).
+# attempts_to_correct = every rated attempt of the visit so far.
+complete_task <- function(s) {
+  s$v$correct_at <- s$v$attempts
+  s$v$t_correct <- s$v$last_at
+  advance(s, 0.001)
+  emit(s, "task_completed", json_obj(attempts_to_correct = s$v$attempts,
+                                     time_to_first_confirm_s = s$v$t_first,
+                                     time_to_correct_s = s$v$t_correct))
+}
+
+# One rated red-button press at position pos_no (k = attempt at this
+# position). correct is normally "no error codes" (the invariant). Passing
+# correct explicitly lets one fake press break the invariant on purpose (P110).
+# No scene has foreign material, so "foreign" is always [].
+press_confirm <- function(s, pos_no, k, attempt, correct = length(attempt$codes) == 0) {
   at <- active_s(s)
+  note_attempt(s, correct, attempt$codes, at)
   emit(s, "confirm_pressed", json_obj(
-    attempt_no = k, container = counts_obj(attempt$box),
-    required = counts_obj(attempt$req), correct = correct,
+    attempt_no = s$v$attempts, position = pos_no,
+    position_count = length(order_positions[[s$scene]]), attempt_in_position = k,
+    line = line_obj(attempt$pos, attempt$placed_full, attempt$placed_loose),
+    foreign = json_arr(list()), correct = correct,
     error_codes = codes_json(attempt$codes), time_since_scene_enter_s = at))
-  record_outcome(s, k, correct, attempt$codes, at)
+  correct
+}
+
+# A red-button press the validator ignores (early return): not an attempt,
+# not in confirm_count, only counted in confirm_ignored.
+ignore_confirm <- function(s, reason, pos_no) {
+  s$v$ignored <- s$v$ignored + 1
+  emit(s, "confirm_ignored", json_obj(reason = reason, position = pos_no,
+                                      time_since_scene_enter_s = active_s(s)))
+}
+
+# One rated quiz touch. Only ConceptScene counts quiz touches in summary.csv
+# (its confirm_count); in ComplexScene the summary counts red-button presses
+# only, the remainder quiz lives in the events. WRONG_ANSWER has item null.
+answer_quiz <- function(s, quiz, question_id, selected, k, right) {
+  correct <- selected == right
+  codes <- if (correct) list() else list(err("WRONG_ANSWER"))
+  at <- active_s(s)
+  s$v$quiz_attempts <- s$v$quiz_attempts + 1
+  if (s$scene == "ConceptScene") note_attempt(s, correct, codes, at)
+  emit(s, "quiz_answer", json_obj(
+    attempt_no = s$v$quiz_attempts, quiz = quiz, question_id = question_id,
+    selected = selected, correct = correct, attempt_in_question = k,
+    error_codes = codes_json(codes), time_since_scene_enter_s = at))
+  correct
+}
+
+# One question, touched until right (a touched toggle is rated at once,
+# decision 020). After 4 wrong touches the trainee finds the right one.
+ask_question <- function(s, person, quiz, question_id, q) {
+  k <- 0
+  repeat {
+    k <- k + 1
+    wrong <- k < 5 && runif(1) < p_error(person, q$skill, k)
+    selected <- if (wrong) sample(setdiff(q$keys, q$right), 1) else q$right
+    if (answer_quiz(s, quiz, question_id, selected, k, q$right)) break
+    advance(s, runif(1, 3, 10))  # read the feedback line, touch again
+  }
+  practise(person, q$skill)
+}
+
+# ---- 5c. Station rides (decision 019) --------------------------------------
+
+# Wait for a ride (~3 s). The trainee may press the red button meanwhile: the
+# validator ignores it (reason station_moving). press_position = the position
+# the logic already shows (it changes at once, the boxes follow).
+ride_wait <- function(s, press_position) {
+  ride_s <- runif(1, 2.8, 3.3)
+  if (runif(1) < 0.2) {
+    early <- runif(1, 0.8, 2.0)
+    advance(s, early)
+    ignore_confirm(s, "station_moving", press_position)
+    advance(s, ride_s - early)
+  } else {
+    advance(s, ride_s)
+  }
+}
+
+# Between positions: the old storage box leaves (storage_out, the position
+# just done), the next one comes in (storage_in, the new position).
+ride_between_positions <- function(s, done_pos) {
+  advance(s, 0.6)  # PositionStockSwitcher startDelay
+  emit(s, "station_move_start", json_obj(what = "storage_out", position = done_pos))
+  advance(s, 0.001)
+  emit(s, "station_move_start", json_obj(what = "storage_in", position = done_pos + 1))
+  ride_wait(s, done_pos + 1)
+  emit(s, "station_move_arrived", json_obj(what = "storage_out", position = done_pos))
+  advance(s, 0.001)
+  emit(s, "station_move_arrived", json_obj(what = "storage_in", position = done_pos + 1))
+}
+
+# ComplexScene: storage box 1 only rides in after the remainder quiz is right.
+ride_first_box_in <- function(s) {
+  advance(s, 0.001)
+  emit(s, "station_move_start", json_obj(what = "storage_in", position = 1))
+  ride_wait(s, 1)
+  emit(s, "station_move_arrived", json_obj(what = "storage_in", position = 1))
+}
+
+# Order done: the last storage box leaves, the order box follows once the
+# storage box has cleared the station (OrderBoxConveyor.stationStock).
+ride_order_end <- function(s, last_pos) {
+  advance(s, 0.6)
+  emit(s, "station_move_start", json_obj(what = "storage_out", position = last_pos))
+  advance(s, 1.2)
+  emit(s, "station_move_start", json_obj(what = "order_box", position = last_pos))
+  advance(s, runif(1, 1.6, 2.1))
+  emit(s, "station_move_arrived", json_obj(what = "storage_out", position = last_pos))
+  advance(s, 1.2)
+  emit(s, "station_move_arrived", json_obj(what = "order_box", position = last_pos))
 }
 
 # ---- 6. What happens inside each kind of scene -----------------------------
 
-run_welcome <- function(s) {
-  advance(s, runif(1, 15, 45))
-  maybe_unity_error(s)
-}
-
-run_quiz <- function(s, person) {
-  advance(s, runif(1, 20, 60))  # read the package descriptions
-  maybe_pause(s)
-  maybe_unity_error(s)
-  k <- 0
-  repeat {
-    k <- k + 1
-    if (k == 1 && runif(1) < 0.05) {
-      selected <- NULL  # confirm without a selection
-      codes <- list(err("NO_ANSWER"))
-    } else if (k < 6 && runif(1) < p_error(person, "package_concept", k)) {
-      selected <- sample(c("gg", "both"), 1)
-      codes <- list(err("WRONG_ANSWER"))
-    } else {
-      selected <- "vpe"  # the right answer
-      codes <- list()
-    }
-    s$v$attempts <- s$v$attempts + 1
-    at <- active_s(s)
-    correct <- length(codes) == 0
-    emit(s, "quiz_answer", json_obj(attempt_no = s$v$attempts, selected = selected,
-                                    correct = correct, error_codes = codes_json(codes)))
-    if (record_outcome(s, s$v$attempts, correct, codes, at)) break
+# practice = FALSE: a resumed session (the keypad jumps straight to the
+# offered scene, so the Welcome practice is not done again).
+run_welcome <- function(s, practice = TRUE) {
+  advance(s, runif(1, 8, 20))
+  if (practice && s$schema == 2) {
+    # First grab of the box, then first red-button press (#39).
+    emit(s, "welcome_practice_done", json_obj(action = "grab"))
     advance(s, runif(1, 4, 15))
+    emit(s, "welcome_practice_done", json_obj(action = "button"))
+    advance(s, runif(1, 3, 10))
   }
-  advance(s, runif(1, 3, 10))  # read the feedback, then press the menu
-  person$seen[["package_concept"]] <- c(person$seen[["package_concept"]], 0)[1] + 1
+  maybe_unity_error(s)
 }
 
-# max_confirms: stop after this many presses (0 = never confirms).
+# ConceptScene: 11 tour steps ("Weiter"), the quiz opens at material_flow,
+# then the 4 questions in order, each touched until right.
+run_concept <- function(s, person) {
+  for (i in seq_along(tour_steps)) {
+    advance(s, runif(1, 5, 15))  # read the step, press "Weiter"
+    emit(s, "tour_step", json_obj(step_id = tour_steps[i], step_index = i))
+    if (tour_steps[i] == "material_flow") {
+      advance(s, 0.001)
+      emit(s, "quiz_unlocked")
+    }
+    if (i == 5) maybe_pause(s)
+  }
+  # Some trainees press "Von vorn" and skim the first steps again (step_index
+  # back to 1). The quiz stays open (it opens for good).
+  if (runif(1) < 0.2) {
+    for (i in 1:3) {
+      advance(s, runif(1, 2, 6))
+      emit(s, "tour_step", json_obj(step_id = tour_steps[i], step_index = i))
+    }
+  }
+  maybe_unity_error(s)
+  for (qid in names(concept_questions)) {
+    advance(s, runif(1, 5, 15))  # read the question and the three answers
+    ask_question(s, person, "concept", qid, concept_questions[[qid]])
+  }
+  complete_task(s)
+  advance(s, runif(1, 3, 10))  # read the feedback, then press the menu
+}
+
+# ComplexScene before position 1: the remainder quiz (full cartons, loose
+# pieces). Some trainees press the red button first (the #58 reminder,
+# confirm_ignored "quiz_first"). Both right -> storage box 1 rides in.
+run_remainder_quiz <- function(s, person) {
+  if (runif(1) < 0.15) {
+    advance(s, runif(1, 3, 10))
+    ignore_confirm(s, "quiz_first", 1)
+  }
+  for (qid in names(remainder_questions)) {
+    advance(s, runif(1, 5, 15))
+    ask_question(s, person, "complex_remainder", qid, remainder_questions[[qid]])
+  }
+  ride_first_box_in(s)
+  advance(s, runif(1, 20, 50))  # pick the cartons and loose rings of position 1
+}
+
+# A picking scene, one position after the other.
+# max_confirms: stop after this many rated presses in the visit (0 = never
+#   confirms; then the Complex remainder quiz is not answered either).
 # give_up: every press is wrong (for quit/crash endings).
-# first_press: a fixed first press (list(box, codes, correct)) for edge cases.
-run_picking <- function(s, person, max_confirms = 8, give_up = FALSE,
-                        first_press = NULL, end_on_correct = FALSE,
-                        double_cause_pause = FALSE) {
+# forced: fixed presses for edge cases, by position, e.g.
+#   list("2" = list(press1, press2)); a press = list(placed_full, placed_loose,
+#   codes, correct).
+# crash_after_position: stop right after this position's ride (for a crash).
+run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
+                        forced = list(), end_on_correct = FALSE,
+                        double_cause_pause = FALSE, crash_after_position = NULL) {
   scene <- s$scene
+  positions <- order_positions[[scene]]
   advance(s, runif(1, 30, 70))  # read the WMS order and pick packages
   if (double_cause_pause) {
     # Two causes in the same frame: headset off and focus lost together.
@@ -577,42 +779,64 @@ run_picking <- function(s, person, max_confirms = 8, give_up = FALSE,
     maybe_pause(s)
   }
   maybe_unity_error(s)
+  if (scene == "ComplexScene" && max_confirms > 0) run_remainder_quiz(s, person)
 
-  done <- FALSE
-  k <- 0
-  while (k < max_confirms) {
-    k <- k + 1
-    if (k == 1 && !is.null(first_press)) {
-      req <- order_required[[scene]]
-      req$total_pieces <- total_pieces(scene, req)
-      attempt <- list(box = first_press$box, req = req, codes = first_press$codes)
-      done <- press_confirm(s, attempt, first_press$correct)
-    } else {
-      attempt <- draw_attempt(scene, person, k, force_wrong = give_up,
-                              force_right = (k == 8 && !give_up))
-      done <- press_confirm(s, attempt)
+  for (pos_no in seq_along(positions)) {
+    k <- 0
+    pos_done <- FALSE
+    fixed <- forced[[as.character(pos_no)]]
+    while (s$v$attempts < max_confirms) {
+      k <- k + 1
+      if (k <= length(fixed)) {
+        f <- fixed[[k]]
+        attempt <- list(pos = positions[[pos_no]], placed_full = f$placed_full,
+                        placed_loose = f$placed_loose, codes = f$codes)
+        pos_done <- press_confirm(s, pos_no, k, attempt, f$correct)
+      } else {
+        attempt <- draw_attempt(scene, pos_no, person, k, force_wrong = give_up,
+                                force_right = (k >= 8 && !give_up))
+        pos_done <- press_confirm(s, pos_no, k, attempt)
+      }
+      if (pos_done) break
+      advance(s, runif(1, 8, 30))  # read the feedback and fix the box
     }
-    if (done) break
-    advance(s, runif(1, 8, 30))  # read the feedback and fix the container
-  }
+    if (!pos_done) break  # gave up, or no presses left
 
-  # Practice counts for the skills this scene tests.
-  for (sk in scene_skill_list[[scene]]) {
-    person$seen[[sk]] <- c(person$seen[[sk]], 0)[1] + 1
+    # Position correct: position_completed, then the boxes ride.
+    advance(s, 0.001)
+    emit(s, "position_completed", json_obj(position = pos_no, attempts_in_position = k))
+    for (sk in picking_skill_list[[scene]]) practise(person, sk)
+
+    if (pos_no < length(positions)) {
+      ride_between_positions(s, pos_no)
+      if (!is.null(crash_after_position) && crash_after_position == pos_no) {
+        advance(s, runif(1, 5, 15))  # starts reading position 2, then the crash
+        return(invisible(FALSE))
+      }
+      advance(s, runif(1, 20, 50))  # read the new WMS line and pick
+    } else {
+      complete_task(s)  # OrderCompleted
+      if (end_on_correct) return(invisible(TRUE))  # Complex: EndSession("completed")
+      ride_order_end(s, pos_no)
+      # Now and then a press after the end: ignored, reason "completed".
+      if (runif(1) < 0.1) {
+        advance(s, runif(1, 1, 3))
+        ignore_confirm(s, "completed", pos_no)
+      }
+    }
   }
-  if (done && end_on_correct) return(invisible(TRUE))  # session ends right away
   advance(s, runif(1, 3, 10))
-  invisible(done)
+  invisible(!is.na(s$v$correct_at))
 }
 
 run_visit <- function(s, person, ...) {
   if (s$scene == "WelcomeScene") run_welcome(s)
-  else if (s$scene == "ConceptScene") run_quiz(s, person)
+  else if (s$scene == "ConceptScene") run_concept(s, person)
   else run_picking(s, person, ...)
 }
 
-# A normal course: every scene in build order, ends "completed" on the first
-# correct confirm in ComplexScene (#28 calls EndSession("completed") there).
+# A normal course: every scene in build order, ends "completed" when the
+# ComplexScene order is complete (#28 calls EndSession("completed") there).
 run_full_course <- function(person, build, start_utc, special = list(), start_mode = "manual",
                             resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
                             language = "DE") {
@@ -629,6 +853,11 @@ run_full_course <- function(person, build, start_utc, special = list(), start_mo
   invisible(s)
 }
 
+# A fixed press for run_picking(forced = ...).
+fixed_press <- function(placed_full, codes, correct = length(codes) == 0, placed_loose = NULL) {
+  list(placed_full = placed_full, placed_loose = placed_loose, codes = codes, correct = correct)
+}
+
 # ---- 7. The fake participants ----------------------------------------------
 
 # P950: facilitator's trial run with a test ID. It belongs in practice/, but
@@ -637,9 +866,71 @@ run_full_course <- function(person, build, start_utc, special = list(), start_mo
 p950 <- new_person("P950")
 s <- start_session(p950, "aaa1111", "2026-11-02T09:00:00Z", start_mode = "auto", language = "EN")
 run_welcome(s)
-go_to_scene(s, "ConceptScene"); run_quiz(s, p950)
+go_to_scene(s, "ConceptScene"); run_concept(s, p950)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p950)
 end_session(s, "quit")
+
+# ---- 7b. Legacy v1 format for the mixed-schema test (P115 only) ------------
+# P115 ran on an older build that still wrote schema_version 1 (before
+# decision 021): header without layout_version/event_groups, confirm_pressed
+# with container/required package-type counts (gg, vpe, gga, ggb, loose,
+# other, total_pieces), quiz_answer without quiz/question_id, NO_ANSWER still
+# possible, summary.csv with the two dwell columns. analyse.R must warn about
+# mixed schema versions. Do not use this writer for anything else.
+
+legacy_counts <- function(gg = NULL, vpe = NULL, gga = NULL, ggb = NULL, loose = NULL,
+                          other = NULL, total_pieces = NULL) {
+  json_obj(gg = gg, vpe = vpe, gga = gga, ggb = ggb, loose = loose, other = other,
+           total_pieces = total_pieces)
+}
+
+run_legacy_v1_session <- function(person, build, start_utc) {
+  s <- start_session(person, build, start_utc, schema = 1)
+  run_welcome(s)  # schema 1 had no welcome_practice_done
+
+  # v1 Concept quiz: one question confirmed with a button. A confirm without
+  # a selection gave NO_ANSWER; task_completed came at the first right answer.
+  go_to_scene(s, "ConceptScene")
+  advance(s, runif(1, 20, 60))
+  for (selected in list(NULL, "gg", "vpe")) {
+    correct <- identical(selected, "vpe")
+    codes <- if (is.null(selected)) list(err("NO_ANSWER"))
+             else if (!correct) list(err("WRONG_ANSWER"))
+             else list()
+    note_attempt(s, correct, codes, active_s(s))
+    emit(s, "quiz_answer", json_obj(attempt_no = s$v$attempts, selected = selected,
+                                    correct = correct, error_codes = codes_json(codes)))
+    if (correct) complete_task(s) else advance(s, runif(1, 4, 15))
+  }
+  advance(s, runif(1, 3, 10))
+
+  # v1 BasicPickingScene: 6 GG cartons required; first press one short.
+  go_to_scene(s, "BasicPickingScene")
+  advance(s, runif(1, 30, 70))
+  required <- legacy_counts(gg = 6, vpe = 0, other = 0, total_pieces = 300)
+  presses <- list(
+    list(box = legacy_counts(gg = 5, vpe = 0, other = 0, total_pieces = 250),
+         codes = list(err("TOO_FEW", "gg"))),
+    list(box = legacy_counts(gg = 6, vpe = 0, other = 0, total_pieces = 300),
+         codes = list()))
+  for (p in presses) {
+    correct <- length(p$codes) == 0
+    at <- active_s(s)
+    note_attempt(s, correct, p$codes, at)
+    emit(s, "confirm_pressed", json_obj(
+      attempt_no = s$v$attempts, container = p$box, required = required,
+      correct = correct, error_codes = codes_json(p$codes), time_since_scene_enter_s = at))
+    if (correct) complete_task(s) else advance(s, runif(1, 8, 30))
+  }
+  advance(s, runif(1, 3, 10))
+  end_session(s, "quit")
+  invisible(s)
+}
+
+# P115: the legacy schema-1 session (an older build, before the v2 builds).
+run_legacy_v1_session(new_person("P115"), "ccc3333", "2026-11-02T14:00:00Z")
+
+# ---- 7c. Participants in the current format --------------------------------
 
 # P101: normal course.
 run_full_course(new_person("P101"), "aaa1111", "2026-11-03T08:00:00Z")
@@ -680,7 +971,7 @@ end_session(s, "completed")
 p103 <- new_person("P103")
 s <- start_session(p103, "aaa1111", "2026-11-03T11:00:00Z")
 run_welcome(s)
-go_to_scene(s, "ConceptScene"); run_quiz(s, p103)
+go_to_scene(s, "ConceptScene"); run_concept(s, p103)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p103)
 go_to_scene(s, "MixedPickingScene"); run_picking(s, p103, max_confirms = 1, give_up = TRUE)
 begin_pause(s, "hmd_unmounted")
@@ -689,17 +980,19 @@ crash_epoch <- s$start + s$t
 restart_utc <- format(as.POSIXct(round(crash_epoch + 6 * 60), origin = "1970-01-01", tz = "UTC"),
                       "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
 # Resume: the keypad offers MixedPickingScene and P103 accepts; the scene
-# restarts from its beginning (design section 4, resume after a crash).
+# restarts from its beginning (design section 4, resume after a crash) and
+# scene_enter.via is "resume". No Welcome practice in a resumed session.
 s <- start_session(p103, "bbb2222", restart_utc,
                    resume_scene = "MixedPickingScene", resume_accepted = TRUE)
-run_welcome(s)
-go_to_scene(s, "MixedPickingScene"); run_picking(s, p103)
+run_welcome(s, practice = FALSE)
+go_to_scene(s, "MixedPickingScene", via = "resume"); run_picking(s, p103)
 go_to_scene(s, "ComplexScene"); run_picking(s, p103, end_on_correct = TRUE)
 end_session(s, "completed")
 
-# P104: gives up in ComplexScene after two wrong confirms, takes the headset
-# off and the app is closed while still paused (quit callback runs: reason
-# "quit", no app_resume; scene_exit.paused_s includes the open pause).
+# P104: gives up in ComplexScene (remainder quiz done, two wrong confirms at
+# position 1), takes the headset off and the app is closed while still paused
+# (quit callback runs: reason "quit", no app_resume; scene_exit.paused_s
+# includes the open pause).
 p104 <- new_person("P104")
 s <- start_session(p104, "aaa1111", "2026-11-03T14:00:00Z")
 run_welcome(s)
@@ -717,20 +1010,27 @@ end_session(s, "quit")
 p105 <- new_person("P105")
 s <- start_session(p105, "aaa1111", "2026-11-04T08:00:00Z", language = NULL)
 run_welcome(s)
-go_to_scene(s, "ConceptScene"); run_quiz(s, p105)
+go_to_scene(s, "ConceptScene"); run_concept(s, p105)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p105, max_confirms = 1, give_up = TRUE)
 raise_error(s)
 crash_session(s)
 
-# P106: one pause whose app_pause lists two causes.
+# P106: one pause whose app_pause lists two causes. Also the first press at
+# Complex position 2 has 2 loose clamps too many (EXTRA_LOOSE, so every
+# picking code appears in the fake data whatever the random draws give).
 run_full_course(new_person("P106"), "aaa1111", "2026-11-04T09:30:00Z",
-                special = list(MixedPickingScene = list(double_cause_pause = TRUE)))
+                special = list(MixedPickingScene = list(double_cause_pause = TRUE),
+                               ComplexScene = list(forced = list("2" = list(
+                                 fixed_press(3, list(err("EXTRA_LOOSE", "training_b")),
+                                             placed_loose = 8))))))
 
-# P107: enters ComplexScene but never confirms; the facilitator ends the
-# session (#27 control) -> a visit with 0 confirms (error rate must be NA).
-# In WelcomeScene a broken loop raises 200+ different errors: the error cap is
-# reached, later errors (also in later scenes) are only counted in scene_exit.
-# One repeat folded before the cap is still written at the visit close.
+# P107: enters ComplexScene but never confirms (and never answers the
+# remainder quiz); the facilitator ends the session (#44 control, opened once
+# and cancelled, then opened again) -> a visit with 0 confirms (error rate
+# must be NA). In WelcomeScene a broken loop raises 200+ different errors: the
+# error cap is reached, later errors (also in later scenes) are only counted
+# in scene_exit. One repeat folded before the cap is still written at the
+# visit close.
 p107 <- new_person("P107")
 s <- start_session(p107, "aaa1111", "2026-11-04T11:00:00Z")
 run_welcome(s)
@@ -745,6 +1045,12 @@ for (scene in c("ConceptScene", "BasicPickingScene", "MixedPickingScene")) {
   go_to_scene(s, scene); run_visit(s, p107)
 }
 go_to_scene(s, "ComplexScene"); run_picking(s, p107, max_confirms = 0)
+emit(s, "end_control_opened")
+advance(s, 2.5)
+emit(s, "end_control_cancelled")
+advance(s, 40)
+emit(s, "end_control_opened")
+advance(s, 1.5)
 end_session(s, "facilitator")
 
 # P108: normal course on the newer build bbb2222, but the study build still had
@@ -754,18 +1060,17 @@ end_session(s, "facilitator")
 run_full_course(new_person("P108"), "bbb2222", "2026-11-04T13:00:00Z", start_mode = "auto",
                 language = "EN")
 
-# P109: one confirm carries FOO_BAR, a code missing from skill_map.csv.
+# P109: the first Mixed press carries FOO_BAR, a code missing from skill_map.csv.
 run_full_course(new_person("P109"), "aaa1111", "2026-11-04T14:30:00Z",
-  special = list(MixedPickingScene = list(first_press = list(
-    box = list(vpe = 0, gga = 2, ggb = 1, other = 0),
-    codes = list(err("FOO_BAR")), correct = FALSE))))
+  special = list(MixedPickingScene = list(forced = list("1" = list(
+    fixed_press(2, list(err("FOO_BAR", "connector_a"))))))))
 
-# P110: one confirm says correct = true although it has an error code
-# (today's OrderConfirm accepts 6 GG + 1 VPE). Breaks the invariant on purpose.
+# P110: the first Basic press says correct = true although it has an error
+# code (the 6 cartons are there but one lies loose, and a faulty validator
+# accepts it). Breaks the invariant on purpose; the order then completes.
 run_full_course(new_person("P110"), "aaa1111", "2026-11-05T08:00:00Z",
-  special = list(BasicPickingScene = list(first_press = list(
-    box = list(gg = 6, vpe = 1, other = 0, total_pieces = 300),
-    codes = list(err("WRONG_TYPE")), correct = TRUE))))
+  special = list(BasicPickingScene = list(forced = list("1" = list(
+    fixed_press(6, list(err("EKZ_PLACEMENT")), correct = TRUE))))))
 
 # P111: crashes in BasicPickingScene after one wrong confirm. On restart the
 # keypad offers BasicPickingScene, but the resume is declined, so the trainee
@@ -774,7 +1079,7 @@ run_full_course(new_person("P110"), "aaa1111", "2026-11-05T08:00:00Z",
 p111 <- new_person("P111")
 s <- start_session(p111, "aaa1111", "2026-11-05T09:30:00Z")
 run_welcome(s)
-go_to_scene(s, "ConceptScene"); run_quiz(s, p111)
+go_to_scene(s, "ConceptScene"); run_concept(s, p111)
 go_to_scene(s, "BasicPickingScene"); run_picking(s, p111, max_confirms = 1, give_up = TRUE)
 crash_session(s)
 restart_utc <- format(as.POSIXct(round(s$start + s$t + 4 * 60), origin = "1970-01-01", tz = "UTC"),
@@ -790,11 +1095,31 @@ s <- run_full_course(p111, "aaa1111", restart_utc,
 p112 <- new_person("P112")
 s <- start_session(p112, "aaa1111", "2026-11-05T11:30:00Z")
 run_welcome(s)
-go_to_scene(s, "ConceptScene"); run_quiz(s, p112)
+go_to_scene(s, "ConceptScene"); run_concept(s, p112)
 end_session(s, "quit")
 restart_utc <- format(as.POSIXct(round(s$start + s$t + 3 * 60), origin = "1970-01-01", tz = "UTC"),
                       "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
 run_full_course(p112, "aaa1111", restart_utc, ended_warning = TRUE)
+
+# P113: in MixedPickingScene the first press at position 2 has nothing of
+# SCHRAUBE B in the box (EMPTY at position > 1: the 3 KABELVERBINDER A cartons
+# of position 1 still lie there but no longer count); the next press is right.
+run_full_course(new_person("P113"), "aaa1111", "2026-11-05T13:00:00Z",
+  special = list(MixedPickingScene = list(forced = list("2" = list(
+    fixed_press(0, list(err("EMPTY"))),
+    fixed_press(3, list()))))))
+
+# P114: ComplexScene position 1 correct, the boxes ride to position 2, then
+# the app crashes (no task_completed in ComplexScene: the course is not
+# finished). Last session on the device, so no crash_recovered line.
+p114 <- new_person("P114")
+s <- start_session(p114, "aaa1111", "2026-11-05T14:30:00Z")
+run_welcome(s)
+for (scene in c("ConceptScene", "BasicPickingScene", "MixedPickingScene")) {
+  go_to_scene(s, scene); run_visit(s, p114)
+}
+go_to_scene(s, "ComplexScene"); run_picking(s, p114, crash_after_position = 1)
+crash_session(s)
 
 # ---- 8. Write the files ----------------------------------------------------
 
@@ -809,8 +1134,10 @@ for (s in device$sessions) {
   stem <- file.path(fake_research, paste0(s$pid, "_", s$sid))
   write_lf(s$lines, paste0(stem, "_events.jsonl"))
   # The logger creates the summary file with its first row (first scene_exit).
+  # The legacy schema-1 file (P115) gets the old column header.
   if (length(s$summary) > 0) {
-    write_lf(c(summary_header, s$summary), paste0(stem, "_summary.csv"))
+    header_row <- if (s$schema == 2) summary_header else summary_header_v1
+    write_lf(c(header_row, s$summary), paste0(stem, "_summary.csv"))
   }
 }
 
@@ -830,6 +1157,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 overview <- data.frame(
   participant_id = vapply(device$sessions, function(s) s$pid, character(1)),
   build = vapply(device$sessions, function(s) s$build, character(1)),
+  schema = vapply(device$sessions, function(s) s$schema, numeric(1)),
   event_lines = vapply(device$sessions, function(s) length(s$lines), integer(1)),
   summary_rows = vapply(device$sessions, function(s) length(s$summary), integer(1)),
   last_event = vapply(device$sessions, function(s) {
