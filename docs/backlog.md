@@ -1327,13 +1327,13 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
   - Bộ lấy mẫu nằm ngoài `Research/`; `Research/` không có `Update`/`LateUpdate`/`FixedUpdate`.
   - Một người cố ý nhìn lần lượt WMS → quiz → thẻ kệ → thẻ kết quả → Menu, mỗi chỗ 5 s → R gán đúng thứ tự các vùng thô từ `_pose.csv` của lần ghi đó.
   - Spec và báo cáo ghi rõ: đây là hướng đầu, không phải eye tracking.
-- **Decision:** docs/decisions/021-research-log-catalogue-v2.md
+- **Decision:** docs/decisions/021-research-log-catalogue-v2.md, docs/decisions/022-no-in-app-pose-perf.md (thay phần #30 của 021)
 - **Inspector work expected:** no (decision 021: không collider vùng nhìn mới; sampler gắn lúc chạy hoặc trên logger scene)
 - **Công:** L
 - **Test trên kính:** bắt buộc (đo FPS trên Quest 3)
 - **Depends on:** #26. Spec mục 9 (2026-11-01): chỉ ghi hướng đầu, không ghi vị trí tay. #35, #47 trước (decision 011, người dùng 2026-11-01: không thu dữ liệu nhìn theo bố cục cũ; thêm phiên bản bố cục vào header log; ý "mỗi vùng nhìn có collider riêng trên prefab giá" đã bị decision 021 thay: vùng gán trong R).
 - **Bổ sung (review cuối #26, 2026-11-01):** dữ liệu 10 Hz (`_pose.csv`) phải ghi qua một stream mở sẵn suốt phiên (đóng/flush khi pause, đổi scene, kết thúc phiên). `SessionFiles` hiện mở file cho mỗi dòng: ổn cho sự kiện thưa, không ổn cho 10 dòng/giây (cấp phát và ghi đĩa liên tục). Không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (sự kiện rơi vào lượt scene trước).
-- **Status:** todo
+- **Status:** dropped (2026-11-04, decision 022: người dùng chọn không có code theo frame trong app để mượt nhất; độ mượt đo bằng OVR Metrics Tool bên ngoài; mất phần cử động đầu của Q4 và phần nhìn WMS của Q3)
 
 ### #74 [Feature] Log tay, tracking và rơi sàn (tách từ #29)
 - **Type:** feature

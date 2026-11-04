@@ -1,6 +1,6 @@
 # Research data logging – specification (draft)
 
-Status: v2 per decision 021 (2026-11-04), `schema_version` 2. The session core (sections 1, 3, 4.1, `unity_error` and `crash_recovered` in 4.6, 5) is implemented by backlog #26; the participant keypad, resume offer and the `session_start` fields (section 2, 4.1) by #27; the outcome events of 4.2/4.3 and the outcome columns of section 5 by #28 step 2; the interaction events of 4.1 (`menu_select`, `end_control_*`, `scene_enter.via`) and 4.4 by #29 (header `event_groups` `session`, `outcome`, `interaction`); the pose events are planned in #30 and #74 (the v1 catalogue of 2026-11-01 is replaced; decision: `docs/decisions/021-research-log-catalogue-v2.md`). Design and decisions: `docs/superpowers/specs/2026-11-01-research-logger-design.md`.
+Status: v2 per decision 021 (2026-11-04), `schema_version` 2. The session core (sections 1, 3, 4.1, `unity_error` and `crash_recovered` in 4.6, 5) is implemented by backlog #26; the participant keypad, resume offer and the `session_start` fields (section 2, 4.1) by #27; the outcome events of 4.2/4.3 and the outcome columns of section 5 by #28 step 2; the interaction events of 4.1 (`menu_select`, `end_control_*`, `scene_enter.via`) and 4.4 by #29 (header `event_groups` `session`, `outcome`, `interaction`); there are no pose or perf data in the app (decision 022, #30 dropped: smoothness is checked with OVR Metrics Tool outside the app); #74 is planned (the v1 catalogue of 2026-11-01 is replaced; decision: `docs/decisions/021-research-log-catalogue-v2.md`). Design and decisions: `docs/superpowers/specs/2026-11-01-research-logger-design.md`.
 
 Goal: record, per learner and per session, how trainees perform and experience the VR order-picking course on Meta Quest 3, so the logs can later be analysed and joined with the paper questionnaires (SSQ before and after, NASA-TLX at the end) via a pseudonymous participant ID. There is no paper test of the course content and no control group, so improvement is read from error rates per skill across scenes (an indication, not proof).
 
@@ -130,13 +130,15 @@ Removed from v1: `button_touch`, `info_shown`, `end_pos`; there is no `step_chan
 
 ### 4.5 Attention proxy (Quest 3 has no eye tracking)
 
+**Not implemented (decision 022, 2026-11-04):** the app writes no `_pose.csv`, so there are no head-direction zones. The text below is kept as the design if the study lead revives #30.
+
 There is no `gaze_target_*` event. Head-direction zones are assigned in R from `_pose.csv` per `layout_version` (an angle table per layout; the 200 ms minimum dwell is an R parameter). Picking scenes: `screen_column` (WMS + quiz + Beispiel), `shelf`, `desk_left`, `desk_right`, `confirm_area` (red button + result card), `menu`. Concept: `tour`, `ekz`, `flow`, `labelboard`. There is no `order_box` / `storage_box` zone. This is **head direction**, not eye gaze – state it as such in any publication, and treat it as "reading" only after the headset check of #30.
 
 ### 4.6 Comfort and technical
 
 | Event / data | Data | Source |
 |---|---|---|
-| `perf_sample` (every 5 s, #30) | `fps_avg`, `frame_ms_p95`, `dropped_frames`, `battery_level`, `cpu_level`/`gpu_level` if available | `FrameTimingManager` / `OVRPlugin.GetAppPerfStats`, `SystemInfo.batteryLevel` |
+| `perf_sample` (every 5 s, #30; **not implemented, decision 022**: FPS and dropped frames come from OVR Metrics Tool, run outside the app) | `fps_avg`, `frame_ms_p95`, `dropped_frames`, `battery_level`, `cpu_level`/`gpu_level` if available | `FrameTimingManager` / `OVRPlugin.GetAppPerfStats`, `SystemInfo.batteryLevel` |
 | `unity_error` | `type` (lowercase `error` / `exception` / `assert`), `message` (rooted file paths cut to the file name), `stack` (first lines; `null` on a line that only reports folded repeats), `folded_count` (repeats of the same message folded in before this line), `n_errors` (how many errors the line stands for: 1 for a first occurrence, `folded_count` + 1 for a line written after the 5 s window, `folded_count` for a line written at visit close that only reports folded repeats; the sum over a visit's lines equals `scene_exit.unity_errors` unless the cap was reached) | `Application.logMessageReceived` (warnings and known OVRPlugin XR start-up noise filtered by a list; the logger's own errors are not logged) |
 | `crash_recovered` | `last_event_t`, `recovered_by_session_id`; written into the old file with its old `session_id`, `t`, `scene` and `scene_visit` `null`, `utc` = time of detection | on next start, any earlier events file without `session_end` |
 
@@ -146,13 +148,15 @@ Clean end vs crash: `session_end` with reason `quit` is written by Unity's quit 
 
 ### 4.7 Pose stream (`_pose.csv`)
 
+**Not implemented (decision 022, 2026-11-04):** no per-frame sampler is added to the app, so the trainee's frame time carries no logging cost. Kept as the design if #30 is revived.
+
 10 Hz, head pose only (no hand positions): `t, scene, head_px, head_py, head_pz, head_rx, head_ry, head_rz, head_rw`. Enables path length, head movement (comfort) and the zone assignment of 4.5. Written through an open stream, flushed and closed on pause, scene change and session end. The sampler (timer/coroutine) lives outside `Research/` (in `Assembly-CSharp`) and calls the logger one way; `Research/` has no per-frame method. Planned, #30. If 10 Hz costs FPS on Quest, drop to 5 Hz and note it here.
 
 ## 5. Summary CSV (one row per scene visit)
 
 `participant_id, session_id, build, schema_version, scene, scene_visit, enter_utc, duration_s, paused_s, confirm_count, confirm_ignored, first_attempt_correct, attempts_to_correct, time_to_first_confirm_s, time_to_correct_s, completed, error_codes_all, grabs, drops_floor, container_enters, container_exits, pauses, hmd_removed_count, fps_avg, dropped_frames, unity_errors`
 
-`duration_s` is active time (pauses subtracted), `paused_s` the paused time of the visit. #26 fills identity, `build`, `schema_version`, `enter_utc`, `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`; #28 step 2 fills the outcome columns and #29 `grabs`, `container_enters`, `container_exits`; `drops_floor`, `fps_avg`, `dropped_frames` stay empty (NA in R) until #74 and #30. `error_codes_all` is semicolon-separated `CODE:n` (e.g. `TOO_FEW:2;EMPTY:1`). The events file is the source of truth; `analyse.R` rebuilds the table from events and compares it with `summary.csv` (tolerance 0.002 s for `_s` columns). The v1 dwell columns are gone: R computes dwell in the wide file.
+`duration_s` is active time (pauses subtracted), `paused_s` the paused time of the visit. #26 fills identity, `build`, `schema_version`, `enter_utc`, `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`; #28 step 2 fills the outcome columns and #29 `grabs`, `container_enters`, `container_exits`; `drops_floor` stays empty (NA in R) until #74; `fps_avg` and `dropped_frames` are always empty (decision 022: no perf data in the app). `error_codes_all` is semicolon-separated `CODE:n` (e.g. `TOO_FEW:2;EMPTY:1`). The events file is the source of truth; `analyse.R` rebuilds the table from events and compares it with `summary.csv` (tolerance 0.002 s for `_s` columns). The v1 dwell columns are gone: R computes dwell in the wide file.
 
 **summary.csv column rules** (what the C# writer computes; step 2 is written from this table). A *counted attempt* is: in ConceptScene a `quiz_answer` (every rated quiz touch); in Basic, Mixed and Complex a `confirm_pressed`. Complex remainder-quiz touches (`quiz` = `complex_remainder`) and every `confirm_ignored` are never counted attempts.
 
