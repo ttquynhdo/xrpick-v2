@@ -1191,7 +1191,8 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Công:** S
 - **Test trên kính:** bắt buộc (chạm A/B/C bằng tay thật ở cả hai scene)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl76.md
+- **Status:** verified-mcp (9/12 ✅, chờ test tay H1–H3 trên kính)
 
 ### #77 [P1] Chữ tiếng Anh bảo bấm „Weiter“ trong khi nút ghi „Next“
 - **Type:** bug
