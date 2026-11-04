@@ -1351,7 +1351,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 ### #31 [Feature] Hướng dẫn lấy log về máy + script gộp với phiếu giấy
 - **Type:** feature
 - **Scene(s):** —
-- **Files:** `docs/research-data-guide.md` (mới, cho người điều phối), script nhỏ R hoặc Python gộp các `_summary.csv` theo `participant_id`
+- **Files:** `docs/research-data-guide.md` (mới, cho người điều phối), `analysis/paper_forms_template.csv`, `analysis/analyse.R` mục 14b (nối phiếu giấy vào `wide_with_paper.csv`), `make_fake_data.R`, `selftest.R`, `analysis/README.md`
 - **Problem:** Người điều phối cần quy trình rõ ràng để chép log từ Quest (Meta Quest Developer Hub / `adb pull`), kiểm tra đủ file, xoá trên kính sau khi chép, và nối với dữ liệu phiếu giấy.
 - **Done when:** Một người chưa làm bao giờ làm theo hướng dẫn chép được log của 2 phiên thử về máy; script gộp ra một bảng mỗi người một dòng (hoặc mỗi scene một dòng) kèm cột từ file phiếu giấy mẫu.
 - **Inspector work expected:** no
@@ -1362,7 +1362,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Bổ sung (review cuối #27, 2026-11-01):** trước mỗi đợt thu dữ liệu: xoá thư mục `research/` trên kính và làm trống `analysis/data/real/` (hiện có log thử `P101`, `P899` của dev). Dev test dùng mã thử `P9xx` (vào `practice/`, bị loại khỏi phân tích); chỉ ca cảnh báo "đã có phiên hoàn tất" cần mã thật, dùng `P899` và xoá ngay sau đó.
 - **Bổ sung (review cuối #44, 2026-11-01):** thêm ô "Abbruchgrund" vào phiếu giấy (mệt/chóng mặt, thời gian, chạm nhầm, khác), nối theo `participant_id`; không đưa vào app.
 - **Depends on:** #28 (cần `summary.csv`). Spec mục 9 (2026-11-01): người điều phối xoá log trên kính ngay sau khi chép về và kiểm tra đủ file.
-- **Status:** todo
+- **Test report:** docs/test-reports/bl31.md
+- **Status:** verified-mcp (5/7 ✅, chờ bạn thử M1 chép log 2 phiên theo hướng dẫn, M2 nhập 2 phiếu và chạy `analyse.R`)
 
 ### #43 [Feature] Bài kiểm tra ngắn trong VR ở đầu và cuối khóa
 - **Type:** feature

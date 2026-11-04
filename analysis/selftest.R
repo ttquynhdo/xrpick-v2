@@ -341,6 +341,75 @@ local({
             any(grepl("language 'EN'", warn_lines) & grepl("P108", warn_lines)))
   stopifnot(!any(grepl("P950", warn_lines) & grepl("language", warn_lines)))
 
+  # 8p. Paper forms (#31): data/fake/paper_forms.csv (semicolons,
+  #     Windows-1252, German dates, as German Excel saves it) is read,
+  #     validated, scored and joined into wide_with_paper.csv; wide.csv
+  #     stays log-only. Expected values below are worked out by hand.
+  stopifnot(!any(grepl("^(ssq|tlx)_", names(wide))))
+  wp_path <- file.path(output_dir, "wide_with_paper.csv")
+  stopifnot(file.exists(wp_path), file.exists(file.path(output_dir, "ssq_pre_post.png")),
+            file.exists(file.path(output_dir, "tlx_vs_attempts.png")))
+  wp <- read_csv(wp_path, show_col_types = FALSE, guess_max = 1000)
+  pw <- function(col, pid) wp[[col]][wp$participant_id == pid]
+  # 15 log participants + P120 (paper only); P950 (test) and "P13" (typo) not.
+  stopifnot(nrow(wp) == 16, anyDuplicated(wp$participant_id) == 0)
+  stopifnot(identical(sort(wp$participant_id[!wp$has_log]), "P120"))
+  stopifnot(!any(c("P950", "P13") %in% wp$participant_id))
+  stopifnot(identical(sort(wp$participant_id[wp$paper_status == "no_paper"]), c("P113", "P114")),
+            pw("paper_status", "P102") == "duplicate", is.na(pw("ssq_post_total", "P102")))
+  # No free text in the joined file, only whether a note exists.
+  stopifnot(!"note" %in% names(wp), isTRUE(pw("paper_note_present", "P107")),
+            isFALSE(pw("paper_note_present", "P101")))
+  # P101: pre all 0; post items 1, 3, 8 = 1 -> raw N = 2 (items 1, 8),
+  # O = 2 (items 1, 3), D = 1 (item 8): N 19.08, O 15.16, D 13.92,
+  # total (2 + 2 + 1) * 3.74 = 18.7. TLX (40+10+30+20+45+15)/6 = 26.7.
+  stopifnot(pw("ssq_pre_total", "P101") == 0, pw("ssq_post_nausea", "P101") == 19.08,
+            pw("ssq_post_oculomotor", "P101") == 15.16, pw("ssq_post_disorientation", "P101") == 13.92,
+            pw("ssq_post_total", "P101") == 18.7, pw("ssq_change_total", "P101") == 18.7,
+            pw("tlx_raw", "P101") == 26.7, pw("session_date", "P101") == "2026-11-03")
+  stopifnot(abs(pw("end_time_diff_min", "P101")) <= 1, abs(pw("end_time_diff_min", "P103")) <= 1)
+  # P108: item 3 (headache) empty -> oculomotor and total NA, nausea measured.
+  stopifnot(is.na(pw("ssq_pre_03_headache", "P108")), is.na(pw("ssq_pre_oculomotor", "P108")),
+            is.na(pw("ssq_pre_total", "P108")), !is.na(pw("ssq_pre_nausea", "P108")),
+            is.na(pw("ssq_change_total", "P108")))
+  # P106: post item 8 = 4 and TLX effort = 120 are set to empty: nausea and
+  # disorientation NA (item 8 is in both), oculomotor measured; tlx_raw NA.
+  stopifnot(is.na(pw("ssq_post_08_nausea", "P106")), is.na(pw("ssq_post_nausea", "P106")),
+            is.na(pw("ssq_post_disorientation", "P106")), !is.na(pw("ssq_post_oculomotor", "P106")),
+            is.na(pw("tlx_effort", "P106")), is.na(pw("tlx_raw", "P106")), pw("paper_problems", "P106") == 2)
+  stopifnot(pw("abbruchgrund", "P107") == "mued_schwindlig", pw("abbruchgrund", "P104") == "zeit",
+            is.na(pw("abbruchgrund", "P105")), is.na(pw("tlx_raw", "P112")))
+  warn_lines <- readLines(file.path(output_dir, "warnings.txt"), encoding = "UTF-8")
+  has_warn <- function(...) any(Reduce(`&`, lapply(c(...), function(p) grepl(p, warn_lines, fixed = TRUE))))
+  stopifnot(has_warn("'P13'", "not P + 3 digits"), has_warn("paper form for P120 but no log"),
+            has_warn("log for P113 but no paper form"), has_warn("log for P114 but no paper form"),
+            has_warn("P102 appears 2 times"), has_warn("P106", "ssq_post_08_nausea = '4'"),
+            has_warn("P106", "tlx_effort = '120'"), has_warn("P108", "SSQ pre item(s) empty (03_headache)"),
+            has_warn("'absturz'"), has_warn("P109", "abbruchgrund given although"),
+            has_warn("paper form P110: end time"), has_warn("P112: NASA-TLX not filled"))
+  # P107 was ended by the facilitator and has a reason: no warning for it.
+  stopifnot(!has_warn("P107", "no abbruchgrund"), !has_warn("P101: end time"), !has_warn("paper", "P950"))
+  check_line <- warn_lines[grepl("^Paper forms to check", warn_lines)]
+  stopifnot(length(check_line) == 1,
+            all(sapply(c("P102", "P105", "P106", "P108", "P109", "P110", "P112", "P113", "P114", "P120"),
+                       grepl, check_line)),
+            !grepl("P101", check_line), !grepl("P107", check_line))
+  # Windows-1252 text was read as UTF-8 (the note keeps its umlaut).
+  stopifnot(paper_raw$note[paper_raw$participant_id == "P107"] == "Übelkeit in Komplex")
+  # The template (commas, UTF-8, ISO date) reads the same way; its header is
+  # the column contract with analyse.R.
+  tpl <- readLines("analysis/paper_forms_template.csv", warn = FALSE)
+  stopifnot(identical(strsplit(tpl[1], ",")[[1]], paper_cols))
+  tpl_try <- file.path(tempdir(), "paper_forms_comma.csv")
+  writeLines(c(tpl[1], paste(c("P101", "2026-11-03", "F1", "9:05", rep("0", 31), "2", rep("50", 6),
+                               "zeit", ""), collapse = ",")), tpl_try)
+  tpl_read <- read_paper_file(tpl_try)
+  stopifnot(nrow(tpl_read) == 1, tpl_read$participant_id == "P101", tpl_read$ssq_post_16_burping == "2",
+            tpl_read$abbruchgrund == "zeit", tpl_read$paper_row == 2)
+  unlink(tpl_try)
+  # Decision 022: no pose/perf promise left in the Q4 output.
+  stopifnot(any(grepl("decision 022", warn_lines)))
+
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.
   stopifnot(data_quality$duplicate_files[data_quality$participant_id == "P101"] == 2)
@@ -401,7 +470,12 @@ local({
   close(con)
   data_dir <- old_logs
   output_dir <- file.path(tempdir(), "selftest_old_logs_out")
+  # No paper file here (only research/ was copied): no error, and a joined
+  # file left from an earlier run is removed, never shown as current.
+  dir.create(output_dir, showWarnings = FALSE)
+  writeLines("stale", file.path(output_dir, "wide_with_paper.csv"))
   source("analysis/analyse.R", local = TRUE)
+  stopifnot(!file.exists(file.path(output_dir, "wide_with_paper.csv")))
   stopifnot(is.na(rw("resume_offered", "P106")), is.na(rw("resume_declined", "P106")),
             is.na(rw("ended_session_override", "P106")))
   stopifnot(isFALSE(rw("resume_offered", "P109")), isFALSE(rw("resume_declined", "P109")),

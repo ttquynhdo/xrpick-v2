@@ -2,8 +2,11 @@
 #
 # Turns research logs from the xpick app into charts and tables for
 # research questions 1 (improvement per skill), 2 (hard scenes, common errors),
-# 3 (where the time of a position goes, from the #29 interaction events) and
-# 6 (data quality). Rules: docs/superpowers/specs/2026-11-01-research-logger-design.md
+# 3 (where the time of a position goes, from the #29 interaction events),
+# 4 and 5 (paper SSQ / NASA-TLX joined by participant_id, #31; only when a
+# paper_forms.csv exists) and 6 (data quality). There is no pose, frame-rate
+# or tracking data in the logs (decision 022): Q4 uses the SSQ change with
+# headset removals, pauses, early end and active time only. Rules: docs/superpowers/specs/2026-11-01-research-logger-design.md
 # section 8. Log format: docs/research-logging-spec.md, schema_version 2
 # (decision 021). Logs with schema_version 1 are read for sessions, visits and
 # pauses, but their outcome events (v1 catalogue) are not: NA, not measured.
@@ -228,10 +231,18 @@ known_events <- c("header", "session_start", "session_end", "scene_enter", "scen
                   "crash_recovered", "confirm_pressed", "confirm_ignored", "position_completed",
                   "task_completed", "quiz_answer", "quiz_unlocked", "tour_step",
                   "station_move_start", "station_move_arrived", "welcome_practice_done",
-                  "grab_start", "grab_end", "container_enter", "container_exit",
-                  "object_dropped_floor", "input_mode_change", "tracking_lost",
-                  "tracking_regained", "perf_sample")
-unknown_events <- setdiff(unique(events$event), known_events)
+                  "grab_start", "grab_end", "container_enter", "container_exit")
+# Decision 022 dropped #30 (pose, perf) and #74 (floor drops, input mode,
+# tracking): the app must never write these. If one turns up, the build is not
+# the study build (or the decision was reopened): warn, don't read them.
+dropped_events_022 <- c("perf_sample", "object_dropped_floor", "input_mode_change",
+                        "tracking_lost", "tracking_regained")
+seen_022 <- events %>% filter(event %in% dropped_events_022) %>% distinct(participant_id, event)
+if (nrow(seen_022) > 0) {
+  warn("event(s) the app should not write since decision 022 (not read): ",
+       paste0(seen_022$participant_id, " ", seen_022$event, collapse = ", "))
+}
+unknown_events <- setdiff(unique(events$event), c(known_events, dropped_events_022))
 if (length(unknown_events) > 0) {
   message("Note: event names not in the v2 catalogue: ", paste(unknown_events, collapse = ", "))
 }
@@ -1153,6 +1164,16 @@ if (length(summary_files) > 0) {
     count(participant_id, session_id, path, name = "n_rows") %>%
     pick_longest_files("summary")
   summary_rows <- summary_rows %>% filter(!path %in% dropped_summary_files$path) %>% select(-path)
+  # Decision 022: drops_floor, fps_avg and dropped_frames are always empty
+  # (no floor, perf or frame data in the app). A value there is not a
+  # measurement we can trust: warn and never use it.
+  for (cl in intersect(c("drops_floor", "fps_avg", "dropped_frames"), names(summary_rows))) {
+    filled <- summary_rows %>% filter(!is.na(.data[[cl]]), .data[[cl]] != "")
+    if (nrow(filled) > 0) {
+      warn("summary.csv column ", cl, " has values although decision 022 says it is always empty (ignored): ",
+           paste(unique(filled$participant_id), collapse = ", "))
+    }
+  }
 }
 
 # Sort "B:1;A:2" -> "A:2;B:1" so the code order never counts as a difference.
@@ -1878,6 +1899,342 @@ scene_cols <- setdiff(names(wide), participant_cols)
 wide <- wide %>% select(all_of(participant_cols), all_of(scene_col_order(scene_cols)))
 write_csv(wide, file.path(output_dir, "wide.csv"), na = "")
 
+# ---- 14b. Paper forms (#31): SSQ before/after, NASA-TLX, Abbruchgrund ------------
+
+# The facilitator types the paper forms into a CSV built from
+# analysis/paper_forms_template.csv and saves it as
+# analysis/data/<wave>/paper_forms.csv (columns: README, "Paper forms").
+# The file is optional: without it only wide.csv is written and nothing fails.
+# The joined table goes to its own file, wide_with_paper.csv, on purpose:
+# wide.csv keeps the same log-only columns with or without paper data, and the
+# SSQ answers are health data, so the one file holding them is easy to name,
+# guard and delete.
+
+# The paper end time is local wall-clock time; the log is UTC.
+if (!exists("paper_time_zone")) paper_time_zone <- "Europe/Berlin"
+# End time on paper vs the participant's last logged event: a bigger gap
+# usually means a swapped form or a typo in the ID.
+end_time_warn_min <- 15
+
+# The 16 SSQ items in the standard order (Kennedy et al. 1993). The German
+# paper form must use the same order: column 01 = item 1, and so on.
+ssq_items <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
+               "05_difficulty_focusing", "06_salivation_increased", "07_sweating", "08_nausea",
+               "09_difficulty_concentrating", "10_fullness_of_head", "11_blurred_vision",
+               "12_dizzy_eyes_open", "13_dizzy_eyes_closed", "14_vertigo",
+               "15_stomach_awareness", "16_burping")
+# Which items load on which subscale (Kennedy et al. 1993; some items count twice).
+ssq_subscales <- list(nausea = c(1, 6, 7, 8, 9, 15, 16),
+                      oculomotor = c(1, 2, 3, 4, 5, 9, 11),
+                      disorientation = c(5, 8, 10, 11, 12, 13, 14))
+ssq_weights <- c(nausea = 9.54, oculomotor = 7.58, disorientation = 13.92)
+ssq_total_weight <- 3.74
+# NASA-TLX raw (unweighted): 6 scales 0-100. Performance: 0 = good, 100 = poor
+# (as on the original form), so for every scale higher = more load.
+tlx_scales <- c("mental", "physical", "temporal", "performance", "effort", "frustration")
+abbruch_levels <- c("mued_schwindlig", "zeit", "fehlbedienung", "andere")
+
+ssq_cols <- function(form) paste0("ssq_", form, "_", ssq_items)
+paper_cols <- c("participant_id", "session_date", "facilitator", "end_time_local",
+                ssq_cols("pre"), ssq_cols("post"), paste0("tlx_", tlx_scales),
+                "abbruchgrund", "note")
+
+# The template and this script must name the same columns (a contract, like
+# the log format): stop early if someone edited one of them alone.
+template_path <- file.path(analysis_folder, "paper_forms_template.csv")
+if (file.exists(template_path)) {
+  template_cols <- strsplit(sub("﻿", "", readLines(template_path, n = 1, warn = FALSE)), ",")[[1]]
+  if (!identical(template_cols, paper_cols)) {
+    stop("paper_forms_template.csv and analyse.R list different paper columns; change both together.")
+  }
+}
+
+# Reads one paper file as text cells. Excel on a German PC saves "CSV" with
+# semicolons and often in Windows-1252, the template has commas and UTF-8:
+# both are accepted, so whoever types the forms never has to fix the format.
+read_paper_file <- function(path) {
+  raw <- readLines(path, warn = FALSE)
+  if (length(raw) == 0) return(NULL)
+  if (!all(validUTF8(raw))) raw <- iconv(raw, from = "windows-1252", to = "UTF-8")
+  raw[1] <- sub("^﻿", "", raw[1])
+  delim <- if (str_count(raw[1], fixed(";")) > str_count(raw[1], fixed(","))) ";" else ","
+  tab <- read_delim(I(paste(c(raw, ""), collapse = "\n")), delim = delim, na = character(),
+                    col_types = cols(.default = col_character()), trim_ws = TRUE,
+                    skip_empty_rows = FALSE, show_col_types = FALSE, progress = FALSE)
+  names(tab) <- tolower(trimws(names(tab)))
+  # Row number as Excel shows it (header = row 1), for the warnings.
+  tab <- tab %>% mutate(paper_file = path, paper_row = row_number() + 1L, .before = 1)
+  for (cl in setdiff(paper_cols, names(tab))) {
+    warn("paper file ", path, " has no column ", cl, " (read as empty)")
+    tab[[cl]] <- ""
+  }
+  extra <- setdiff(names(tab), c(paper_cols, "paper_file", "paper_row"))
+  if (length(extra) > 0) warn("paper file ", path, ": unknown column(s) ignored: ", paste(extra, collapse = ", "))
+  tab <- tab %>% select(paper_file, paper_row, all_of(paper_cols)) %>%
+    mutate(across(all_of(paper_cols), ~ coalesce(trimws(.x), "")))
+  # Rows Excel leaves behind with nothing in them are not data.
+  tab %>% filter(if_any(all_of(paper_cols), ~ .x != ""))
+}
+
+# Paper files are named paper_forms*.csv; fake/ is skipped for real data_dirs
+# (same rule as for the logs).
+paper_files <- list.files(data_dir, pattern = "^paper_forms.*\\.csv$", recursive = TRUE, full.names = TRUE)
+if (!grepl("fake", data_dir)) paper_files <- paper_files[!grepl("/fake/", paper_files)]
+xlsx_only <- list.files(data_dir, pattern = "^paper_forms.*\\.xlsx$", recursive = TRUE, full.names = TRUE)
+if (length(paper_files) == 0 && length(xlsx_only) > 0) {
+  warn("paper forms found only as Excel file(s) (", paste(xlsx_only, collapse = ", "),
+       "): save them as CSV (paper_forms.csv) to join them")
+}
+# An old joined file from an earlier run must not survive a run without paper.
+unlink(file.path(output_dir, c("wide_with_paper.csv", "ssq_pre_post.png", "tlx_vs_attempts.png")))
+paper_raw <- map(paper_files, read_paper_file) %>% compact() %>% list_rbind()
+paper_check_ids <- character(0)
+
+if (length(paper_files) == 0 || nrow(paper_raw) == 0) {
+  message("No paper forms (paper_forms.csv) under ", data_dir, ": wide_with_paper.csv not written.")
+} else {
+  message("Reading ", nrow(paper_raw), " paper form row(s) from ", paste(paper_files, collapse = ", "))
+  where <- function(r) paste0(basename(r$paper_file), " row ", r$paper_row)
+
+  # 1. IDs: a row without a valid P + 3 digits ID can't be joined; it is
+  #    named in the warnings (never silently dropped). Test IDs are dropped
+  #    like their logs.
+  no_id <- paper_raw %>% filter(participant_id == "")
+  for (i in seq_len(nrow(no_id))) warn("paper form ", where(no_id[i, ]), " has data but no participant_id (not joined)")
+  bad_id <- paper_raw %>% filter(participant_id != "", !is_valid_id(participant_id))
+  for (i in seq_len(nrow(bad_id))) {
+    warn("paper form ", where(bad_id[i, ]), ": participant_id '", bad_id$participant_id[i],
+         "' is not P + 3 digits (typo?), not joined")
+  }
+  paper_test <- paper_raw %>% filter(is_valid_id(participant_id), is_test_id(participant_id))
+  if (nrow(paper_test) > 0) message("Dropped paper form(s) of test IDs: ", paste(paper_test$participant_id, collapse = ", "))
+  paper <- paper_raw %>% filter(is_valid_id(participant_id), !is_test_id(participant_id))
+
+  # 2. Duplicates: two rows for one ID can't be told apart (which is right?).
+  #    Neither is joined; the ID gets paper_status "duplicate".
+  dup_ids <- paper %>% count(participant_id) %>% filter(n > 1) %>% pull(participant_id)
+  for (pid in dup_ids) {
+    d <- paper %>% filter(participant_id == pid)
+    warn("paper forms: ", pid, " appears ", nrow(d), " times (", paste(where(d), collapse = ", "),
+         "): none joined, keep one row")
+  }
+
+  # 3. Numbers: SSQ items are whole numbers 0-3, TLX 0-100. An empty cell is
+  #    "not filled" (NA, never 0); a value out of range is a typing error: the
+  #    cell becomes NA and is named in the warnings.
+  problems <- tibble(participant_id = character(), column = character())
+  check_num <- function(df, cols, lo, hi, whole) {
+    for (cl in cols) {
+      txt <- df[[cl]]
+      val <- suppressWarnings(as.numeric(sub(",", ".", txt, fixed = TRUE)))
+      bad <- txt != "" & (is.na(val) | val < lo | val > hi | (whole & val != round(val)))
+      for (i in which(bad)) {
+        warn("paper form ", where(df[i, ]), " (", df$participant_id[i], "): ", cl, " = '", txt[i],
+             "' is not ", if (whole) "a whole number " else "a number ", lo, "-", hi, " (set to empty)")
+        problems <<- bind_rows(problems, tibble(participant_id = df$participant_id[i], column = cl))
+      }
+      val[bad | txt == ""] <- NA_real_
+      df[[cl]] <- val
+    }
+    df
+  }
+  paper <- check_num(paper, c(ssq_cols("pre"), ssq_cols("post")), 0, 3, TRUE)
+  paper <- check_num(paper, paste0("tlx_", tlx_scales), 0, 100, FALSE)
+  # The TLX scale has 21 marks (steps of 5): another value is a reading slip.
+  for (cl in paste0("tlx_", tlx_scales)) {
+    off <- which(!is.na(paper[[cl]]) & paper[[cl]] %% 5 != 0)
+    for (i in off) warn("paper form ", where(paper[i, ]), " (", paper$participant_id[i], "): ", cl, " = ",
+                        paper[[cl]][i], " is between two marks of the scale (check the paper)")
+  }
+
+  # 4. Not filled: a whole form missing is common after an early stop and
+  #    matters for Q4/Q5; single empty items make their subscales NA.
+  for (i in seq_len(nrow(paper))) {
+    for (form in c("pre", "post")) {
+      miss <- ssq_items[is.na(unlist(paper[i, ssq_cols(form)]))]
+      if (length(miss) > 0) paper_check_ids <- c(paper_check_ids, paper$participant_id[i])
+      if (length(miss) == 16) warn("paper form ", paper$participant_id[i], ": SSQ ", form, " not filled")
+      else if (length(miss) > 0) warn("paper form ", paper$participant_id[i], ": SSQ ", form, " item(s) empty (",
+                                      paste(miss, collapse = ", "), "): their subscales and the total are NA")
+    }
+    miss <- tlx_scales[is.na(unlist(paper[i, paste0("tlx_", tlx_scales)]))]
+    if (length(miss) > 0) paper_check_ids <- c(paper_check_ids, paper$participant_id[i])
+    if (length(miss) == 6) warn("paper form ", paper$participant_id[i], ": NASA-TLX not filled")
+    else if (length(miss) > 0) warn("paper form ", paper$participant_id[i], ": NASA-TLX scale(s) empty (",
+                                    paste(miss, collapse = ", "), "): tlx_raw is NA")
+  }
+
+  # 5. Abbruchgrund: one of the fixed values or empty (case and spaces are
+  #    ignored). Anything else is named and left empty.
+  paper <- paper %>% mutate(abbruch_txt = abbruchgrund, abbruchgrund = tolower(trimws(abbruchgrund)))
+  bad_ab <- paper %>% filter(abbruchgrund != "", !abbruchgrund %in% abbruch_levels)
+  for (i in seq_len(nrow(bad_ab))) {
+    warn("paper form ", where(bad_ab[i, ]), " (", bad_ab$participant_id[i], "): abbruchgrund '",
+         bad_ab$abbruch_txt[i], "' is not one of ", paste(abbruch_levels, collapse = " / "), " (set to empty)")
+    problems <- bind_rows(problems, tibble(participant_id = bad_ab$participant_id[i], column = "abbruchgrund"))
+  }
+  paper <- paper %>% mutate(abbruchgrund = if_else(abbruchgrund %in% abbruch_levels, abbruchgrund, NA_character_))
+
+  # 6. Date (YYYY-MM-DD as in the template, or DD.MM.YYYY as German Excel
+  #    saves it) and end time (HH:MM, Excel may add :SS) -> one local time.
+  parse_paper_date <- function(x) {
+    iso <- as.Date(x, format = "%Y-%m-%d")
+    de <- as.Date(x, format = "%d.%m.%Y")
+    out <- if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}$", x), iso, de)
+    out[!grepl("^(\\d{4}-\\d{1,2}-\\d{1,2}|\\d{1,2}\\.\\d{1,2}\\.\\d{4})$", x)] <- NA
+    out
+  }
+  paper <- paper %>%
+    mutate(date_parsed = parse_paper_date(session_date),
+           time_ok = grepl("^\\d{1,2}:\\d{2}(:\\d{2})?$", end_time_local),
+           # "9:05" and "09:05:00" both become "09:05:00" (one format for all rows).
+           time_hms = if_else(grepl("^\\d{1,2}:\\d{2}$", end_time_local), paste0(end_time_local, ":00"), end_time_local),
+           end_local = as.POSIXct(if_else(!is.na(date_parsed) & time_ok,
+                                          paste(format(date_parsed), time_hms), NA_character_),
+                                  format = "%Y-%m-%d %H:%M:%S", tz = paper_time_zone))
+  for (i in which(paper$session_date != "" & is.na(paper$date_parsed))) {
+    warn("paper form ", where(paper[i, ]), " (", paper$participant_id[i], "): session_date '",
+         paper$session_date[i], "' is not YYYY-MM-DD or DD.MM.YYYY")
+  }
+  for (i in which(paper$end_time_local != "" & !paper$time_ok)) {
+    warn("paper form ", where(paper[i, ]), " (", paper$participant_id[i], "): end_time_local '",
+         paper$end_time_local[i], "' is not HH:MM")
+  }
+
+  # 7. Scores. Raw subscale = sum of its items (NA if any item is NA, no
+  #    guessing); weighted as Kennedy et al. 1993. Change = post - pre, so a
+  #    trainee who came in with symptoms is not counted as made sick by VR.
+  ssq_scores <- function(df, form) {
+    m <- as.matrix(df[ssq_cols(form)])
+    raw <- map(ssq_subscales, ~ rowSums(m[, .x, drop = FALSE]))
+    out <- tibble(!!paste0("ssq_", form, "_nausea") := round(raw$nausea * ssq_weights[["nausea"]], 2),
+                  !!paste0("ssq_", form, "_oculomotor") := round(raw$oculomotor * ssq_weights[["oculomotor"]], 2),
+                  !!paste0("ssq_", form, "_disorientation") := round(raw$disorientation * ssq_weights[["disorientation"]], 2),
+                  !!paste0("ssq_", form, "_total") := round((raw$nausea + raw$oculomotor + raw$disorientation) *
+                                                              ssq_total_weight, 2))
+    out
+  }
+  paper <- bind_cols(paper, ssq_scores(paper, "pre"), ssq_scores(paper, "post")) %>%
+    mutate(ssq_change_nausea = ssq_post_nausea - ssq_pre_nausea,
+           ssq_change_oculomotor = ssq_post_oculomotor - ssq_pre_oculomotor,
+           ssq_change_disorientation = ssq_post_disorientation - ssq_pre_disorientation,
+           ssq_change_total = ssq_post_total - ssq_pre_total,
+           # Raw (unweighted) TLX: the mean of the 6 scales, NA if one is missing.
+           tlx_raw = round(rowMeans(across(all_of(paste0("tlx_", tlx_scales)))), 1))
+
+  # 8. Cross-checks with the logs. Every ID on one side only is named: a
+  #    typo on the form, logs not copied, or a form not typed in yet.
+  log_ids <- data_quality$participant_id
+  paper_ids <- unique(paper$participant_id)
+  for (pid in setdiff(paper_ids, log_ids)) warn("paper form for ", pid, " but no log (logs not copied? typo in the ID?)")
+  for (pid in setdiff(log_ids, paper_ids)) warn("log for ", pid, " but no paper form (not typed in? typo in the ID?)")
+
+  last_event <- sessions %>% group_by(participant_id) %>% summarise(last_utc = max(last_utc), .groups = "drop")
+  paper <- paper %>% left_join(last_event, by = "participant_id") %>%
+    mutate(end_time_diff_min = round(as.numeric(difftime(end_local, last_utc, units = "mins")), 1))
+  far <- paper %>% filter(!participant_id %in% dup_ids, abs(end_time_diff_min) > end_time_warn_min)
+  for (i in seq_len(nrow(far))) {
+    warn("paper form ", far$participant_id[i], ": end time ", far$session_date[i], " ", far$end_time_local[i],
+         " (", paper_time_zone, ") is ", far$end_time_diff_min[i], " min from the last logged event ",
+         format(far$last_utc[i], "%Y-%m-%d %H:%M", tz = paper_time_zone), " (swapped form or wrong ID?)")
+  }
+
+  # Abbruchgrund vs how the log ended: a facilitator stop needs a reason on
+  # paper; a reason for someone who finished the course is contradictory.
+  ab_check <- paper %>% filter(!participant_id %in% dup_ids) %>%
+    inner_join(data_quality %>% select(participant_id, end_status, course_finished), by = "participant_id")
+  for (pid in ab_check$participant_id[ab_check$end_status == "facilitator" & is.na(ab_check$abbruchgrund)]) {
+    warn("paper form ", pid, ": session ended by the facilitator but no abbruchgrund")
+    paper_check_ids <- c(paper_check_ids, pid)
+  }
+  for (pid in ab_check$participant_id[!is.na(ab_check$abbruchgrund) & ab_check$course_finished %in% TRUE]) {
+    warn("paper form ", pid, ": abbruchgrund given although the log shows the course finished")
+    paper_check_ids <- c(paper_check_ids, pid)
+  }
+
+  # 9. The joined file: all log participants plus paper-only IDs (so nothing
+  #    disappears), one row each. The free-text note never leaves the paper
+  #    file (privacy, and no free text as data): only whether there is one.
+  problem_counts <- problems %>% count(participant_id, name = "paper_problems")
+  paper_out <- paper %>%
+    filter(!participant_id %in% dup_ids) %>%
+    transmute(participant_id, paper_status = "joined",
+              session_date = format(date_parsed), facilitator = na_if(facilitator, ""),
+              end_time_local = na_if(end_time_local, ""), end_time_diff_min,
+              abbruchgrund, paper_note_present = note != "",
+              across(starts_with("ssq_pre_")), across(starts_with("ssq_post_")),
+              across(starts_with("ssq_change_")), across(all_of(paste0("tlx_", tlx_scales))), tlx_raw) %>%
+    bind_rows(tibble(participant_id = dup_ids, paper_status = rep("duplicate", length(dup_ids)))) %>%
+    left_join(problem_counts, by = "participant_id") %>%
+    mutate(paper_problems = coalesce(paper_problems, 0L))
+  wide_with_paper <- wide %>% mutate(has_log = TRUE) %>%
+    full_join(paper_out, by = "participant_id") %>%
+    mutate(has_log = coalesce(has_log, FALSE), paper_status = coalesce(paper_status, "no_paper")) %>%
+    select(participant_id, has_log, paper_status, all_of(setdiff(names(paper_out), c("participant_id", "paper_status"))),
+           everything()) %>%
+    arrange(participant_id)
+  write_csv(wide_with_paper, file.path(output_dir, "wide_with_paper.csv"), na = "")
+  paper_check_ids <- sort(unique(c(paper_check_ids, dup_ids, problems$participant_id, setdiff(paper_ids, log_ids),
+                                   setdiff(log_ids, paper_ids), far$participant_id)))
+
+  # 10. Q4 chart: SSQ before vs after, per participant. There is no frame-rate
+  #     or head-movement data (decision 022), so the only log signals shown
+  #     are headset removal, pauses and an early end.
+  joined <- wide_with_paper %>% filter(has_log, paper_status == "joined")
+  q4 <- joined %>%
+    mutate(log_signal = if_else(hmd_removed_count > 0 | pauses > 0 | end_status != "completed",
+                                "headset off, paused or ended early", "none of these")) %>%
+    select(participant_id, log_signal, matches("^ssq_(pre|post)_(nausea|oculomotor|disorientation|total)$")) %>%
+    pivot_longer(-c(participant_id, log_signal), names_to = c("form", "score"),
+                 names_pattern = "ssq_(pre|post)_(.*)") %>%
+    group_by(participant_id, score) %>% filter(!anyNA(value), n() == 2) %>% ungroup()
+  if (nrow(q4) > 0) {
+    score_labels <- c(nausea = "Nausea", oculomotor = "Oculomotor", disorientation = "Disorientation",
+                      total = "Total score")
+    n_q4 <- q4 %>% distinct(participant_id, score) %>% count(score) %>%
+      mutate(label = paste0(score_labels[score], " (n = ", n, ")"))
+    score_levels <- intersect(names(score_labels), n_q4$score)
+    q4 <- q4 %>% mutate(form = factor(form, levels = c("pre", "post"), labels = c("before", "after")),
+                        score = factor(score, levels = score_levels,
+                                       labels = n_q4$label[match(score_levels, n_q4$score)]))
+    p_q4 <- ggplot(q4, aes(form, value, group = participant_id, colour = log_signal)) +
+      geom_line(alpha = 0.6) + geom_point(size = 2) +
+      facet_wrap(~ score, nrow = 1, scales = "free_y") +
+      scale_colour_manual(values = c("headset off, paused or ended early" = okabe_ito[5],
+                                     "none of these" = okabe_ito[4]), name = "In the log") +
+      labs(title = "Q4: Does VR discomfort (SSQ) rise from before to after the course?",
+           subtitle = paste0("Line = one participant with both forms. Weighted SSQ scores (Kennedy 1993). ",
+                             "No frame-rate or head-movement data exist (decision 022)."),
+           x = "SSQ form", y = "SSQ score (weighted)") +
+      theme_minimal(base_size = 11) + theme(legend.position = "bottom")
+    ggsave(file.path(output_dir, "ssq_pre_post.png"), p_q4, width = 10, height = 4.5, dpi = 150, bg = "white")
+  }
+
+  # 11. Q5 chart: NASA-TLX vs the attempts and the trainee's active time.
+  #     Who stopped early did fewer scenes: hollow points.
+  q5 <- joined %>% filter(!is.na(tlx_raw)) %>%
+    transmute(participant_id, tlx_raw,
+              finished = if_else(course_finished %in% TRUE, "finished the course", "did not finish / unknown"),
+              `Rated attempts, whole course (quiz touches + red-button presses)` = total_confirms,
+              `Trainee active time (min)` = round((active_s - coalesce(facilitator_tail_s, 0)) / 60, 1)) %>%
+    pivot_longer(-c(participant_id, tlx_raw, finished), names_to = "measure") %>%
+    filter(!is.na(value)) %>%
+    # n per panel: schema-1 logs have no attempt count, so the panels can differ.
+    group_by(measure) %>% mutate(measure = paste0(measure, " (n = ", n(), ")")) %>% ungroup()
+  if (nrow(q5) > 0) {
+    p_q5 <- ggplot(q5, aes(value, tlx_raw, shape = finished)) +
+      geom_point(size = 2.5, colour = okabe_ito[4]) +
+      scale_shape_manual(values = c("finished the course" = 16, "did not finish / unknown" = 1), name = NULL) +
+      facet_wrap(~ measure, scales = "free_x") +
+      labs(title = "Q5: Do trainees who needed more attempts or time report more load?",
+           subtitle = paste0("Point = one participant. Raw NASA-TLX = mean of the 6 scales, once at the end. ",
+                             "Hollow = stopped early: fewer scenes, so fewer attempts and less time."),
+           x = NULL, y = "Raw NASA-TLX (0-100)") +
+      theme_minimal(base_size = 11) + theme(legend.position = "bottom")
+    ggsave(file.path(output_dir, "tlx_vs_attempts.png"), p_q5, width = 10, height = 4.5, dpi = 150, bg = "white")
+  }
+}
+
 # ---- 15. Validity limits and warnings file --------------------------------------
 
 validity_limits <- c(
@@ -1887,7 +2244,9 @@ validity_limits <- c(
   "- Complex position 1 is scaffolded by the remainder quiz: the quiz hands the trainee the numbers (full cartons, loose pieces) before the first pick, so position 1 measures picking, not calculation; position 2 is unscaffolded (item_skills.csv, column scaffolded; hollow points in first_attempt_by_item.png). Don't pool the two positions as one calculate_quantity measure.",
   "- Schema 1 logs (before decision 021) are kept for data quality, but their outcome columns are NA (not measured).",
   "- Small N, one run per person: describe distributions; any test is exploratory.",
-  "- Time-to-correct only covers visits that reached correct; the 'never' counts show who is missing.")
+  "- Time-to-correct only covers visits that reached correct; the 'never' counts show who is missing.",
+  "- Q4 (paper SSQ): the logs hold no frame-rate, frame-drop, head-movement or tracking data (decision 022). SSQ change (post - pre) can only be read against headset removals, pauses, an early end (end_status, abbruchgrund) and active time, for the whole session (no per-scene sickness).",
+  "- Q5 (paper NASA-TLX, once at the end, raw = unweighted mean): who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.")
 
 flagged <- data_quality %>%
   filter(end_status != "completed" | multi_session | mixed_build | duration_censored |
@@ -1903,6 +2262,9 @@ report_lines <- c(
          nrow(sessions), " session(s), ", nrow(visits), " visit(s)."),
   paste0("Participants to check in data_quality.csv: ",
          if (length(flagged) == 0) "none" else paste(flagged, collapse = ", ")),
+  paste0("Paper forms to check (wide_with_paper.csv): ",
+         if (length(paper_files) == 0) "no paper file"
+         else if (length(paper_check_ids) == 0) "none" else paste(paper_check_ids, collapse = ", ")),
   "",
   "WARNINGS:",
   if (length(warning_lines) == 0) "(none)" else paste0("- ", warning_lines),

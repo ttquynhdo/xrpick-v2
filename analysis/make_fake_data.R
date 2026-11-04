@@ -9,8 +9,12 @@
 # events of #29 (grab_start/_end, container_enter/_exit, menu_select,
 # end_control_opened/_cancelled, scene_enter.via). Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
-# "interaction" group: its interaction numbers must be NA, not 0). No #30
-# events (pose, perf) are faked.
+# "interaction" group: its interaction numbers must be NA, not 0). No pose,
+# perf, floor-drop or tracking events: decision 022 dropped #30 and #74, the
+# app never writes them.
+# Also writes the typed-in paper forms (SSQ pre/post, NASA-TLX, Abbruchgrund,
+# #31) as data/fake/paper_forms.csv, with the entry mistakes analyse.R must
+# catch (section 9).
 # One participant (P115) is written in the old schema-1 shape on purpose, to
 # test that analyse.R warns about mixed schema versions.
 # Why: analyse.R must be tested before real participants exist, and the
@@ -465,7 +469,8 @@ exit_scene <- function(s) {
   # #29 grabs where the scene has packages with PackageData (not Welcome:
   # its practice box has none), container counts where there is an order
   # container (picking scenes); both empty in a build before #29.
-  # drops_floor (#74) and the #30 columns stay empty (not measured, never 0).
+  # drops_floor, fps_avg and dropped_frames stay empty (decision 022: never
+  # measured, never 0).
   v <- s$v
   has_outcome <- s$scene != "WelcomeScene"
   outcome <- function(x) if (has_outcome) x else ""
@@ -1351,6 +1356,93 @@ stem_copy <- file.path(fake_backup, paste0(p101_session$pid, "_", p101_session$s
 write_lf(head(p101_session$lines, length(p101_session$lines) - 6), paste0(stem_copy, "_events.jsonl"))
 write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summary) - 1)),
          paste0(stem_copy, "_summary.csv"))
+
+# ---- 9. Paper forms (#31) ---------------------------------------------------
+
+# The forms as a facilitator would type them into Excel on a German PC and
+# save as "CSV": semicolons, dates mostly DD.MM.YYYY, Windows-1252 text.
+# Columns: analysis/paper_forms_template.csv. Edge cases analyse.R must catch:
+#   P101  known scores (pre all 0, post items 1, 3, 8 = 1), ISO date
+#   P102  typed in twice (duplicate: none joined)
+#   P103  end time with seconds (Excel), two sessions (last one counts)
+#   P104  abbruchgrund "Zeit " (case and space are ignored -> zeit)
+#   P105  abbruchgrund "absturz" (not in the list -> warned, empty)
+#   P106  SSQ post item 8 = 4 and TLX effort = 120 (out of range -> empty)
+#   P107  facilitator ended the session: abbruchgrund mued_schwindlig + note
+#   P108  SSQ pre item 3 empty (oculomotor and total NA, nausea not)
+#   P109  abbruchgrund "andere" although the course was finished
+#   P110  end time 3 h off (swapped form?)
+#   P112  NASA-TLX not filled
+#   P113  ID typed as "P13" (invalid; P113 then has a log but no paper)
+#   P114  no paper form at all
+#   P120  paper form but no log
+#   P950  test ID (dropped)
+set.seed(31)
+paper_tz <- "Europe/Berlin"
+ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
+                    "05_difficulty_focusing", "06_salivation_increased", "07_sweating", "08_nausea",
+                    "09_difficulty_concentrating", "10_fullness_of_head", "11_blurred_vision",
+                    "12_dizzy_eyes_open", "13_dizzy_eyes_closed", "14_vertigo",
+                    "15_stomach_awareness", "16_burping")
+tlx_names <- c("mental", "physical", "temporal", "performance", "effort", "frustration")
+paper_header <- c("participant_id", "session_date", "facilitator", "end_time_local",
+                  paste0("ssq_pre_", ssq_item_names), paste0("ssq_post_", ssq_item_names),
+                  paste0("tlx_", tlx_names), "abbruchgrund", "note")
+
+# Local end of a participant's last session (what the facilitator writes down).
+last_event_local <- function(pid) {
+  ends <- vapply(Filter(function(s) s$pid == pid, device$sessions),
+                 function(s) s$start + s$t, numeric(1))
+  as.POSIXct(floor(max(ends)), origin = "1970-01-01", tz = "UTC")
+}
+
+paper_row <- function(pid, pre = NULL, post = NULL, tlx = NULL, abbruch = "", note = "",
+                      end_offset_h = 0, date_iso = FALSE, time_seconds = FALSE, id_written = pid,
+                      end_at = NULL) {
+  end <- if (is.null(end_at)) last_event_local(pid) else end_at
+  end <- end + end_offset_h * 3600
+  if (is.null(pre)) pre <- sample(0:3, 16, replace = TRUE, prob = c(0.70, 0.20, 0.07, 0.03))
+  if (is.null(post)) post <- sample(0:3, 16, replace = TRUE, prob = c(0.50, 0.30, 0.15, 0.05))
+  if (is.null(tlx)) tlx <- sample(seq(0, 100, 5), 6, replace = TRUE)
+  c(id_written,
+    format(end, if (date_iso) "%Y-%m-%d" else "%d.%m.%Y", tz = paper_tz),
+    sample(c("F1", "F2"), 1),
+    format(end, if (time_seconds) "%H:%M:%S" else "%H:%M", tz = paper_tz),
+    as.character(pre), as.character(post), as.character(tlx), abbruch, note)
+}
+
+blank <- function(x, i) { x[i] <- ""; x }
+p106_post <- sample(0:3, 16, replace = TRUE); p106_post[8] <- 4
+p106_tlx <- sample(seq(0, 100, 5), 6, replace = TRUE); p106_tlx[5] <- 120
+p108_pre <- blank(as.character(sample(0:3, 16, replace = TRUE, prob = c(0.7, 0.2, 0.07, 0.03))), 3)
+paper_rows <- list(
+  paper_row("P101", pre = rep(0, 16), post = c(1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0),
+            tlx = c(40, 10, 30, 20, 45, 15), date_iso = TRUE),
+  paper_row("P102"),
+  paper_row("P102"),
+  paper_row("P103", time_seconds = TRUE),
+  paper_row("P104", abbruch = "Zeit "),
+  paper_row("P105", abbruch = "absturz", note = "App abgestürzt in Basic"),
+  paper_row("P106", post = p106_post, tlx = p106_tlx),
+  paper_row("P107", abbruch = "mued_schwindlig", note = "Übelkeit in Komplex"),
+  paper_row("P108", pre = p108_pre),
+  paper_row("P109", abbruch = "andere"),
+  paper_row("P110", end_offset_h = 3),
+  paper_row("P111"),
+  paper_row("P112", tlx = rep("", 6)),
+  paper_row("P113", id_written = "P13"),
+  paper_row("P115"),
+  paper_row("P120", end_at = as.POSIXct("2026-11-06 09:00:00", tz = "UTC")),
+  paper_row("P950"))
+paper_lines <- c(paste(paper_header, collapse = ";"),
+                 vapply(paper_rows, function(r) {
+                   if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")
+                   paste(r, collapse = ";")
+                 }, character(1)),
+                 paste(rep("", length(paper_header)), collapse = ";"))  # a row Excel left empty
+con <- file(file.path(fake_root, "paper_forms.csv"), open = "wb")
+writeLines(iconv(paper_lines, from = "UTF-8", to = "windows-1252"), con, sep = "\r\n", useBytes = TRUE)
+close(con)
 
 # Short overview so the run can be checked by eye.
 overview <- data.frame(

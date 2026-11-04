@@ -5,8 +5,12 @@ The xpick app writes one events file and one summary file per session
 log contract v2: `docs/decisions/021-research-log-catalogue-v2.md`).
 The scripts here turn those files into charts and tables for research questions
 1 (improvement per skill), 2 (hard scenes, common errors), 3 (where the time
-of an order position goes, from the #29 interaction events) and 6 (data quality),
-plus a wide per-participant file for SPSS and the paper questionnaires.
+of an order position goes, from the #29 interaction events), 4 and 5 (paper
+SSQ and NASA-TLX, once the typed-in paper forms are there, #31) and 6 (data
+quality), plus a wide per-participant file for SPSS, joined with the paper forms.
+The logs hold **no** pose, head-movement, frame-rate or tracking data (decision
+022, `docs/decisions/022-no-in-app-pose-perf.md`): question 4 compares the SSQ
+change only with headset removals, pauses, an early end and active time.
 
 | File | What it is |
 |---|---|
@@ -16,11 +20,14 @@ plus a wide per-participant file for SPSS and the paper questionnaires.
 | `scenes.csv` | `scene, build_order`: scene order in every chart (survives scene renames). |
 | `skill_map.csv` | `error_code, skill, description`: which skill each error code tests. |
 | `scene_skills.csv` | `scene, skill`: which skills each scene tests (an error-free tested skill shows 0 %, not missing). |
+| `paper_forms_template.csv` | Empty paper-form table (header row only) to copy for each wave; see *Paper forms*. |
 | `item_skills.csv` | `scene, item, skill, scaffolded`: the skill of each quiz question (`question_id`) and order position (`position_<n>`), and which items are scaffolded (Complex `position_1`). A position with an empty skill tests every skill of its scene. |
 | `data/` | Copied logs. **Git-ignored, never commit.** |
 | `output/` | Charts and tables. Git-ignored. |
 
-The study lead may edit the four CSVs without touching code.
+The study lead may edit the four config CSVs (`scenes`, `skill_map`, `scene_skills`,
+`item_skills`) without touching code. The header of `paper_forms_template.csv` is a
+contract with `analyse.R` (the script stops if they differ): change both together.
 
 ## Setup (once)
 
@@ -38,6 +45,77 @@ Test IDs (`P000`, `P900`–`P999`) are dropped wherever they are, in
 `practice/` or by mistake in `research/` (the latter with a warning). A real
 ID (`P001`–`P899`) found under `practice/` is **kept**, with a warning, so no
 participant's data is lost silently: check it in `warnings.txt`.
+
+## Paper forms (SSQ, NASA-TLX, Abbruchgrund)
+
+Each participant fills the SSQ **before** putting on the headset and **again at the
+end**, and the NASA-TLX once at the end (design, *Study setup*). The facilitator adds
+the end time and, if the session was stopped, the Abbruchgrund. Type them in like this:
+
+1. Copy `analysis/paper_forms_template.csv` to `analysis/data/<wave>/paper_forms.csv`
+   (next to `research/`, e.g. `analysis/data/wave1/paper_forms.csv`).
+   The file name must start with `paper_forms` and end in `.csv`. It is under
+   `data/`, so it is git-ignored: **never commit it** (SSQ answers are health data).
+2. One row per participant, one column per answer. Leave a cell **empty** when the
+   answer is missing (never type 0 for "not answered": 0 means "none").
+3. Save as CSV. Excel on a German PC saves semicolons and Windows-1252
+   ("CSV (Trennzeichen-getrennt)"); "CSV UTF-8" with commas works too. Both are read.
+   An `.xlsx` alone is not read (the script warns). The template has commas: a German
+   Excel may show it all in column A; then use *Daten → Aus Text/CSV* (separator comma)
+   or type into a new sheet with the same header and save as CSV.
+
+| Column | Values |
+|---|---|
+| `participant_id` | `P` + 3 digits as printed on the paper set, e.g. `P017`. |
+| `session_date` | `YYYY-MM-DD` (or `DD.MM.YYYY`, as German Excel rewrites it). |
+| `facilitator` | Short facilitator code, e.g. `F1` (not a name). |
+| `end_time_local` | `HH:MM`, local time, as written down at the end (Congratulations screen with `Code: P…`, or the clock when the session was stopped). |
+| `ssq_pre_01_general_discomfort` … `ssq_pre_16_burping` | SSQ before, items 1–16 in the standard order (Kennedy et al. 1993), whole numbers 0 (none) – 3 (severe). |
+| `ssq_post_01_…` … `ssq_post_16_…` | SSQ at the end, same items. |
+| `tlx_mental`, `tlx_physical`, `tlx_temporal`, `tlx_performance`, `tlx_effort`, `tlx_frustration` | NASA-TLX raw, 0–100 in steps of 5 (the 21 marks of the scale). `tlx_performance`: 0 = good, 100 = poor (as on the form). No pairwise weighting. |
+| `abbruchgrund` | Empty (not stopped) or one of `mued_schwindlig`, `zeit`, `fehlbedienung`, `andere`. |
+| `note` | Optional free text for the study lead (no names, no health details beyond the reason). Never copied into any output. |
+
+The 16 SSQ item columns, in order: `01_general_discomfort`, `02_fatigue`,
+`03_headache`, `04_eye_strain`, `05_difficulty_focusing`, `06_salivation_increased`,
+`07_sweating`, `08_nausea`, `09_difficulty_concentrating`, `10_fullness_of_head`,
+`11_blurred_vision`, `12_dizzy_eyes_open`, `13_dizzy_eyes_closed`, `14_vertigo`,
+`15_stomach_awareness`, `16_burping`. The German paper form must list the items in
+this order.
+
+Why raw TLX: the pairwise weighting adds 15 comparisons per person at the end of a
+VR session and changes the score little (raw and weighted TLX correlate highly);
+with a small N the extra form time is not worth it.
+
+**How the join works.** `analyse.R` reads every `paper_forms*.csv` under `data_dir`.
+Without one it writes `wide.csv` as before, with no error. With one it also writes
+`wide_with_paper.csv`: every row of `wide.csv` plus participants who have a paper form
+but no log, joined on `participant_id`. `wide.csv` itself never gets paper columns,
+so its columns don't depend on whether paper exists, and the SSQ answers live in
+one file you can guard and delete. Checks (all in `warnings.txt`, nothing dropped
+silently; the IDs are listed under "Paper forms to check"):
+
+- an ID not in `P` + 3 digits is not joined (row number named); test IDs are dropped;
+- an ID typed twice: neither row is joined (`paper_status` = `duplicate`), keep one;
+- a value out of range (SSQ not 0–3, TLX not 0–100) becomes empty and is named
+  (`paper_problems` counts them); a TLX value between two marks is only warned;
+- empty answers: a missing SSQ item makes its subscale(s) and the total NA (no
+  guessing), a missing TLX scale makes `tlx_raw` NA; a form not filled at all is named;
+- an `abbruchgrund` outside the list becomes empty (upper case and spaces are
+  ignored); a facilitator-ended session without one, and an `abbruchgrund` for
+  someone whose log shows the course finished, are warned;
+- IDs with a paper form but no log, and with a log but no paper form;
+- `end_time_diff_min` = paper end time minus the participant's last logged event
+  (time zone `paper_time_zone`, default `Europe/Berlin`; set it before sourcing if
+  the study runs elsewhere); more than 15 min is warned (swapped form? wrong ID?).
+
+Columns added in `wide_with_paper.csv`: `has_log`, `paper_status` (`joined` /
+`no_paper` / `duplicate`), `session_date`, `facilitator`, `end_time_local`,
+`end_time_diff_min`, `abbruchgrund`, `paper_note_present`, the 32 SSQ items, per form
+`ssq_<pre|post>_nausea`, `_oculomotor`, `_disorientation`, `_total` (weighted:
+raw sums × 9.54, 7.58, 13.92; total = sum of the three raw sums × 3.74),
+`ssq_change_<scale>` = post − pre, the 6 `tlx_*` scales, `tlx_raw` (mean of the 6),
+`paper_problems`.
 
 ## Run
 
@@ -78,6 +156,9 @@ RStudio. Without Rscript on PATH use the full path, e.g.
 | `time_to_correct_by_scene.png` | 2 | Active time to the first correct confirm per scene; `never` counts the people who didn't get there (survivor bias). |
 | `data_quality.csv` / `.png` | 6 | One row per participant: `end_status` (completed / facilitator / quit / crash), `course_finished` (empty = no outcome events logged), `multi_session`, `mixed_build`, `builds`, `gap_h`, `resume_offered` / `resume_declined` (#27: a resume after a crash was offered / declined in any session; empty = log from before #27), `ended_session_override` (a session was started with "Trotzdem starten" although the ID already had a finished session; empty = log from before the #27 fix wave), `duration_censored`, repeat visits, `paused_s` (seconds), pauses, headset removals, Unity errors, `error_cap_reached`, invariant breaks, unknown codes, mismatches with `summary.csv`, `exit_disagreements` (visits whose `scene_exit` numbers differ from their events), `duplicate_files` (copies of a session's files that were dropped), `interaction_logged` (#29 group in the header of any session), `end_control_opens` (facilitator end control opened; more than 1 = opened by mistake; empty = not measured), `menu_blocked` (touches on a locked Menu item, #42), `open_grabs` (a package still held at a crash / scene change: no hold time), `facilitator_tail_s` (active seconds from the last `end_control_opened` to the end of a session the facilitator ended: not the trainee's time). Orange = check. |
 | `wide.csv` | all | One row per real participant for SPSS. Per-scene columns (`active_s_<Scene>`, `paused_s_<Scene>`, `time_to_correct_s_<Scene>`, `confirms_<Scene>`, `error_rate_<Scene>`, `error_rate_<Scene>_<skill>`, …) come from the counting visit; scenes without a confirm or quiz (WelcomeScene) have no outcome columns. `confirm_ignored_<Scene>` = red-button presses the app ignored (box still riding, order already done, Complex quiz not answered yet): counted, never an attempt, never in a rate. `wait_s_<Scene>` = seconds the trainee was blocked by a box change **before** `task_completed`: one interval per `storage_in` ride, from its trigger (the previous position's `position_completed`; for Complex box 1 the last remainder-quiz touch before the ride) to that ride's `station_move_arrived` (the visit's last event if it never arrived), intervals unioned, cut at `task_completed`, minus pauses. It includes the 0.6 s before the box starts and leaves out the old box still riding away; Basic has no `storage_in` ride, so 0. `wait_after_done_s_<Scene>` = union of all rides after `task_completed` (the boxes leaving at the end; empty when the task was never completed). These three exist only for the red-button scenes (Basic, Mixed, Complex). #29: `grabs_<Scene>` (= `grab_start` lines; Concept and the picking scenes, WelcomeScene's box has no `PackageData`), `regrabs_<Scene>` (grabs of a package already grabbed in the visit), `time_to_first_grab_s_<Scene>`, `container_enters_<Scene>` / `container_exits_<Scene>` (picking scenes only; an exit = a package taken out of the order container again), and `read_s_` / `pick_s_` / `check_s_<Scene>_p<n>` per position. All NA (not 0) for a session whose header `event_groups` lacks `interaction`. Join the paper forms (SSQ, NASA-TLX, #31) on `participant_id`. |
+| `wide_with_paper.csv` | 4, 5 | Only with a paper file: `wide.csv` + the paper columns (see *Paper forms*). The file to give SPSS for questions 4 and 5. |
+| `ssq_pre_post.png` | 4 | SSQ subscales and total before and after, one line per participant with both forms, `n` per panel. Colour = the log shows a headset removal, a pause or an end other than `completed`. No frame-rate or head-movement data (decision 022). |
+| `tlx_vs_attempts.png` | 5 | Raw NASA-TLX against rated attempts over the whole course and the trainee's active time (minutes, facilitator tail removed), `n` per panel. Hollow = did not finish (fewer scenes). |
 | `warnings.txt` | 6 | Everything the script found odd, then the validity limits. Read it first. |
 
 Rules the script applies (design §8, decision 021): `events.jsonl` is the source of truth;
@@ -162,6 +243,8 @@ counts) is reported as a mismatch.
 - Data recorded before backlog #14 (feedback printing target numbers) measure trial-and-error, not skill. Keep builds before and after #14 apart (`builds` column).
 - Small N, one run per person: describe distributions first; any test is exploratory.
 - Time-to-correct only covers visits that reached correct; read it with the `never` counts.
+- Q4: no frame-rate, frame-drop, head-movement or tracking data exist (decision 022). The SSQ change can only be set against headset removals, pauses, an early end (`end_status`, `abbruchgrund`) and active time, for the whole session; sickness per scene can't be analysed. Pre-existing symptoms are why the change (post − pre) is used, not post alone.
+- Q5: NASA-TLX is asked once at the end (raw, unweighted). Who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.
 
 ## If the logger format changes
 
@@ -186,8 +269,13 @@ removed field bumps `schema_version`.
    `source("analysis/analyse.R")`
    Hai dòng đầu script in ra là `data_dir = …` và `output_dir = …`: kiểm tra đúng
    thư mục. Nếu `data_dir` chứa chữ `fake`, script dừng và báo lỗi (dữ liệu giả).
+   Nếu có phiếu giấy: nhập vào bản sao của `analysis/paper_forms_template.csv`, lưu thành
+   `analysis/data/wave1/paper_forms.csv` (xem mục *Paper forms*; ô trống = chưa trả lời,
+   không gõ 0). Script ghi thêm `wide_with_paper.csv`, `ssq_pre_post.png`,
+   `tlx_vs_attempts.png`. Không có file phiếu thì script vẫn chạy bình thường.
 6. Kết quả nằm trong `analysis/output/`. Đọc `warnings.txt` trước, rồi
-   `data_quality.png` (ai có dữ liệu cần kiểm tra lại), sau đó mới xem các biểu đồ.
+   `data_quality.png` (ai có dữ liệu cần kiểm tra lại) và dòng "Paper forms to check"
+   (phiếu giấy nhập sai hoặc thiếu), sau đó mới xem các biểu đồ.
    Biểu đồ chính cho câu hỏi 1 là `first_attempt_by_item.png` (lần thử đầu tiên ở
    mỗi câu hỏi / mỗi vị trí); hai biểu đồ `error_rate_by_skill*.png` chỉ là phụ.
 7. Khi trình bày kết quả, luôn ghi kèm các giới hạn ở mục *Validity limits*: chỉ là

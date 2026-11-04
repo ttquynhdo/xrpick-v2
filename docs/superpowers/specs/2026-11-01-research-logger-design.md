@@ -13,7 +13,7 @@ The user ranked the research questions (1 = most important):
 | 1 | Do trainees improve across the course? | Error rate per **skill** across scenes; attempts within a scene | #28 (outcome), skill map (this design) |
 | 2 | Which scene is hard, which errors are common? | Stacked bar: error codes per scene; box plot time-to-correct per scene | #28 |
 | 3 | Where does time go (reading WMS, picking, confirming)? | Per-trainee timeline | #29, #30 |
-| 4 | Does VR discomfort (paper SSQ) relate to frame drops / head movement? | Scatter | #30 + paper |
+| 4 | Does VR discomfort (paper SSQ) relate to frame drops / head movement? | Scatter | paper SSQ + indirect log signals (#26 pauses, headset removals, active time); frame drops and head movement dropped by decision 022 |
 | 5 | Does perceived load (paper NASA-TLX) match attempts? | Scatter | #28 + paper |
 | 6 | Whose data is affected by errors, pauses, headset removal? | Data-quality table | **#26** |
 
@@ -71,7 +71,7 @@ Consequences: log folder `…/LocalLow/XRISE/xpick/research/` in the Editor and 
 - CSV: comma separator, dot decimal, UTF-8, header row, UTC timestamps in ISO 8601. (German Excel may mis-split columns; R/SPSS read it correctly.)
 - R script written for a beginner: one `.R` file run top to bottom, commented step by step, packages limited to `tidyverse` and `jsonlite`.
 
-**Study setup** (spec §9, decided 2026-11-01): no between-group condition, one run per participant; facilitator types the ID; menu locked to build order during the study (#42); head pose only, no hand positions; facilitator deletes logs on the headset after copying. Paper questionnaires (user, 2026-11-01): **SSQ before putting on the headset and again at the end**, **NASA-TLX once at the end**. The wide file joins one set of paper columns per participant (`ssq_pre_*`, `ssq_post_*`, `tlx_*`). Question 4 uses the SSQ change (post − pre, per subscale and total) against whole-session log measures (session `fps_avg`/dropped frames, head movement, total active time). Question 5 compares NASA-TLX with total attempts and active time. Per-scene load or sickness can't be analysed. The paper forms and their entry template belong to #31; the app doesn't change.
+**Study setup** (spec §9, decided 2026-11-01): no between-group condition, one run per participant; facilitator types the ID; menu locked to build order during the study (#42); head pose only, no hand positions; facilitator deletes logs on the headset after copying. Paper questionnaires (user, 2026-11-01): **SSQ before putting on the headset and again at the end**, **NASA-TLX once at the end**. The wide file joins one set of paper columns per participant (`ssq_pre_*`, `ssq_post_*`, `tlx_*`). Question 4 uses the SSQ change (post − pre, per subscale and total) against whole-session log measures (total active time, pauses, headset removals; no frame or head-movement data since decision 022). Question 5 compares NASA-TLX with total attempts and active time. Per-scene load or sickness can't be analysed. The paper forms and their entry template belong to #31; the app doesn't change.
 
 **Session start before #27 exists:** the logger starts a session automatically at app start with a configured test ID. Default `P000` = practice mode, logged to `research/practice/` and excluded from analysis. #27 later replaces the automatic start with the keypad flow through a public `StartSession(participantId)`.
 
