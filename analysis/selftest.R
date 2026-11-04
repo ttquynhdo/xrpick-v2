@@ -27,8 +27,8 @@ local({
   source("analysis/make_fake_data.R", local = TRUE)
   source("analysis/analyse.R", local = TRUE)
 
-  # 2. One row per real participant: P101-P112; the test ID P950 is dropped.
-  stopifnot(nrow(wide) == 12)
+  # 2. One row per real participant: P101-P115; the test ID P950 is dropped.
+  stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
 
@@ -91,6 +91,50 @@ local({
   stopifnot(any(has_stack & folded > 0 & p102_err$n_err == folded + 1))
   stopifnot(any(!has_stack & folded > 0 & p102_err$n_err == folded))
   stopifnot(!any(error_lines$legacy))
+
+  # 8m. Log contract v2 (decision 021): first attempt per item, rated vs
+  #     ignored presses, completion only at the last position, schema 1.
+  warn_lines <- readLines(file.path(output_dir, "warnings.txt"), encoding = "UTF-8")
+  items <- read_csv(file.path(output_dir, "items.csv"), show_col_types = FALSE)
+  stopifnot(file.exists(file.path(output_dir, "first_attempt_by_item.png")))
+  stopifnot(all(c("participant_id", "scene", "item", "skill", "scaffolded",
+                  "first_attempt_correct", "attempts") %in% names(items)))
+  # Review Focus 4: right only on a later touch counts as first-attempt wrong.
+  stopifnot(all(!items$first_attempt_correct[items$attempts > 1]))
+  # Review Focus 2: ignored presses never count as attempts.
+  stopifnot(all(visits$confirm_count == visits$rated_presses, na.rm = TRUE))
+  stopifnot(any(visits$confirm_ignored > 0, na.rm = TRUE))
+  # Review Focus 3: Mixed/Complex completed only after the last position.
+  stopifnot(!any(wide$completed_ComplexScene[wide$participant_id == "P114"] %in% TRUE))
+  # Review Focus 5: no check_material rate for Mixed/Complex; tested skills present.
+  stopifnot(!any(skill_rates$scene %in% c("MixedPickingScene", "ComplexScene") & skill_rates$skill == "check_material"))
+  stopifnot(all(c("calculate_quantity", "calculate_loose", "ekz_placement") %in% skill_rates$skill))
+  # Review Focus 1: the schema-1 file is warned, not fatal; its outcome is NA.
+  stopifnot(any(grepl("schema_version 1", warn_lines)))
+  stopifnot(any(grepl("schema_version 1", warn_lines) & grepl("P115", warn_lines)))
+  stopifnot(is.na(wide$confirms_BasicPickingScene[wide$participant_id == "P115"]),
+            is.na(wide$course_finished[wide$participant_id == "P115"]))
+  stopifnot(!"P115" %in% items$participant_id, !any(grepl("NO_ANSWER", warn_lines)))
+  # WRONG_ANSWER gets its skill from item_skills.csv: never an unknown code.
+  stopifnot(!any(grepl("unknown error code WRONG_ANSWER", warn_lines)))
+  # P113: Mixed position 2 first press EMPTY, then correct -> wrong first, 2 attempts.
+  it <- function(pid, sc, item) items[items$participant_id == pid & items$scene == sc & items$item == item, ]
+  p113 <- it("P113", "MixedPickingScene", "position_2")
+  stopifnot(nrow(p113) == 1, isFALSE(p113$first_attempt_correct), p113$attempts == 2)
+  # P114: Complex position 1 right at once (scaffolded), then a crash: no
+  # position_2 item, the visit is not completed but the item is measured.
+  p114 <- it("P114", "ComplexScene", "position_1")
+  stopifnot(nrow(p114) == 1, isTRUE(p114$first_attempt_correct), isTRUE(p114$scaffolded))
+  stopifnot(nrow(it("P114", "ComplexScene", "position_2")) == 0)
+  stopifnot(isFALSE(it("P114", "ComplexScene", "cartons")$scaffolded))
+  # Quiz items carry the skill of item_skills.csv.
+  stopifnot(all(items$skill[items$item == "loose"] == "calculate_loose"),
+            all(items$skill[items$item == "material_by_matnr"] == "check_material"))
+  # wide.csv: confirm_ignored and station wait per picking scene, not for Concept.
+  stopifnot(all(c("confirm_ignored_BasicPickingScene", "confirm_ignored_ComplexScene",
+                  "wait_s_MixedPickingScene", "wait_s_ComplexScene") %in% names(wide)))
+  stopifnot(!any(c("confirm_ignored_ConceptScene", "wait_s_ConceptScene") %in% names(wide)))
+  stopifnot(all(wide$wait_s_MixedPickingScene[!is.na(wide$wait_s_MixedPickingScene)] >= 0))
 
   # 8d. Pauses: P102's pause spans Mixed visit 1 -> Basic visit 2: it counts in
   #     Mixed 1, its time is split (4.5 s + 7.25 s). P104 quits while paused:

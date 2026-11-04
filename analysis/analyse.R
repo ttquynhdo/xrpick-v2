@@ -3,7 +3,9 @@
 # Turns research logs from the xpick app into charts and tables for
 # research questions 1 (improvement per skill), 2 (hard scenes, common errors)
 # and 6 (data quality). Rules: docs/superpowers/specs/2026-11-01-research-logger-design.md
-# section 8.
+# section 8. Log format: docs/research-logging-spec.md, schema_version 2
+# (decision 021). Logs with schema_version 1 are read for sessions, visits and
+# pauses, but their outcome events (v1 catalogue) are not: NA, not measured.
 #
 # events.jsonl is the source of truth: every per-visit number is rebuilt from
 # the events. summary.csv is only used as a cross-check of the C# code.
@@ -89,6 +91,25 @@ skill_map <- read_csv(file.path(analysis_folder, "skill_map.csv"), show_col_type
 scene_skills <- read_csv(file.path(analysis_folder, "scene_skills.csv"), show_col_types = FALSE)
 # Scenes with a confirm button or quiz (the only ones with outcome data).
 outcome_scenes <- unique(scene_skills$scene)
+
+# Skill and "scaffolded" flag per item (a quiz question_id or "position_<n>").
+# WRONG_ANSWER has no fixed skill in skill_map.csv: it gets the skill of its
+# question here. scaffolded = TRUE only where the CSV says true (Complex
+# position 1: the remainder quiz hands the trainee the numbers); an empty cell
+# or an item not in the CSV counts as not scaffolded.
+item_skills <- read_csv(file.path(analysis_folder, "item_skills.csv"), show_col_types = FALSE,
+                        col_types = cols(.default = col_character())) %>%
+  mutate(skill = na_if(trimws(skill), ""),
+         scaffolded = coalesce(tolower(trimws(scaffolded)) == "true", FALSE))
+
+# A position item without a skill in item_skills.csv (all of them until the
+# study lead decides D28) is shown as "picking": the whole position right at
+# the first press, any error code.
+position_skill_default <- "picking"
+
+# Scenes with the red button (rated presses, confirm_ignored, station rides).
+# ConceptScene has only the quiz (no red button since #73), WelcomeScene neither.
+red_button_scenes <- c("BasicPickingScene", "MixedPickingScene", "ComplexScene")
 
 # ---- 3. Read every events file -----------------------------------------------
 
@@ -191,12 +212,19 @@ if (nrow(mixed_files) > 0) {
 }
 
 # Unknown event names are kept but reported (maybe a newer logger version).
+# The list is the v2 catalogue (spec section 4); not all of them are used yet.
 known_events <- c("header", "session_start", "session_end", "scene_enter", "scene_exit",
+                  "menu_select", "end_control_opened", "end_control_cancelled",
                   "app_pause", "app_resume", "unity_error", "unity_error_cap_reached",
-                  "crash_recovered", "confirm_pressed", "quiz_answer", "task_completed")
+                  "crash_recovered", "confirm_pressed", "confirm_ignored", "position_completed",
+                  "task_completed", "quiz_answer", "quiz_unlocked", "tour_step",
+                  "station_move_start", "station_move_arrived", "welcome_practice_done",
+                  "grab_start", "grab_end", "container_enter", "container_exit",
+                  "object_dropped_floor", "input_mode_change", "tracking_lost",
+                  "tracking_regained", "perf_sample")
 unknown_events <- setdiff(unique(events$event), known_events)
 if (length(unknown_events) > 0) {
-  message("Note: event names not used by this script: ", paste(unknown_events, collapse = ", "))
+  message("Note: event names not in the v2 catalogue: ", paste(unknown_events, collapse = ", "))
 }
 
 # ---- 5. Sessions: build, start, end, how they ended -------------------------------
@@ -207,15 +235,35 @@ if (length(unknown_events) > 0) {
 # language (#11): "DE" / "EN", fixed for the whole session (chosen on the
 # keypad before the code; there is no language_change event). NA = a log from
 # a build before #11, which wrote null.
+# Schema 2 adds layout_version ("019" = three-lane station, decision 019) and
+# event_groups (the groups this build emits). A group missing from
+# event_groups means "not measured" (NA), never 0. Logs without the key
+# (schema 1) keep event_groups NA.
 headers <- events %>% filter(event == "header") %>%
   transmute(session_id,
+            participant_id, file,
             has_header = TRUE,
             header_utc = parse_utc(utc),
             build = map_chr(data, ~ as_chr(.x$build)),
             schema_version = map_int(data, ~ as_int(.x$schema_version)),
+            layout_version = map_chr(data, ~ as_chr(.x$layout_version)),
+            groups_logged = map_lgl(data, ~ "event_groups" %in% names(.x)),
+            event_groups = map_chr(data, ~ if (is.null(.x$event_groups)) NA_character_ else
+              paste(unlist(.x$event_groups), collapse = ";")),
             session_start_mode = map_chr(data, ~ as_chr(.x$session_start_mode)),
             language = map_chr(data, ~ as_chr(.x$language)))
 if (any(duplicated(headers$session_id))) warn("a session has more than one header line")
+
+# Schema 1 logs (before decision 021) use the old outcome catalogue (gg/vpe
+# container keys, NO_ANSWER, quiz without question_id). They are not read as
+# outcomes: the session counts for data quality, its outcome columns are NA.
+old_schema <- headers %>% filter(schema_version %in% 1L)
+for (i in seq_len(nrow(old_schema))) {
+  warn("schema_version 1 log ", old_schema$file[i], " (", old_schema$participant_id[i],
+       "): v1 outcome events are not read, ",
+       "its outcome columns are NA (not measured)")
+}
+headers <- headers %>% select(-file, -participant_id)
 
 # session_start: the resume offer after a crash (#27). resume_offered_scene =
 # the scene the keypad offered (null = nothing offered), resume_accepted =
@@ -506,41 +554,113 @@ for (i in seq_len(nrow(exit_checks))) {
        " ", r$scene, " visit ", r$scene_visit, ": ", paste(fields, collapse = "; "))
 }
 
-# ---- 7. Outcome events (#28): confirm presses and quiz answers ----------------
+# ---- 7. Outcome events (#28): rated presses, quiz touches, station rides ------
 
-# One row per press. error_codes is a list of {code, item}; keep the codes.
-press_events <- visit_events %>% filter(event %in% c("confirm_pressed", "quiz_answer"))
-presses <- press_events %>%
-  transmute(participant_id, session_id, scene, scene_visit, t, event,
+# Which sessions measured outcomes at all (spec section 3, header):
+# - schema 1: no. Its outcome events use the v1 catalogue (warned in section 5).
+# - schema 2: the header's event_groups says whether "outcome" was emitted; a
+#   missing group means not measured (NA), never 0.
+# - no header / no event_groups key: measured when the session has any rated
+#   press (the rule before schema 2).
+# Only events of sessions that are not schema 1 are read as outcomes.
+v2_events <- visit_events %>%
+  semi_join(sessions %>% filter(!schema_version %in% 1L), by = "session_id")
+
+# One row per rated attempt: a red-button press (confirm_pressed) or a quiz
+# touch (quiz_answer). The app counts attempt_no separately for the two, so a
+# press is identified by press_id (its row here), never by attempt_no.
+# error_codes is a list of {code, item}; foreign a list of {item, count}.
+presses <- v2_events %>% filter(event %in% c("confirm_pressed", "quiz_answer")) %>%
+  arrange(session_id, t, line) %>%
+  transmute(participant_id, session_id, scene, scene_visit, t, line, event,
             attempt_no = map_int(data, ~ as_int(.x$attempt_no)),
+            # Quiz touches (null on red-button presses).
+            quiz = map_chr(data, ~ as_chr(.x$quiz)),
+            question_id = map_chr(data, ~ as_chr(.x$question_id)),
+            selected = map_chr(data, ~ as_chr(.x$selected)),
+            # Red-button presses (null on quiz touches).
+            position = map_int(data, ~ as_int(.x$position)),
+            position_count = map_int(data, ~ as_int(.x$position_count)),
+            # Attempt number at this item: per position or per question.
+            attempt_in_item = map_int(data, ~ as_int(.x$attempt_in_position %||% .x$attempt_in_question)),
+            # The current order line (required_loose / placed_loose are null outside Complex).
+            line_item = map_chr(data, ~ as_chr(.x$line$item)),
+            soll = map_int(data, ~ as_int(.x$line$soll)),
+            vpe = map_int(data, ~ as_int(.x$line$vpe)),
+            required_full = map_int(data, ~ as_int(.x$line$required_full)),
+            required_loose = map_int(data, ~ as_int(.x$line$required_loose)),
+            placed_full = map_int(data, ~ as_int(.x$line$placed_full)),
+            placed_loose = map_int(data, ~ as_int(.x$line$placed_loose)),
+            # Materials not in the order; "" = none (logged as []).
+            n_foreign = map_int(data, ~ length(.x$foreign %||% list())),
+            foreign_items = map_chr(data, ~ paste(map_chr(.x$foreign %||% list(),
+                                                          function(f) as_chr(f$item)), collapse = ";")),
             correct = map_lgl(data, ~ as_lgl(.x$correct)),
             codes = map(data, ~ map_chr(.x$error_codes %||% list(), function(e) as_chr(e$code))),
             time_since_scene_enter_s = map_dbl(data, ~ as_num(.x$time_since_scene_enter_s))) %>%
-  mutate(n_codes = lengths(codes))
+  mutate(n_codes = lengths(codes),
+         press_id = row_number(),
+         # The item an attempt belongs to: the quiz question or the order position.
+         item = if_else(event == "quiz_answer", question_id,
+                        if_else(is.na(position), NA_character_, paste0("position_", position))),
+         # Attempts that summary.csv counts in confirm_count: rated red-button
+         # presses, and quiz touches in ConceptScene. The Complex remainder quiz
+         # is only in the events (it shows up in items, not in visit totals).
+         counted = event == "confirm_pressed" | !quiz %in% "complex_remainder")
 
-# Invariant (design section 6): correct == (no error codes). Report every break.
+# Invariant (spec section 6): correct == (no error codes). Report every break.
 invariant_breaks <- presses %>% filter(is.na(correct) | correct != (n_codes == 0))
 for (i in seq_len(nrow(invariant_breaks))) {
   r <- invariant_breaks[i, ]
   warn("invariant correct == (error_codes empty) broken: ", r$participant_id, " ", r$scene,
-       " visit ", r$scene_visit, " attempt ", r$attempt_no, " (correct = ", r$correct,
+       " visit ", r$scene_visit, " ", r$event, " attempt ", r$attempt_no, " (correct = ", r$correct,
        ", codes = ", paste(r$codes[[1]], collapse = ";"), ")")
 }
 
-# One row per error code on a press, with its skill from skill_map.csv.
+# Every attempt needs its item (position / question_id), and attempt_in_position
+# / attempt_in_question must count 1, 2, 3 ... per item within a visit.
+no_item <- presses %>% filter(is.na(item))
+for (i in seq_len(nrow(no_item))) {
+  warn(no_item$event[i], " without position / question_id: ", no_item$participant_id[i], " ",
+       no_item$scene[i], " visit ", no_item$scene_visit[i], " (not in items.csv)")
+}
+bad_item_count <- presses %>% filter(!is.na(item)) %>%
+  group_by(participant_id, session_id, scene, scene_visit, item) %>%
+  filter(is.na(attempt_in_item) | attempt_in_item != row_number()) %>% slice(1) %>% ungroup()
+for (i in seq_len(nrow(bad_item_count))) {
+  r <- bad_item_count[i, ]
+  warn("attempt_in_position / attempt_in_question out of order: ", r$participant_id, " ", r$scene,
+       " visit ", r$scene_visit, " item ", r$item, " (logged ", r$attempt_in_item, ")")
+}
+
+# One row per error code on an attempt, with its skill. skill_map.csv gives
+# the skill of each code; WRONG_ANSWER has none there and takes the skill of
+# its question from item_skills.csv (resolved first, so it is never "unknown").
 press_codes <- presses %>%
-  select(participant_id, session_id, scene, scene_visit, attempt_no, codes) %>%
+  select(participant_id, session_id, scene, scene_visit, press_id, attempt_no, event, item,
+         counted, codes) %>%
   unnest_longer(codes, values_to = "code") %>%
   mutate(code = as.character(code)) %>%  # stays text even with no presses (pre-#28 logs)
   filter(!is.na(code)) %>%
-  left_join(skill_map %>% select(error_code, skill), by = c("code" = "error_code"))
+  left_join(skill_map %>% transmute(error_code, code_skill = as.character(skill)),
+            by = c("code" = "error_code")) %>%
+  left_join(item_skills %>% transmute(scene, item, item_skill = skill), by = c("scene", "item")) %>%
+  mutate(known_code = code %in% skill_map$error_code,
+         skill = if_else(code == "WRONG_ANSWER", item_skill, code_skill))
 
 # Unknown codes are warned, never silently dropped (design section 8).
-unknown_codes <- press_codes %>% filter(is.na(skill))
+unknown_codes <- press_codes %>% filter(!known_code)
 for (i in seq_len(nrow(unknown_codes))) {
   r <- unknown_codes[i, ]
   warn("unknown error code ", r$code, " (not in skill_map.csv): ", r$participant_id, " ",
        r$scene, " visit ", r$scene_visit, " attempt ", r$attempt_no)
+}
+# A wrong quiz touch whose question has no skill in item_skills.csv.
+unmapped_questions <- press_codes %>% filter(code == "WRONG_ANSWER", is.na(skill)) %>%
+  distinct(scene, item)
+for (i in seq_len(nrow(unmapped_questions))) {
+  warn("question_id ", unmapped_questions$item[i], " in ", unmapped_questions$scene[i],
+       " has no skill in item_skills.csv: its WRONG_ANSWER codes count for no skill")
 }
 
 # A known code whose skill scene_skills.csv doesn't list for that scene. The
@@ -555,35 +675,40 @@ for (i in seq_len(nrow(extra_pairs))) {
 }
 skill_pairs <- scene_skills %>% distinct(scene, skill)
 
-task_completed <- visit_events %>% filter(event == "task_completed") %>%
+# task_completed = the whole task of the visit is done: in Mixed and Complex
+# only after the last position (OrderCompleted), in Concept when all 4
+# questions are right. Its presence is what "completed" means.
+task_completed <- v2_events %>% filter(event == "task_completed") %>%
   transmute(session_id, scene, scene_visit,
+            tc_seen = TRUE,
             tc_attempts_to_correct = map_int(data, ~ as_int(.x$attempts_to_correct)),
             tc_time_to_first_confirm_s = map_dbl(data, ~ as_num(.x$time_to_first_confirm_s)),
             tc_time_to_correct_s = map_dbl(data, ~ as_num(.x$time_to_correct_s))) %>%
   distinct(session_id, scene, scene_visit, .keep_all = TRUE)
 
-# Active time at a press, for quiz answers (they carry no time field): wall
-# time since scene enter minus the paused time between enter and the press.
+# Active time at an attempt, for logs whose attempts carry no time field: wall
+# time since scene enter minus the paused time between enter and the attempt.
 press_active <- presses %>%
-  select(session_id, scene, scene_visit, attempt_no, t, time_since_scene_enter_s) %>%
+  select(press_id, session_id, scene, scene_visit, t, time_since_scene_enter_s) %>%
   left_join(enters %>% select(session_id, scene, scene_visit, enter_t),
             by = c("session_id", "scene", "scene_visit")) %>%
   mutate(paused_before = paused_between(session_id, enter_t, t),
-         active_at_s = coalesce(time_since_scene_enter_s, round(t - enter_t - paused_before, 3)))
+         active_at_s = coalesce(time_since_scene_enter_s, round(t - enter_t - paused_before, 3))) %>%
+  select(press_id, active_at_s)
 
-# Per visit outcome numbers. A press "has an error" when it carries at least one code.
+# Per visit outcome numbers, from the counted attempts only (the same set as
+# summary.csv). A press "has an error" when it carries at least one code.
 press_visit <- presses %>%
-  left_join(press_active %>% select(session_id, scene, scene_visit, attempt_no, active_at_s),
-            by = c("session_id", "scene", "scene_visit", "attempt_no")) %>%
-  arrange(session_id, scene, scene_visit, attempt_no) %>%
+  filter(counted) %>%
+  left_join(press_active, by = "press_id") %>%
+  arrange(session_id, scene, scene_visit, t, line) %>%
   group_by(session_id, scene, scene_visit) %>%
   summarise(
     confirm_count = n(),
     presses_with_error = sum(n_codes > 0),
-    # Rows are sorted by attempt_no, so row 1 is the first attempt.
+    # Rows are sorted by time, so row 1 is the first attempt.
+    first_press_id = press_id[1],
     first_attempt_correct = correct[1],
-    first_attempt_has_error = n_codes[1] > 0,
-    attempts_to_correct_presses = if (any(correct, na.rm = TRUE)) min(attempt_no[correct %in% TRUE]) else NA_integer_,
     time_to_first_confirm_presses = active_at_s[1],
     error_codes_all = {
       cc <- unlist(codes)
@@ -594,11 +719,78 @@ press_visit <- presses %>%
     },
     .groups = "drop")
 
-# Outcome data exist only once #28 logs them. A session with no press at all
-# is treated as "not measured" (NA), not as "0 confirms": pre-#28 logs have
-# no outcome events. A session with presses in some scenes measures them all,
-# so a picking visit there with no press is a real 0.
-outcome_sessions <- unique(presses$session_id)
+# Rated attempts counted a second way, straight from the event names (red
+# button scenes: confirm_pressed; other scenes: quiz_answer). selftest.R checks
+# that it equals confirm_count, so confirm_ignored can never slip in.
+rated_counts <- v2_events %>%
+  filter((scene %in% red_button_scenes & event == "confirm_pressed") |
+           (!scene %in% red_button_scenes & event == "quiz_answer")) %>%
+  count(session_id, scene, scene_visit, name = "ev_rated_presses")
+
+# Red-button presses the validator ignored (station moving, order already
+# completed, Complex quiz not answered yet). Never an attempt, never in a
+# denominator; only counted.
+ignored_counts <- v2_events %>% filter(event == "confirm_ignored") %>%
+  count(session_id, scene, scene_visit, name = "ev_confirm_ignored")
+
+# Station rides (decision 019): time the trainee waits while a storage box or
+# the order box rides. Each ride = station_move_start -> station_move_arrived
+# of the same (what, position). Rides overlap (old box leaves while the new
+# one arrives), so the wait is the union of the ride intervals, not their
+# sum, minus paused time. A ride with no arrival (crash) ends at the visit end.
+first_or_na <- function(x) if (length(x) == 0) NA_real_ else min(x)
+ride_rows <- v2_events %>% filter(event %in% c("station_move_start", "station_move_arrived")) %>%
+  mutate(what = map_chr(data, ~ as_chr(.x$what)),
+         position = map_int(data, ~ as_int(.x$position))) %>%
+  group_by(session_id, scene, scene_visit, what, position) %>%
+  summarise(start_t = first_or_na(t[event == "station_move_start"]),
+            arrived_t = first_or_na(t[event == "station_move_arrived"]), .groups = "drop") %>%
+  left_join(visits_base %>% select(session_id, scene, scene_visit, end_t),
+            by = c("session_id", "scene", "scene_visit"))
+no_start <- ride_rows %>% filter(is.na(start_t))
+if (nrow(no_start) > 0) {
+  warn(nrow(no_start), " station_move_arrived without a station_move_start (ignored)")
+}
+ride_rows <- ride_rows %>% filter(!is.na(start_t)) %>%
+  mutate(end_t = coalesce(arrived_t, end_t))
+# Merge overlapping [start, end] intervals into one (union).
+union_intervals <- function(start_t, end_t) {
+  o <- order(start_t)
+  start_t <- start_t[o]
+  end_t <- end_t[o]
+  out_s <- numeric(0)
+  out_e <- numeric(0)
+  for (i in seq_along(start_t)) {
+    k <- length(out_e)
+    if (k > 0 && start_t[i] <= out_e[k]) {
+      out_e[k] <- max(out_e[k], end_t[i])  # overlaps the previous ride: extend it
+    } else {
+      out_s <- c(out_s, start_t[i])
+      out_e <- c(out_e, end_t[i])
+    }
+  }
+  tibble(start_t = out_s, end_t = out_e)
+}
+wait_stats <- tibble(session_id = character(), scene = character(), scene_visit = integer(),
+                     ev_wait_s = double())
+if (nrow(ride_rows) > 0) {
+  wait_stats <- ride_rows %>%
+    group_by(session_id, scene, scene_visit) %>%
+    group_modify(~ union_intervals(.x$start_t, .x$end_t)) %>%
+    ungroup() %>%
+    mutate(active_wait_s = end_t - start_t - paused_between(session_id, start_t, end_t)) %>%
+    group_by(session_id, scene, scene_visit) %>%
+    summarise(ev_wait_s = round(sum(active_wait_s), 3), .groups = "drop")
+}
+
+# Sessions that measured outcomes (rule at the top of this section).
+session_outcome <- sessions %>%
+  transmute(session_id,
+            outcome_measured = case_when(
+              schema_version %in% 1L ~ FALSE,
+              groups_logged %in% TRUE ~ str_detect(coalesce(event_groups, ""), "(^|;)outcome(;|$)"),
+              TRUE ~ session_id %in% presses$session_id))
+outcome_sessions <- session_outcome$session_id[session_outcome$outcome_measured]
 
 # ---- 8. Merge sessions per participant and number visits across them ----------
 
@@ -608,12 +800,25 @@ visits <- visits_base %>%
             by = "session_id") %>%
   left_join(press_visit, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(task_completed, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(rated_counts, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(ignored_counts, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(wait_stats, by = c("session_id", "scene", "scene_visit")) %>%
   mutate(
+    # Outcome numbers exist only for scenes with a confirm or quiz in sessions
+    # that measured outcomes; everywhere else they stay NA (not measured).
+    # Inside a measuring session a visit without a press is a real 0.
     outcome_logged = session_id %in% outcome_sessions & scene %in% outcome_scenes,
+    red_button = outcome_logged & scene %in% red_button_scenes,
     confirm_count = if_else(outcome_logged, coalesce(confirm_count, 0L), NA_integer_),
+    rated_presses = if_else(outcome_logged, coalesce(ev_rated_presses, 0L), NA_integer_),
     presses_with_error = if_else(outcome_logged, coalesce(presses_with_error, 0L), NA_integer_),
-    completed = if_else(outcome_logged, !is.na(tc_time_to_correct_s) | !is.na(attempts_to_correct_presses), NA),
-    attempts_to_correct = coalesce(tc_attempts_to_correct, attempts_to_correct_presses),
+    # Ignored presses and station rides exist only where there is a red button.
+    confirm_ignored = if_else(red_button, coalesce(ev_confirm_ignored, 0L), NA_integer_),
+    wait_s = if_else(red_button, coalesce(ev_wait_s, 0), NA_real_),
+    # Completed = the visit has a task_completed (Mixed/Complex: after the last
+    # position, so a correct position 1 followed by a crash is not completed).
+    completed = if_else(outcome_logged, coalesce(tc_seen, FALSE), NA),
+    attempts_to_correct = tc_attempts_to_correct,
     time_to_first_confirm_s = coalesce(tc_time_to_first_confirm_s, time_to_first_confirm_presses),
     time_to_correct_s = tc_time_to_correct_s,
     # Error rate per visit: share of presses with >= 1 code; NA when 0 presses.
@@ -646,11 +851,18 @@ if (length(unknown_scenes) > 0) {
 
 summary_files <- list.files(data_dir, pattern = "_summary\\.csv$", recursive = TRUE, full.names = TRUE)
 if (!grepl("fake", data_dir)) summary_files <- summary_files[!grepl("/fake/", summary_files)]
-read_summary <- function(path) read_csv(path, show_col_types = FALSE, na = "",
-  col_types = cols(.default = col_double(), participant_id = col_character(),
-                   session_id = col_character(), build = col_character(), scene = col_character(),
-                   enter_utc = col_character(), first_attempt_correct = col_logical(),
-                   completed = col_logical(), error_codes_all = col_character()))
+# Every cell is read as text first, then the known columns get their type.
+# So a summary.csv of another schema (schema 1 with dwell_* columns and no
+# confirm_ignored) reads without errors; a missing column becomes NA below.
+summary_num_cols <- c("schema_version", "scene_visit", "duration_s", "paused_s", "confirm_count",
+                      "confirm_ignored", "attempts_to_correct", "time_to_first_confirm_s",
+                      "time_to_correct_s", "pauses", "hmd_removed_count", "unity_errors")
+summary_lgl_cols <- c("first_attempt_correct", "completed")
+read_summary <- function(path) {
+  read_csv(path, show_col_types = FALSE, na = "", col_types = cols(.default = col_character())) %>%
+    mutate(across(any_of(summary_num_cols), as.numeric),
+           across(any_of(summary_lgl_cols), as.logical))
+}
 summary_rows <- tibble()
 dropped_summary_files <- dropped_event_files[0, ]
 if (length(summary_files) > 0) {
@@ -667,9 +879,25 @@ if (length(summary_files) > 0) {
 norm_codes <- function(x) map_chr(x, ~ if (is.na(.x)) NA_character_ else
   paste(sort(strsplit(.x, ";", fixed = TRUE)[[1]]), collapse = ";"))
 
+# Outcome columns: confirm_count = rated attempts (red-button presses; quiz
+# touches in ConceptScene; the Complex remainder quiz is not in it),
+# confirm_ignored = ignored red-button presses (empty outside picking scenes).
+outcome_compare_cols <- c("confirm_count", "confirm_ignored", "first_attempt_correct",
+                          "attempts_to_correct", "time_to_first_confirm_s", "time_to_correct_s",
+                          "completed", "error_codes_all")
 compare_cols <- c("duration_s", "paused_s", "pauses", "hmd_removed_count", "unity_errors",
-                  "confirm_count", "first_attempt_correct", "attempts_to_correct",
-                  "time_to_first_confirm_s", "time_to_correct_s", "completed", "error_codes_all")
+                  outcome_compare_cols)
+if (nrow(summary_rows) > 0) {
+  # A column this summary.csv schema doesn't have is "not measured".
+  for (cl in setdiff(compare_cols, names(summary_rows))) {
+    summary_rows[[cl]] <- if (cl %in% summary_lgl_cols) NA else
+      if (cl == "error_codes_all") NA_character_ else NA_real_
+  }
+  # Schema 1 rows: their outcome columns follow the v1 catalogue and are not
+  # read (same rule as for the events, section 5), so they are not compared.
+  summary_rows <- summary_rows %>%
+    mutate(across(all_of(outcome_compare_cols), ~ if_else(schema_version %in% 1, NA, .x)))
+}
 summary_mismatches <- tibble(participant_id = character(), session_id = character(),
                              scene = character(), scene_visit = integer(), column = character(),
                              events_value = character(), summary_value = character())
@@ -745,6 +973,8 @@ data_quality <- sessions %>%
     # TRUE = a session ran in a language other than DE (warned above).
     language_not_de = any(!is.na(language) & language != "DE"),
     schema_versions = paste(unique(schema_version), collapse = ";"),
+    # Station layout per session ("NA" = schema 1 log, no layout_version).
+    layout_versions = paste(unique(coalesce(layout_version, "NA")), collapse = ";"),
     n_crashes = sum(end_status == "crash"),
     # end_status of the participant = how their last session ended.
     end_status = last(end_status),
@@ -759,8 +989,10 @@ data_quality <- sessions %>%
     .groups = "drop") %>%
   mutate(multi_session = n_sessions > 1,
          mixed_build = str_detect(builds, ";"),
-         # NA = not measured: none of the person's sessions logged outcome events.
-         course_finished = if_else(participant_id %in% presses$participant_id,
+         # TRUE = a session of the person is a schema 1 log (outcomes not read).
+         old_schema_log = str_detect(schema_versions, "(^|;)1(;|$)"),
+         # NA = not measured: none of the person's sessions measured outcomes.
+         course_finished = if_else(participant_id %in% sessions$participant_id[sessions$session_id %in% outcome_sessions],
                                    participant_id %in% finished_ids, NA)) %>%
   left_join(visits %>% group_by(participant_id) %>%
               summarise(n_visits = n(),
@@ -786,7 +1018,7 @@ data_quality <- sessions %>%
                   duplicate_files), ~ coalesce(.x, 0L)),
          error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
-         mixed_build, languages, language_not_de, schema_versions, gap_h, n_crashes, resume_offered, resume_declined,
+         mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, invariant_breaks,
@@ -803,6 +1035,8 @@ dq_long <- data_quality %>%
             # Empty = not measured (no outcome events logged).
             course_finished = coalesce(as.character(course_finished), ""),
             sessions = as.character(n_sessions), builds = str_replace_all(builds, ";", "\n"),
+            # Orange = not schema 2 (a schema 1 log: its outcomes are NA, not read).
+            schema = str_replace_all(schema_versions, ";", "\n"),
             # "NA" = not recorded (log from before #11); orange = not DE.
             language = if_else(language_not_de, paste0("!", languages), languages),
             gap_h = if_else(is.na(gap_h), "", as.character(gap_h)),
@@ -829,6 +1063,7 @@ dq_long <- data_quality %>%
            column == "course_finished" ~ value == "FALSE",
            column == "sessions" ~ value != "1",
            column == "builds" ~ str_detect(value, "\n") | value %in% c("editor", "unknown", "NA"),
+           column == "schema" ~ value != "2",
            column == "gap_h" ~ value != "",
            column == "language" ~ str_starts(value, "!"),
            column %in% c("censored", "error_cap", "resume_declined", "ended_override") ~ value == "TRUE",
@@ -852,26 +1087,52 @@ p_dq <- ggplot(dq_long, aes(column, participant_id, fill = attention)) +
 ggsave(file.path(output_dir, "data_quality.png"), p_dq,
        width = 12, height = 2.4 + 0.32 * nrow(data_quality), dpi = 150, bg = "white")
 
-# ---- 11. Error rate per skill across scenes (question 1) -----------------------
+# ---- 11. Question 1: first attempt per item (main), error rate per skill ------
 
-counting_visits <- visits %>% filter(counting, confirm_count > 0)
-
-# Per counting visit and per skill the scene tests: share of presses with a
-# code of that skill. A tested but error-free skill gives 0 %, not missing.
-skill_rates <- counting_visits %>%
-  mutate(scene = as.character(scene)) %>%
-  select(participant_id, session_id, scene, scene_visit, confirm_count) %>%
-  inner_join(skill_pairs, by = "scene", relationship = "many-to-many") %>%
-  left_join(press_codes %>% filter(!is.na(skill)) %>%
-              distinct(session_id, scene, scene_visit, attempt_no, skill) %>%
-              group_by(session_id, scene, scene_visit, skill) %>%
-              summarise(presses_with_skill_error = n(),
-                        first_attempt_skill_error = any(attempt_no == 1), .groups = "drop"),
-            by = c("session_id", "scene", "scene_visit", "skill")) %>%
-  mutate(presses_with_skill_error = coalesce(presses_with_skill_error, 0L),
-         first_attempt_skill_error = coalesce(first_attempt_skill_error, FALSE),
-         error_rate = presses_with_skill_error / confirm_count,
-         scene = factor(scene, levels = levels(visits$scene)))
+# Main measure (spec 4.3, decision 021): was the FIRST attempt at an item
+# right? An item is a quiz question (question_id) or an order position
+# ("position_<n>"). Right only on a later touch counts as wrong at the first
+# attempt, so guessing through the A/B/C options doesn't look like knowledge.
+# Per participant, scene and item the first visit with an attempt at that
+# item counts (repeat visits after a crash are later exposures).
+visit_order <- visits %>%
+  transmute(session_id, scene = as.character(scene), scene_visit, visit_no, repeat_visit)
+item_attempts <- presses %>%
+  filter(!is.na(item)) %>%
+  inner_join(visit_order, by = c("session_id", "scene", "scene_visit")) %>%
+  arrange(participant_id, scene, item, visit_no, t, line) %>%
+  group_by(participant_id, scene, item) %>%
+  filter(visit_no == min(visit_no)) %>%
+  ungroup()
+items <- item_attempts %>%
+  group_by(participant_id, scene, item) %>%
+  summarise(session_id = first(session_id),
+            scene_visit = first(scene_visit),
+            repeat_visit = first(repeat_visit),
+            kind = if_else(first(event) == "quiz_answer", "quiz", "position"),
+            quiz = first(quiz),
+            first_attempt_correct = first(correct),
+            attempts = n(),
+            reached_correct = any(correct %in% TRUE),
+            first_attempt_codes = paste(first(codes), collapse = ";"),
+            .groups = "drop") %>%
+  mutate(first_attempt_codes = na_if(first_attempt_codes, "")) %>%
+  left_join(item_skills, by = c("scene", "item")) %>%
+  mutate(
+    # Positions without a skill in item_skills.csv: "picking" (whole position).
+    skill = if_else(is.na(skill) & kind == "position", position_skill_default, skill),
+    scaffolded = coalesce(scaffolded, FALSE),
+    scene = factor(scene, levels = levels(visits$scene))) %>%
+  arrange(participant_id, scene, item)
+unmapped_items <- items %>% filter(is.na(skill)) %>% distinct(scene, item)
+for (i in seq_len(nrow(unmapped_items))) {
+  warn("quiz item ", unmapped_items$item[i], " in ", unmapped_items$scene[i],
+       " is not in item_skills.csv: left out of first_attempt_by_item.png")
+}
+write_csv(items %>% select(participant_id, scene, item, kind, quiz, skill, scaffolded,
+                           first_attempt_correct, attempts, reached_correct, first_attempt_codes,
+                           session_id, scene_visit, repeat_visit),
+          file.path(output_dir, "items.csv"), na = "")
 
 # Empty chart with a note, used when there are no outcome events (pre-#28 logs).
 empty_chart <- function(title) {
@@ -881,11 +1142,93 @@ empty_chart <- function(title) {
     theme_void()
 }
 
+# 95 % Wilson interval for k of n (better than +-1.96 SE for small n and
+# shares near 0 or 100 %).
+wilson <- function(k, n, z = 1.96) {
+  p <- k / n
+  centre <- (p + z^2 / (2 * n)) / (1 + z^2 / n)
+  half <- z * sqrt(p * (1 - p) / n + z^2 / (4 * n^2)) / (1 + z^2 / n)
+  tibble(lo = pmax(0, centre - half), hi = pmin(1, centre + half))
+}
+
+# Skills in a fixed order (scene_skills.csv, then "picking") and one
+# colour-blind-safe colour each, shared by all Q1 charts.
+skill_levels <- unique(c(unique(scene_skills$skill), sort(unique(na.omit(item_skills$skill))),
+                         position_skill_default))
+skill_colours <- setNames(okabe_ito[seq_along(skill_levels)], skill_levels)
+
+title_items <- "Is the first attempt per item right more often later in the course?"
+item_shares <- items %>% filter(!is.na(skill)) %>%
+  group_by(skill, scene, item, kind, scaffolded) %>%
+  summarise(k = sum(first_attempt_correct %in% TRUE), n = n(), .groups = "drop")
+if (nrow(item_shares) == 0) {
+  p_items <- empty_chart(title_items)
+  warn("no outcome data: first_attempt_by_item.png is empty")
+} else {
+  # x axis = scene + item in build order; within a scene the order of
+  # item_skills.csv (quiz before the positions in Complex), then positions.
+  item_shares <- item_shares %>%
+    bind_cols(wilson(item_shares$k, item_shares$n)) %>%
+    mutate(share = k / n,
+           csv_order = match(paste(scene, item), paste(item_skills$scene, item_skills$item)),
+           pos_no = suppressWarnings(as.integer(str_remove(item, "^position_"))),
+           item_rank = coalesce(csv_order, 1000L + coalesce(pos_no, 0L)),
+           x_label = paste0(str_remove(as.character(scene), "(Picking)?Scene$"), "\n", item),
+           skill = factor(skill, levels = skill_levels),
+           # Hollow = scaffolded (the app handed the trainee the numbers).
+           fill_colour = if_else(scaffolded, "white", skill_colours[as.character(skill)])) %>%
+    arrange(as.integer(scene), item_rank) %>%
+    mutate(x_label = factor(x_label, levels = unique(x_label)))
+  p_items <- ggplot(item_shares, aes(x_label, 100 * share, colour = skill)) +
+    geom_linerange(aes(ymin = 100 * lo, ymax = 100 * hi), linewidth = 0.7, alpha = 0.6) +
+    geom_point(aes(shape = kind, fill = fill_colour), size = 3.5, stroke = 1.2) +
+    geom_text(aes(y = -9, label = paste0(k, "/", n)), colour = "grey30", size = 3) +
+    facet_wrap(~ skill, scales = "free_x", drop = TRUE) +
+    scale_colour_manual(values = skill_colours, guide = "none") +
+    scale_fill_identity() +
+    scale_shape_manual(values = c(quiz = 21, position = 22), name = NULL,
+                       labels = c(quiz = "quiz question", position = "order position")) +
+    scale_y_continuous(limits = c(-12, 105), breaks = seq(0, 100, 25)) +
+    labs(title = title_items,
+         subtitle = paste0("Point = share of participants right at the first attempt; line = 95 % Wilson interval; ",
+                           "label = right / participants.\nHollow = scaffolded (Complex position 1: the remainder ",
+                           "quiz gave the numbers).\nQuiz guess rate 33 % (A/B/C), 50 % (EKZ questions). ",
+                           "Indication only: fixed scene order, no control group."),
+         x = "Scene and item (build order)", y = "Right at the first attempt (% of participants)") +
+    theme_minimal(base_size = 11) +
+    theme(legend.position = "bottom")
+}
+ggsave(file.path(output_dir, "first_attempt_by_item.png"), p_items, width = 11, height = 7, dpi = 150, bg = "white")
+
+# Secondary measure: error rate per skill. Only the attempts counted in
+# confirm_count (red-button presses; quiz touches in ConceptScene) are in the
+# numerator and the denominator; the Complex remainder quiz is in items above.
+counting_visits <- visits %>% filter(counting, confirm_count > 0)
+
+# Per counting visit and per skill the scene tests: share of presses with a
+# code of that skill. A tested but error-free skill gives 0 %, not missing.
+skill_rates <- counting_visits %>%
+  mutate(scene = as.character(scene)) %>%
+  select(participant_id, session_id, scene, scene_visit, confirm_count, first_press_id) %>%
+  inner_join(skill_pairs, by = "scene", relationship = "many-to-many") %>%
+  left_join(press_codes %>% filter(counted, !is.na(skill)) %>%
+              distinct(session_id, scene, scene_visit, press_id, skill) %>%
+              group_by(session_id, scene, scene_visit, skill) %>%
+              summarise(presses_with_skill_error = n(),
+                        skill_error_press_ids = list(press_id), .groups = "drop"),
+            by = c("session_id", "scene", "scene_visit", "skill")) %>%
+  mutate(presses_with_skill_error = coalesce(presses_with_skill_error, 0L),
+         # The visit's first counted attempt carried a code of this skill.
+         first_attempt_skill_error = map2_lgl(skill_error_press_ids, first_press_id,
+                                              ~ !is.null(.x) && .y %in% .x),
+         error_rate = presses_with_skill_error / confirm_count,
+         scene = factor(scene, levels = levels(visits$scene))) %>%
+  select(-skill_error_press_ids, -first_press_id)
+
 # Scenes with skills, in build order, so every layer uses the same x order.
 skill_scene_limits <- intersect(levels(visits$scene), unique(skill_pairs$scene))
-skill_colours <- setNames(okabe_ito[seq_along(unique(skill_pairs$skill))], sort(unique(skill_pairs$skill)))
 
-title_q1 <- "Does the error rate per skill fall across the course?"
+title_q1 <- "Secondary: does the error rate per press fall across the course, per skill?"
 if (nrow(skill_rates) == 0) {
   p_skill <- empty_chart(title_q1)
   warn("no outcome data: error_rate_by_skill.png and error_rate_by_skill_first_attempt.png are empty")
@@ -941,6 +1284,7 @@ ggsave(file.path(output_dir, "error_rate_by_skill_first_attempt.png"), p_first, 
 
 title_q2 <- "Which error codes occur in which scene?"
 codes_counting <- press_codes %>%
+  filter(counted) %>%
   semi_join(counting_visits %>% mutate(scene = as.character(scene)),
             by = c("session_id", "scene", "scene_visit")) %>%
   mutate(code = if_else(is.na(skill), paste0(code, " (unknown)"), code),
@@ -961,7 +1305,8 @@ if (nrow(codes_counting) == 0) {
     scale_x_discrete(drop = FALSE) +
     scale_y_continuous(expand = expansion(mult = c(0, 0.25))) +
     labs(title = title_q2,
-         subtitle = "Counting visits only (first visit with >= 1 confirm). One press can carry several codes.",
+         subtitle = paste0("Counting visits only (first visit with >= 1 confirm). One press can carry several codes. ",
+                           "Complex remainder quiz not included (see items.csv)."),
          x = "Scene (build order)", y = "Error codes logged (count)") +
     theme_minimal(base_size = 11) +
     theme(axis.text.x = element_text(angle = 25, hjust = 1))
@@ -1011,6 +1356,7 @@ per_scene <- visits %>% filter(counting) %>%
   mutate(scene = as.character(scene)) %>%
   transmute(participant_id, scene,
             active_s = duration_s, paused_s = paused_s, confirms = confirm_count,
+            confirm_ignored = confirm_ignored, wait_s = wait_s,
             errors = presses_with_error, error_rate = error_rate,
             first_correct = first_attempt_correct, attempts_to_correct = attempts_to_correct,
             time_to_correct_s = time_to_correct_s, completed = completed,
@@ -1022,13 +1368,17 @@ outcome_measures <- c("confirms", "errors", "error_rate", "first_correct", "atte
                       "time_to_correct_s", "completed")
 wide_scene <- per_scene %>%
   pivot_wider(id_cols = participant_id, names_from = scene, names_glue = "{.value}_{scene}",
-              values_from = c(visits, active_s, paused_s, confirms, errors, error_rate, first_correct,
-                              attempts_to_correct, time_to_correct_s, completed, visit_censored))
+              values_from = c(visits, active_s, paused_s, confirms, confirm_ignored, wait_s, errors,
+                              error_rate, first_correct, attempts_to_correct, time_to_correct_s,
+                              completed, visit_censored))
 # Scenes without a confirm or quiz (WelcomeScene) never have outcome values:
 # drop those always-empty columns.
 no_outcome_cols <- as.vector(outer(outcome_measures, setdiff(unique(per_scene$scene), outcome_scenes),
                                    paste, sep = "_"))
-wide_scene <- wide_scene %>% select(-any_of(no_outcome_cols))
+# Ignored presses and station waits exist only in scenes with a red button.
+no_button_cols <- as.vector(outer(c("confirm_ignored", "wait_s"),
+                                  setdiff(unique(per_scene$scene), red_button_scenes), paste, sep = "_"))
+wide_scene <- wide_scene %>% select(-any_of(c(no_outcome_cols, no_button_cols)))
 
 wide_skill <- skill_rates %>%
   transmute(participant_id, name = paste0("error_rate_", scene, "_", skill), error_rate) %>%
@@ -1045,7 +1395,7 @@ scene_col_order <- function(cols) {
 }
 
 participant_cols <- c("participant_id", "end_status", "course_finished", "multi_session",
-                      "mixed_build", "builds", "schema_versions", "gap_h", "n_sessions",
+                      "mixed_build", "builds", "schema_versions", "layout_versions", "gap_h", "n_sessions",
                       "resume_offered", "resume_declined", "ended_session_override",
                       "duration_censored", "active_s", "paused_s", "pauses",
                       "hmd_removed_count", "unity_errors", "total_confirms")
@@ -1067,8 +1417,9 @@ write_csv(wide, file.path(output_dir, "wide.csv"), na = "")
 validity_limits <- c(
   "VALIDITY LIMITS (print with every report):",
   "- Fixed scene order: a lower error rate in a later scene mixes learning with scene difficulty. It is an indication of improvement, not proof (no control group, no pre/post test).",
-  "- ConceptScene quiz: the feedback reveals the right answer and a guess is right 33 % of the time, so quiz attempts say little about knowledge.",
-  "- Data recorded before backlog #14 (feedback printing target numbers) measure trial-and-error, not skill. Separate builds before/after #14 (column builds).",
+  "- Quizzes (ConceptScene, Complex remainder quiz): a guess is right 33 % of the time (A/B/C; 50 % for the two-option EKZ questions) and a touch is rated at once, so later touches are trial-and-error. Use the first attempt per item (items.csv), not the number of touches.",
+  "- Complex position 1 is scaffolded by the remainder quiz: the quiz hands the trainee the numbers (full cartons, loose pieces) before the first pick, so position 1 measures picking, not calculation; position 2 is unscaffolded (item_skills.csv, column scaffolded; hollow points in first_attempt_by_item.png). Don't pool the two positions as one calculate_quantity measure.",
+  "- Schema 1 logs (before decision 021) are kept for data quality, but their outcome columns are NA (not measured).",
   "- Small N, one run per person: describe distributions; any test is exploratory.",
   "- Time-to-correct only covers visits that reached correct; the 'never' counts show who is missing.")
 
@@ -1076,7 +1427,8 @@ flagged <- data_quality %>%
   filter(end_status != "completed" | multi_session | mixed_build | duration_censored |
            invariant_breaks > 0 | unknown_codes > 0 | summary_mismatches > 0 |
            exit_disagreements > 0 | duplicate_files > 0 | error_cap_reached |
-           resume_declined %in% TRUE | ended_session_override %in% TRUE | language_not_de) %>%
+           resume_declined %in% TRUE | ended_session_override %in% TRUE | language_not_de |
+           old_schema_log) %>%
   pull(participant_id)
 
 report_lines <- c(
