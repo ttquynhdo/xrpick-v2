@@ -779,6 +779,50 @@ MonoBehaviour:
     m_Key: complex.quiz.how_to
     m_Metadata:
       m_Items: []
+  - m_Id: 727156674924544
+    m_Key: concept.tour.intro.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810624
+    m_Key: concept.tour.material.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810625
+    m_Key: concept.tour.verp_einh.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810626
+    m_Key: concept.tour.soll.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810627
+    m_Key: concept.tour.cartons.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810628
+    m_Key: concept.tour.ist.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810629
+    m_Key: concept.tour.rest.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810630
+    m_Key: concept.tour.empf_kz_003.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810631
+    m_Key: concept.tour.empf_kz_000.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810632
+    m_Key: concept.tour.not_used.action
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156763004928
+    m_Key: concept.tour.material_flow.action
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

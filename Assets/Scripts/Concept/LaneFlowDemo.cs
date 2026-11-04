@@ -9,6 +9,8 @@ using UnityEngine;
 /// work spot; once it has stopped, the order container rides away over the middle lane too. Containers are switched off
 /// only at the end of their ride, out of sight. Leaving the step, "Von vorn" or disabling puts everything back. Same
 /// paths as PositionStockSwitcher/OrderBoxConveyor (LaneRide), but no station_move events and no grabbable riders.
+/// #89: the tour bar stands between the trainee's eyes and the start of the middle lane, so the objects in
+/// hideWhileRiding are hidden from the first ride until the order container has left, then shown again.
 /// </summary>
 public class LaneFlowDemo : MonoBehaviour
 {
@@ -40,12 +42,18 @@ public class LaneFlowDemo : MonoBehaviour
     [Tooltip("Offsets of the order container: onto the middle lane, then back behind the monitor.")]
     [SerializeField] private Vector3[] orderPath = { new(-0.40f, 0f, 0f), new(-0.40f, 0f, 2.29f) };
 
-    [SerializeField] private float startDelay = 1f;
+    [Header("View (#89)")]
+    [Tooltip("Hidden while the containers ride (they would block the middle lane); only those active at the start are shown again.")]
+    [SerializeField] private GameObject[] hideWhileRiding;
+
+    [Tooltip("Seconds to read the step on the bar before the containers ride.")]
+    [SerializeField] private float startDelay = 4f;
     [SerializeField] private float storageSpeed = 0.6f;
     [SerializeField] private float orderSpeed = 0.45f;
     [SerializeField] private float cornerPause = 0.3f;
 
     private readonly List<(Transform transform, Vector3 position, bool active)> start = new();
+    private readonly List<GameObject> hidden = new();
     private bool changed;
 
     private void Awake()
@@ -111,6 +119,8 @@ public class LaneFlowDemo : MonoBehaviour
         changed = true;
         yield return new WaitForSeconds(startDelay);
 
+        HideViewBlockers();
+
         // The next storage container starts in the hood.
         List<Transform> nextRiders = Riders(nextStorageStock);
         LaneRide.Move(nextStorageBox, nextRiders, arrivalPath[0]);
@@ -133,6 +143,36 @@ public class LaneFlowDemo : MonoBehaviour
         }
 
         yield return RideAway(orderBox, null, orderPath, orderSpeed);
+
+        ShowViewBlockers();
+    }
+
+    private void HideViewBlockers()
+    {
+        if (hideWhileRiding == null)
+            return;
+
+        foreach (GameObject blocker in hideWhileRiding)
+        {
+            if (blocker != null && blocker.activeSelf)
+            {
+                hidden.Add(blocker);
+                blocker.SetActive(false);
+            }
+        }
+    }
+
+    private void ShowViewBlockers()
+    {
+        foreach (GameObject blocker in hidden)
+        {
+            if (blocker != null)
+            {
+                blocker.SetActive(true);
+            }
+        }
+
+        hidden.Clear();
     }
 
     private IEnumerator RideAway(Transform box, Transform stock, IReadOnlyList<Vector3> path, float speed)
@@ -154,6 +194,7 @@ public class LaneFlowDemo : MonoBehaviour
     private void ResetStation()
     {
         StopAllCoroutines();
+        ShowViewBlockers();
         if (!changed)
             return;
 

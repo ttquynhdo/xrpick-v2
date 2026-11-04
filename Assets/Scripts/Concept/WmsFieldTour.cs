@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,9 +7,11 @@ using UnityEngine.UI;
 /// <summary>
 /// #20, docs/decisions/010: walks the trainee through the WMS dialog one field at a time. Each step shows its markers
 /// outside the screen border; nothing is drawn on the dialog itself. #78, decision 024: a step about one field writes
-/// its text into a caption next to that field; the other steps use the board right of the screen.
-/// The "Weiter" control is a poke toggle used as a push button. #80, docs/decisions/024: a fixed bar below the
-/// screen holds [Zurück] "Schritt n von 11" [Weiter]; "Zurück" is dimmed and not pressable at step 1.
+/// its title and what the field is into a caption next to that field.
+/// #89, decision 026: one bar centred below the screen holds the step text of the steps without a caption, the
+/// "what to do" line with a hand icon for every step, and [Zurück] "Schritt n von 11" [Weiter] (poke toggles used as
+/// push buttons, #80). The bar is hidden at the start and opens through <see cref="Open"/> (card 1 done) or after
+/// <see cref="autoOpenSeconds"/>; step 1 is shown and logged only then.
 /// </summary>
 public class WmsFieldTour : MonoBehaviour
 {
@@ -23,15 +26,15 @@ public class WmsFieldTour : MonoBehaviour
     [Serializable]
     public class Step
     {
-        // #55: the texts are the Loc keys concept.tour.<id>.title / .body.
-        [Tooltip("Stable id, e.g. soll (for #28 logging later); also names the Loc keys concept.tour.<id>.title/.body.")]
+        // #55: the texts are the Loc keys concept.tour.<id>.title / .body / .action (#89).
+        [Tooltip("Stable id, e.g. soll (for #28 logging later); also names the Loc keys concept.tour.<id>.title/.body/.action.")]
         public string id;
 
         [Tooltip("Shown only during this step; placed outside the monitor border.")]
         public GameObject[] markers;
 
-        // #78, decision 024: a caption next to the field (one of the markers). Empty = the text goes on the board.
-        [Tooltip("Caption title next to the field; leave empty to use the board right of the screen.")]
+        // #78, decision 024: a caption next to the field (one of the markers). Empty = the text goes on the bar.
+        [Tooltip("Caption title next to the field; leave empty to show the step text on the bar.")]
         public TMP_Text captionTitle;
 
         public TMP_Text captionBody;
@@ -39,13 +42,20 @@ public class WmsFieldTour : MonoBehaviour
 
     [SerializeField] private Step[] steps;
 
-    [Header("Board")]
-    [SerializeField] private TMP_Text titleText;
-    [SerializeField] private TMP_Text bodyText;
+    [Header("Bar (#89, decision 026)")]
+    [Tooltip("Interactables/Tour Nav Bar; hidden until the tour opens.")]
+    [SerializeField] private GameObject barRoot;
 
-    [Tooltip("Board panel with titleText/bodyText; hidden while a step shows its own caption (decision 024).")]
-    [SerializeField] private GameObject boardPanel;
+    [Tooltip("Step text of the steps without a caption (intro, cartons, not_used, material_flow).")]
+    [SerializeField] private TMP_Text barText;
+
+    [Tooltip("The \"what to do\" line next to the hand icon.")]
+    [SerializeField] private TMP_Text actionText;
+
     [SerializeField] private TMP_Text progressText;
+
+    [Tooltip("The tour opens by itself after this many seconds if card 1 is not done yet; 0 = never.")]
+    [SerializeField] private float autoOpenSeconds = 60f;
 
     [Header("Next control")]
     [SerializeField] private Toggle nextToggle;
@@ -59,11 +69,15 @@ public class WmsFieldTour : MonoBehaviour
     [SerializeField] private CanvasGroup backGroup;
 
     private int current;
+    private bool ready;
 
     // Step id of the step just shown, raised on every step change incl. the first (#73: the quiz unlocks at a step).
     public event Action<string> StepShown;
 
-    public string CurrentStepId => steps != null && steps.Length > 0 ? steps[current].id : null;
+    public bool IsOpen { get; private set; }
+
+    // Null until the bar is open (#89).
+    public string CurrentStepId => IsOpen ? steps[current].id : null;
 
     private void OnEnable()
     {
@@ -93,16 +107,12 @@ public class WmsFieldTour : MonoBehaviour
 
     private void Start()
     {
-        if (RequiredReference.IsMissing(titleText, nameof(titleText), this)
-            | RequiredReference.IsMissing(bodyText, nameof(bodyText), this)
+        if (RequiredReference.IsMissing(barRoot, nameof(barRoot), this)
+            | RequiredReference.IsMissing(barText, nameof(barText), this)
+            | RequiredReference.IsMissing(actionText, nameof(actionText), this)
             | RequiredReference.IsMissing(nextToggle, nameof(nextToggle), this)
             | RequiredReference.IsMissing(backToggle, nameof(backToggle), this))
             return;
-
-        if (backLabel != null)
-        {
-            backLabel.text = Loc.Get(BackKey);
-        }
 
         if (steps == null || steps.Length == 0)
         {
@@ -110,13 +120,51 @@ public class WmsFieldTour : MonoBehaviour
             return;
         }
 
+        if (backLabel != null)
+        {
+            backLabel.text = Loc.Get(BackKey);
+        }
+
+        foreach (Step step in steps)
+        {
+            SetMarkers(step, false);
+        }
+
+        ready = true;
+
+        // Open() may already have run (card 1 done before this Start).
+        if (IsOpen)
+        {
+            barRoot.SetActive(true);
+            ShowStep(0);
+            return;
+        }
+
+        barRoot.SetActive(false);
+        if (autoOpenSeconds > 0f)
+        {
+            StartCoroutine(OpenAfterDelay());
+        }
+    }
+
+    // #89: shows the bar at step 1; later calls do nothing. Called when card 1 is done (ConceptCardProgress).
+    public void Open()
+    {
+        if (IsOpen)
+            return;
+
+        IsOpen = true;
+        if (!ready)
+            return;
+
+        barRoot.SetActive(true);
         ShowStep(0);
     }
 
     // Also callable from a UnityEvent.
     public void NextStep()
     {
-        if (steps == null || steps.Length == 0)
+        if (!IsOpen)
             return;
 
         ShowStep((current + 1) % steps.Length);
@@ -125,10 +173,16 @@ public class WmsFieldTour : MonoBehaviour
     // Decision 024: back one step; does nothing at step 1 (no step change, no log).
     public void PreviousStep()
     {
-        if (steps == null || steps.Length == 0 || current == 0)
+        if (!IsOpen || current == 0)
             return;
 
         ShowStep(current - 1);
+    }
+
+    private IEnumerator OpenAfterDelay()
+    {
+        yield return new WaitForSeconds(autoOpenSeconds);
+        Open();
     }
 
     private void OnNextToggled(bool isOn)
@@ -162,14 +216,21 @@ public class WmsFieldTour : MonoBehaviour
         SetMarkers(steps[index], true);
 
         Step step = steps[index];
+        string title = Loc.Get(StepKeyPrefix + step.id + ".title");
+        string body = Loc.Get(StepKeyPrefix + step.id + ".body");
         bool hasCaption = step.captionTitle != null && step.captionBody != null;
-        if (boardPanel != null)
+        if (hasCaption)
         {
-            boardPanel.SetActive(!hasCaption);
+            step.captionTitle.text = title;
+            step.captionBody.text = body;
+            barText.text = string.Empty;
+        }
+        else
+        {
+            barText.text = $"<b>{title}:</b> {body}";
         }
 
-        (hasCaption ? step.captionTitle : titleText).text = Loc.Get(StepKeyPrefix + step.id + ".title");
-        (hasCaption ? step.captionBody : bodyText).text = Loc.Get(StepKeyPrefix + step.id + ".body");
+        actionText.text = Loc.Get(StepKeyPrefix + step.id + ".action");
 
         if (progressText != null)
         {

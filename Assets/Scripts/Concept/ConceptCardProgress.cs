@@ -41,7 +41,6 @@ public class ConceptCardProgress : MonoBehaviour
     private readonly List<(Grabbable grabbable, Action<PointerEvent> handler)> packageGrabs = new();
 
     private ConceptCardTracker tracker;
-    private string firstStepId;
     private InstructionCardLook label;
     private InstructionCardLook wms;
     private InstructionCardLook quizLook;
@@ -115,9 +114,6 @@ public class ConceptCardProgress : MonoBehaviour
         if (missing)
             return;
 
-        // The tour shows its first step in its own Start; any other step id later means "Weiter" was pressed.
-        firstStepId = tour.CurrentStepId;
-
         label = new InstructionCardLook(labelCard, frameOutset);
         wms = new InstructionCardLook(wmsCard, frameOutset);
         quizLook = new InstructionCardLook(quizCard, frameOutset);
@@ -140,12 +136,19 @@ public class ConceptCardProgress : MonoBehaviour
         if (evt.Type == PointerEventType.Select && tracker.PackageGrabbed(package.MaterialKey))
         {
             Apply();
+
+            // #89, decision 026: card 1 done opens the tour bar.
+            if (tracker.LabelDone && tour != null)
+            {
+                tour.Open();
+            }
         }
     }
 
+    // #89: the tour shows a step only once its bar is open, so the first step shown moves the frame to card 2.
     private void HandleStepShown(string stepId)
     {
-        if (firstStepId != null && stepId != firstStepId && tracker.TourAdvanced())
+        if (tracker.TourAdvanced())
         {
             Apply();
         }

@@ -242,8 +242,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627375
-    m_Localized: "Nehmen Sie jede Verpackung in die Hand. Die Erkl\xE4rung steht
-      links neben dem Bildschirm."
+    m_Localized: Nehmen Sie jede Verpackung in die Hand und lesen Sie ihr Etikett.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627376
@@ -298,8 +297,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627389
-    m_Localized: "Das ist ein Auftrag im Lagerverwaltungssystem (LVS). Dr\xFCcken
-      Sie \u201EWeiter\u201C."
+    m_Localized: Hier sehen Sie einen Auftrag im Lagerverwaltungssystem (LVS).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627390
@@ -307,8 +305,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627391
-    m_Localized: Materialnummer und Bezeichnung. Nehmen Sie den Karton STECKER C
-      in die Hand und vergleichen Sie beides mit seinem Etikett.
+    m_Localized: Materialnummer und Bezeichnung.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627392
@@ -316,8 +313,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627393
-    m_Localized: "St\xFCck pro Karton. Auf dem Etikett des Kartons STECKER C steht
-      daf\xFCr VPE."
+    m_Localized: "St\xFCck pro Karton, auf dem Etikett steht daf\xFCr VPE."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627394
@@ -350,7 +346,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627401
-    m_Localized: 'Hier steht, wie Sie die Teile einlegen. 003 ist EKZ 3: einzeln
+    m_Localized: 'Hier steht, wie Sie die Teile einlegen: 003 ist EKZ 3, also einzeln
       und geordnet.'
     m_Metadata:
       m_Items: []
@@ -359,8 +355,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: "Bei anderen Auftr\xE4gen kann hier 000 stehen, also EKZ 0. Dann
-      d\xFCrfen die Teile ungeordnet liegen oder eingef\xFCllt werden."
+    m_Localized: "Bei anderen Auftr\xE4gen kann hier 000 stehen, also EKZ 0: Die
+      Teile d\xFCrfen ungeordnet liegen oder eingef\xFCllt werden."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -368,8 +364,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627405
-    m_Localized: "Die markierten Bereiche brauchen Sie in der \xDCbung nicht. Das
-      Feld Anweisung bleibt in der \xDCbung leer."
+    m_Localized: Die markierten Bereiche brauchen Sie hier nicht. Das Feld Anweisung
+      bleibt leer.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627407
@@ -558,8 +554,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627451
     m_Localized: "Der Lagerbeh\xE4lter kommt von links und f\xE4hrt \xFCber die mittlere
-      Bahn weg, der Auftragsbeh\xE4lter erst, wenn der Auftrag fertig ist. Am echten
-      Kommissionierplatz bewegen Sie die Beh\xE4lter von Hand."
+      Bahn weg; der Auftragsbeh\xE4lter f\xE4hrt erst weg, wenn der Auftrag erledigt
+      ist. In der Praxis bewegen Sie die Beh\xE4lter von Hand."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -735,7 +731,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307008
-    m_Localized: '120 : 40 = 3 Kartons'
+    m_Localized: 'Soll : Verp.-Einh. = 120 : 40 = 3 Kartons'
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307009
@@ -855,6 +851,53 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 668799050059776
     m_Localized: "Dr\xFCcken Sie A, B oder C, um zu antworten."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156674924544
+    m_Localized: "Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810624
+    m_Localized: Nehmen Sie den Karton STECKER C in die Hand. Vergleichen Sie Mat.-Nr
+      und Bez. mit dem Etikett.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810625
+    m_Localized: Suchen Sie die VPE auf dem Etikett des Kartons STECKER C.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810626
+    m_Localized: "Lesen Sie die Zahl im Feld Soll ab. Dr\xFCcken Sie dann \u201EWeiter\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810627
+    m_Localized: "Schauen Sie in den Auftragsbeh\xE4lter rechts."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810628
+    m_Localized: "Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810629
+    m_Localized: "Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810630
+    m_Localized: "Sehen Sie sich das Beispiel \u201EEmpf Kz 003\u201C zwischen den
+      Beh\xE4ltern an."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810631
+    m_Localized: "Vergleichen Sie die beiden Beispiele zwischen den Beh\xE4ltern."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156758810632
+    m_Localized: "Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 727156763004928
+    m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu. Beantworten Sie
+      dann die Fragen unter dem Bildschirm."
     m_Metadata:
       m_Items: []
   references:

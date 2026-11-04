@@ -15,7 +15,7 @@ public enum ConceptCard
 /// #79, docs/decisions/024 (6, 7) and 025: which ConceptScene task card is current and which are done, from
 /// actions only. Card 1 is done once a package of every material was grabbed, card 2 when the tour first reaches
 /// its last step (the questions open), card 3 when all questions are right. The current card moves forward only:
-/// card 1 at the start, card 2 after the first "Weiter" or when card 1 is done, card 3 when the questions open,
+/// card 1 at the start, card 2 when the tour bar opens (#89) or card 1 is done, card 3 when the questions open,
 /// none when they are all right. Done marks never go away. Pure C#, covered by ConceptCardTrackerTests.
 /// </summary>
 public sealed class ConceptCardTracker
@@ -50,7 +50,7 @@ public sealed class ConceptCardTracker
         return true;
     }
 
-    // The tour left its first step for the first time ("Weiter").
+    // The tour bar opened (#89; before: the tour left its first step for the first time).
     public bool TourAdvanced() => MoveTo(ConceptCard.Wms);
 
     public bool QuizOpened()

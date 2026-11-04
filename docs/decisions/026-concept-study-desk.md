@@ -50,6 +50,9 @@ Không phương án nào bị veto: không quy tắc nghiệp vụ nào đổi; 
 
 **Bị bác:** phương án 0 làm riêng (R4, R6, R8 còn; thanh đè cụm); giữ `Info Panel` làm nhãn phụ (bảng trống khi không cầm gì); dời bảng tour (vẫn hai chỗ đọc); câu hỏi tự hiện cạnh thanh (tranh chỗ, bước 11 quá tải; dự phòng); dòng hành động trong chú thích ô (thanh gần carton hơn); cho vật minh hoạ cầm được rồi về chỗ (phức tạp `Lane Flow Demo`, bẩn `grab_*`); trường `opened_by` (suy ra được); giữ `Worked Example` thu gọn (vẫn che thùng); dấu „✓ 4/4“ riêng trên cụm (thẻ 3 đã có ✓).
 
+## Bổ sung 2026-11-04 (khi làm #89, người dùng chọn)
+Đo trong scene: thanh ở giữa (z 0,48) che 53–81 % đoạn đầu làn giữa (z 0,7–1,0) và 22–33 % thùng đơn với mắt cao 1,45–1,75 m, đúng chỗ thùng kho rẽ vào làn giữa ở bước `material_flow`. Quyết định: `LaneFlowDemo` bắt đầu sau 4 s (trước 1 s) để người học đọc thanh; trong lúc thùng chạy, thanh (và cụm câu hỏi, cho tới #93) ẩn; khi thùng đơn chạy xong thì hiện lại; đổi bước giữa chừng thì hiện lại ngay. #93 dựa vào đó: „Zu den Fragen“ chỉ thấy được sau khi demo dừng. Không đổi log.
+
 ## Done when
 Xem `docs/backlog.md` #89, #90, #91, #92, #93.
 
@@ -75,5 +78,5 @@ Không có câu mới. D30/D31 của 024 vẫn giữ. Quan sát ở buổi test:
 - Thẻ 1 tính theo `MaterialKey` khi `Grabbable` Select → `Assets/Scripts/Concept/ConceptCardProgress.cs` → đã kiểm (synthesizer)
 - `concept.card.step1_body` „links neben dem Bildschirm“; `concept.tour.material.body` lời dặn cuối câu 2 → `docs/i18n/strings-todo.csv:55, 71` → đã kiểm
 - P801: `intro` ≈ 150 s, 17 `grab_start` trước `material`, lùi 10→4 sau `task_completed` → log `05_data/raw/P801_*` (data-analyst) → chưa kiểm lại
-- Thanh giữa (≈ 0,40 m) đè cụm x 0,10–0,42; góc nhìn thanh −42°, carton −68°, thùng đơn +32°/−49° → suy ra từ toạ độ (xr-ux-reviewer) → chưa kiểm bằng ảnh
+- Thanh giữa (≈ 0,40 m) đè cụm x 0,10–0,42; góc nhìn thanh −42°, carton −68°, thùng đơn +32°/−49° → suy ra từ toạ độ (xr-ux-reviewer) → đã kiểm khi làm #89: thanh x −0,16…0,28 đè cụm ở bước 11 (`TestEvidence/ConceptScene/bl89/T5_after_material_flow.png`); thanh che đầu làn giữa (xem bổ sung)
 - Chữ DE vừa thanh; thẻ nhãn đọc được ở 30–40 cm; phát hiện tay chạm vật không có `Grabbable` → chưa kiểm (đo khi làm, thử trên kính)
