@@ -74,17 +74,17 @@ Positions: Basic 1 position, Mixed 2, Complex 2 (decisions 012, 016); Concept ha
 
 | Event | Data | Source |
 |---|---|---|
-| `confirm_pressed` | One per **rated** press only, written before the position advances. `attempt_no` (per scene visit), `position`, `position_count`, `attempt_in_position`, `line`: `{item, soll, vpe, required_full, required_loose, placed_full, placed_loose}` (current position only; `required_loose` / `placed_loose` are `null` outside Complex), `foreign`: `[{item, count}]` (materials not in the order, `[]` if none), `correct` (bool), `error_codes` (list of `{code, item}`, see 4.3), `time_since_scene_enter_s` | `OrderConfirm.OrderConfirmation`, `MixedPickingValidator.ConfirmOrder`, `PiecesOrderValidator.ConfirmOrder` |
+| `confirm_pressed` | One per **rated** press only, written before the position advances. `attempt_no` (per scene visit; a counter separate from `quiz_answer.attempt_no`), `position`, `position_count`, `attempt_in_position`, `line`: `{item, soll, vpe, required_full, required_loose, placed_full, placed_loose}` (current position only; `required_loose` / `placed_loose` are `null` outside Complex), `foreign`: `[{item, count}]` (materials not in the order, `[]` if none; `count` = full cartons + loose pieces of that material, from `ForeignMaterial.Full + Loose`), `correct` (bool), `error_codes` (list of `{code, item}`, see 4.3), `time_since_scene_enter_s` | `OrderConfirm.OrderConfirmation`, `MixedPickingValidator.ConfirmOrder`, `PiecesOrderValidator.ConfirmOrder` |
 | `confirm_ignored` | `reason`: `station_moving` \| `completed` \| `quiz_first` (the early returns, incl. the #58 reminder), `position`, `time_since_scene_enter_s`. Not an attempt, not in `confirm_count` | the same validators |
 | `position_completed` | `position`, `attempts_in_position` (from `LineAdvanced`, and once for the last position at `OrderCompleted`) | validators |
-| `task_completed` | `attempts_to_correct` (sum of rated attempts), `time_to_first_confirm_s`, `time_to_correct_s`. Picking scenes: at `OrderCompleted`; Concept: when all 4 questions are right (`LessonCompleted`). Complex then calls `EndSession("completed")` | validators, `PackageQuizController` |
-| `quiz_answer` | `attempt_no` (per visit), `quiz`: `concept` \| `complex_remainder`, `question_id`, `selected` (answer key), `correct`, `attempt_in_question`, `error_codes`, `time_since_scene_enter_s`. Every rated touch (a touched toggle is rated at once, decision 020) | `PackageQuizController.AnswerChosen`, `RemainderQuizController.AnswerChosen` |
+| `task_completed` | `attempts_to_correct` (Basic/Mixed: number of `confirm_pressed`; Complex: number of `confirm_pressed` until completion over positions 1 and 2, remainder-quiz touches excluded; Concept: number of `quiz_answer`; always equals `confirm_count` of the visit), `time_to_first_confirm_s`, `time_to_correct_s`. Picking scenes: at `OrderCompleted`; Concept: when all 4 questions are right (`LessonCompleted`). Complex then calls `EndSession("completed")` | validators, `PackageQuizController` |
+| `quiz_answer` | `attempt_no` (per visit, separate counter from `confirm_pressed.attempt_no`), `quiz`: `concept` \| `complex_remainder`, `question_id`, `selected` (answer key), `correct`, `attempt_in_question`, `error_codes`, `time_since_scene_enter_s`. Every rated touch (a touched toggle is rated at once, decision 020) | `PackageQuizController.AnswerChosen`, `RemainderQuizController.AnswerChosen` |
 | `quiz_unlocked` | `{}` (Concept quiz opens at tour step `material_flow`) | `PackageQuizController.Unlocked` |
 | `tour_step` | `step_id`, `step_index` (1–11; „Von vorn“ = back to 1) | `WmsFieldTour.StepShown` |
 | `station_move_start` / `station_move_arrived` | `what`: `storage_out` \| `storage_in` \| `order_box`, `position` (the position just completed for `storage_out` / `order_box`, the new one for `storage_in`; Complex box 1 arrives after the remainder quiz) | `PositionStockSwitcher`, `OrderBoxConveyor` (new events, logging only) |
 | `welcome_practice_done` | `action`: `grab` \| `button` (first time each, #39) | `WelcomePracticeFeedback` |
 
-Order rule: `confirm_pressed` → `position_completed` → `station_move_start` → `station_move_arrived`.
+Order rule: `confirm_pressed` → `position_completed` → `station_move_start` → `station_move_arrived`. Complex has no last-position `storage_out` / `order_box` rides in the log: `EndSession("completed")` runs at `OrderCompleted`, and events after session end are dropped.
 
 Question ids: Concept `cartons_from_soll` {`2`, `4` (right), `25`}, `material_by_matnr` {`connector_a`, `screw_b` (right), `ring_d`}, `ekz_003` {`ordered` (right), `poured`}, `ekz_000` {`ordered`, `poured` (right)}; Complex position-1 remainder quiz `cartons` {`"1"`, `"2"` (right), `"3"`}, `loose` {`"5"` (right), `"20"`, `"55"`}. The Concept tour has 11 steps and unlocks the quiz at step id `material_flow`.
 
@@ -97,7 +97,7 @@ Derived from container contents vs. order, independent of the text shown to the 
 | Code | Meaning |
 |---|---|
 | `EMPTY` | confirm with nothing of the **current position** in the box (at position > 1, packages of finished positions don't count) |
-| `WRONG_MATERIAL` | a material (`item` = material key) not in the order, or not of the current position, is inside |
+| `WRONG_MATERIAL` | a material (`item` = material key) not in the order, or not of the current position, is inside (packages of finished positions don't count) |
 | `TOO_FEW` / `TOO_MANY` | full cartons short/over for the ordered `item` |
 | `MISSING_LOOSE` / `EXTRA_LOOSE` | loose pieces short/over (Complex only) |
 | `WRONG_ANSWER` | quiz touch rated wrong (Concept, Complex remainder quiz); `item` is `null`, the question is in `question_id` of the event |
@@ -150,11 +150,27 @@ Clean end vs crash: `session_end` with reason `quit` is written by Unity's quit 
 
 `participant_id, session_id, build, schema_version, scene, scene_visit, enter_utc, duration_s, paused_s, confirm_count, confirm_ignored, first_attempt_correct, attempts_to_correct, time_to_first_confirm_s, time_to_correct_s, completed, error_codes_all, grabs, drops_floor, container_enters, container_exits, pauses, hmd_removed_count, fps_avg, dropped_frames, unity_errors`
 
-`duration_s` is active time (pauses subtracted), `paused_s` the paused time of the visit. #26 fills identity, `build`, `schema_version`, `enter_utc`, `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`; the rest stay empty (NA in R) until #28 step 2, #29 and #30. `confirm_count` counts rated presses only; `confirm_ignored` counts the ignored ones (the v1 dwell columns are gone: R computes dwell in the wide file). `error_codes_all` is semicolon-separated `CODE:n` (e.g. `TOO_FEW:2;EMPTY:1`). The events file is the source of truth; `analyse.R` rebuilds the table from events and compares it with `summary.csv` (tolerance 0.002 s for `_s` columns).
+`duration_s` is active time (pauses subtracted), `paused_s` the paused time of the visit. #26 fills identity, `build`, `schema_version`, `enter_utc`, `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`; the rest stay empty (NA in R) until #28 step 2, #29, #30 and #74 (`drops_floor` is filled by #74). `error_codes_all` is semicolon-separated `CODE:n` (e.g. `TOO_FEW:2;EMPTY:1`). The events file is the source of truth; `analyse.R` rebuilds the table from events and compares it with `summary.csv` (tolerance 0.002 s for `_s` columns). The v1 dwell columns are gone: R computes dwell in the wide file.
+
+**summary.csv column rules** (what the C# writer computes; step 2 is written from this table). A *counted attempt* is: in ConceptScene a `quiz_answer` (every rated quiz touch); in Basic, Mixed and Complex a `confirm_pressed`. Complex remainder-quiz touches (`quiz` = `complex_remainder`) and every `confirm_ignored` are never counted attempts.
+
+| Column | Covers | Value per scene |
+|---|---|---|
+| `confirm_count` | counted attempts of the visit | Concept: quiz touches; Basic/Mixed/Complex: rated red-button presses; Welcome: empty |
+| `confirm_ignored` | `confirm_ignored` events | Basic/Mixed/Complex: count (0 if none); Welcome and Concept: empty |
+| `first_attempt_correct` | the first counted attempt only | `true`/`false`; Concept: the first quiz touch; empty when the visit has no counted attempt, and in Welcome |
+| `time_to_first_confirm_s` | the first counted attempt | `time_since_scene_enter_s` of that attempt (Concept: the first rated quiz touch; Complex: the first red-button press, not a remainder-quiz touch); empty when none |
+| `error_codes_all` | counted attempts only | `CODE:n` summed over their `error_codes`; Complex: red-button presses only (remainder-quiz `WRONG_ANSWER` not included); empty when none |
+| `attempts_to_correct`, `time_to_correct_s` | the visit's `task_completed` | its values; empty when the visit has no `task_completed`; `attempts_to_correct` equals `confirm_count` |
+| `completed` | `task_completed` in the visit | `true` if the visit has one, else `false`; Welcome: empty |
+| `grabs`, `container_enters`, `container_exits` | #29 events | counts; empty before #29 |
+| `drops_floor` | `object_dropped_floor` | count; filled by #74, empty before |
+
+WelcomeScene leaves every outcome column empty (`confirm_count`, `confirm_ignored`, `first_attempt_correct`, `attempts_to_correct`, `time_to_first_confirm_s`, `time_to_correct_s`, `completed`, `error_codes_all`).
 
 ## 6. Contract for outcome events (#28) and analysis
 
-These shapes are fixed now; the fake data in `analysis/` follows them (task 3 of the v2 plan). The in-code validator result type can be shaped freely as long as it maps 1:1 onto this format.
+These shapes are fixed now; the fake data in `analysis/` follows them (`analysis/make_fake_data.R`). The in-code validator result type can be shaped freely as long as it maps 1:1 onto this format.
 
 **`confirm_pressed`** (one per rated press; Mixed position 1, 2 of 3 cartons placed):
 ```json
@@ -185,7 +201,7 @@ A key that doesn't apply in a scene is `null`, not 0. `item` is `null` for codes
 
 **Session end:** #28 calls `ResearchLogger.EndSession("completed")` at `OrderCompleted` in ComplexScene; #44 adds the hidden facilitator control (decision 004 §9) for `EndSession("facilitator")`. `analyse.R` derives `end_status` (completed / facilitator / quit / crash) and `course_finished` (a `task_completed` in ComplexScene) itself.
 
-**Derived measures (computed later, not logged):** task time, share correct at first attempt per item (main) and error rate per skill (secondary: share of rated presses per visit with at least one code of that skill), attempts to correct, error profile per scene, hesitation (enter to exit of the same object), re-grabs, time spent reading WMS before first grab (minus station-move time), head movement per minute, dwell per head-direction zone, frame drops vs SSQ change, NASA-TLX vs attempts and active time. Which visit counts: the first visit of a scene with at least one rated confirm; later visits are flagged `repeat_visit`.
+**Derived measures (computed later, not logged):** task time, share correct at first attempt per item (main) and error rate per skill (secondary, per visit and skill: denominator = counted attempts that test that skill via `item_skills.csv` / `scene_skills.csv` (an order position with no skill row tests every skill its scene lists), numerator = those with at least one error code of that skill, first attempt = the earliest such attempt; scaffolded items (Complex `position_1`) and remainder-quiz touches are excluded; NA, not 0, when the visit has no such attempt), attempts to correct, error profile per scene, hesitation (`grab_start` to `grab_end` and `container_enter` to `container_exit` of the same object), re-grabs, time spent reading WMS before first grab (minus `wait_s`), `wait_s` (union of the station rides `station_move_start` to `station_move_arrived`, cut at `task_completed`) and `wait_after_done_s` (R-derived, not logged), head movement per minute, dwell per head-direction zone, frame drops vs SSQ change, NASA-TLX vs attempts and active time. Which visit counts: the first visit of a scene with at least one rated confirm; later visits are flagged `repeat_visit`.
 
 ## 7. Dependencies and validity notes
 
@@ -197,11 +213,11 @@ A key that doesn't apply in a scene is `null`, not 0. `item` is `null` for codes
 
 ## 8. Implementation outline (to become backlog items)
 
-1. `ResearchLogger` core (#26, done): session, header, JSONL/CSV writers with per-line flush, error capture, crash recovery, test IDs, R analysis on fake and real data. No scene changes.
-2. Participant ID keypad + confirmation + end screen in WelcomeScene.
-3. Outcome events: shared error-code helper + hooks in the four validators and the quiz; summary CSV.
-4. Interaction events: `GrabLogger` on package prefabs, counter enter/exit, button touches, input mode, tracking.
-5. Attention proxy + pose stream + perf samples.
+1. `ResearchLogger` core (#26, done): session, header, JSONL/CSV writers with per-line flush, error capture, crash recovery, test IDs, R analysis on fake and real data. No scene changes. Keypad, resume offer and end control (#27, #44) are done too.
+2. #28 step 2: outcome events (shared error-code helper + hooks in the validators, both quizzes, tour, `PositionStockSwitcher` / `OrderBoxConveyor`, `WelcomePracticeFeedback`, `EkzPlacementCheck`) and the summary CSV rules of section 5.
+3. #29 (reduced): grab events registered at runtime on `Grabbable` + `PackageData` (no Inspector component), container enter/exit, `menu_select`, `scene_enter.via`, end-control events.
+4. #30: pose stream (`_pose.csv`) and `perf_sample`; sampler outside `Research/`, head-direction zones assigned in R.
+5. #74: hand and input mode, tracking lost/regained, floor drops.
 6. Retrieval guide for facilitators (MQDH/adb) and the merge of the wide file with the paper data by `participant_id`.
 
 ## 9. Open decisions (need the study lead)

@@ -1247,7 +1247,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 ### #28 [Feature] Log kết quả mỗi lần xác nhận + mã lỗi + summary.csv
 - **Type:** feature
 - **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
-- **Files:** Assets/Scripts/PackageQuizController.cs:25, Assets/Scripts/WS Scripts/OrderConfirm.cs:27, Assets/Scripts/MixPickingValidator.cs:18, Assets/Scripts/PiecesOrderValidator.cs:24; helper mới tính mã lỗi; spec mục 4.2, 4.3, 5
+- **Files:** Assets/Scripts/PackageQuizController.cs:25, Assets/Scripts/WS Scripts/OrderConfirm.cs:27, Assets/Scripts/MixPickingValidator.cs:18, Assets/Scripts/PiecesOrderValidator.cs:24, Assets/Scripts/Complex/RemainderQuizController.cs, Assets/Scripts/Concept/WmsFieldTour.cs, Assets/Scripts/PositionStockSwitcher.cs, Assets/Scripts/OrderBoxConveyor.cs, Assets/Scripts/Welcome/WelcomePracticeFeedback.cs, Assets/Scripts/EkzPlacementCheck.cs; helper mới tính mã lỗi; spec mục 4.2, 4.3, 5
 - **Problem:** Validator chỉ có đúng/sai và chữ hiển thị, không ghi lại số lần thử, thời gian, trong thùng có gì hay loại lỗi.
 - **Done when (decision 021, thay Done when cũ; các Bổ sung bên dưới đã được hợp nhất vào 021, chỉ còn là lịch sử):**
   - Spec v2 (`schema_version` 2) cho toàn bộ danh mục của 021 (cả trường của #29/#30), `skill_map.csv`, `scene_skills.csv`, `item_skills.csv` (mới), `make_fake_data.R`, `analyse.R` đổi trong cùng một commit, `selftest.R` xanh, data-analyst duyệt **trước** khi sửa code scene.
@@ -1294,7 +1294,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 ### #29 [Feature] Log thao tác: cầm/thả, thùng, nút, kiểu điều khiển
 - **Type:** feature
 - **Scene(s):** cả 5 scene
-- **Files:** component mới `GrabLogger` gắn vào prefab/package (sự kiện grab của Interaction SDK), Assets/Scripts/PackageCounter.cs:29, :61, Assets/Scripts/MixPickingContainer.cs:27, :44, Assets/Scripts/PiecesContainerCounter.cs:30, :46, Assets/Scripts/PackageInfoOnGrab.cs:24, Assets/Scripts/SceneMenuController.cs:6–44; spec mục 4.1 (`menu_select`), 4.4
+- **Files:** đăng ký lúc chạy trên mọi `Grabbable` có `PackageData` theo mẫu `Assets/Scripts/InstructionStepHighlighter.cs` (không có component `GrabLogger`; `PackageCounter.cs` đã xoá), Assets/Scripts/MixPickingContainer.cs, Assets/Scripts/PiecesContainerCounter.cs, Assets/Scripts/WS Scripts/CalcForWMS.cs, Assets/Scripts/SceneMenuController.cs, Assets/Scripts/MenuCurrentLesson.cs, Assets/Scripts/ParticipantEntry/FacilitatorEndControl.cs; spec mục 4.1 (`menu_select`, `scene_enter.via`), 4.4
 - **Problem:** Không biết học viên thao tác ra sao: cầm nhầm, đặt vào rồi lấy ra, làm rơi, mất tracking tay.
 - **Done when (decision 021, rút gọn; tay/tracking/rơi sàn tách sang #74):**
   - Đặt một kiện vào thùng bằng code qua MCP → `container_enter` với `material_key`; collider thứ hai của cùng vật thể vào trigger → không có dòng thứ hai.
@@ -1304,9 +1304,9 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
   - Mở rồi `Fortsetzen` panel người điều phối → `end_control_opened` rồi `end_control_cancelled`.
   - Chọn một mục Menu đang mở → `menu_select` có `target_scene`, không có `item_label` (`blocked` chỉ khi relay pointer làm được, xem 021).
   - Không có `button_touch`, `info_shown`.
-- **Inspector work expected:** yes (gắn `GrabLogger` vào các package, gán layer/tag sàn)
+- **Inspector work expected:** no (đăng ký lúc chạy, không gắn component nào; layer/tag sàn thuộc #74)
 - **Công:** L
-- **Test trên kính:** bắt buộc (cầm tay trái/phải, mất tracking)
+- **Test trên kính:** không (MCP: `Grabbable.ProcessPointerEvent`; tay/tracking chuyển sang #74)
 - **Bổ sung (review cuối #44, 2026-11-01):** ghi thêm `end_control_opened` (panel hiện) và `end_control_cancelled` (bấm `Fortsetzen`) từ `FacilitatorEndControl`, là sự kiện cộng thêm; R dùng `t` của lần mở cuối để loại thời gian của người điều phối khỏi lượt cuối và đếm số lần mở nhầm; sửa `make_fake_data.R` và `analyse.R` cùng lúc. Từ reviewer cuối: nhả giữ khi `OnApplicationPause`/`OnApplicationFocus(false)`; có thể theo dõi `pointerId` đã bắt đầu giữ; nếu Q1 cho thấy giữ bị rớt thì tắt `_recoilAssist` chỉ trên `PokeInteractable` của prefab.
 - **Depends on:** #26. API sự kiện grab/tracking của Meta SDK phải kiểm tra trong project trước (spec mới ghi theo hiểu biết, chưa xác minh).
 - **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (vd. `input_mode_change` ban đầu, đăng ký `GrabLogger`): `activeSceneChanged` chạy sau các hàm đó nên sự kiện rơi vào lượt scene trước. Ghi từ `Start` trở đi.
@@ -1316,7 +1316,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 ### #30 [Feature] Hướng nhìn (theo đầu), luồng tư thế và hiệu năng
 - **Type:** feature
 - **Scene(s):** cả 5 scene
-- **Files:** script mới (gaze proxy + pose sampler + perf sampler), collider/tag cho bảng WMS, thẻ hướng dẫn, thùng, menu; spec mục 4.5, 4.6 (`perf_sample`), 4.7
+- **Files:** script mới (pose sampler + perf sampler, ngoài `Research/`); vùng nhìn gán trong R từ `_pose.csv`, không cần collider/tag; spec mục 4.5, 4.6 (`perf_sample`), 4.7
 - **Problem:** Cần dữ liệu về chú ý (đọc WMS bao lâu), độ thoải mái (rớt khung hình, cử động đầu) để đối chiếu với SSQ/NASA-TLX trên giấy.
 - **Done when (decision 021; không còn `gaze_target_*` trong app, R gán vùng từ `_pose.csv`):**
   - Trên Quest 3 có `_pose.csv` 10 Hz (±10 %) ghi qua một stream mở sẵn; tắt kính đột ngột thì file còn tới dòng ≤ 1 s trước đó.
@@ -1328,7 +1328,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Inspector work expected:** no (decision 021: không collider vùng nhìn mới; sampler gắn lúc chạy hoặc trên logger scene)
 - **Công:** L
 - **Test trên kính:** bắt buộc (đo FPS trên Quest 3)
-- **Depends on:** #26. Spec mục 9 (2026-11-01): chỉ ghi hướng đầu, không ghi vị trí tay. #35, #47 trước (decision 011, người dùng 2026-11-01: không thu dữ liệu nhìn theo bố cục cũ; mỗi vùng nhìn có collider riêng trên prefab giá; thêm phiên bản bố cục vào header log).
+- **Depends on:** #26. Spec mục 9 (2026-11-01): chỉ ghi hướng đầu, không ghi vị trí tay. #35, #47 trước (decision 011, người dùng 2026-11-01: không thu dữ liệu nhìn theo bố cục cũ; thêm phiên bản bố cục vào header log; ý "mỗi vùng nhìn có collider riêng trên prefab giá" đã bị decision 021 thay: vùng gán trong R).
 - **Bổ sung (review cuối #26, 2026-11-01):** dữ liệu 10 Hz (`_pose.csv`) phải ghi qua một stream mở sẵn suốt phiên (đóng/flush khi pause, đổi scene, kết thúc phiên). `SessionFiles` hiện mở file cho mỗi dòng: ổn cho sự kiện thưa, không ổn cho 10 dòng/giây (cấp phát và ghi đĩa liên tục). Không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (sự kiện rơi vào lượt scene trước).
 - **Status:** todo
 
