@@ -26,6 +26,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Mới 2026-11-03 (review lại toàn bộ, mục #58–#71):** thứ tự đề xuất: merge #57 → #58 (S, Complex) → #60 (S, Concept, sau #57) → #62 (S, chỉ CSV) → #59 (M, 4 scene, sau #58) → #64 (Menu, sau #59) → #36 (mở lại, nhãn Concept) → #13 (export có cả chữ mới). Song song được vì khác scene: #58 ∥ #60; #68 (Concept) không chạy cùng #60/#61/#63. Cần `solution-decision` trước: #61. #71 đã có decision 019 (2026-11-03, ba làn, công L, không chạy song song với mục nào sửa Mixed/Complex/Concept), sau đó #72 (Basic). **Người dùng 2026-11-03:** không chờ người hướng dẫn nữa; câu hỏi mở thành giả định, kiểm trong buổi test với người hướng dẫn tuần sau. Dọn dẹp lúc rảnh: #63, #65, #68, #69, #70. Bị chặn: #66 (D12), #67 (A5). Test kính gom vào buổi tới: #59, #62, #64, #69, #70, #36.
 - **Rà lại 2026-11-03 sau decision 019 và 020 (người dùng áp dụng tất cả vì mục tiêu nhất quán):** thứ tự **#58 → #73 (Concept: #60 + bảng 10 bước + #61 + #68) → #62 → #59 → #71 (Mixed/Complex, gồm #66, #70) → #72 (Basic) → #67 → #64 → #36 → #13**; lúc rảnh #63 (sau #73), #65, #69. Đóng: #17 done theo giả định A2; #21, #50 done, test kính còn lại chuyển sang #71/#72; #19 H-held chuyển sang #71. Gộp: #60, #61, #68 → #73; #66, #70 → #71. #67 bỏ chặn theo giả định A5. #43 bỏ (quy tắc 25 phút). #59 còn 3 scene (Concept bỏ thẻ kết quả). Không còn mục nào chờ người hướng dẫn: câu hỏi mở là giả định, kiểm ở buổi test tuần sau.
 - **Cập nhật 2026-11-03:** #71 và #72 verified-mcp (ba làn ở Basic, Mixed, Complex). Tiếp theo: #67 → #64 → #36 → #13. #67 verified-mcp (Mixed 150/50 rồi 60/20). #64 verified-mcp (2026-11-04, Menu font 18, rộng 400 px về bên phải). Tiếp theo: #36 → #13. Test kính gom vào buổi tới: #71 T5, H1–H4; #72 T6, T7.
+- **Mới 2026-11-04 (video test kính P811, English):** làm trước #36 và #13 vì #76 chặn người học ở Concept. Decision 024 chốt bố cục #78–#80 (#77 gộp vào #78); decision 025 (người dùng: học bằng nhìn và làm, không đọc chữ) thêm lớp vật thật lên trên: carton STECKER C, 3 carton 40/80/120, thùng mẫu EKZ (mục mới #83), băng ba làn có thùng chạy (#81). Thứ tự **#76 (P0, S, Concept + Complex) → #78 + #80 → #79 → #83 → #81** (#83 và #81 đổi chỗ được), rồi #82 (R, sau #80), #36 → #13 (export có chữ mới của #78–#83). Các mục ConceptScene không chạy song song với nhau. Test kính gom: #76, #78–#81, #83, cùng M1–M3 của #73.
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
@@ -1173,7 +1174,116 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Depends on:** #57, #52; giả định D26 (ba làn), câu mới về việc tra bảng Empf Kz (kiểm ở buổi test, không chặn)
 - **Decision:** docs/decisions/019-station-three-lanes-flow.md (phần Concept), docs/decisions/020-concept-quiz-tap-to-answer.md
 - **Test report:** docs/test-reports/bl73.md
-- **Status:** verified-mcp (19/19 ✅, chờ test tay M1–M3)
+- **Bổ sung (test kính 2026-11-04, video P811 EN):** M2, M3 ❌ vì chỉ nút B chạm được (→ #76); M1 ⚠️ góp ý bố cục (→ #78). Đóng #73 khi #76 xong và M1–M3 chạy lại ✅.
+- **Status:** verified-mcp (19/19 ✅, test tay M2/M3 ❌ → #76, M1 → #78)
+
+## Test kính 2026-11-04 (video P811, English)
+
+Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4` (7:35, Welcome → Concept), xem từng giây ở đoạn quiz, đo vùng chạm trong Editor; góp ý của người dùng sau khi xem lại.
+
+### #76 [P0] Vùng chạm của cụm câu hỏi chỉ phủ nút B (Concept + Complex)
+- **Type:** bug
+- **Scene(s):** ConceptScene, ComplexScene
+- **Files:** ConceptScene `Interactables/AnswerOption/Surface` (`BoundsClipper`), ComplexScene `Remainder Quiz/Surface`
+- **Problem:** `BoundsClipper` của `Surface` chỉ rộng 13,1 × 4,3 cm, nằm giữa canvas rộng 31,3 cm, nên chỉ nút B nằm trong vùng chạm; A và C không phản hồi. Trong video, câu 3 (đáp án đúng A) không bao giờ trả lời được: người học kẹt, Concept không xong, với mã nghiên cứu Menu khoá luôn bài 3. Complex có cùng kích thước vùng chạm.
+- **Done when:** Ở ConceptScene sau khi cụm mở, chạm A bằng tay (Simulator/kính) → A được chấm ngay. Chạm C → C được chấm ngay. Chạm B → B được chấm ngay. Trả lời đúng cả 4 câu (câu 3 = A) → „Richtig!“ và nhắc chọn bài 3. Ở ComplexScene chạm từng đáp án A/B/C của `Remainder Quiz` → mỗi nút được chấm. Chạm vào mép trống của tấm (ngoài các nút) → không chấm gì. (code) Vùng `BoundsClipper` của hai `Surface` phủ cả hàng nút (so bằng toạ độ world của nút A trái nhất và C phải nhất). `NextButton` và các bảng khác không đổi.
+- **Inspector work expected:** yes (kích thước/vị trí `Surface` ở hai scene)
+- **Công:** S
+- **Test trên kính:** bắt buộc (chạm A/B/C bằng tay thật ở cả hai scene)
+- **Depends on:** —
+- **Status:** todo
+
+### #77 [P1] Chữ tiếng Anh bảo bấm „Weiter“ trong khi nút ghi „Next“
+- **Type:** bug
+- **Scene(s):** ConceptScene
+- **Files:** docs/i18n/strings-todo.csv (`concept.tour.intro.body`, `concept.card.step2_body`)
+- **Problem:** Bản EN (dùng cho pilot) viết `Press "Weiter".` ở bước 1 của tour và thẻ 2 trên giá, nhưng nút `concept.tour.next` hiện „Next“. Người học tiếng Anh không thấy nút nào tên „Weiter“.
+- **Done when:** Chọn English, vào ConceptScene: bước 1 của tour và thẻ 2 trên giá ghi `Press "Next".` Chọn Deutsch: hai chỗ vẫn ghi „Drücken Sie „Weiter“.“ (code) Không chuỗi EN nào trong CSV còn chứa „Weiter“.
+- **Inspector work expected:** no (chỉ CSV + `ImportCsv`)
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** —
+- **Status:** dropped (gộp vào #78 theo decision 024: chữ intro và thẻ 2 viết lại cùng chú thích)
+
+### #78 [Feature] ConceptScene: một điểm bắt đầu rõ ràng, giải thích nằm sát ô, cụm câu hỏi không che màn WMS
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene (`InstructionShelf` cards, `Info Panel`, `Sample Description`, `Interactables/NextButton`, `Interactables/AnswerOption`, `WMS_Monitor/Head/Screen/Tour Markers`), Assets/Scripts/PackageQuizController.cs, Assets/Scripts/Concept/WmsFieldTour.cs, docs/i18n/strings-todo.csv
+- **Problem:** Khi vào Concept, cùng lúc thấy 6 tấm (thẻ trên giá, bảng nhãn, màn WMS, bảng tour + „Next“, cụm câu hỏi đang khoá, Menu) và không có gì cho biết nhìn đâu trước. Cụm câu hỏi (0,04, 1,23, 0,50) nằm giữa mắt và màn hình, che hàng dưới của dialog (Karton, Gew.) suốt cả tour, kể cả lúc khoá (decision 020 cho nó hiện một dòng khi khoá). Người dùng muốn cụm chỉ xuất hiện sau khi xem hết tour WMS. Thêm: sau khi trả lời đúng, „Richtig! …“ còn hiện dưới câu mới, dễ tưởng câu mới đã được trả lời (đúng theo #73 nhưng gây hiểu nhầm trong video).
+- **Bổ sung (người dùng 2026-11-04, nguyên lý spatial contiguity):** chữ giải thích của từng ô nằm trên bảng tour `Sample Description` (0,70, 1,30, 0,98), bên phải màn hình, cách các ô ở nửa trái dialog (Soll, Empf Kz, Mat.-Nr) khoảng 0,7–0,9 m, nên người học phải nhìn qua lại giữa ô và bảng để nối hai thứ; rất mệt. Mũi tên cột của mỗi marker (`Top`/`TopTip` ở y 585, trên viền màn hình) nằm sát dòng „Modus / Auftragsart“, nên ở bước `empf_kz_000` người xem tưởng nó chỉ vào dòng đó (ảnh người dùng gửi). Phương án phải giữ quy tắc màn hình (decision 010: không vẽ gì lên dialog).
+- **Done when:** Vào ConceptScene, chưa làm gì: chỉ thẻ 1 trên giá có khung xanh; `Info Panel` có tiêu đề „1. Etikett lesen“; cụm câu hỏi, bảng EKZ và bảng Ablauf không hiện. Ở các bước material, verp_einh, soll, ist, rest, empf_kz_003, empf_kz_000: ảnh `wms` của bước đó thấy cả ô và toàn bộ chữ chú thích trong một khung hình; chú thích nằm ngoài viền, cùng phía và ngang hàng với ô. Ở các bước intro, cartons, not_used, material_flow: chú thích nằm ở cùng một chỗ cố định bên phải viền. Ở mỗi bước một ô, tiêu đề chú thích ghi đúng nhãn trên màn hình (vd „Verp.-Einh.“, „Empf Kz“). Ở bước Soll, Empf Kz, Mat.-Nr không còn mũi tên nào trên viền trên; ảnh `wms_step8` không có mũi tên nào cạnh „Modus / Auftragsart“. Test kính: người mới chỉ đúng ô được nói ở bước 3 (Verp.-Einh.), 6 (Ist) và 8 (Empf Kz). Ở bước 1–10: ảnh `wms` và `overview` không có tấm nào che dialog. Tới bước 11 lần đầu: cụm câu hỏi hiện; ảnh `overview` cho thấy cụm không che dialog, chú thích bước 11, bảng EKZ hay bảng Ablauf; trên kính, tay duỗi thoải mái chạm được A, B, C. Quiz đã mở, lùi về bước 7 (Rest): cụm vẫn mở và không che chú thích của Rest. Trả lời đúng câu 1: „Richtig! …“ đứng dưới câu 1 khoảng 1,5 s, chạm A/B/C lúc đó không được chấm; sau đó câu 2 hiện với dòng hướng dẫn trung tính, không có „Richtig!“. Thẻ 3 cho biết câu hỏi mở sau phần giải thích LVS. Trên vùng dialog không có chữ, khung hay mũi tên nào ngoài nhãn WMS. (025) Vào ConceptScene, chưa làm gì: hai thùng trên băng đứng yên, bảng Ablauf không hiện. (025) Ở bước 1–10 không có vật nào chuyển động. (025) Chú thích của mỗi bước có nhiều nhất 2 câu (DE và EN). (code) Mọi chuỗi mới hoặc đổi (chú thích, „Zurück“, thẻ 2, thẻ 3, tiêu đề `Info Panel`) có key + EN + DE qua `localize-strings` + `german-reviewer`; ở EN nút đi tiếp ghi „Next“ và không chuỗi EN nào còn „Weiter“ (#77); bản DE của chú thích dài nhất không bị cắt.
+- **Inspector work expected:** yes (vị trí/ẩn hiện cụm câu hỏi, vị trí chữ giải thích theo từng bước, marker, có thể thứ tự hiện các tấm)
+- **Công:** M–L
+- **Test trên kính:** bắt buộc (người mới vào scene, có biết nhìn đâu trước không; đọc giải thích có phải nhìn qua lại không; nói đúng ô được chỉ không; cụm có che WMS không)
+- **Depends on:** #76 (cùng sửa `AnswerOption`); decision 024; giả định D30 (hỏi người hướng dẫn, không chặn) (sửa 010, 015, 020); #77 gộp vào đây
+- **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md
+- **Status:** todo
+
+### #79 [Feature] ConceptScene: dấu xong trên thẻ việc như WelcomeScene
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene `InstructionShelf/Panel/Cards`, Assets/Scripts/Welcome/WelcomePracticeFeedback.cs (mẫu), script mới cho Concept
+- **Problem:** Ở Welcome mỗi thẻ việc có dấu tích khi làm xong (#39), còn ở Concept ba thẻ („Read the label“, „Get to know the WMS“, „Answer the questions“) không bao giờ đổi, nên người học không biết mình đã xong việc nào. Basic/Mixed/Complex dùng khung bước hiện tại (#40) thay vì dấu tích: cần chọn một kiểu cho Concept cho nhất quán.
+- **Done when:** (025) Cầm 3 trong 4 kiện cầm được (KABELVERBINDER A, SCHRAUBE B, RING D, STECKER C): thẻ 1 chưa có ✓. Cầm kiện thứ tư: thẻ 1 có ✓. 3 carton tĩnh ở bước `cartons` và các vòng trong thùng mẫu EKZ không cầm được và không tính. Cầm lại một kiện đã cầm không tính là kiện mới. Tour tới bước 11 lần đầu: thẻ 2 có ✓. Trả lời đúng câu 4: thẻ 3 có ✓ và khung xanh tắt. Lúc vào, khung xanh ở thẻ 1; lần đầu bấm Weiter/Zurück (hoặc khi thẻ 1 xong): khung sang thẻ 2; quiz mở: khung sang thẻ 3. Bấm „Von vorn“ hoặc „Zurück“: mọi ✓ đã có vẫn giữ. Không thẻ nào có chữ hay nền đỏ/xanh lá. Ảnh `instructions` (DE và EN): ✓ ở góc thẻ, không che chữ.
+- **Inspector work expected:** yes (badge trên 3 thẻ)
+- **Công:** S–M
+- **Test trên kính:** nhanh (thấy dấu khi xong từng việc)
+- **Depends on:** #78 (cùng scene, làm sau #78 và #80); decision 024; giả định D31 (hỏi người hướng dẫn, không chặn)
+- **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md
+- **Status:** todo
+
+
+### #80 [Feature] ConceptScene: nút „Next“ đặt ở chỗ tự nói nghĩa, thêm nút „Zurück“ trong tour
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** Assets/Scripts/Concept/WmsFieldTour.cs (`NextStep`, `ShowStep`), ConceptScene `Interactables/NextButton`, `Sample Description`, docs/i18n/strings-todo.csv (`concept.tour.*`), docs/research-logging-spec.md (`tour_step`), analysis/make_fake_data.R, analysis/analyse_set.R
+- **Problem:** (người dùng 2026-11-04) Nút „Next“/„Weiter“ đứng một mình ở (0,33, 1,33, 0,46), giữa người học và bảng tour, không dính với chữ hay số bước nào, nên người mới không biết bấm nó để làm gì. Tour chỉ đi tới (`NextStep`); muốn đọc lại bước vừa xong thì phải đi hết 11 bước rồi „Von vorn“. Người học cần quay lại bước trước khi chưa hiểu.
+- **Done when:** Ở mọi bước, dưới màn hình có cùng một thanh [Zurück] „Schritt n von 11“ [Weiter], đứng yên một chỗ. Ở bước 1: „Zurück“ hiện mờ; chạm vào không đổi bước và không ghi log. Ở bước n (2–11): bấm „Zurück“ → hiện bước n−1 với đúng chú thích, đúng marker và „Schritt n−1 von 11“. Lùi từ bước 9 về 8: bảng EKZ và mũi tên của nó ẩn. Lùi từ bước 11 về 10: cụm câu hỏi đã mở vẫn mở (bảng Ablauf không còn hiện, 025). Ở bước 11 nút đi tiếp ghi „Von vorn“; bấm → bước 1. Trên kính, bấm „Weiter“ 10 lần liền rồi „Zurück“ 5 lần: không lần nào kích hoạt nhầm nút kia, tay duỗi thoải mái. (Editor) Khe giữa hai nút ≥ 8 cm, vùng chạm `Surface` phủ cả hai nút. Người mới nói đúng nghĩa của hai nút mà không cần hỏi. (code) Mỗi bước hiện ra, dù tiến hay lùi, ghi đúng một `tour_step`. (code) Đi 11→10→11 chỉ ghi một `quiz_unlocked`. (code) Header có `layout_version` "025" nếu 024 và 025 ra cùng một build (nếu 024 ra build trước thì build đó ghi "024"). (code) Demo băng, mẫu EKZ và 3 carton tĩnh không ghi event nào; Concept không có `station_move_*` hay `confirm_*`. (code) spec ghi câu về Back và chạm trong lúc giữ „Richtig!“; `make_fake_data.R` có chuỗi Back, `selftest.R` xanh, `data-analyst` đã duyệt.
+- **Inspector work expected:** yes (nút mới, vị trí hai nút)
+- **Công:** M
+- **Test trên kính:** bắt buộc (người mới hiểu nút; bấm lùi/tiến bằng tay thật, không chạm nhầm)
+- **Depends on:** #78 (cùng thanh/chú thích), #76 (vùng chạm); decision 024
+- **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md
+- **Status:** todo
+
+### #81 [Feature] ConceptScene: băng ba làn thật, thùng chạy ở bước „Weg der Behälter“
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene (prefab `RollerConveyorThreeLanes`, thùng kho + thùng kho kế tiếp + thùng đơn, `Sample Description/WmsFieldTour.steps[material_flow].markers`, `Ablauf Overview`), script demo mới dùng `Assets/Scripts/LaneRide.cs`, docs/i18n/strings-todo.csv (`concept.tour.material_flow.*`, nhãn làn)
+- **Problem:** (người dùng 2026-11-04, video P811) Bước 11 „The way of the containers“ chỉ có chữ (trái, giữa, phải). Hình duy nhất là bảng `Ablauf Overview` ở (1,25, 1,36, 0,09), quay 86°: nhìn thẳng vào màn WMS không thấy (ảnh `TestEvidence/ConceptScene/flow-visibility/step11_front.png`), và sơ đồ chỉ là ba biểu tượng nhỏ (`step11_board.png`). ConceptScene không có băng lăn ba làn như Basic/Mixed/Complex. Người dùng: học phải bằng nhìn và làm, không đọc chữ rồi tưởng tượng.
+- **Done when:** Vào ConceptScene: có `RollerConveyorThreeLanes`, thùng kho đứng ở (−0.346, 0.768, 0.712), thùng đơn ở (0.453, 0.768, 0.712); ảnh `overview` cho thấy cùng bố cục với Basic. Không có `WarehouseConveyorNetworkThreeLanes`, counter hay validator. Tới bước 11 lần đầu: sau khoảng 1 s thùng kho sang làn giữa và chạy ra sau dưới bàn sau, cùng lúc thùng kho kế tiếp chạy vào từ trái tới chỗ làm việc; khi thùng kế tiếp đã dừng, thùng đơn sang làn giữa và chạy ra sau; cả đoạn ≤ khoảng 15 s. Thùng chỉ tắt khi đã khuất. Trong suốt demo, đứng nhìn chú thích bước 11, không quay đầu quá ±30° vẫn thấy cả ba làn và cả hai thùng. Mỗi làn có nhãn tĩnh dùng đúng từ của chú thích, cả DE lẫn EN. Chú thích bước 11 có câu „ở trạm thật bạn đẩy thùng bằng tay“ và không gọi tên nơi thùng đơn đi tới. Bấm Zurück trong lúc demo: chuyển động dừng, các thùng về chỗ ban đầu. Bấm Weiter tới bước 11 lần nữa: demo chạy lại từ đầu. „Von vorn“: thùng về chỗ cũ và đứng yên. Kiện người học đặt vào một trong hai thùng trước bước 11 không bị mang theo, vẫn cầm được sau demo. Cụm quiz hiện ở bước 11 không nằm trên đường thùng chạy; chạm A/B/C không chạm vào thùng. Bảng `Ablauf Overview` không còn trong `markers` của bước 11 (object giữ, inactive). Trên Quest nhìn bằng mắt: thùng chạy mượt, không gây khó chịu. (code) Demo không ghi event nào (không `station_move_*`); coroutine dừng trong `OnDisable` và khi rời bước. Chữ mới qua `localize-strings` + `german-reviewer`.
+- **Inspector work expected:** yes (đặt băng và thùng vào bố cục Concept, có thể dời `RearBench`/`Info Panel`; marker bước 11)
+- **Công:** M–L
+- **Test trên kính:** bắt buộc (người mới ở bước 11 tự thấy thùng chạy; FPS bằng mắt; có khớp với băng ở bài 3–5 không)
+- **Depends on:** #78, #80 (bố cục 024); decision 019 (ba làn); giả định D11/D17, D32 (không chặn); làm sau hoặc trước #83 đều được
+- **Decision:** docs/decisions/025-concept-show-and-do.md
+- **Status:** todo
+
+### #82 [Feature] R: chỉ số tour ConceptScene (thời gian mỗi bước, số lần lùi, Next rồi Back nhanh)
+- **Type:** feature
+- **Scene(s):** — (chỉ `analysis/`)
+- **Files:** analysis/analyse_set.R, analysis/make_fake_data.R, analysis/selftest.R, docs/research-logging-spec.md
+- **Problem:** Từ #80 (decision 024) tour có „Zurück“, nhưng R chưa tính gì từ `tour_step`. Không biết bước nào làm người học đọc lại hay bấm nhầm.
+- **Done when:** Chạy `analyse.R` trên dữ liệu giả có chuỗi Back: bảng mỗi người × bước có thời gian chủ động (bỏ khoảng `app_pause`–`app_resume`; bước 11 kết thúc ở `quiz_answer` đầu tiên hoặc `scene_exit`), số lần Back theo bước, số lần Next rồi Back trong < 2 s. Hướng đi suy từ `step_index` (+1 = Next, −1 = Back, 11→1 = „Von vorn“). Log `layout_version` khác "024" không tính số Back. `selftest.R` xanh.
+- **Inspector work expected:** no
+- **Công:** S–M
+- **Test trên kính:** không
+- **Depends on:** #80
+- **Decision:** docs/decisions/024-concept-captions-nav-bar.md
+- **Status:** todo
+
+### #83 [Feature] ConceptScene: mẫu thật ở bước nhãn, số carton và EKZ
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene (carton STECKER C mới với `PackageData`, 3 carton tĩnh, 2 thùng mẫu RING D, `WmsFieldTour.steps[].markers` của `material`, `verp_einh`, `cartons`, `empf_kz_003`, `empf_kz_000`), docs/i18n/strings-todo.csv (`concept.tour.*`)
+- **Problem:** (decision 025, video P811) Đơn mẫu trên WMS là STECKER C nhưng trên bàn không có kiện STECKER C, nên người học không khớp được nhãn với LVS bằng tay. Bước „số carton“ chỉ là chữ (120 : 40 = 3). EKZ 000 được hỏi ở câu 4 nhưng chưa từng được cho xem, chỉ nói bằng chữ.
+- **Done when:** Vào ConceptScene: có một carton STECKER C cầm được; nhãn trước và nhãn trên ghi „STECKER C / Mat.-Nr: 625417 / VPE: 40 ST“; `PackageData` là `stecker_c` / 625417 / 40, trùng `SampleWmsOrder`. Ở bước `material` và `verp_einh`: carton có marker cam, chú thích bảo cầm carton lên. Cầm carton: `Info Panel` hiện 625417 và VPE 40. Trên kính, giơ carton trước màn hình: nhãn và ô Mat.-Nr, Verp.-Einh. thấy cùng lúc. Không cầm carton vẫn bấm „Weiter“ được. Ở bước `cartons`: 3 carton STECKER C tĩnh hiện lần lượt, khoảng 0,6 s một cái, trên chúng lần lượt có „40“, „80“, „120 = Soll“; chú thích còn một dòng „120 : 40 = 3 Kartons“. Rời bước `cartons` (Weiter hoặc Zurück): 3 carton ẩn; vào lại bước: chúng hiện lại từ đầu. Ở bước `empf_kz_003`: một thùng đơn mẫu nhỏ, RING D xếp từng chiếc thẳng hàng, ghi „Empf Kz 003“. Ở bước `empf_kz_000`: thêm thùng thứ hai, RING D đổ lộn xộn, ghi „Empf Kz 000“; chữ đi kèm nói „được phép“ (dürfen), không nói „phải“. Bước 9–11: bảng EKZ của decision 018 vẫn hiện như cũ. Ảnh `wms` và `overview` ở bước 5, 8 và 9: carton và thùng mẫu không che dialog, chú thích hay thanh điều hướng, và nằm trong ±30° quanh màn hình. Không demo nào dùng số của quiz (100, 25, 738190). (code) 3 carton tĩnh và vòng trong thùng mẫu không có `Grabbable`; không ghi event mới. Mọi chuỗi mới có key + EN + DE qua `localize-strings` + `german-reviewer`; nhãn kiện và nhãn WMS không dịch.
+- **Inspector work expected:** yes (carton mới, carton tĩnh, thùng mẫu, marker)
+- **Công:** M
+- **Test trên kính:** bắt buộc (người mới có tự cầm carton STECKER C không; giơ nhãn cạnh màn hình đọc được không; phân biệt hai thùng mẫu)
+- **Depends on:** #78, #80 (bố cục 024); #79 dùng carton này cho thẻ 1; giả định D4/D5 (EKZ 3 cho carton là đơn giản hoá)
+- **Decision:** docs/decisions/025-concept-show-and-do.md
+- **Status:** todo
 
 ## Feature – Log dữ liệu nghiên cứu
 
