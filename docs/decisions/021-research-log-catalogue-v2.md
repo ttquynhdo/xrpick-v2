@@ -62,7 +62,7 @@ Thêm `layout_version` (011, 019) và một trường liệt kê nhóm sự ki�
 ### Hướng đầu, tư thế, hiệu năng (#30)
 - Bỏ `gaze_target_enter/exit` khỏi app. R gán vùng thô từ `_pose.csv` theo bảng góc của từng `layout_version`: picking `screen_column` (WMS + quiz + Beispiel), `shelf`, `desk_left`, `desk_right`, `confirm_area` (nút + thẻ kết quả), `menu`; Concept `tour`, `ekz`, `flow`, `labelboard`; ngưỡng 200 ms là tham số R. Không còn vùng riêng `order_box` / `storage_box` (nhìn thùng là việc của chính nhiệm vụ).
 - `perf_sample` mỗi 5 s; `_pose.csv` 10 Hz, chỉ đầu, qua stream mở sẵn, flush/đóng khi pause, đổi scene, kết thúc phiên.
-  - **Thay bằng decision 022 (2026-11-04):** không làm phần này trong app (người dùng chọn mượt nhất, không có code theo frame); độ mượt đo bằng OVR Metrics Tool bên ngoài.
+  - **Thay bằng decision 022 (2026-11-04):** không làm phần này trong app (người dùng chọn mượt nhất, không có code theo frame); không cài thêm gì lên Quest, độ mượt kiểm bằng mắt trong buổi thử.
 - Bộ lấy mẫu pose/perf nằm ngoài `Research/` (Assembly-CSharp, timer/coroutine) và gọi logger một chiều; `Research/` không có hàm chạy theo frame.
 
 ### Summary CSV
