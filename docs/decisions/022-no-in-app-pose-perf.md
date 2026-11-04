@@ -1,6 +1,6 @@
 # Quyết định 022: Không ghi pose và perf trong app; đo độ mượt bằng OVR Metrics Tool bên ngoài
 
-- **Backlog:** #30
+- **Backlog:** #30, #74
 - **Trạng thái:** accepted (người dùng chọn 2026-11-04)
 - **Ngày:** 2026-11-04
 - **Thay thế:** 021, chỉ phần „Hướng đầu, tư thế, hiệu năng (#30)“ (`_pose.csv` 10 Hz, `perf_sample`, vùng nhìn gán từ pose). Mọi phần khác của 021 giữ nguyên.
@@ -31,7 +31,10 @@ Người dùng muốn trải nghiệm mượt nhất và không có rủi ro nà
 - Buổi thử với OVR Metrics Tool thấy giật đúng lúc cầm/thả hoặc bấm nút đỏ: mở mục mới để ghi sự kiện qua stream mở sẵn hoặc luồng nền, có đo lại; không tự thêm pose/perf.
 - Nhóm nghiên cứu cần Q4 đầy đủ về sau: chạy lại `solution-decision` cho #30 (bản nháp A ở trên là điểm bắt đầu).
 
+## Bổ sung: #74 cũng bỏ (người dùng chọn 2026-11-04)
+Theo cùng quy tắc „mượt nhất, không rủi ro“: không thêm code bắt va chạm sàn hay đọc trạng thái tracking của Meta SDK trong lúc học. `hand` / `input` trong `grab_*` luôn `null`; không có `object_dropped_floor`, `input_mode_change`, `tracking_lost` / `tracking_regained`; cột `drops_floor` luôn trống. Mất: số lần làm rơi kiện (chỉ đoán qua re-grab và `container_exit` của #29) và cờ „chậm do mất tracking“ cho Q6. Người điều phối ghi tay trên phiếu nếu thấy kính mất tay nhiều. Không câu hỏi nghiên cứu nào lấy dữ liệu chính từ #74.
+
 ## Ảnh hưởng
-- Backlog #30: `dropped` (theo decision này).
+- Backlog #30, #74: `dropped` (theo decision này).
 - Spec: §4.5, §4.6 (`perf_sample`), §4.7 ghi là không làm; §5 `fps_avg`, `dropped_frames` luôn trống.
 - R: không cần sửa (nhóm `pose`/`perf` không có trong header → NA).

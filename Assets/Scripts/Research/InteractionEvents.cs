@@ -2,7 +2,7 @@ using System;
 
 /// <summary>
 /// Data objects of the interaction events of #29 (decision 021, research-logging-spec §4.1, §4.4). Pure C#, so
-/// field names and values are covered by InteractionEventsTests. hand and input stay null until #74.
+/// field names and values are covered by InteractionEventsTests. hand and input are always null (decision 022: #74 dropped).
 /// </summary>
 public static class InteractionEvents
 {

@@ -1,6 +1,6 @@
 # Research data logging – specification (draft)
 
-Status: v2 per decision 021 (2026-11-04), `schema_version` 2. The session core (sections 1, 3, 4.1, `unity_error` and `crash_recovered` in 4.6, 5) is implemented by backlog #26; the participant keypad, resume offer and the `session_start` fields (section 2, 4.1) by #27; the outcome events of 4.2/4.3 and the outcome columns of section 5 by #28 step 2; the interaction events of 4.1 (`menu_select`, `end_control_*`, `scene_enter.via`) and 4.4 by #29 (header `event_groups` `session`, `outcome`, `interaction`); there are no pose or perf data in the app (decision 022, #30 dropped: smoothness is checked with OVR Metrics Tool outside the app); #74 is planned (the v1 catalogue of 2026-11-01 is replaced; decision: `docs/decisions/021-research-log-catalogue-v2.md`). Design and decisions: `docs/superpowers/specs/2026-11-01-research-logger-design.md`.
+Status: v2 per decision 021 (2026-11-04), `schema_version` 2. The session core (sections 1, 3, 4.1, `unity_error` and `crash_recovered` in 4.6, 5) is implemented by backlog #26; the participant keypad, resume offer and the `session_start` fields (section 2, 4.1) by #27; the outcome events of 4.2/4.3 and the outcome columns of section 5 by #28 step 2; the interaction events of 4.1 (`menu_select`, `end_control_*`, `scene_enter.via`) and 4.4 by #29 (header `event_groups` `session`, `outcome`, `interaction`); there are no pose or perf data in the app (decision 022, #30 dropped: smoothness is checked with OVR Metrics Tool outside the app, and no hand, tracking or floor-drop data (decision 022, #74 dropped) (the v1 catalogue of 2026-11-01 is replaced; decision: `docs/decisions/021-research-log-catalogue-v2.md`). Design and decisions: `docs/superpowers/specs/2026-11-01-research-logger-design.md`.
 
 Goal: record, per learner and per session, how trainees perform and experience the VR order-picking course on Meta Quest 3, so the logs can later be analysed and joined with the paper questionnaires (SSQ before and after, NASA-TLX at the end) via a pseudonymous participant ID. There is no paper test of the course content and no control group, so improvement is read from error rates per skill across scenes (an indication, not proof).
 
@@ -119,14 +119,14 @@ Main Q1 measure: share correct at the **first attempt per item** (question / pos
 
 | Event | Data | Source |
 |---|---|---|
-| `grab_start` | `object_id` (hierarchy path of the GameObject carrying `PackageData`, e.g. `Interactables/ring (3)`, Basic `GG_Package (25)/SM_box_1`; taken when the scene loads, unique per scene), `material_key`, `hand` (`L`/`R`), `input` (`hand`/`controller`); `hand` and `input` may be `null` until #74 | `PackageGrabLogger`, created at runtime per loaded scene, subscribes to every `Grabbable` with `PackageData` (no component in the Inspector), `WhenPointerEventRaised`: one grab per package, first selecting pointer → `grab_start` |
+| `grab_start` | `object_id` (hierarchy path of the GameObject carrying `PackageData`, e.g. `Interactables/ring (3)`, Basic `GG_Package (25)/SM_box_1`; taken when the scene loads, unique per scene), `material_key`, `hand` (`L`/`R`), `input` (`hand`/`controller`); `hand` and `input` are always `null` (decision 022, #74 dropped) | `PackageGrabLogger`, created at runtime per loaded scene, subscribes to every `Grabbable` with `PackageData` (no component in the Inspector), `WhenPointerEventRaised`: one grab per package, first selecting pointer → `grab_start` |
 | `grab_end` | `object_id`, `material_key`, `hand`, `input` (as above), `duration_s` (active seconds since this object's `grab_start` in the same visit, `null` when that start is not in this visit) | the same, last pointer released (Unselect or Cancel). A `grab_start` without `grab_end` (crash or scene change while holding) is an open grab. WelcomeScene logs no grabs (its box has no `PackageData`) |
 | `container_enter` / `container_exit` | `container`: `order`, `object_id`, `material_key`, `count_after` (packages in the order container after the change: every package the counter holds, finished positions included, each loose piece 1, the opened display carton never; Basic: cartons in the trigger. Not the WMS Ist) | counters' `OnTriggerEnter/Exit` via `OrderContainerLog`, only when the set actually changes. From `OrderCompleted` on (container shipped, `OrderBoxConveyor.IsShipped`) no `container_*` is written |
-| `object_dropped_floor` (#74) | `object_id`, `fall_from_height_m` | collision with floor layer |
-| `input_mode_change` (#74) | `from`, `to` | `OVRInput.GetActiveController` change |
-| `tracking_lost` / `tracking_regained` (#74) | `what`: `hand_L` / `hand_R` / `controller` | OVR hand/controller tracking state |
+| `object_dropped_floor` (#74, **not implemented, decision 022**) | `object_id`, `fall_from_height_m` | collision with floor layer |
+| `input_mode_change` (#74, **not implemented, decision 022**) | `from`, `to` | `OVRInput.GetActiveController` change |
+| `tracking_lost` / `tracking_regained` (#74, **not implemented, decision 022**) | `what`: `hand_L` / `hand_R` / `controller` | OVR hand/controller tracking state |
 
-Removed from v1: `button_touch`, `info_shown`, `end_pos`; there is no `step_changed` / `first_grab` (R rebuilds the steps from `grab_start` + `position_completed`). Filling `hand` for real is #74.
+Removed from v1: `button_touch`, `info_shown`, `end_pos`; there is no `step_changed` / `first_grab` (R rebuilds the steps from `grab_start` + `position_completed`). `hand` stays `null`: #74 is dropped (decision 022).
 
 ### 4.5 Attention proxy (Quest 3 has no eye tracking)
 
@@ -156,7 +156,7 @@ Clean end vs crash: `session_end` with reason `quit` is written by Unity's quit 
 
 `participant_id, session_id, build, schema_version, scene, scene_visit, enter_utc, duration_s, paused_s, confirm_count, confirm_ignored, first_attempt_correct, attempts_to_correct, time_to_first_confirm_s, time_to_correct_s, completed, error_codes_all, grabs, drops_floor, container_enters, container_exits, pauses, hmd_removed_count, fps_avg, dropped_frames, unity_errors`
 
-`duration_s` is active time (pauses subtracted), `paused_s` the paused time of the visit. #26 fills identity, `build`, `schema_version`, `enter_utc`, `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`; #28 step 2 fills the outcome columns and #29 `grabs`, `container_enters`, `container_exits`; `drops_floor` stays empty (NA in R) until #74; `fps_avg` and `dropped_frames` are always empty (decision 022: no perf data in the app). `error_codes_all` is semicolon-separated `CODE:n` (e.g. `TOO_FEW:2;EMPTY:1`). The events file is the source of truth; `analyse.R` rebuilds the table from events and compares it with `summary.csv` (tolerance 0.002 s for `_s` columns). The v1 dwell columns are gone: R computes dwell in the wide file.
+`duration_s` is active time (pauses subtracted), `paused_s` the paused time of the visit. #26 fills identity, `build`, `schema_version`, `enter_utc`, `duration_s`, `paused_s`, `pauses`, `hmd_removed_count`, `unity_errors`; #28 step 2 fills the outcome columns and #29 `grabs`, `container_enters`, `container_exits`; `drops_floor` is always empty (decision 022, #74 dropped); `fps_avg` and `dropped_frames` are always empty (decision 022: no perf data in the app). `error_codes_all` is semicolon-separated `CODE:n` (e.g. `TOO_FEW:2;EMPTY:1`). The events file is the source of truth; `analyse.R` rebuilds the table from events and compares it with `summary.csv` (tolerance 0.002 s for `_s` columns). The v1 dwell columns are gone: R computes dwell in the wide file.
 
 **summary.csv column rules** (what the C# writer computes; step 2 is written from this table). A *counted attempt* is: in ConceptScene a `quiz_answer` (every rated quiz touch); in Basic, Mixed and Complex a `confirm_pressed`. Complex remainder-quiz touches (`quiz` = `complex_remainder`) and every `confirm_ignored` are never counted attempts.
 
@@ -171,7 +171,7 @@ Clean end vs crash: `session_end` with reason `quit` is written by Unity's quit 
 | `completed` | `task_completed` in the visit | `true` if the visit has one, else `false`; Welcome: empty |
 | `grabs` | `grab_start` events | Concept, Basic, Mixed, Complex: count (0 if none); Welcome: empty |
 | `container_enters`, `container_exits` | `container_enter` / `container_exit` | Basic, Mixed, Complex: count (0 if none); Welcome and Concept: empty. All three #29 columns are empty when the header lacks `interaction` |
-| `drops_floor` | `object_dropped_floor` | count; filled by #74, empty before |
+| `drops_floor` | `object_dropped_floor` | always empty (decision 022: #74 dropped) |
 
 WelcomeScene leaves every outcome column empty (`confirm_count`, `confirm_ignored`, `first_attempt_correct`, `attempts_to_correct`, `time_to_first_confirm_s`, `time_to_correct_s`, `completed`, `error_codes_all`).
 
@@ -225,7 +225,7 @@ A key that doesn't apply in a scene is `null`, not 0. `item` is `null` for codes
 2. #28 step 2 (done): outcome events (shared error-code helper + hooks in the validators, both quizzes, tour, `PositionStockSwitcher` / `OrderBoxConveyor`, `WelcomePracticeFeedback`, `EkzPlacementCheck`) and the summary CSV rules of section 5.
 3. #29 (reduced): grab events registered at runtime on `Grabbable` + `PackageData` (no Inspector component), container enter/exit, `menu_select`, `scene_enter.via`, end-control events.
 4. #30: pose stream (`_pose.csv`) and `perf_sample`; sampler outside `Research/`, head-direction zones assigned in R.
-5. #74: hand and input mode, tracking lost/regained, floor drops.
+5. #74: hand and input mode, tracking lost/regained, floor drops. **Dropped (decision 022).**
 6. Retrieval guide for facilitators (MQDH/adb) and the merge of the wide file with the paper data by `participant_id`.
 
 ## 9. Open decisions (need the study lead)

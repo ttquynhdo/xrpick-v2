@@ -1345,8 +1345,8 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** M
 - **Test trên kính:** bắt buộc
 - **Depends on:** #29. Không chặn thu dữ liệu thật (decision 021).
-- **Decision:** docs/decisions/021-research-log-catalogue-v2.md
-- **Status:** todo
+- **Decision:** docs/decisions/021-research-log-catalogue-v2.md, docs/decisions/022-no-in-app-pose-perf.md
+- **Status:** dropped (2026-11-04, decision 022: người dùng chọn không thêm code chạy trong lúc học; không câu hỏi nghiên cứu nào lấy dữ liệu chính từ #74)
 
 ### #31 [Feature] Hướng dẫn lấy log về máy + script gộp với phiếu giấy
 - **Type:** feature
