@@ -1083,7 +1083,8 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Công:** S
 - **Test trên kính:** nhanh (bấm nút)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl69.md
+- **Status:** verified-mcp (5/5 MCP ✅, chờ test tay R5: bấm nút bằng tay trên Quest)
 
 ### #70 [P3] ComplexScene: bảng ví dụ gần cụm câu hỏi hơn
 - **Type:** logic
