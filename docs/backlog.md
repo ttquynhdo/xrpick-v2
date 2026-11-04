@@ -471,7 +471,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (2026-11-01, #17):** nhãn giờ có 3 dòng `TÊN` / `Mat.-Nr: …` / `VPE: n ST`, không tự xuống dòng, tự thu nhỏ chữ (min 30 %). Nhãn túi SCHRAUBE B (Mixed, Concept) và nhãn carton Basic (một mặt bên) rất nhỏ khi nhìn từ chỗ đứng (`TestEvidence/ConceptScene/bl17/L_after_labels_1.png`, `TestEvidence/BasicPickingScene/bl17/L_after_labels.png`). Nhãn vẫn là chữ tĩnh, phải khớp `PackageData` (`testing.md` K2).
 - **Test report:** docs/test-reports/bl36.md
 - **Bổ sung (review 2026-11-03, mở lại):** Concept `Interactables/[GG_Package]` (KABELVERBINDER A): sticker mặt trước quay sang phải (+x), không về phía trainee, chữ xoay ≈90°, xám mảnh; nhãn `Label Top` cũng xoay (ảnh `ConceptScene/views/labels.png`, `instructions_wide.png`). Done when "mọi kiện" chưa đạt ở Concept. Cũng kiểm: 3 carton RING D ở Complex (`GGB/[VPE_1..3]/Cube/Text (TMP)`) có cỡ font khác nhau (0.06 / 0.06 / 0.15), chụp `labels` sau khi trả lời câu hỏi.
-- **Status:** in progress (mở lại 2026-11-03: nhãn carton Concept xoay ngang; trước đó verified-mcp 11/13 ✅, H1/H2 chưa test)
+- **Bổ sung (2026-11-04, sửa phần mở lại):** carton Concept đã xoay về 0°, nhãn trước và nhãn trên đọc đúng chiều. 3 nhãn RING D ở Complex cùng cỡ (0,65, chữ hoa 9,3 mm), không cần sửa. Nhãn túi SCHRAUBE B ở Concept bị bảng quiz (#73) che khi đứng tại chỗ, nên túi được dời về phía trước 13 cm (người dùng chọn 2026-11-04). Thêm case tay H3: cầm túi mà không chạm nhầm nút quiz.
+- **Status:** verified-mcp (2026-11-04: lần mở lại 9/9 ✅, chờ test tay H1–H3)
 
 ### #37 [P2] Menu: trong tầm với, đánh dấu bài đang làm, khó chạm nhầm
 - **Type:** logic
