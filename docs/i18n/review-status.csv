@@ -72,7 +72,7 @@ concept.card.task_body,Lernen Sie das Etikett und das Lagerverwaltungssystem (LV
 entry.confirm.correct,Korrigieren,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.confirm.yes,Ja,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.keypad.delete,Löschen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-entry.keypad.title,Code eingeben,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+entry.keypad.title,Teilnehmercode eingeben,proposed,german-reviewer (agent),2026-11-04,Agent: OK; was „Code eingeben“, changed so testers know which code is meant
 entry.resume.continue,Fortsetzen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.resume.restart,Neu beginnen,proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional 'Von vorn beginnen', left to #13"
 entry.testmode,Testmodus – wird nicht ausgewertet,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)

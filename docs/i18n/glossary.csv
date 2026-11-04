@@ -44,7 +44,7 @@ Kartonage,die,cardboard packaging,Cardboard packaging of pre-packed material.,no
 Schachtel,die,small box,Product packaging box.,no,requirements: Kommissionierung.pptx slide 17,proposed,
 Material,das,material,"The goods of an order line (identified by Materialnummer), whatever their packaging.",no,requirements,proposed,Used in feedback such as complex.feedback.wrong_package.
 loses Material,das,loose material,Material that is not pre-packed and is picked piece by piece.,no,requirements: Kommissionierung.pptx slide 6/9; Detail Description,proposed,"Use for loose items; the unit is Stück (ST). The documents use neither Paket, Packstück nor Gebinde."
-Code,der,code,"Short identifier of a participant, P plus three digits (e.g. P017), typed on the keypad.",no,decision 004 (#27),proposed,"Used as 'Code eingeben', 'Code: P017'."
+Code,der,code,"Short identifier of a participant, P plus three digits (e.g. P017), typed on the keypad.",no,decision 004 (#27),proposed,"Used as 'Teilnehmercode eingeben' (keypad title), 'Code: P017'."
 Sitzung,die,session,"One run of the app by one participant, recorded by the research logger.",no,decision 004 (#27),proposed,Used in entry.warning.finished and entry.error.start.
 Testmodus,der,test mode,"State for test codes (P000, P900-P999) whose data is not analysed.",no,decision 004 (#27),proposed,
 Kurs,der,course,The whole training sequence of five lessons.,no,decision 004 (#27),proposed,Course leader = Kursleitung.
