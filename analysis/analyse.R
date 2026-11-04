@@ -606,7 +606,11 @@ presses <- v2_events %>% filter(event %in% c("confirm_pressed", "quiz_answer")) 
          # Attempts that summary.csv counts in confirm_count: rated red-button
          # presses, and quiz touches in ConceptScene. The Complex remainder quiz
          # is only in the events (it shows up in items, not in visit totals).
-         counted = event == "confirm_pressed" | !quiz %in% "complex_remainder")
+         counted = event == "confirm_pressed" | !quiz %in% "complex_remainder") %>%
+  # scaffolded = the app handed the trainee the numbers for this item
+  # (item_skills.csv: Complex position 1). Kept out of the skill rates.
+  left_join(item_skills %>% select(scene, item, scaffolded), by = c("scene", "item")) %>%
+  mutate(scaffolded = coalesce(scaffolded, FALSE))
 
 # Invariant (spec section 6): correct == (no error codes). Report every break.
 invariant_breaks <- presses %>% filter(is.na(correct) | correct != (n_codes == 0))
@@ -638,7 +642,7 @@ for (i in seq_len(nrow(bad_item_count))) {
 # its question from item_skills.csv (resolved first, so it is never "unknown").
 press_codes <- presses %>%
   select(participant_id, session_id, scene, scene_visit, press_id, attempt_no, event, item,
-         counted, codes) %>%
+         counted, scaffolded, codes) %>%
   unnest_longer(codes, values_to = "code") %>%
   mutate(code = as.character(code)) %>%  # stays text even with no presses (pre-#28 logs)
   filter(!is.na(code)) %>%
@@ -681,6 +685,7 @@ skill_pairs <- scene_skills %>% distinct(scene, skill)
 task_completed <- v2_events %>% filter(event == "task_completed") %>%
   transmute(session_id, scene, scene_visit,
             tc_seen = TRUE,
+            tc_t = t,  # session time of completion (station rides are cut here)
             tc_attempts_to_correct = map_int(data, ~ as_int(.x$attempts_to_correct)),
             tc_time_to_first_confirm_s = map_dbl(data, ~ as_num(.x$time_to_first_confirm_s)),
             tc_time_to_correct_s = map_dbl(data, ~ as_num(.x$time_to_correct_s))) %>%
@@ -707,7 +712,6 @@ press_visit <- presses %>%
     confirm_count = n(),
     presses_with_error = sum(n_codes > 0),
     # Rows are sorted by time, so row 1 is the first attempt.
-    first_press_id = press_id[1],
     first_attempt_correct = correct[1],
     time_to_first_confirm_presses = active_at_s[1],
     error_codes_all = {
@@ -738,6 +742,11 @@ ignored_counts <- v2_events %>% filter(event == "confirm_ignored") %>%
 # of the same (what, position). Rides overlap (old box leaves while the new
 # one arrives), so the wait is the union of the ride intervals, not their
 # sum, minus paused time. A ride with no arrival (crash) ends at the visit end.
+# The rides of the last position (storage_out + order_box) start at
+# OrderCompleted, i.e. after task_completed; Basic/Mixed then linger until the
+# scene is left while Complex ends the session at once. So wait_s counts only
+# ride time BEFORE the visit's task_completed (the whole visit when there is
+# none), comparable across scenes; the part after it is wait_after_done_s.
 first_or_na <- function(x) if (length(x) == 0) NA_real_ else min(x)
 ride_rows <- v2_events %>% filter(event %in% c("station_move_start", "station_move_arrived")) %>%
   mutate(what = map_chr(data, ~ as_chr(.x$what)),
@@ -772,15 +781,26 @@ union_intervals <- function(start_t, end_t) {
   tibble(start_t = out_s, end_t = out_e)
 }
 wait_stats <- tibble(session_id = character(), scene = character(), scene_visit = integer(),
-                     ev_wait_s = double())
+                     ev_wait_s = double(), ev_wait_after_done_s = double())
 if (nrow(ride_rows) > 0) {
   wait_stats <- ride_rows %>%
     group_by(session_id, scene, scene_visit) %>%
     group_modify(~ union_intervals(.x$start_t, .x$end_t)) %>%
     ungroup() %>%
-    mutate(active_wait_s = end_t - start_t - paused_between(session_id, start_t, end_t)) %>%
+    left_join(task_completed %>% select(session_id, scene, scene_visit, tc_t),
+              by = c("session_id", "scene", "scene_visit")) %>%
+    mutate(
+      cut_t = coalesce(tc_t, Inf),
+      # Part of each merged ride before / after task_completed.
+      before_end = pmin(end_t, cut_t),
+      after_start = pmax(start_t, cut_t),
+      before_s = if_else(before_end > start_t,
+                         before_end - start_t - paused_between(session_id, start_t, before_end), 0),
+      after_s = if_else(end_t > after_start,
+                        end_t - after_start - paused_between(session_id, after_start, end_t), 0)) %>%
     group_by(session_id, scene, scene_visit) %>%
-    summarise(ev_wait_s = round(sum(active_wait_s), 3), .groups = "drop")
+    summarise(ev_wait_s = round(sum(before_s), 3),
+              ev_wait_after_done_s = round(sum(after_s), 3), .groups = "drop")
 }
 
 # Sessions that measured outcomes (rule at the top of this section).
@@ -815,6 +835,8 @@ visits <- visits_base %>%
     # Ignored presses and station rides exist only where there is a red button.
     confirm_ignored = if_else(red_button, coalesce(ev_confirm_ignored, 0L), NA_integer_),
     wait_s = if_else(red_button, coalesce(ev_wait_s, 0), NA_real_),
+    # Rides after task_completed (end of order); NA when not completed.
+    wait_after_done_s = if_else(red_button & !is.na(tc_seen), coalesce(ev_wait_after_done_s, 0), NA_real_),
     # Completed = the visit has a task_completed (Mixed/Complex: after the last
     # position, so a correct position 1 followed by a crash is not completed).
     completed = if_else(outcome_logged, coalesce(tc_seen, FALSE), NA),
@@ -1205,25 +1227,37 @@ ggsave(file.path(output_dir, "first_attempt_by_item.png"), p_items, width = 11, 
 # numerator and the denominator; the Complex remainder quiz is in items above.
 counting_visits <- visits %>% filter(counting, confirm_count > 0)
 
-# Per counting visit and per skill the scene tests: share of presses with a
-# code of that skill. A tested but error-free skill gives 0 %, not missing.
+# Presses of scaffolded items (Complex position 1: the remainder quiz handed
+# the trainee the numbers) measure picking, not calculation (decision 021),
+# so they are left out of the skill rates: numerator AND denominator.
+# skill_presses = the counted, unscaffolded presses of the visit.
+skill_press_base <- presses %>%
+  filter(counted, !scaffolded) %>%
+  arrange(session_id, scene, scene_visit, t, line) %>%
+  group_by(session_id, scene, scene_visit) %>%
+  summarise(skill_presses = n(), first_skill_press_id = press_id[1], .groups = "drop")
+
+# Per counting visit and per skill the scene tests: share of unscaffolded
+# presses with a code of that skill. A tested but error-free skill gives 0 %,
+# not missing. A visit with only scaffolded presses has no skill rate.
 skill_rates <- counting_visits %>%
   mutate(scene = as.character(scene)) %>%
-  select(participant_id, session_id, scene, scene_visit, confirm_count, first_press_id) %>%
+  select(participant_id, session_id, scene, scene_visit) %>%
+  inner_join(skill_press_base, by = c("session_id", "scene", "scene_visit")) %>%
   inner_join(skill_pairs, by = "scene", relationship = "many-to-many") %>%
-  left_join(press_codes %>% filter(counted, !is.na(skill)) %>%
+  left_join(press_codes %>% filter(counted, !scaffolded, !is.na(skill)) %>%
               distinct(session_id, scene, scene_visit, press_id, skill) %>%
               group_by(session_id, scene, scene_visit, skill) %>%
               summarise(presses_with_skill_error = n(),
                         skill_error_press_ids = list(press_id), .groups = "drop"),
             by = c("session_id", "scene", "scene_visit", "skill")) %>%
   mutate(presses_with_skill_error = coalesce(presses_with_skill_error, 0L),
-         # The visit's first counted attempt carried a code of this skill.
-         first_attempt_skill_error = map2_lgl(skill_error_press_ids, first_press_id,
+         # The visit's first unscaffolded counted attempt carried a code of this skill.
+         first_attempt_skill_error = map2_lgl(skill_error_press_ids, first_skill_press_id,
                                               ~ !is.null(.x) && .y %in% .x),
-         error_rate = presses_with_skill_error / confirm_count,
+         error_rate = presses_with_skill_error / skill_presses,
          scene = factor(scene, levels = levels(visits$scene))) %>%
-  select(-skill_error_press_ids, -first_press_id)
+  select(-skill_error_press_ids, -first_skill_press_id)
 
 # Scenes with skills, in build order, so every layer uses the same x order.
 skill_scene_limits <- intersect(levels(visits$scene), unique(skill_pairs$scene))
@@ -1249,6 +1283,7 @@ if (nrow(skill_rates) == 0) {
     scale_y_continuous(limits = c(-12, 105), breaks = seq(0, 100, 25)) +
     labs(title = title_q1,
          subtitle = paste0("Dots = one participant's first visit with >= 1 confirm; diamond = mean. ",
+                           "Scaffolded Complex position 1 left out. ",
                            "Indication only: fixed scene order, no control group."),
          x = "Scene (build order)", y = "Confirm presses with an error of this skill (%)") +
     theme_minimal(base_size = 11) +
@@ -1356,7 +1391,7 @@ per_scene <- visits %>% filter(counting) %>%
   mutate(scene = as.character(scene)) %>%
   transmute(participant_id, scene,
             active_s = duration_s, paused_s = paused_s, confirms = confirm_count,
-            confirm_ignored = confirm_ignored, wait_s = wait_s,
+            confirm_ignored = confirm_ignored, wait_s = wait_s, wait_after_done_s = wait_after_done_s,
             errors = presses_with_error, error_rate = error_rate,
             first_correct = first_attempt_correct, attempts_to_correct = attempts_to_correct,
             time_to_correct_s = time_to_correct_s, completed = completed,
@@ -1368,7 +1403,7 @@ outcome_measures <- c("confirms", "errors", "error_rate", "first_correct", "atte
                       "time_to_correct_s", "completed")
 wide_scene <- per_scene %>%
   pivot_wider(id_cols = participant_id, names_from = scene, names_glue = "{.value}_{scene}",
-              values_from = c(visits, active_s, paused_s, confirms, confirm_ignored, wait_s, errors,
+              values_from = c(visits, active_s, paused_s, confirms, confirm_ignored, wait_s, wait_after_done_s, errors,
                               error_rate, first_correct, attempts_to_correct, time_to_correct_s,
                               completed, visit_censored))
 # Scenes without a confirm or quiz (WelcomeScene) never have outcome values:
@@ -1376,7 +1411,7 @@ wide_scene <- per_scene %>%
 no_outcome_cols <- as.vector(outer(outcome_measures, setdiff(unique(per_scene$scene), outcome_scenes),
                                    paste, sep = "_"))
 # Ignored presses and station waits exist only in scenes with a red button.
-no_button_cols <- as.vector(outer(c("confirm_ignored", "wait_s"),
+no_button_cols <- as.vector(outer(c("confirm_ignored", "wait_s", "wait_after_done_s"),
                                   setdiff(unique(per_scene$scene), red_button_scenes), paste, sep = "_"))
 wide_scene <- wide_scene %>% select(-any_of(c(no_outcome_cols, no_button_cols)))
 

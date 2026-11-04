@@ -135,6 +135,28 @@ local({
                   "wait_s_MixedPickingScene", "wait_s_ComplexScene") %in% names(wide)))
   stopifnot(!any(c("confirm_ignored_ConceptScene", "wait_s_ConceptScene") %in% names(wide)))
   stopifnot(all(wide$wait_s_MixedPickingScene[!is.na(wide$wait_s_MixedPickingScene)] >= 0))
+  # Known value: P114 Mixed (no pauses). Ride between positions: storage_out
+  # 326.967 -> 330.148 and storage_in 326.968 -> 330.149 overlap, union =
+  # 3.182 s (a sum would be 6.362). The end-of-order rides (351.199 -> 355.573,
+  # after task_completed at 350.599) are not in wait_s but in wait_after_done_s.
+  m114 <- visits[visits$participant_id == "P114" & visits$scene == "MixedPickingScene", ]
+  stopifnot(nrow(m114) == 1, abs(m114$wait_s - 3.182) < 0.002,
+            abs(m114$wait_after_done_s - 4.374) < 0.002)
+  # Basic has one position: every ride starts at the order's end, so wait_s 0.
+  stopifnot(all(visits$wait_s[visits$scene == "BasicPickingScene"] == 0, na.rm = TRUE))
+  # Scaffolded Complex position 1 is out of the skill rates: the denominator
+  # of every Complex rate = the visit's position-2 presses; P114 (position 1
+  # only, then crash) has no Complex skill rate.
+  pos2 <- presses %>% filter(scene == "ComplexScene", item == "position_2") %>%
+    count(session_id, scene_visit, name = "n_pos2")
+  cx <- skill_rates %>% filter(scene == "ComplexScene") %>%
+    left_join(pos2, by = c("session_id", "scene_visit"))
+  stopifnot(nrow(cx) > 0, all(cx$skill_presses == cx$n_pos2))
+  stopifnot(!any(skill_rates$participant_id == "P114" & skill_rates$scene == "ComplexScene"))
+  stopifnot(any(cx$skill_presses < visits$confirm_count[match(paste(cx$session_id, "ComplexScene", cx$scene_visit),
+                                                                paste(visits$session_id, visits$scene, visits$scene_visit))]))
+  stopifnot(all(c("wait_after_done_s_MixedPickingScene") %in% names(wide)),
+            !"wait_after_done_s_ConceptScene" %in% names(wide))
 
   # 8d. Pauses: P102's pause spans Mixed visit 1 -> Basic visit 2: it counts in
   #     Mixed 1, its time is split (4.5 s + 7.25 s). P104 quits while paused:
