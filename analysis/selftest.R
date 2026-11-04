@@ -27,7 +27,8 @@ local({
   source("analysis/make_fake_data.R", local = TRUE)
   source("analysis/analyse.R", local = TRUE)
 
-  # 2. One row per real participant: P101-P115; the test ID P950 is dropped.
+  # 2. One row per study participant: P101-P115; the test ID P950 is dropped,
+  #    the pilot IDs P801-P803 are in their own set (8q).
   stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
@@ -410,6 +411,49 @@ local({
   # Decision 022: no pose/perf promise left in the Q4 output.
   stopifnot(any(grepl("decision 022", warn_lines)))
 
+  # 8q. Pilot set (decision 023, #75): P801 (EN), P802 (DE), P803 (EN, crash
+  #     + accepted resume) in research/pilot/ are analysed as their own set
+  #     into output_dir/pilot/, with every main output, and never mix with
+  #     the study set (logs and paper forms).
+  pilot_dir <- file.path(output_dir, "pilot")
+  pilot_files <- c(expected_files, "items.csv", "first_attempt_by_item.png", "process_by_position.csv",
+                   "time_by_phase.png", "wide_with_paper.csv", "ssq_pre_post.png", "tlx_vs_attempts.png")
+  missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
+  if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
+  stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
+  pilot_ids <- c("P801", "P802", "P803")
+  stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
+            identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
+  is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
+  # No pilot ID in any study table or file, no study ID in any pilot one.
+  for (tab in list(wide, visits, items, data_quality, presses, sessions)) stopifnot(!any(is_p8(tab$participant_id)))
+  for (tab in list(pilot_set$wide, pilot_set$visits, pilot_set$items, pilot_set$data_quality,
+                   pilot_set$presses, pilot_set$sessions)) stopifnot(all(is_p8(tab$participant_id)))
+  p_items <- read_csv(file.path(pilot_dir, "items.csv"), show_col_types = FALSE)
+  stopifnot(nrow(p_items) > 0, all(is_p8(p_items$participant_id)))
+  # Paper rows join the set of their ID: study wp keeps its 16 rows (8p), the
+  # pilot wp has exactly the three pilots, all joined.
+  p_wp <- read_csv(file.path(pilot_dir, "wide_with_paper.csv"), show_col_types = FALSE, guess_max = 1000)
+  stopifnot(identical(sort(p_wp$participant_id), pilot_ids), all(p_wp$paper_status == "joined"),
+            all(p_wp$has_log), !any(is_p8(wp$participant_id)))
+  # EN is expected for pilots: no language warning, language_not_de FALSE,
+  # languages recorded as logged.
+  p_warn <- readLines(file.path(pilot_dir, "warnings.txt"), encoding = "UTF-8")
+  stopifnot(!any(grepl("language '", p_warn)), !any(pilot_set$data_quality$language_not_de))
+  pq <- function(col, pid) pilot_set$data_quality[[col]][pilot_set$data_quality$participant_id == pid]
+  stopifnot(pq("languages", "P801") == "EN", pq("languages", "P802") == "DE", pq("languages", "P803") == "EN")
+  stopifnot(any(grepl("PILOT SET", p_warn)), !any(grepl("PILOT SET", warn_lines)))
+  # P803: crash, accepted resume, finished; the others one clean session.
+  pw8 <- function(col, pid) pilot_set$wide[[col]][pilot_set$wide$participant_id == pid]
+  stopifnot(isTRUE(pw8("multi_session", "P803")), isTRUE(pw8("resume_offered", "P803")),
+            isFALSE(pw8("resume_declined", "P803")), isTRUE(pw8("course_finished", "P803")),
+            isFALSE(pw8("multi_session", "P801")), isTRUE(pw8("course_finished", "P801")))
+  # Pilot seam checks as for the study (8b), no folder warnings on clean data.
+  stopifnot(!any(grepl("disagrees|differs", p_warn)),
+            !any(grepl("outside research/pilot|in research/pilot", c(p_warn, warn_lines))))
+  # The study report names the pilot IDs it left out.
+  stopifnot(any(grepl("^Pilot IDs .*P801, P802, P803", warn_lines)))
+
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.
   stopifnot(data_quality$duplicate_files[data_quality$participant_id == "P101"] == 2)
@@ -476,6 +520,8 @@ local({
   writeLines("stale", file.path(output_dir, "wide_with_paper.csv"))
   source("analysis/analyse.R", local = TRUE)
   stopifnot(!file.exists(file.path(output_dir, "wide_with_paper.csv")))
+  # No pilot logs in this copy: no pilot set, and no old pilot folder left.
+  stopifnot(is.null(pilot_set), !dir.exists(file.path(output_dir, "pilot")))
   stopifnot(is.na(rw("resume_offered", "P106")), is.na(rw("resume_declined", "P106")),
             is.na(rw("ended_session_override", "P106")))
   stopifnot(isFALSE(rw("resume_offered", "P109")), isFALSE(rw("resume_declined", "P109")),
@@ -486,6 +532,31 @@ local({
   stopifnot(!any(grepl("inconsistent", old_warn)))
   stopifnot(any(grepl("P101 WelcomeScene visit 1 grabs events=NA summary=0", old_warn, fixed = TRUE)))
   unlink(c(old_logs, output_dir), recursive = TRUE)
+
+  # 8r. Wrong folders (decision 023), on a temp copy: P801's files moved to
+  #     research/, P101's into research/pilot/. The ID decides the set (no
+  #     data lost), and each move is warned in the set that keeps the data.
+  moved <- file.path(tempdir(), "selftest_moved")
+  unlink(moved, recursive = TRUE)
+  dir.create(moved)
+  file.copy("analysis/data/fake/research", moved, recursive = TRUE)
+  mv <- function(pattern, from, to) {
+    f <- list.files(file.path(moved, "research", from), pattern = pattern, full.names = TRUE)
+    stopifnot(length(f) == 2, all(file.rename(f, file.path(moved, "research", to, basename(f)))))
+  }
+  mv("^P801_", "pilot", ".")
+  mv("^P101_", ".", "pilot")
+  data_dir <- moved
+  output_dir <- file.path(tempdir(), "selftest_moved_out")
+  source("analysis/analyse.R", local = TRUE)
+  s_warn <- readLines(file.path(output_dir, "warnings.txt"), encoding = "UTF-8")
+  p_warn <- readLines(file.path(output_dir, "pilot", "warnings.txt"), encoding = "UTF-8")
+  stopifnot(any(grepl("study ID in research/pilot/", s_warn) & grepl("P101", s_warn)),
+            any(grepl("pilot ID outside research/pilot/", p_warn) & grepl("P801", p_warn)),
+            !any(grepl("pilot ID outside", s_warn)), !any(grepl("study ID in research/pilot", p_warn)))
+  stopifnot("P101" %in% wide$participant_id, !"P801" %in% wide$participant_id,
+            "P801" %in% pilot_set$wide$participant_id, !"P101" %in% pilot_set$wide$participant_id)
+  unlink(c(moved, output_dir), recursive = TRUE)
 
   # 9. Without allow_fake, analyse.R must refuse the fake folder.
   # (parent = globalenv(), so it can't see allow_fake from this environment)

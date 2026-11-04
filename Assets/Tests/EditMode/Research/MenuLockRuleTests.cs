@@ -25,6 +25,13 @@ namespace XRPick.Research.Tests
             Assert.IsFalse(MenuLockRule.IsOpen("P017", current, target, false));
         }
 
+        [Test]
+        public void PilotId_IsLockedLikeAStudyId()
+        {
+            Assert.IsFalse(MenuLockRule.IsOpen("P801", 2, 3, false));
+            Assert.IsTrue(MenuLockRule.IsOpen("P801", 2, 3, true));
+        }
+
         [TestCase(null)]
         [TestCase("P000")]
         [TestCase("P950")]

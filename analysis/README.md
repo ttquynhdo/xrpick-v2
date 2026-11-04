@@ -14,7 +14,8 @@ change only with headset removals, pauses, an early end and active time.
 
 | File | What it is |
 |---|---|
-| `analyse.R` | The analysis. One script, run top to bottom, `tidyverse` + `jsonlite` only. |
+| `analyse.R` | The script you run. It runs `analyse_set.R` once for the study set and once for the pilot set (see *Participant sets*). |
+| `analyse_set.R` | The analysis of one participant set, run top to bottom, `tidyverse` + `jsonlite` only. Not run directly. |
 | `selftest.R` | Makes fake data and checks `analyse.R` against every edge case. Run after any change. |
 | `make_fake_data.R` | Writes fake logs in exactly the logger's format (base R). The contract between C# and R. |
 | `scenes.csv` | `scene, build_order`: scene order in every chart (survives scene renames). |
@@ -23,11 +24,11 @@ change only with headset removals, pauses, an early end and active time.
 | `paper_forms_template.csv` | Empty paper-form table (header row only) to copy for each wave; see *Paper forms*. |
 | `item_skills.csv` | `scene, item, skill, scaffolded`: the skill of each quiz question (`question_id`) and order position (`position_<n>`), and which items are scaffolded (Complex `position_1`). A position with an empty skill tests every skill of its scene. |
 | `data/` | Copied logs. **Git-ignored, never commit.** |
-| `output/` | Charts and tables. Git-ignored. |
+| `output/` | Charts and tables of the study set; `output/pilot/` the same for the pilot set. Git-ignored. |
 
 The study lead may edit the four config CSVs (`scenes`, `skill_map`, `scene_skills`,
 `item_skills`) without touching code. The header of `paper_forms_template.csv` is a
-contract with `analyse.R` (the script stops if they differ): change both together.
+contract with `analyse_set.R` (the script stops if they differ): change both together.
 
 ## Setup (once)
 
@@ -42,9 +43,32 @@ Copy the headset folder `/sdcard/Android/data/com.xrise.xpick/files/research/`
 `analysis/data/<wave>/`, e.g. `analysis/data/wave1/research/`. Keep the file
 names as they are (`P101_<session_id>_events.jsonl`, `..._summary.csv`).
 Test IDs (`P000`, `P900`–`P999`) are dropped wherever they are, in
-`practice/` or by mistake in `research/` (the latter with a warning). A real
-ID (`P001`–`P899`) found under `practice/` is **kept**, with a warning, so no
+`practice/` or by mistake in `research/` (the latter with a warning). A study
+or pilot ID found under `practice/` is **kept**, with a warning, so no
 participant's data is lost silently: check it in `warnings.txt`.
+
+## Participant sets (decision 023, backlog #75)
+
+| IDs | Set | Folder on the headset | Language | Outputs |
+|---|---|---|---|---|
+| `P001`–`P799` | study | `research/` | always `DE` (else warned) | `output_dir` (`analysis/output/`) |
+| `P800`–`P899` | pilot | `research/pilot/` | the one chosen on the keypad (`EN` or `DE`), no warning | `output_dir/pilot/` (`analysis/output/pilot/`) |
+| `P000`, `P900`–`P999` | test | `research/practice/` | any | none (dropped) |
+
+`analyse.R` runs the same analysis on each set and writes **all** outputs (charts,
+`items.csv`, `wide.csv`, `wide_with_paper.csv`, `data_quality.*`, `warnings.txt`)
+into the set's folder. The ID range decides the set, the folder only checks it:
+a pilot ID outside `research/pilot/` stays in the pilot set and is warned in
+`output/pilot/warnings.txt` ("pilot ID outside research/pilot/"); a study ID inside
+`research/pilot/` stays in the study set and is warned in `output/warnings.txt`
+("study ID in research/pilot/"). Paper-form rows join the set of their
+`participant_id` (one `paper_forms.csv` for both is fine). The study
+`warnings.txt` lists the pilot IDs it left out; the pilot `warnings.txt` ends with
+a "PILOT SET" validity line. Without pilot logs, `output/pilot/` is deleted so no
+old pilot result looks current. After `source("analysis/analyse.R")` the study
+tables are in the workspace (`wide`, `visits`, …), the pilot tables in
+`pilot_set` (e.g. `pilot_set$wide`). Pilot results are a try-out of the course
+and the analysis, **never** study results: never pool the two sets.
 
 ## Paper forms (SSQ, NASA-TLX, Abbruchgrund)
 
@@ -135,7 +159,7 @@ output_dir <- "analysis/output"
 source("analysis/analyse.R")
 ```
 
-`analyse.R` prints `data_dir` and `output_dir` first; check them. It refuses
+`analyse.R` prints `set`, `data_dir` and `output_dir` for each set; check them. It refuses
 any `data_dir` whose path contains `fake` unless `allow_fake <- TRUE` is set
 (only `selftest.R` does that). `selftest.R` runs in its own environment and
 writes to `analysis/output/selftest/`, so it leaves no settings behind in
@@ -248,7 +272,7 @@ counts) is reported as a mismatch.
 
 ## If the logger format changes
 
-Change `make_fake_data.R` and `analyse.R` in the same commit, run
+Change `make_fake_data.R` and `analyse_set.R` (the analysis) in the same commit, run
 `selftest.R`, then run `analyse.R` on one real Play-mode log. A renamed or
 removed field bumps `schema_version`.
 
@@ -273,7 +297,10 @@ removed field bumps `schema_version`.
    `analysis/data/wave1/paper_forms.csv` (xem mục *Paper forms*; ô trống = chưa trả lời,
    không gõ 0). Script ghi thêm `wide_with_paper.csv`, `ssq_pre_post.png`,
    `tlx_vs_attempts.png`. Không có file phiếu thì script vẫn chạy bình thường.
-6. Kết quả nằm trong `analysis/output/`. Đọc `warnings.txt` trước, rồi
+6. Kết quả của nhóm nghiên cứu (`P001`–`P799`) nằm trong `analysis/output/`; kết quả
+   của nhóm pilot (`P800`–`P899`, log trong `research/pilot/`) nằm riêng trong
+   `analysis/output/pilot/`, cùng các file như trên. Không bao giờ gộp hai nhóm.
+   Đọc `warnings.txt` trước, rồi
    `data_quality.png` (ai có dữ liệu cần kiểm tra lại) và dòng "Paper forms to check"
    (phiếu giấy nhập sai hoặc thiếu), sau đó mới xem các biểu đồ.
    Biểu đồ chính cho câu hỏi 1 là `first_attempt_by_item.png` (lần thử đầu tiên ở

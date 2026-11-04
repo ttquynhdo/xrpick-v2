@@ -12,7 +12,6 @@ using System.Text;
 public sealed class SessionFiles
 {
     private const string EventsSuffix = "_events.jsonl";
-    private const string PracticeFolder = "practice";
 
     private static readonly UTF8Encoding Utf8NoBom = new UTF8Encoding(false);
 
@@ -117,7 +116,12 @@ public sealed class SessionFiles
     public static int MarkCrashedSessions(string researchRoot, string recoveredBySessionId, string utcNow)
     {
         int marked = 0;
-        foreach (var dir in new[] { researchRoot, Path.Combine(researchRoot, PracticeFolder) })
+        foreach (var dir in new[]
+                 {
+                     researchRoot,
+                     Path.Combine(researchRoot, ResearchIds.PracticeFolder),
+                     Path.Combine(researchRoot, ResearchIds.PilotFolder),
+                 })
         {
             foreach (var path in ListEventFiles(dir, "*" + EventsSuffix))
             {

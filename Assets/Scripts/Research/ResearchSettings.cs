@@ -13,7 +13,7 @@ public sealed class ResearchSettings : ScriptableObject
     [Tooltip("Start a session automatically at app start (until #27 adds the keypad).")]
     [SerializeField] private bool autoStart = true;
 
-    [Tooltip("Participant ID for the automatic start: P + 3 digits. P000 and P900-P999 log to research/practice/.")]
+    [Tooltip("Participant ID for the automatic start: P + 3 digits. P000 and P900-P999 log to research/practice/, P800-P899 to research/pilot/.")]
     [SerializeField] private string autoStartParticipantId = "P000";
 
     [Header("Developer")]

@@ -1365,6 +1365,20 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Test report:** docs/test-reports/bl31.md
 - **Status:** verified-mcp (5/7 ✅, chờ bạn thử M1 chép log 2 phiên theo hướng dẫn, M2 nhập 2 phiếu và chạy `analyse.R`)
 
+### #75 [Feature] Dải mã pilot P800–P899: chọn được ngôn ngữ, phân tích riêng
+- **Type:** feature
+- **Scene(s):** WelcomeScene (bàn phím); mọi scene (khoá Menu)
+- **Files:** `Assets/Scripts/Research/ResearchIds.cs`, `SessionFiles.cs`, `ResearchSettings.cs` (tooltip), test `ResearchIdsTests`, `MenuLockRuleTests`, `SessionFilesTests`; `analysis/` (data-analyst); `docs/research-logging-spec.md`, `docs/research-data-guide.md`
+- **Problem:** Pilot tiếng Anh (người dùng, bạn của người dùng ngày 2026-11-06) phải được phân tích để làm cơ sở cho round 3. Trước đó tiếng Anh chỉ chạy được với mã thử, mà mã thử thì bị R loại và mở hết Menu.
+- **Done when:** Mã `P800`–`P899` giữ ngôn ngữ đã chọn, ghi vào `research/pilot/`, có khoá Menu, cảnh báo „đã có phiên kết thúc“ và học tiếp như mã thật. Mã `P001`–`P799` vẫn luôn là `DE`. `analyse.R` ra một bộ kết quả pilot riêng trong `output/pilot/`, không có mã pilot trong kết quả đợt thật và ngược lại, và không cảnh báo ngôn ngữ cho pilot EN. `selftest.R` xanh.
+- **Decision:** docs/decisions/023-pilot-id-range.md
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** nhanh (một phiên pilot EN trong buổi test)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl75.md
+- **Status:** verified-mcp (12/13 ✅, chờ test tay P1: một phiên pilot `P801` English trên Quest, rồi chạy `analyse.R` trên log đó)
+
 ### #43 [Feature] Bài kiểm tra ngắn trong VR ở đầu và cuối khóa
 - **Type:** feature
 - **Scene(s):** WelcomeScene (đầu khóa), ComplexScene hoặc một scene cuối mới (cuối khóa)

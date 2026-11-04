@@ -21,7 +21,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -50,10 +50,13 @@ analysis_folder <- if (file.exists("skill_map.csv")) "." else "analysis"
 fake_root <- file.path(analysis_folder, "data", "fake")
 fake_research <- file.path(fake_root, "research")
 fake_practice <- file.path(fake_research, "practice")
+# Pilot IDs P800-P899 log to research/pilot/ (decision 023, ResearchIds.FolderFor).
+fake_pilot <- file.path(fake_research, "pilot")
 
 # Start clean so a rerun never mixes old and new files.
 unlink(fake_root, recursive = TRUE)
 dir.create(fake_practice, recursive = TRUE, showWarnings = FALSE)
+dir.create(fake_pilot, recursive = TRUE, showWarnings = FALSE)
 
 # ---- 2. JSON writing (same text the C# logger writes) -----------------------
 
@@ -333,7 +336,7 @@ active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s - open_pause_part
 # ended_warning: TRUE when the facilitator started despite the "already
 # finished" warning ("Trotzdem starten"); the logger writes false otherwise.
 # language: header language (#11), "DE" or "EN", fixed for the session. The
-# keypad forces "DE" for research IDs; test IDs keep the chosen one. NULL =
+# keypad forces "DE" for study IDs; test and pilot IDs keep the chosen one. NULL =
 # a log written before #11 (header language null).
 # schema: 2 (current); 1 only for the legacy P115 file (section 7b).
 # interaction: FALSE = a build before #29 (no "interaction" in event_groups,
@@ -349,6 +352,9 @@ start_session <- function(person, build, start_utc, start_mode = "manual",
   s$schema <- schema
   s$interaction <- schema == 2 && interaction
   s$language <- language
+  # Pilot IDs log to research/pilot/; everything else here to research/ (P950,
+  # a test ID, sits in research/ on purpose, see section 7).
+  s$folder <- if (grepl("^P8[0-9]{2}$", s$pid)) fake_pilot else fake_research
   s$start <- to_epoch(start_utc)
   s$t <- 0
   s$last_t <- 0
@@ -1325,6 +1331,38 @@ for (scene in c("ConceptScene", "BasicPickingScene", "MixedPickingScene")) {
 go_to_scene(s, "ComplexScene"); run_picking(s, p114, crash_after_position = 1)
 crash_session(s)
 
+# ---- 7d. Pilot participants (P800-P899, decision 023) ----------------------
+# They run like study participants (Menu lock, warning, resume) but keep the
+# language chosen on the keypad and log to research/pilot/. analyse.R must
+# analyse them as their own set (output/pilot/), without a language warning,
+# and never mix them into the study set. They ran on a second headset, so
+# P114's crashed file (above) gets no crash_recovered line from them.
+device$open <- list()
+
+# P801: the English pilot (developer), normal course.
+run_full_course(new_person("P801"), "aaa1111", "2026-11-06T08:00:00Z", language = "EN")
+
+# P802: the German expert's last run with a pilot ID, in DE.
+run_full_course(new_person("P802"), "aaa1111", "2026-11-06T09:30:00Z", language = "DE")
+
+# P803: English pilot (friend) crashes in BasicPickingScene after one wrong
+# confirm, the keypad offers BasicPickingScene and the resume is accepted.
+p803 <- new_person("P803")
+s <- start_session(p803, "aaa1111", "2026-11-06T11:00:00Z", language = "EN")
+run_welcome(s)
+go_to_scene(s, "ConceptScene"); run_concept(s, p803)
+go_to_scene(s, "BasicPickingScene"); run_picking(s, p803, max_confirms = 1, give_up = TRUE)
+crash_session(s)
+restart_utc <- format(as.POSIXct(round(s$start + s$t + 5 * 60), origin = "1970-01-01", tz = "UTC"),
+                      "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+s <- start_session(p803, "aaa1111", restart_utc, language = "EN",
+                   resume_scene = "BasicPickingScene", resume_accepted = TRUE)
+run_welcome(s, practice = FALSE)
+go_to_scene(s, "BasicPickingScene", via = "resume"); run_picking(s, p803)
+go_to_scene(s, "MixedPickingScene"); run_picking(s, p803)
+go_to_scene(s, "ComplexScene"); run_picking(s, p803, end_on_correct = TRUE)
+end_session(s, "completed")
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1335,7 +1373,7 @@ write_lf <- function(lines, path) {
 }
 
 for (s in device$sessions) {
-  stem <- file.path(fake_research, paste0(s$pid, "_", s$sid))
+  stem <- file.path(s$folder, paste0(s$pid, "_", s$sid))
   write_lf(s$lines, paste0(stem, "_events.jsonl"))
   # The logger creates the summary file with its first row (first scene_exit).
   # The legacy schema-1 file (P115) gets the old column header.
@@ -1377,6 +1415,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
+#   P801-P803  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -1433,7 +1472,10 @@ paper_rows <- list(
   paper_row("P113", id_written = "P13"),
   paper_row("P115"),
   paper_row("P120", end_at = as.POSIXct("2026-11-06 09:00:00", tz = "UTC")),
-  paper_row("P950"))
+  paper_row("P950"),
+  paper_row("P801"),
+  paper_row("P802"),
+  paper_row("P803"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

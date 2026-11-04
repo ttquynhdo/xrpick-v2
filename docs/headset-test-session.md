@@ -1,10 +1,20 @@
-# Buổi test trên kính: mọi case đang chờ
+# Buổi test trên kính: pilot EN và mọi case đang chờ
 
-Danh sách này gom mọi case `Bạn ⏳` trong `docs/test-reports/` (ngày 2026-11-04, `main` 590f959) để làm hết trong **một buổi trên Quest**. Thứ tự đi theo bài học, nên mỗi scene chỉ cần vào một lần. Trong ngoặc là mục backlog và mã case.
+Danh sách này gom mọi case `Bạn ⏳` trong `docs/test-reports/` (2026-11-04) để làm trong **một buổi trên Quest**, kèm phiên pilot tiếng Anh của bạn (decision 023). Trong ngoặc là mục backlog và mã case.
 
-Cần: Quest 3, máy tính có MQDH/`adb` (xem `docs/research-data-guide.md` bước 0), khoảng 60–90 phút. Ghi ✅ / ❌ vào từng ô. Với ❌, ghi một câu là thấy gì; nếu được thì chụp ảnh trên kính.
+Buổi test gồm ba lượt, mỗi lượt có một mục đích riêng:
 
-Trong cả buổi, để ý độ mượt theo decision 022: giật khi cầm/thả, khi bấm nút đỏ, khi thùng chạy hay khi đổi scene thì ghi lại đúng lúc nào.
+| Lượt | Mã | Ngôn ngữ | Mục đích | Dữ liệu |
+|---|---|---|---|---|
+| 1 | `P801` (mã pilot) | English | học như một người học thật, từ đầu đến cuối | **được phân tích** (pilot) |
+| 2 | `P901` (mã thử) | Deutsch | kiểm luồng, chữ tiếng Đức có chồng/tràn không, các thao tác cố ý | bị loại |
+| 3 | `P899` (mã pilot, chỉ để thử) | Deutsch | crash rồi học tiếp, cảnh báo „đã có phiên kết thúc“ | **xoá sau buổi** |
+
+Thao tác cố ý (bấm sai, cầm kiện trong lúc thùng chạy, …) chỉ làm ở lượt 2, để lượt 1 giữ đúng như một người học thật. Thứ 6, bạn của bạn dùng `P802` với English, làm như lượt 1.
+
+Cần: Quest 3, máy tính có MQDH/`adb` (xem `docs/research-data-guide.md` bước 0), khoảng 90–120 phút. Ghi ✅ / ❌ vào từng ô. Với ❌, ghi một câu là thấy gì; nếu được thì chụp ảnh trên kính.
+
+Cả ba lượt đều để ý độ mượt theo decision 022: giật khi cầm/thả, khi bấm nút đỏ, khi thùng chạy hay khi đổi scene thì ghi lại đúng lúc nào.
 
 ---
 
@@ -12,15 +22,29 @@ Trong cả buổi, để ý độ mượt theo decision 022: giật khi cầm/th
 
 - [ ] Build app lên Quest. Ghi thời gian build: ____ phút (#11 L9)
 - [ ] Mở app: WelcomeScene hiện bàn phím nhập mã, không tự chạy phiên. Frame đầu không nhấp nháy (#11 L9)
+- [ ] Xoá log cũ trên kính (`research-data-guide.md` mục 1, bước 1)
+- [ ] Điền SSQ trước cho chính bạn (pilot dùng phiếu như người thật)
 
-## 1. Lượt 1 – mã thử `P901` (Menu mở hết)
+## 1. Lượt 1 – pilot `P801`, English
 
-### WelcomeScene
-- [ ] Trước khi nhập mã: chạm `English` → scene tải lại, chữ tiếng Anh. Chạm `Deutsch` → chữ Đức lại (#11 L10)
-- [ ] Nhập `P901`, bắt đầu
-- [ ] Cầm thùng bằng tay thật → ✓ hiện ở thẻ 1. Chạm nút đỏ bằng ngón tay → nghe tiếng bấm, ✓ ở thẻ 2, mục „2. Grundlagen“ trong Menu sáng xanh (#39 H1, #28 T1)
-- [ ] Nút đỏ ở cùng chỗ như các bài sau, bấm được bằng tay (#69 R5)
-- [ ] Đọc Menu từ chỗ đứng, chạm một mục để sang bài (#64 F6)
+Làm như một người học thật, không cố ý thử lỗi.
+
+- [ ] Trước khi gõ mã: chạm `English` → màn hình tải lại, chữ tiếng Anh. Chạm `Deutsch` → chữ Đức lại, rồi `English` lần nữa (#11 L10)
+- [ ] Gõ `P801`, xác nhận. App vẫn ở tiếng Anh, không có nhãn „Testmodus“ (#75)
+- [ ] Welcome: cầm thùng bằng tay thật → ✓ ở thẻ 1. Chạm nút đỏ bằng ngón tay → nghe tiếng bấm, ✓ ở thẻ 2, mục bài 2 trong Menu sáng xanh (#39 H1, #28 T1). Nút đỏ bấm được bằng tay (#69 R5)
+- [ ] Chạm thử một mục Menu mờ trước khi xong bài → không có gì xảy ra. Xong bài → mục kế sáng, chạm vào để sang bài (#42 H1, #29 H2, #64 F6)
+- [ ] Học hết Concept, Basic, Mixed, Complex theo hướng dẫn trên thẻ, tới màn hình chúc mừng có `Code: P801`
+- [ ] Trong lúc học, ghi những chỗ bạn thấy khó hiểu, khó với tới hay khó đọc (để làm round 3)
+- [ ] Điền SSQ sau và NASA-TLX
+
+## 2. Lượt 2 – mã thử `P901`, Deutsch
+
+Menu mở hết, nên đi thẳng tới scene cần thử. Ở mỗi scene, chú ý chữ tiếng Đức: không chồng lên nhau, không tràn ra khỏi thẻ hay bảng, không bị cắt.
+
+- [ ] Trước khi gõ mã: chọn `Deutsch`. Gõ `P901` → có nhãn „Testmodus“
+
+### WelcomeScene và Menu
+- [ ] Đọc Menu từ chỗ đứng: tên bài in đậm có „» “ nằm trên một dòng (#64 F6)
 
 ### ConceptScene
 - [ ] Đọc nhãn carton và túi từ chỗ đứng, không cúi (#36 H1)
@@ -30,8 +54,7 @@ Trong cả buổi, để ý độ mượt theo decision 022: giật khi cầm/th
 - [ ] Hover/nhấn nút thì thấy đổi màu, có tiếng (#52 H2)
 - [ ] Cầm lần lượt 3 kiện rồi đặt lại, không bấm nhầm „Weiter“, đáp án hay Menu (#52 H3)
 - [ ] Đi hết tour. Đọc bảng EKZ (bước 9) và bảng 10 bước (bước 11) từ chỗ đứng: đọc được mọi dòng, không phải quay người quá nhiều (#57 E8b, #73 M1)
-- [ ] Sau bước 11, poke A/B/C thật: chấm ngay, nút không bị kẹt ở dáng đang chọn (#73 M3)
-- [ ] Nếu có người chưa biết app: để họ tự trả lời 4 câu, xem họ có chạm nhầm không (#73 M2)
+- [ ] Sau bước 11, poke A/B/C thật: chấm ngay, nút không bị kẹt ở dáng đang chọn (#73 M3, #73 M2)
 
 ### BasicPickingScene
 - [ ] Nhìn bàn sau và màn hình từ chỗ đứng: thấy hợp lý (#51 H1)
@@ -60,23 +83,20 @@ Trong cả buổi, để ý độ mượt theo decision 022: giật khi cầm/th
 - [ ] Lấy từng vòng RING D bằng tay: vòng không co nhỏ, mỗi vòng Ist +1 / −1. Bỏ một vòng vào thùng đơn rồi lấy ra (#19 C6, C7, B1)
 - [ ] Bấm sai một lần, đúng một lần. Đọc thẻ kết quả (#59 H1)
 - [ ] Thùng kho 2 chạy vào bình thường, không nhảy (vì vào từ Menu ở Mixed) (#71 H4)
-- [ ] Làm hết đơn → màn hình chúc mừng, hiện `Code: P901`
+- [ ] Làm hết đơn → màn hình chúc mừng, chữ tổng kết tiếng Đức không tràn
 
-## 2. Lượt 2 – mã nghiên cứu `P899` (Menu khoá)
+## 3. Lượt 3 – `P899`, Deutsch (crash và học tiếp)
 
-`P899` là mã thật, nên **xoá file của nó sau buổi** (mục 3).
-
-- [ ] Vào app lại, nhập `P899`. Trong Welcome, chạm mục Menu mờ → không có gì xảy ra (#42 H1, #29 H2)
-- [ ] Làm xong Welcome → mục kế sáng lên, chạm vào → sang Concept (#42 H1)
-- [ ] Chọn tiếp tới Mixed. Giữa bài, tắt hẳn app (giả crash)
-- [ ] Mở lại, nhập `P899`, chọn `Fortsetzen` → vào Mixed từ đầu, Menu khoá cho tới khi xong bài (#42 H2, K4)
+- [ ] Gõ `P899`, đi tới Mixed theo khoá Menu. Giữa bài, tắt hẳn app (giả crash)
+- [ ] Mở lại, gõ `P899`, chọn `Fortsetzen` → vào Mixed từ đầu, Menu khoá cho tới khi xong bài (#42 H2, K4)
 - [ ] Kết thúc bằng cách giữ đĩa tối 3 s → `Beenden`
+- [ ] Gõ `P899` lần nữa → hiện cảnh báo „bereits eine abgeschlossene Sitzung“ → `Korrigieren`
 
-## 3. Sau buổi – trên máy tính
+## 4. Sau buổi – trên máy tính
 
-- [ ] Theo `docs/research-data-guide.md`, chép log 2 phiên thử về máy, kiểm đủ file. Ghi lại chỗ nào khó hiểu (#31 M1)
-- [ ] Xoá trên kính các file của `P899` (`research/`) và của `P901` (`research/practice/`)
-- [ ] Gửi Claude thư mục log đã chép. Claude đọc để kiểm #28 T2 (một `confirm_pressed`), #29 H1 (`grab_*`, `container_enter/exit` từ tay thật) và #29 H2 (`menu_select` `blocked: true`)
-- [ ] Nhập 2 phiếu thử vào `analysis/paper_forms.csv` bằng Excel. Mã thử bị loại khỏi phân tích, nên nhờ Claude đổi mã khi test, hoặc làm với log thật đầu tiên (#31 M2)
+- [ ] Theo `docs/research-data-guide.md`, chép log về máy, kiểm đủ file: `P801` trong `research/pilot/`, `P901` trong `research/practice/`. Ghi lại chỗ nào khó hiểu (#31 M1)
+- [ ] Xoá các file của `P899` (trong `research/pilot/`) **ở cả máy tính lẫn kính**, để chúng không vào kết quả pilot. Sau đó xoá log trên kính
+- [ ] Nhập phiếu của `P801` vào `paper_forms.csv` bằng Excel (#31 M2)
+- [ ] Gửi Claude thư mục log đã chép. Claude chạy `analyse.R` và gửi bạn biểu đồ pilot (#75), đồng thời kiểm từ log #28 T2, #29 H1, #29 H2
 
 Gửi lại danh sách này đã đánh dấu. Claude sẽ cập nhật các test report và backlog: case nào ✅ hết thì mục đó thành `done`.

@@ -160,6 +160,18 @@ namespace XRPick.Research.Tests
         }
 
         [Test]
+        public void PilotId_EndedSessionCrashAndResumeUsePilotFolder()
+        {
+            WriteEvents(root, "P801", "done", "header", "session_end");
+            WriteEvents(root, "P802", "old", "header", "scene_enter:MixedPickingScene");
+            Assert.IsTrue(File.Exists(Path.Combine(root, "pilot", "P801_done_events.jsonl")));
+            Assert.IsTrue(SessionFiles.HasEndedSession(root, "P801", "current"));
+            Assert.AreEqual(1, SessionFiles.MarkCrashedSessions(root, "new", "2026-11-01T10:00:00.000Z"));
+            Assert.IsTrue(SessionFiles.TryFindResumePoint(root, "P802", "current", out var scene));
+            Assert.AreEqual("MixedPickingScene", scene);
+        }
+
+        [Test]
         public void TruncatedLastLine_CountsAsCrash_WithoutThrowing()
         {
             WriteEvents(root, "P103", "cut", "header", "scene_enter:BasicPickingScene");

@@ -17,8 +17,9 @@ Không cài thêm gì lên Quest (decision 022). Trên máy tính chỉ cần c�
 - Kiểm tra một lần: cắm kính vào máy bằng cáp USB-C, đeo kính và chọn **Allow** (Cho phép) khi kính hỏi cho phép gỡ lỗi USB. Trong MQDH, kính phải hiện trong *Device Manager*.
 
 **Giấy tờ:**
-- Mỗi người học có một bộ phiếu đã in sẵn **mã người học** (`P001`–`P899`): phiếu đồng ý, SSQ trước, SSQ sau, NASA-TLX, ô *Abbruchgrund* (lý do dừng).
+- Mỗi người học có một bộ phiếu đã in sẵn **mã người học**: `P001`–`P799` cho đợt nghiên cứu thật, `P800`–`P899` cho pilot (xem dưới). Bộ phiếu gồm: phiếu đồng ý, SSQ trước, SSQ sau, NASA-TLX, ô *Abbruchgrund* (lý do dừng).
 - Danh sách tên ↔ mã chỉ nằm trên giấy, ở trưởng nhóm nghiên cứu. Không viết tên lên phiếu khảo sát và không gõ tên vào máy.
+- **Mã pilot** (`P800`–`P899`, decision 023): chạy giống hệt người học thật (khoá Menu, học tiếp, cảnh báo „đã có phiên kết thúc“), nhưng **giữ ngôn ngữ đã chọn** (English hoặc Deutsch). Log nằm trong thư mục con `pilot/` và được phân tích riêng, không bao giờ trộn với đợt thật.
 - Mã thử (`P000`, `P900`–`P999`) chỉ dùng để thử máy: app hiện „Testmodus – wird nicht ausgewertet“ (chế độ thử, không phân tích), và phân tích tự loại chúng.
 
 ## 1. Trước mỗi đợt thu (một lần cho cả đợt)
@@ -44,7 +45,9 @@ Không cài thêm gì lên Quest (decision 022). Trên máy tính chỉ cần c�
 ## 3. Bắt đầu phiên trên kính
 
 1. Mở app `xpick`. Màn hình đầu (WelcomeScene) hiện bàn phím „Code eingeben“ (Nhập mã).
-2. Ngôn ngữ: với mã thật, app luôn chạy tiếng Đức, không cần chọn.
+2. Ngôn ngữ:
+   - Mã thật (`P001`–`P799`): app luôn chạy tiếng Đức, không cần chọn. Chọn English rồi gõ mã thật thì app tự đổi về tiếng Đức.
+   - Mã pilot (`P800`–`P899`): **chọn ngôn ngữ trước khi gõ mã**, bằng nút `Deutsch` / `English` dưới bàn phím. Chạm nút sẽ tải lại màn hình. Sau khi phiên bắt đầu thì không đổi được nữa.
 3. Gõ đúng mã trên phiếu, ví dụ `P017`, rồi chạm **OK**.
 4. App hỏi „Ist der Code P017 richtig?“ (Mã P017 đúng không?):
    - **Ja** (Có): bắt đầu khoá học.
@@ -85,9 +88,9 @@ Không cài thêm gì lên Quest (decision 022). Trên máy tính chỉ cần c�
    adb pull /sdcard/Android/data/com.xrise.xpick/files/research .
    ```
 
-   Lệnh này chép cả thư mục `research/` (và thư mục con `practice/` của mã thử) về máy. Nếu MQDH của bạn có trình quản lý file cho kính, có thể kéo thư mục đó về thay cho lệnh trên (tên menu có thể khác tuỳ phiên bản MQDH). Lệnh `adb pull` luôn dùng được.
+   Lệnh này chép cả thư mục `research/` (cùng thư mục con `pilot/` của mã pilot và `practice/` của mã thử) về máy. Nếu MQDH của bạn có trình quản lý file cho kính, có thể kéo thư mục đó về thay cho lệnh trên (tên menu có thể khác tuỳ phiên bản MQDH). Lệnh `adb pull` luôn dùng được.
 3. **Kiểm tra trước khi xoá:**
-   - Trong `research/`, mỗi người học hôm nay có ít nhất một file `P017_<chuỗi dài>_events.jsonl`, kích thước khác 0 KB. Thường có kèm `P017_<chuỗi dài>_summary.csv`; sau khi kính tắt đột ngột có thể thiếu file summary, điều đó không sao. Một người có thể có nhiều cặp (ví dụ khi phiên bị ngắt rồi học tiếp).
+   - Trong `research/` (với mã pilot: `research/pilot/`), mỗi người học hôm nay có ít nhất một file `P017_<chuỗi dài>_events.jsonl`, kích thước khác 0 KB. Thường có kèm `P017_<chuỗi dài>_summary.csv`; sau khi kính tắt đột ngột có thể thiếu file summary, điều đó không sao. Một người có thể có nhiều cặp (ví dụ khi phiên bị ngắt rồi học tiếp).
    - Số file và kích thước trên máy tính khớp với trên kính. Xem danh sách trên kính bằng:
 
      ```bash
@@ -122,7 +125,7 @@ Không cài thêm gì lên Quest (decision 022). Trên máy tính chỉ cần c�
 
 ## 8. Chạy phân tích
 
-Làm theo `analysis/README.md`. Kết quả nằm trong `analysis/output/`. Đọc `warnings.txt` trước, vì nó ghi mọi chỗ dữ liệu có vấn đề.
+Làm theo `analysis/README.md`. Kết quả của đợt thật nằm trong `analysis/output/`, kết quả pilot trong `analysis/output/pilot/` (cùng các file và biểu đồ). Đọc `warnings.txt` trước, vì nó ghi mọi chỗ dữ liệu có vấn đề. Phiếu giấy của mã pilot nhập chung vào `paper_forms.csv`; phân tích tự đưa chúng vào kết quả pilot.
 
 - `wide.csv`: mỗi người một dòng, chỉ dữ liệu từ log.
 - `wide_with_paper.csv`: như trên, nối thêm điểm SSQ (trước, sau, thay đổi) và NASA-TLX. File này chứa **dữ liệu sức khoẻ**: chỉ lưu ở nơi lưu trữ của nhóm nghiên cứu, không gửi đi, không đưa lên git.
