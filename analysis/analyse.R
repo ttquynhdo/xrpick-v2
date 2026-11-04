@@ -737,17 +737,26 @@ rated_counts <- v2_events %>%
 ignored_counts <- v2_events %>% filter(event == "confirm_ignored") %>%
   count(session_id, scene, scene_visit, name = "ev_confirm_ignored")
 
-# Station rides (decision 019): time the trainee waits while a storage box or
-# the order box rides. Each ride = station_move_start -> station_move_arrived
-# of the same (what, position). Rides overlap (old box leaves while the new
-# one arrives), so the wait is the union of the ride intervals, not their
-# sum, minus paused time. A ride with no arrival (crash) ends at the visit end.
-# The rides of the last position (storage_out + order_box) start at
-# OrderCompleted, i.e. after task_completed; Basic/Mixed then linger until the
-# scene is left while Complex ends the session at once. So wait_s counts only
-# ride time BEFORE the visit's task_completed (the whole visit when there is
-# none), comparable across scenes; the part after it is wait_after_done_s.
+# Station rides (decision 019, spec §6 "Derived measures"). Two numbers:
+#
+# wait_s = time the trainee is blocked by a box change BEFORE task_completed.
+#   The red button is blocked from the moment a position is done (the box
+#   starts after a 0.6 s startDelay) until the new storage box stands at the
+#   work spot (storage_in arrived). The old box (storage_out) keeps riding
+#   after that, but the trainee can already work. So there is one blocked
+#   interval per storage_in ride: from its trigger to its arrived line.
+#   Trigger = the position_completed of the previous position; for
+#   storage_in position 1 (Complex only: box 1 after the remainder quiz) the
+#   last quiz_answer before the ride starts. A storage_in ride without an
+#   arrived line (crash/quit) ends at the visit's last event. Intervals are
+#   unioned (never summed twice), cut at task_completed, minus paused time.
+#   Basic has no storage_in ride, so its wait_s is 0.
+# wait_after_done_s = union of all rides (storage_out, order_box, any what)
+#   after task_completed: the boxes leaving at the end. Basic/Mixed then
+#   linger until the scene is left while Complex ends the session at once,
+#   so this part is kept apart from wait_s.
 first_or_na <- function(x) if (length(x) == 0) NA_real_ else min(x)
+last_or_na <- function(x) if (length(x) == 0) NA_real_ else max(x)
 ride_rows <- v2_events %>% filter(event %in% c("station_move_start", "station_move_arrived")) %>%
   mutate(what = map_chr(data, ~ as_chr(.x$what)),
          position = map_int(data, ~ as_int(.x$position))) %>%
@@ -762,6 +771,36 @@ if (nrow(no_start) > 0) {
 }
 ride_rows <- ride_rows %>% filter(!is.na(start_t)) %>%
   mutate(end_t = coalesce(arrived_t, end_t))
+
+# Triggers of the storage_in rides: position_completed times per position,
+# and quiz_answer times (for box 1 in Complex).
+pos_done_t <- v2_events %>% filter(event == "position_completed") %>%
+  mutate(done_position = map_int(data, ~ as_int(.x$position))) %>%
+  group_by(session_id, scene, scene_visit, done_position) %>%
+  summarise(done_t = first_or_na(t), .groups = "drop")
+quiz_t <- v2_events %>% filter(event == "quiz_answer") %>%
+  select(session_id, scene, scene_visit, quiz_t = t)
+storage_in <- ride_rows %>% filter(what == "storage_in") %>%
+  mutate(done_position = position - 1L) %>%
+  left_join(pos_done_t, by = c("session_id", "scene", "scene_visit", "done_position"))
+# Last quiz touch before each ride's start (only looked up for position 1).
+quiz_trigger <- storage_in %>% filter(position == 1L) %>%
+  select(session_id, scene, scene_visit, position, start_t) %>%
+  inner_join(quiz_t, by = c("session_id", "scene", "scene_visit"),
+             relationship = "many-to-many") %>%
+  filter(quiz_t <= start_t) %>%
+  group_by(session_id, scene, scene_visit, position) %>%
+  summarise(quiz_trigger_t = last_or_na(quiz_t), .groups = "drop")
+storage_in <- storage_in %>%
+  left_join(quiz_trigger, by = c("session_id", "scene", "scene_visit", "position")) %>%
+  mutate(trigger_t = if_else(position == 1L, quiz_trigger_t, done_t))
+no_trigger <- storage_in %>% filter(is.na(trigger_t))
+if (nrow(no_trigger) > 0) {
+  # Should not happen with the real app; the ride start is the best guess.
+  warn(nrow(no_trigger), " storage_in ride(s) without a trigger (position_completed / quiz_answer); wait starts at the ride start")
+}
+storage_in <- storage_in %>% mutate(trigger_t = coalesce(trigger_t, start_t))
+
 # Merge overlapping [start, end] intervals into one (union).
 union_intervals <- function(start_t, end_t) {
   o <- order(start_t)
@@ -772,7 +811,7 @@ union_intervals <- function(start_t, end_t) {
   for (i in seq_along(start_t)) {
     k <- length(out_e)
     if (k > 0 && start_t[i] <= out_e[k]) {
-      out_e[k] <- max(out_e[k], end_t[i])  # overlaps the previous ride: extend it
+      out_e[k] <- max(out_e[k], end_t[i])  # overlaps the previous interval: extend it
     } else {
       out_s <- c(out_s, start_t[i])
       out_e <- c(out_e, end_t[i])
@@ -780,28 +819,39 @@ union_intervals <- function(start_t, end_t) {
   }
   tibble(start_t = out_s, end_t = out_e)
 }
-wait_stats <- tibble(session_id = character(), scene = character(), scene_visit = integer(),
-                     ev_wait_s = double(), ev_wait_after_done_s = double())
+tc_cut <- task_completed %>% select(session_id, scene, scene_visit, tc_t)
+
+# wait_s: blocked intervals (trigger -> storage_in arrived), part before task_completed.
+wait_before <- tibble(session_id = character(), scene = character(), scene_visit = integer(),
+                      ev_wait_s = double())
+if (nrow(storage_in) > 0) {
+  wait_before <- storage_in %>%
+    group_by(session_id, scene, scene_visit) %>%
+    group_modify(~ union_intervals(.x$trigger_t, .x$end_t)) %>%
+    ungroup() %>%
+    left_join(tc_cut, by = c("session_id", "scene", "scene_visit")) %>%
+    mutate(before_end = pmin(end_t, coalesce(tc_t, Inf)),
+           before_s = if_else(before_end > start_t,
+                              before_end - start_t - paused_between(session_id, start_t, before_end), 0)) %>%
+    group_by(session_id, scene, scene_visit) %>%
+    summarise(ev_wait_s = round(sum(before_s), 3), .groups = "drop")
+}
+# wait_after_done_s: all rides, part after task_completed.
+wait_after <- tibble(session_id = character(), scene = character(), scene_visit = integer(),
+                     ev_wait_after_done_s = double())
 if (nrow(ride_rows) > 0) {
-  wait_stats <- ride_rows %>%
+  wait_after <- ride_rows %>%
     group_by(session_id, scene, scene_visit) %>%
     group_modify(~ union_intervals(.x$start_t, .x$end_t)) %>%
     ungroup() %>%
-    left_join(task_completed %>% select(session_id, scene, scene_visit, tc_t),
-              by = c("session_id", "scene", "scene_visit")) %>%
-    mutate(
-      cut_t = coalesce(tc_t, Inf),
-      # Part of each merged ride before / after task_completed.
-      before_end = pmin(end_t, cut_t),
-      after_start = pmax(start_t, cut_t),
-      before_s = if_else(before_end > start_t,
-                         before_end - start_t - paused_between(session_id, start_t, before_end), 0),
-      after_s = if_else(end_t > after_start,
-                        end_t - after_start - paused_between(session_id, after_start, end_t), 0)) %>%
+    inner_join(tc_cut, by = c("session_id", "scene", "scene_visit")) %>%
+    mutate(after_start = pmax(start_t, tc_t),
+           after_s = if_else(end_t > after_start,
+                             end_t - after_start - paused_between(session_id, after_start, end_t), 0)) %>%
     group_by(session_id, scene, scene_visit) %>%
-    summarise(ev_wait_s = round(sum(before_s), 3),
-              ev_wait_after_done_s = round(sum(after_s), 3), .groups = "drop")
+    summarise(ev_wait_after_done_s = round(sum(after_s), 3), .groups = "drop")
 }
+wait_stats <- full_join(wait_before, wait_after, by = c("session_id", "scene", "scene_visit"))
 
 # Sessions that measured outcomes (rule at the top of this section).
 session_outcome <- sessions %>%

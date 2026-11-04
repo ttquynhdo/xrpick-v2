@@ -136,14 +136,24 @@ local({
                   "wait_s_MixedPickingScene", "wait_s_ComplexScene") %in% names(wide)))
   stopifnot(!any(c("confirm_ignored_ConceptScene", "wait_s_ConceptScene") %in% names(wide)))
   stopifnot(all(wide$wait_s_MixedPickingScene[!is.na(wide$wait_s_MixedPickingScene)] >= 0))
-  # Known value: P114 Mixed (no pauses). Ride between positions: storage_out
-  # 326.967 -> 330.148 and storage_in 326.968 -> 330.149 overlap, union =
-  # 3.182 s (a sum would be 6.362). The end-of-order rides (351.199 -> 355.573,
-  # after task_completed at 350.599) are not in wait_s but in wait_after_done_s.
+  # Known value: P114 Mixed (no pauses). The trainee is blocked from
+  # position_completed 1 (326.367) until storage_in 2 arrives (330.149):
+  # 3.782 s. The 0.6 s startDelay counts; storage_out (326.967 -> 330.148)
+  # lies inside it and adds nothing. The end-of-order rides (351.199 ->
+  # 355.573, after task_completed at 350.599) are not in wait_s but in
+  # wait_after_done_s (union 4.374).
   m114 <- visits[visits$participant_id == "P114" & visits$scene == "MixedPickingScene", ]
-  stopifnot(nrow(m114) == 1, abs(m114$wait_s - 3.182) < 0.002,
+  stopifnot(nrow(m114) == 1, abs(m114$wait_s - 3.782) < 0.002,
             abs(m114$wait_after_done_s - 4.374) < 0.002)
-  # Basic has one position: every ride starts at the order's end, so wait_s 0.
+  # Known value: P101 Complex (no pauses), two blocked intervals: box 1 from
+  # the last remainder-quiz touch (488.838; earlier touches are not the
+  # trigger) to storage_in 1 arrived (492.015) = 3.177 s, and
+  # position_completed 1 (517.467) to storage_in 2 arrived (521.300) =
+  # 3.833 s. Sum 7.010. Complex ends the session at task_completed: after part 0.
+  c101 <- visits[visits$participant_id == "P101" & visits$scene == "ComplexScene", ]
+  stopifnot(nrow(c101) == 1, abs(c101$wait_s - 7.010) < 0.002,
+            abs(c101$wait_after_done_s - 0) < 0.002)
+  # Basic has one position and no storage_in ride, so wait_s 0.
   stopifnot(all(visits$wait_s[visits$scene == "BasicPickingScene"] == 0, na.rm = TRUE))
   # Scaffolded Complex position 1 is out of the skill rates: the denominator
   # of every Complex rate = the visit's position-2 presses; P114 (position 1
