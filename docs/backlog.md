@@ -29,11 +29,20 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Mới 2026-11-04 (video test kính P811, English):** làm trước #36 và #13 vì #76 chặn người học ở Concept. Decision 024 chốt bố cục #78–#80 (#77 gộp vào #78); decision 025 (người dùng: học bằng nhìn và làm, không đọc chữ) thêm lớp vật thật lên trên: carton STECKER C, 3 carton 40/80/120, thùng mẫu EKZ (mục mới #83), băng ba làn có thùng chạy (#81). Thứ tự **#76 (P0, S, Concept + Complex) → #78 + #80 → #79 → #83 → #81** (#83 và #81 đổi chỗ được), rồi #82 (R, sau #80), #36 → #13 (export có chữ mới của #78–#83). Các mục ConceptScene không chạy song song với nhau. Test kính gom: #76, #78–#81, #83, cùng M1–M3 của #73.
 - **Rà lại 2026-11-04 (đo ConceptScene trong Editor):** băng ba làn của #81 nằm đúng chỗ các kiện hiện có (vòng RING D ở chỗ thùng đơn, KABELVERBINDER A ở chỗ làm việc), chỗ „bên phải trong tầm tay“ của cụm câu hỏi là chỗ Menu, giữa `Info Panel` và viền dialog chỉ có 11 cm, và thanh điều hướng ở độ sâu màn hình (z ≈ 1,07) thì tay không với tới. Vì vậy bố cục đo một lần ở mục mới #84 trước, rồi mới làm phần chạy. Thứ tự mới: **#76 (merge sau H1–H3) → #84 bố cục → #80 → #78 (+ #85 Complex) → #79 → #83 → #81 → #82** (#83 và #81 đổi chỗ được), rồi #36 → #13. #84, #78–#81, #83 làm tuần tự trên một nhánh `feat/84-concept-show-and-do` (mỗi mục vẫn có test report riêng), ra **một build** ghi `layout_version` "025", `german-reviewer` duyệt mọi chuỗi mới một lần, một buổi test kính chung. #85 (ComplexScene) làm song song được.
 - **Cập nhật 2026-11-04 (cuối ngày):** #76 merged vào `main`. Trên nhánh `feat/84-concept-show-and-do`: #84, #80, #78, #79, #83, #81 verified-mcp (chờ test kính chung), #82 done. #85 verified-mcp. Còn lại: buổi test kính chung (#85 H1, #76 H1–H3, #84 H1–H3, #80 H1–H2, #78 H1–H3, #79 H1, #83 H1–H2, #81 H1–H2, #73 M1–M3) → merge nhánh → #36 → #13.
-- **Mới 2026-11-04 (test kính P801, 19 góp ý R1–R19 → #86–#96):** người dùng ghi kết quả buổi test kính chung vào các test report trước, rồi làm theo đợt:
+- **Cập nhật 2026-11-04 (kết quả test kính P801):** người dùng báo mọi case tay đạt → #76, #78–#81, #83–#85 `done`. #73 M1–M3 chạy lại ✅ → #73 `done`.
+- **Mới 2026-11-04 (test kính P801, 19 góp ý R1–R19 → #86–#96):** *(thứ tự dưới đây đã cũ: ba quyết định xong, thứ tự làm theo khối „Người dùng chốt 2026-11-04“ ngay sau)* người dùng ghi kết quả buổi test kính chung vào các test report trước, rồi làm theo đợt:
   1. **Không cần quyết định, làm ngay (song song được vì khác file):** #95 băng chuyền (prefab + mesh, test không kính) ∥ #96 vòng xuyên carton (Complex, S) ∥ phần Complex của #93.
-  2. **Ba `solution-decision`, chạy song song vì độc lập:** (a) bố cục ConceptScene mới cho #89–#93 (thay phần liên quan của 024/025, đổi `layout_version`); (b) mẫu thẻ + bảng Welcome cho #87, #86; (c) chuẩn kiện và nhãn cho #88 (đảo ngược một phần #36). #94 cần `requirements-analyst` + `instructional-design-reviewer` trước rồi mới `solution-decision`.
-  3. **Sau quyết định:** #88 (4 scene) → ConceptScene tuần tự **#89 → #90 → #91 → #92 → #93 (phần Concept)**; #87 → #86 (5 scene, không chạy cùng lúc với mục khác sửa cùng scene, nên xếp sau #88 và chuỗi Concept, hoặc chen vào khi các scene kia rảnh); #94 chia mục theo scene sau quyết định.
+  2. **Ba `solution-decision`, chạy song song vì độc lập:** (a) bố cục ConceptScene mới cho #89–#93: **xong**, decision 026; (b) mẫu thẻ + bảng Welcome cho #87, #86: **xong**, decision 027 (2026-11-04, phương án A, thẻ „Aufgabe“ nền kem; file decision commit cùng commit đầu của #87, nhánh `feat/87-task-card-template`); #94 kế hoạch EKZ: **xong**, decision 028 (2026-11-04, phương án A: Concept mẫu 003 carton / 000 túi trên bàn học, Mixed vị trí 1 = 003, Complex giữ 000/000); (c) chuẩn kiện và nhãn cho #88: **xong**, decision 029 (2026-11-04, phương án A: cỡ Mixed cho mọi scene, một nhãn trên nắp, chữ cỡ cố định; đảo ngược một phần #36). Đợt 2 xong hết.
+  3. **Sau quyết định:** #88 (4 scene) → ConceptScene tuần tự **#89 → #90 → #91 → #92 → #93 (phần Concept)**; #87 → #86 → #97 (5 scene, không chạy cùng lúc với mục khác sửa cùng scene, nên xếp sau #88 và chuỗi Concept, hoặc chen vào khi các scene kia rảnh); #94 (decision 028): phần Mixed làm được ngay (chỉ MixedPickingScene, không chạy cùng mục khác sửa Mixed), phần Concept sau #89–#93 (cần bàn học 026). #96 không còn chờ #94 vì Complex giữ vật liệu cũ.
+  3b. **#97** (✓ trên thẻ ở Basic/Mixed/Complex, test kính P801 bl79 H1): làm sau #87 (decision 027). **#98** (rút gọn chữ thẻ) chỉ làm nếu dữ liệu pilot cho thấy cần.
   4. **Cuối:** #36 (thay bằng #88) → #13 export EN–DE (có mọi chữ mới), một build, một buổi test kính chung.
+- **Người dùng chốt 2026-11-04: sửa hết một lượt, tuần tự, rồi mới test một lần.** Thứ tự (rà chồng chéo 026–029):
+  1. **#88** trước (cỡ carton quyết ô EKZ Mixed, carton đếm Concept, thùng mẫu EKZ, vòng trên carton Complex; có thể dựng lại lưới 6 ô Basic). **#95** xen vào lúc nào cũng được (chỉ prefab và mesh).
+  2. Concept: **#89** (mở đầu bằng bước đo bố cục bàn học cho mọi vật mới, như #84) → **#90** → **#91** → **#94 phần Concept** → **#92** (cần thùng mẫu mới) → **#93 phần Concept**.
+  3. **#94 phần Mixed** → **#93 phần Complex** → **#96** → **#92 phần Complex** (carton đã mở, người dùng chốt 2026-11-04: quy tắc vật chỉ để xem cho mọi scene).
+  4. **#87** (sau mọi mục đổi chữ thẻ, chạy công cụ slot một lần) → **#86** → **#97**.
+  5. Hợp đồng log: các mục trên **không** tự đổi `layout_version`; cuối đợt đổi một lần "025" → "029" (build có 026–029), `data-analyst` sửa spec + `make_fake_data.R` + `analyse_set.R` một lần (tách Concept, Complex `position_1`, Mixed theo layout), `selftest.R` xanh.
+  6. `german-reviewer` duyệt mọi chữ mới một lần → #36 đóng (thay bằng #88) → #13 export → một build → một buổi test kính; các mục ở trạng thái `verified-mcp` tới buổi đó. Đo lại thời lượng khoá (quy tắc 25 phút).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
@@ -1182,7 +1191,7 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Decision:** docs/decisions/019-station-three-lanes-flow.md (phần Concept), docs/decisions/020-concept-quiz-tap-to-answer.md
 - **Test report:** docs/test-reports/bl73.md
 - **Bổ sung (test kính 2026-11-04, video P811 EN):** M2, M3 ❌ vì chỉ nút B chạm được (→ #76); M1 ⚠️ góp ý bố cục (→ #78). Đóng #73 khi #76 xong và M1–M3 chạy lại ✅.
-- **Status:** verified-mcp (19/19 ✅, test tay M2/M3 ❌ → #76, M1 → #78)
+- **Status:** done (commit 2d8f336, test 22/22 ✅; M1–M3 chạy lại ở test kính P801 sau #76, #78)
 
 ## Test kính 2026-11-04 (video P811, English)
 
@@ -1199,7 +1208,7 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Test trên kính:** bắt buộc (chạm A/B/C bằng tay thật ở cả hai scene)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl76.md
-- **Status:** verified-mcp (9/12 ✅, chờ test tay H1–H3 trên kính)
+- **Status:** done (commit 609ede4, test 12/12 ✅)
 
 ### #77 [P1] Chữ tiếng Anh bảo bấm „Weiter“ trong khi nút ghi „Next“
 - **Type:** bug
@@ -1226,7 +1235,7 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Depends on:** #76 (cùng sửa `AnswerOption`), #84 (chỗ của chú thích và cụm câu hỏi), #80 (cùng thanh); decision 024; giả định D30 (hỏi người hướng dẫn, không chặn) (sửa 010, 015, 020); #77 gộp vào đây
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md
 - **Test report:** docs/test-reports/bl78.md
-- **Status:** verified-mcp (15/15 ✅ MCP/code, 1 case chuyển sang #79, chờ test tay H1–H3 trên kính)
+- **Status:** done (commit 9ab8c54, test 18/18 ✅)
 
 ### #79 [Feature] ConceptScene: dấu xong trên thẻ việc như WelcomeScene
 - **Type:** feature
@@ -1240,7 +1249,7 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Depends on:** #78 (cùng scene, làm sau #78 và #80), #84 (chỗ của 4 kiện); decision 024; giả định D31 (hỏi người hướng dẫn, không chặn)
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md
 - **Test report:** docs/test-reports/bl79.md
-- **Status:** verified-mcp (14/14 ✅, chờ test tay H1 trên kính; theo giả định D31)
+- **Status:** done (commit 57df063, test 15/15 ✅, theo giả định D31; ✓ ở Basic/Mixed/Complex → #97)
 
 
 ### #80 [Feature] ConceptScene: nút „Next“ đặt ở chỗ tự nói nghĩa, thêm nút „Zurück“ trong tour
@@ -1255,7 +1264,7 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Depends on:** #84 (chỗ của thanh), #76 (vùng chạm); decision 024
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md
 - **Test report:** docs/test-reports/bl80.md
-- **Status:** verified-mcp (15/17 ✅, chờ test tay H1–H2 trên kính)
+- **Status:** done (commit 39f8c3c, test 17/17 ✅)
 
 ### #81 [Feature] ConceptScene: băng ba làn thật, thùng chạy ở bước „Weg der Behälter“
 - **Type:** feature
@@ -1269,7 +1278,7 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Depends on:** #84 (băng và thùng đã đặt), #78, #80; decision 019 (ba làn); giả định D11/D17, D32 (không chặn); làm sau hoặc trước #83 đều được
 - **Decision:** docs/decisions/025-concept-show-and-do.md
 - **Test report:** docs/test-reports/bl81.md
-- **Status:** verified-mcp (14/14 ✅, chờ test tay H1–H2 trên kính; theo giả định D11/D17)
+- **Status:** done (commit da14020, test 16/16 ✅, theo giả định D11/D17)
 
 ### #82 [Feature] R: chỉ số tour ConceptScene (thời gian mỗi bước, số lần lùi, Next rồi Back nhanh)
 - **Type:** feature
@@ -1297,7 +1306,7 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Depends on:** #84 (chỗ carton và thùng mẫu), #78, #80; #79 dùng carton này cho thẻ 1; giả định D4/D5 (EKZ 3 cho carton là đơn giản hoá)
 - **Decision:** docs/decisions/025-concept-show-and-do.md
 - **Test report:** docs/test-reports/bl83.md
-- **Status:** verified-mcp (12/12 ✅, chờ test tay H1–H2 trên kính; theo giả định D4/D5)
+- **Status:** done (commit cb764f5, test 14/14 ✅, theo giả định D4/D5)
 
 ### #84 [Feature] ConceptScene: đặt băng ba làn và mọi vật mới vào bố cục một lần, đo trước khi làm phần chạy
 - **Type:** feature
@@ -1311,7 +1320,7 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Depends on:** #76; decision 024, 025
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md (mục *Bổ sung 2026-11-04*)
 - **Test report:** docs/test-reports/bl84.md
-- **Status:** verified-mcp (15/18 ✅, chờ test tay H1–H3 trên kính)
+- **Status:** done (commit e7fd1cc, test 18/18 ✅)
 
 ### #85 [P2] ComplexScene: „Richtig!“ của câu 1 không nằm dưới câu 2 của `Remainder Quiz`
 - **Type:** logic
@@ -1325,7 +1334,7 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Depends on:** #76; cách làm giống #78 (dùng chung thời gian giữ)
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md (mục 5, mở rộng sang Complex)
 - **Test report:** docs/test-reports/bl85.md
-- **Status:** verified-mcp (11/11 ✅, chờ test tay H1 trên kính)
+- **Status:** done (commit 8a7f7d2, test 12/12 ✅)
 
 ---
 
@@ -1340,11 +1349,12 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Scene(s):** WelcomeScene
 - **Files:** WelcomeScene `Info Panel` (canvas `Welcome`), docs/i18n/strings-todo.csv (`welcome.panel.goals`, `welcome.panel.*`)
 - **Problem:** (R1) Chữ sát lề trái, dòng sát nhau, bản EN mục 1 „…warehouse management system (WMS)“ xuống dòng (ghi chú CSV đòi mỗi mục một dòng). Năm mục tiêu là một danh sách liền, người học không thấy phần nào là kiến thức (đọc LVS, nhãn) và phần nào là thực hành (nhặt, EKZ, nhiều vị trí).
-- **Done when:** Ở WelcomeScene, cảnh `entry` sau khi nhập mã, bảng có lề trái và phải bằng nhau, ít nhất bằng chiều cao một chữ. Mỗi mục tiêu nằm trên đúng một dòng ở cả DE và EN. Các mục chia hai cụm có tiêu đề riêng (cụm „hiểu“ khớp bài 2, cụm „làm“ khớp bài 3–5). Khoảng cách giữa các dòng rộng hơn hiện nay (so ảnh trước/sau). Bảng không che Menu, giá thẻ hay thùng. (code) Chữ mới có key + EN + DE qua `localize-strings` + `german-reviewer`.
+- **Done when:** Ở WelcomeScene, cảnh `entry` sau khi nhập mã, bảng có lề trái và phải bằng nhau, ít nhất bằng chiều cao một chữ. Mỗi mục tiêu nằm trên đúng một dòng ở cả DE và EN. Các mục chia hai cụm, mỗi cụm có câu dẫn riêng kết thúc bằng „:“: cụm 1 „Sie verstehen …:“ (bài 2, chứa tên đầy đủ „Lagerverwaltungssystem (LVS)“), cụm 2 „Sie können:“ (bài 3–5). Trong mỗi cụm các mục xếp theo thứ tự bài; mục EKZ không ghi „EKZ 3“. Font các mục không nhỏ hơn font thân thẻ. Hai dòng hướng dẫn thao tác (vàng) nằm thành khối riêng dưới hai cụm. Khoảng cách giữa các dòng rộng hơn hiện nay (so ảnh trước/sau). Bảng không che Menu, giá thẻ hay thùng. (code) Mỗi dòng/cụm là một key, không ghép câu từ mảnh chữ. (code) Chữ mới có key + EN + DE qua `localize-strings` + `german-reviewer`.
 - **Inspector work expected:** yes (padding, line spacing, kích thước bảng)
 - **Công:** S
 - **Test trên kính:** nhanh (đọc bảng từ chỗ đứng, DE và EN)
-- **Depends on:** quyết định chung với #87 (cùng mẫu chữ/khoảng cách)
+- **Depends on:** decision 027 (làm sau hoặc cùng #87: tiêu đề cụm cùng kiểu với thẻ mục tiêu); D33 (không chặn)
+- **Decision:** docs/decisions/027-task-card-template-welcome-goals.md
 - **Status:** todo
 
 ### #87 [Feature] Mẫu thẻ nhiệm vụ chung: thẻ mục tiêu khác thẻ bước, khoảng cách đều, bảng co theo nội dung
@@ -1352,11 +1362,12 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** Assets/Prefabs/InstructionShelf.prefab, `InstructionShelf/Panel/Cards` ở 5 scene, Assets/Scripts/InstructionCardLook.cs, Assets/Scripts/InstructionStepHighlighter.cs, Assets/Scripts/Concept/ConceptCardProgress.cs, `PositionTexts`, docs/i18n/strings-todo.csv (`*.card.*`)
 - **Problem:** (R2) Thẻ „Aufgabe“ (mục tiêu bài) cùng màu đen, cùng kiểu với các thẻ bước, nên không nắm nhanh được mục tiêu. Thẻ đặt tay theo slot cố định (#62/#63), nên khoảng cách không đều trong một bài (Complex: khoảng trống lớn giữa thẻ 1 và 2) và giữa các bài. Bảng gỗ cùng cỡ ở mọi bài: Welcome có 3 thẻ mà bảng rất to; Mixed, Complex chữ dày đặc.
-- **Done when:** Ở cả 5 scene, cảnh `instructions`: thẻ mục tiêu trông khác hẳn thẻ bước (màu nền/khung/vị trí riêng), nhận ra ngay khi nhìn lướt. Khoảng cách giữa các thẻ bằng nhau trong mỗi bài và giống nhau giữa các bài (đo trong Editor, sai lệch ≤ 2 mm). Bảng gỗ cao vừa đủ cho các thẻ của bài đó, không có khoảng trống lớn dưới thẻ cuối. Ở Mixed và Complex, đổi sang vị trí 2: thẻ đổi chữ, khoảng cách vẫn đều và không thẻ nào chồng lên nhau. Khung xanh bước hiện tại (#40, #79) và dấu ✓ (`Done Check`, #39, #79) vẫn hiện đúng chỗ ở thẻ mới. Chữ thân thẻ ở Mixed và Complex ngắn hơn hiện nay (đếm ký tự trước/sau). (code) Khoảng cách do layout tính, không còn slot đặt tay. (code) Chữ đổi qua `localize-strings` + `german-reviewer`.
-- **Inspector work expected:** yes (prefab, layout group, 5 scene)
+- **Done when:** Ở cả 5 scene, cảnh `instructions`: thẻ „Aufgabe“ có nền kem và viền trung tính, khác các thẻ bước nền đen; chữ „Aufgabe“ giữ nguyên. Thẻ „Aufgabe“ không bao giờ có khung xanh, không bị làm mờ và không có ✓. Trong mỗi bài, khoảng hở giữa hai thẻ liền nhau bằng nhau và bằng nhau ở cả 5 bài (đo trong Editor, sai lệch ≤ 2 mm). Mép dưới ván gỗ cách mép dưới thẻ cuối đúng một lề cố định ở cả 5 bài. Ở Mixed và Complex, chuyển từ vị trí 1 sang vị trí 2: thẻ đổi chữ, không thẻ nào đổi chỗ hay đổi cao, không thẻ nào chồng lên nhau. Ở Complex, vị trí 2: thẻ 3 vẫn nằm trên thùng kho. Khung xanh bước hiện tại (#40, #79), việc làm mờ và dấu ✓ (`Done Check`, #39, #79) vẫn hiện đúng chỗ ở Welcome, Concept, Basic, Mixed, Complex. Thân thẻ ở Mixed và Complex dài tối đa 2 câu và ngắn hơn hiện nay (đếm ký tự trước/sau); nhãn WMS và câu „Drücken Sie dann den roten Knopf (F6).“ giữ nguyên. (code) Slot và chiều cao ván do một công cụ Editor (chạy được qua MCP) đặt từ chữ dài nhất DE/EN của cả hai vị trí, không còn slot đặt tay; mỗi thẻ vẫn là một canvas riêng, không layout group. (code) Kiểu thẻ mục tiêu nằm trong `InstructionCardLook`. (code) Chữ đổi qua `localize-strings` + `german-reviewer`.
+- **Inspector work expected:** yes (prefab, slot và ván ở 5 scene qua công cụ Editor)
 - **Công:** L
-- **Test trên kính:** nhanh (đọc thẻ từ chỗ đứng ở 5 bài)
-- **Depends on:** `solution-decision` (mẫu thẻ); làm trước #86 hoặc cùng quyết định
+- **Test trên kính:** nhanh (đọc thẻ từ chỗ đứng ở 5 bài; thẻ kem có bị lóa trên gỗ không)
+- **Depends on:** decision 027; làm trước #86 và #97
+- **Decision:** docs/decisions/027-task-card-template-welcome-goals.md
 - **Status:** todo
 
 ### #88 [Feature] Chuẩn kiện và nhãn: một cỡ cho mỗi loại kiện ở mọi bài, một nhãn nhỏ trên nắp
@@ -1364,11 +1375,12 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** prefab/kiện carton và túi ở 4 scene (sticker `Cube`, `Label Top`, nhãn túi), `BoxSnapper*` ở Basic, `Carton Count Demo`, `Stock STECKER C`
 - **Problem:** (R3, R13, R15) Kiện ở Concept nhỏ, khó cầm, trong khi ở Mixed/Complex to hơn. Chữ nhãn auto-size phủ kín sticker, nên carton to có chữ to sát mép, còn trong cùng Concept nhãn KABELVERBINDER A chữ nhỏ (tên dài) và STECKER C chữ to. Nhãn túi SCHRAUBE B chìa ra ngoài túi. Mỗi carton có hai nhãn (trước + nắp, #36), rối mắt.
-- **Done when:** Cùng một loại kiện (carton, túi) có cùng kích thước ở mọi scene (đo bounds trong Editor). Carton ở Concept to bằng carton ở Mixed. Mỗi carton chỉ có một nhãn, trên nắp; không còn sticker mặt trước. Mọi nhãn cùng một cỡ chữ cố định (không auto-size) với lề quanh chữ; tên dài nhất (SCHLAUCHSCHELLE B) vẫn nằm trong nhãn. Nhãn túi nằm trong mép túi. Cảnh `labels` ở 4 scene: đọc được Mat.-Nr và VPE trên nắp carton trong thùng kho từ chỗ đứng. Basic: 6 carton vẫn vừa 6 ô `BoxSnapper` 2 × 3 và EKZ 3 vẫn chấm đúng. Mixed và Complex: thùng kho vẫn chứa đủ carton như hiện nay. Concept: 3 carton của `Carton Count Demo` vẫn vừa thùng đơn. (code) Nhãn vẫn khớp `PackageData` (tên, Mat.-Nr, VPE).
+- **Done when:** Cùng một loại kiện (carton, túi) có cùng kích thước ở mọi scene (đo bounds trong Editor). Carton ở Concept to bằng carton ở Mixed. Mỗi carton chỉ có một nhãn, trên nắp; không còn sticker mặt trước. Mọi nhãn cùng một cỡ chữ cố định (không auto-size) với lề quanh chữ; tên dài nhất (SCHLAUCHSCHELLE B) vẫn nằm trong nhãn. Nhãn túi nằm trong mép túi. Cảnh `labels` ở 4 scene: đọc được Mat.-Nr và VPE trên nắp carton trong thùng kho từ chỗ đứng. Basic: 6 carton vẫn vừa 6 ô `BoxSnapper` 2 × 3 và EKZ 3 vẫn chấm đúng. Mixed và Complex: thùng kho vẫn chứa đủ carton như hiện nay. Concept: 3 carton của `Carton Count Demo` vẫn vừa thùng đơn. (code) Nhãn vẫn khớp `PackageData` (tên, Mat.-Nr, VPE). Trong thùng kho ở Basic, Mixed, Complex và Concept, mọi carton nằm ngửa nắp lên. Trên Quest đọc được Mat.-Nr và VPE trên nắp carton trong thùng kho từ chỗ đứng (≈ 1,15 m). (code) Một EditMode test hoặc lệnh kiểm qua MCP báo lỗi khi bounds của một carton hoặc túi lệch cỡ chuẩn, hoặc khi chữ nhãn khác `PackageData`.
 - **Inspector work expected:** yes (scale kiện, nhãn, ô snap)
 - **Công:** M–L
 - **Test trên kính:** bắt buộc (cầm kiện bằng tay thật, đọc nhãn trên nắp từ chỗ đứng và khi cầm)
-- **Depends on:** `solution-decision` (cỡ chuẩn, đảo ngược một phần #36); thay #36 khi xong
+- **Depends on:** thay #36 khi xong; A14 (giả định, không chặn)
+- **Decision:** docs/decisions/029-package-size-and-label-standard.md
 - **Status:** todo
 
 ### #89 [Feature] ConceptScene: một thanh tour ở giữa, sát dưới màn hình, chứa chữ của bước và Back/Next, hiện từ thẻ 2
@@ -1412,14 +1424,15 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 
 ### #92 [Feature] Quy tắc „vật nào cầm được“: vật chỉ để xem trông khác kiện thật
 - **Type:** feature
-- **Scene(s):** ConceptScene (và quy tắc cho mọi scene)
-- **Files:** ConceptScene `Carton Count Demo`, `Stock STECKER C`, `Layout Slots/EKZ Sample 003|000`, `Lane Flow Demo` riders
+- **Scene(s):** ConceptScene, ComplexScene (+ mọi scene có vật như thế, tìm ở bước kiểm kê)
+- **Files:** ConceptScene `Carton Count Demo`, `Stock STECKER C`, `Layout Slots/EKZ Sample 003|000`, `Lane Flow Demo` riders; ComplexScene `VPE_OpenedPackage`, `SB_OpenedPackage`
 - **Problem:** (R9) Carton đếm, carton trong thùng kho và thùng mẫu EKZ dùng đúng mô hình và nhãn của kiện cầm được nhưng không có `Grabbable`/collider: tay xuyên qua, không phản hồi. Người học nghi ngờ không biết vật nào trong cảnh tương tác được.
-- **Done when:** Ảnh `container` ở bước `cartons` và ảnh của bước 8–9: carton đếm và thùng mẫu EKZ nhìn khác hẳn kiện cầm được ngay từ chỗ đứng (bán trong suốt + viền). Đưa tay vào carton đếm: hiện „Nur zum Ansehen“; tay rời ra thì chữ tắt. `Stock STECKER C` theo phương án chọn sau khi thử kính (mặc định 1–2 carton) và cũng hiện „Nur zum Ansehen“ khi chạm. Ở bước 11 demo ba làn vẫn chạy như #81. (code) Không vật minh hoạ nào có `PackageData` hay `Grabbable`, nên không ghi `grab_*`. (code) Quy tắc „vật nào cầm được“ được ghi vào CLAUDE.md.
+- **Done when:** Ảnh `container` ở bước `cartons` và ảnh của bước 8–9: carton đếm và thùng mẫu EKZ nhìn khác hẳn kiện cầm được ngay từ chỗ đứng (bán trong suốt + viền). Đưa tay vào carton đếm: hiện „Nur zum Ansehen“; tay rời ra thì chữ tắt. `Stock STECKER C` theo phương án chọn sau khi thử kính (mặc định 1–2 carton) và cũng hiện „Nur zum Ansehen“ khi chạm. Ở bước 11 demo ba làn vẫn chạy như #81. Complex: carton đã mở `VPE_OpenedPackage` (vị trí 1) và `SB_OpenedPackage` (vị trí 2) nhìn khác hẳn carton cầm được (cùng kiểu bán trong suốt + viền), còn vòng RING D và vòng kẹp bên trong vẫn đặc như kiện thật và cầm được như trước; chạm carton đã mở thì hiện „Nur zum Ansehen“. (code) Bước kiểm kê đầu mục: mọi object trông như kiện (mesh carton/túi, có nhãn) mà không có `Grabbable` ở cả 5 scene được liệt kê trong test report, và mỗi object đều mang kiểu vật chỉ để xem. (code) Không vật minh hoạ nào có `PackageData` hay `Grabbable`, nên không ghi `grab_*`; `OrderContents.Form` của carton đã mở (`VPEOpenedDisplay`) và Rest không đổi. (code) Quy tắc „vật nào cầm được“ được ghi vào CLAUDE.md.
+- **Bổ sung (người dùng 2026-11-04):** quy tắc áp cho mọi object ở mọi kịch bản: vật trông như kiện mà không cầm được thì phải trông khác hẳn, gồm cả carton đã mở ở Complex.
 - **Inspector work expected:** yes
 - **Công:** S–M
 - **Test trên kính:** bắt buộc (tay thật chạm vào vật minh hoạ)
-- **Depends on:** decision 026; #94 (vật mẫu EKZ có thể đổi)
+- **Depends on:** decision 026; #94 (vật mẫu EKZ có thể đổi); phần Complex làm khi ComplexScene rảnh (sau #96)
 - **Decision:** docs/decisions/026-concept-study-desk.md
 - **Status:** todo
 
@@ -1438,14 +1451,15 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 
 ### #94 [Feature] Kế hoạch EKZ cho cả khoá và vật mẫu thực tế (EKZ 0 / EKZ 3)
 - **Type:** feature
-- **Scene(s):** ConceptScene, MixedPickingScene, ComplexScene (Basic giữ EKZ 003)
+- **Scene(s):** ConceptScene, MixedPickingScene (Basic, Complex: chỉ regression)
 - **Files:** `MixedPickingContainer.orderLines` / `PiecesContainerCounter.orderLines` (`empfKz`), Assets/Scripts/EkzPlacementCheck.cs, ConceptScene `Layout Slots/EKZ Sample 003|000`, `concept.tour.empf_kz_*`, `concept.quiz.ekz_*`, vật liệu chi tiết rời (`ring_d`, `training_b` clamp)
 - **Problem:** (R10, R12, R16, R19) Concept minh hoạ EKZ 3 bằng 4 vòng RING D xếp 2 × 2, không thuyết phục; hai thùng mẫu đặt trên làn giữa (đường đi của thùng), một vòng xuyên thành thùng. Mixed và Complex đều `Empf Kz 000` cả hai vị trí, carton và vòng đổ lộn xộn, hai vật liệu lẫn trong thùng đơn. Chưa có kế hoạch EKZ qua các bài (bài 3: 003; bài 4, 5: chỉ 000). Người dùng đề xuất vật mới: vít (EKZ 0), cáp CEE, phụ kiện ống (trơn → EKZ 0/2, có đồng hồ/van → EKZ 3).
-- **Done when:** (sau quyết định) Mỗi bài có EKZ ghi trong quyết định, độ khó tăng dần từ bài 3 đến 5. Ở ConceptScene, thùng mẫu EKZ dùng vật khớp với cách làm ở bài sau, đặt ngoài làn băng chuyền, gần chú thích EKZ trên màn hình; không vật nào xuyên thành thùng. Nếu Mixed vị trí 1 dùng EKZ 003: carton phải xếp vào ô, đặt lộn xộn → báo lỗi xếp như Basic; vị trí 2 vẫn đổ được. Nếu Complex có một vị trí EKZ 003: chi tiết rời xếp được bằng tay thật vào ô định sẵn. Quiz `ekz_003`/`ekz_000` và chữ tour khớp vật mới. (code) `XRPick.Orders.Tests` xanh; `EKZ_PLACEMENT` được log ở mọi scene có EKZ 003 và `analysis/` biết điều đó.
+- **Done when:** (decision 028; giả định D4, D34) Ở ConceptScene, mẫu EKZ 003 là carton KABELVERBINDER A xếp thẳng trong ô, mẫu EKZ 000 là túi SCHRAUBE B đổ vào; cả hai nằm trên bàn học, không nằm trên làn nào. Ở ConceptScene, đứng nhìn chú thích Empf Kz thì thấy được hai thùng mẫu mà không phải quay người. Ở ConceptScene, không carton, túi hay vòng nào xuyên qua thành thùng mẫu. Quiz `ekz_003`/`ekz_000` và chữ tour `empf_kz_003`/`000` nói về carton/túi, không nói về vòng. Ở MixedPickingScene, vị trí 1 dialog hiện `Empf Kz` `003`, vị trí 2 hiện `000`. Mixed vị trí 1: đủ 150 chiếc (3 carton), cả 3 carton khớp ô, bấm xác nhận → đúng, sang vị trí 2. Mixed vị trí 1: đủ số lượng nhưng một carton nằm lỏng, bấm xác nhận → `Nicht richtig` với cùng câu lỗi EKZ 3 như Basic, vẫn ở vị trí 1. Mixed vị trí 1: thiếu số lượng và có carton lỏng, bấm xác nhận → lý do hiện ra là số lượng. Mixed vị trí 2: 3 túi đổ lộn xộn vào vùng còn trống, bấm xác nhận → đúng; carton vị trí 1 vẫn trong thùng và không gây lỗi. Ô snap của Mixed nằm trong trigger của `PlasticBox_Order` và không chiếm vùng đổ túi của vị trí 2. Ở ComplexScene, cả hai vị trí hiện `000`; đặt lộn xộn đúng số lượng → kết quả như trước. Basic: mọi case của decision 003 vẫn chạy như trước. (code) `EKZ_PLACEMENT` được log ở Basic và Mixed vị trí 1, không ở nơi khác; mỗi lần xác nhận vị trí log Empf Kz của vị trí đó; `layout_version` đã tăng. (code) Spec, `skill_map.csv`, `make_fake_data.R`, `analyse_set.R` sửa cùng lúc; `selftest.R` xanh; `XRPick.Orders.Tests` xanh. (code) Chữ đổi qua `localize-strings` + `german-reviewer`.
 - **Inspector work expected:** yes
-- **Công:** L (chia thành mục theo scene sau quyết định)
-- **Test trên kính:** bắt buộc (xếp/đổ bằng tay thật)
-- **Depends on:** `requirements-analyst` (EKZ 0 với chi tiết rời có thật là đổ vào không; hai vật liệu có được nằm chung một thùng đơn không; vật nào thực tế được xếp theo EKZ 3), `instructional-design-reviewer`, rồi `solution-decision`; giả định D4/D5, D21–D24; người dùng tự tải và kiểm giấy phép mô hình 3D
+- **Công:** M–L (Concept: mẫu + chữ; Mixed: 3 ô, validator, log/R). Complex EKZ 003 và vật mới bị hoãn (decision 028)
+- **Test trên kính:** bắt buộc (Mixed: xếp carton vào ô và đổ túi bằng tay thật; Concept: thấy thùng mẫu khi đọc chú thích)
+- **Depends on:** decision 026 (bàn học Concept, chỗ đặt thùng mẫu); giả định D4, D34 (câu hỏi D35–D38)
+- **Decision:** docs/decisions/028-ekz-course-plan.md
 - **Status:** todo
 
 ### #95 [P2] Băng chuyền: ray thừa ở ba làn, tấm gỗ vắt trên băng ở trạm trống
@@ -1469,7 +1483,31 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Inspector work expected:** yes (collider, rigidbody)
 - **Công:** S
 - **Test trên kính:** bắt buộc (đặt vòng bằng tay thật)
-- **Depends on:** #94 nếu chi tiết rời đổi vật liệu (khi đó làm cho vật mới)
+- **Depends on:** — (decision 028: Complex giữ RING D và vòng kẹp; vật mới R19 hoãn)
+- **Status:** todo
+
+### #97 [Feature] Dấu ✓ trên thẻ việc ở Basic, Mixed và Complex như Welcome/Concept
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** Assets/Scripts/InstructionStepHighlighter.cs, Assets/Scripts/Orders/InstructionStepTracker.cs, Assets/Scripts/Concept/ConceptCardProgress.cs (mẫu), `InstructionShelf` ở 3 scene, `Done Check` (copy từ WelcomeScene)
+- **Problem:** (test kính P801, bl79 H1) Ở Welcome (#39) và Concept (#79) thẻ việc có ✓ khi xong; ở Basic, Mixed và Complex chỉ có khung xanh bước hiện tại (#40), không có ✓. Người học không thấy cùng một tín hiệu „xong việc“ qua các bài.
+- **Done when:** Basic: cầm kiện đầu tiên → thẻ 1 có ✓; đủ kiện trong thùng → thẻ 2 có ✓; đơn đúng → thẻ 3 có ✓. Mixed/Complex: các ✓ của vị trí 1 xuất hiện như trên. Đúng vị trí 1, khi thẻ đổi sang chữ của vị trí 2 → mọi ✓ tắt, rồi bật lại theo việc của vị trí 2. Đúng vị trí cuối → cả 3 thẻ có ✓. ✓ nằm ở góc thẻ, không che chữ ở DE và EN (ảnh `instructions`). Khung xanh của #40 vẫn chạy như trước. (code) Logic ✓ quyết bởi `InstructionStepTracker` thuần C#, có EditMode test. (code) Không ghi log mới.
+- **Inspector work expected:** yes (badge trên 3 thẻ × 3 scene)
+- **Công:** M
+- **Test trên kính:** nhanh (thấy ✓ khi xong từng việc)
+- **Depends on:** #87 (decision 027: ✓ không bao giờ ở thẻ „Aufgabe“, giữ chỗ ở thẻ mới). Người dùng chốt 2026-11-04: sang vị trí 2 thì ✓ của vị trí 1 tắt (khác Welcome/Concept, nơi ✓ không bao giờ tắt, vì ở đây thẻ đổi sang việc mới)
+- **Status:** todo
+
+### #98 [Feature] Rút gọn dần chữ trên thẻ qua các bài (fading)
+- **Type:** feature
+- **Scene(s):** MixedPickingScene, ComplexScene
+- **Files:** docs/i18n/strings-todo.csv (`mixed.card.*`, `complex.card.*`), `PositionTexts`
+- **Problem:** (decision 027, đề xuất PA3 của `instructional-design-reviewer`, để sau) Ở bài 4–5 người học đã quen các bước đọc LVS / kommissionieren / bestätigen; thân thẻ đầy đủ là chữ thừa (expertise reversal). Chỉ phần mới của bài (nhiều vị trí; thùng đầy + chi tiết rời) cần một câu nổi bật.
+- **Done when:** (sau quyết định, chỉ làm nếu dữ liệu pilot cho thấy cần) Ở Mixed và Complex, thẻ của các bước đã quen chỉ còn tiêu đề hoặc một câu; phần mới của bài có đúng một câu nổi bật. Mở thẳng bài 4 hoặc 5 bằng mã thử: người mới vẫn làm xong đơn chỉ với thẻ và LVS. (code) Chữ đổi qua `localize-strings` + `german-reviewer`.
+- **Inspector work expected:** no (chỉ CSV; chạy lại công cụ slot của #87)
+- **Công:** S
+- **Test trên kính:** nhanh (đọc thẻ ở bài 4–5)
+- **Depends on:** #87; dữ liệu pilot; `solution-decision` (xr-ux-reviewer khuyên không đổi nội dung bước)
 - **Status:** todo
 
 ## Feature – Log dữ liệu nghiên cứu

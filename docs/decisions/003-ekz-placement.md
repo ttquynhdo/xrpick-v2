@@ -33,7 +33,7 @@ EKZ hiện chỉ là chữ trên WMS (`EKZ: 003` ở Basic; Mixed/Complex không
   - Khi bấm xác nhận mới kiểm thêm "mỗi carton đã khớp một ô". Carton nằm lỏng trong thùng = đơn chưa hoàn thành, báo sai cách đặt theo EKZ 3, không nêu số hay vị trí ô.
   - `Empf Kz` hiện `003`.
   - Đọc trạng thái khớp qua event của Interaction SDK. Nếu snap trên Quest gây khó cầm nắm thì chuyển sang kiểm vị trí bằng code (unity B), *Done when* giữ nguyên trừ ca "tự khớp".
-- **Mixed, Complex (EKZ 0):** `Empf Kz` hiện `000` cho mọi vật tư (Ring D, Screw B, Cable Connector A). Đặt lỏng là đúng, logic đúng/sai không đổi. Phần hiển thị làm cùng #10.
+- **Mixed, Complex (EKZ 0):** (Mixed vị trí 1 nay là `003`, xem decision 028.) `Empf Kz` hiện `000` cho mọi vật tư (Ring D, Screw B, Cable Connector A). Đặt lỏng là đúng, logic đúng/sai không đổi. Phần hiển thị làm cùng #10.
 - **Không làm:** nhãn EKZ trên mép thùng (UX 2: lặp thông tin, làm thay bước đọc WMS); ô gợi ý mờ sau lần sai; rút dần gợi ý (để sau, khi chốt tên bài #18).
 - **Thứ tự:** làm #24 (kiện thừa) trước phần Basic của #41, để không dồn hai yếu tố mới vào một bài.
 - **Đề xuất bị bác:** unity A (Ist chỉ tính kiện đã snap; cơ chế đọc event vẫn được dùng); ID 3 / C chuyển sang #20 làm phần kiểm tra hiểu; UX 3 (câu hỏi "vì sao ring được để lỏng") chuyển sang #20/#14.
