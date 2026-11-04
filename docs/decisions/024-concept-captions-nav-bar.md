@@ -1,7 +1,7 @@
 # Quyết định 024: ConceptScene: chú thích sát từng ô, thanh „Zurück / Schritt n von 11 / Weiter“ cố định dưới màn hình, cụm câu hỏi chỉ hiện ở bước cuối, thẻ việc có ✓ và khung bước hiện tại
 
 - **Backlog:** #78, #79, #80 (một quyết định chung); #77 gộp vào
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (sửa một phần bởi 026, 2026-11-04: mục 1, 3, 4, 7, 8, 9)
 - **Ngày:** 2026-11-04
 - **Ý kiến đã xét:** unity-reviewer, data-analyst, xr-ux-reviewer, instructional-design-reviewer → decision-synthesizer. Không hỏi requirements-analyst (không đổi quy tắc nghiệp vụ) và german-reviewer (mọi chuỗi mới qua `localize-strings` + `german-reviewer` khi làm).
 - **Lựa chọn của người dùng (2026-11-04):** chấp nhận phương án B; thẻ 1 có ✓ sau khi cầm cả 3 kiện (giữ chữ „jede Verpackung“); Concept dùng ✓ + khung xanh; sau câu đúng giữ „Richtig!“ 1,5 s rồi tự sang câu mới.

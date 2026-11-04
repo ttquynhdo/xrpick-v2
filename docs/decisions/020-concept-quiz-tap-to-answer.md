@@ -1,7 +1,7 @@
 # Quyết định 020: Cụm câu hỏi ConceptScene chấm ngay khi chạm như Complex, tự nói cách trả lời, chỉ mở sau tour
 
 - **Backlog:** #61 (làm trong mục Concept gộp #73)
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (sửa một phần bởi 026, 2026-11-04: mục 3, cụm câu hỏi Concept)
 - **Ngày:** 2026-11-03
 - **Ý kiến đã xét:** unity-reviewer, data-analyst, xr-ux-reviewer, instructional-design-reviewer → decision-synthesizer. Không hỏi requirements-analyst (không có quy tắc nghiệp vụ mới) và german-reviewer (chữ mới qua `localize-strings` + `german-reviewer` khi làm).
 - **Lựa chọn của người dùng (2026-11-03):** phương án B (chạm là chấm). Nút đỏ ở Concept: không còn việc gì cần tương tác nên **ẩn** theo nguyên lý redundancy (không giữ lại chỉ để có tiếng bấm). Áp dụng mọi thay đổi backlog liên quan vì mục tiêu nhất quán.

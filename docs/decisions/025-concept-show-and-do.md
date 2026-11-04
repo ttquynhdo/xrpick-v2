@@ -1,7 +1,7 @@
 # Quyết định 025: ConceptScene dạy bằng vật thật trên trạm (carton STECKER C, ví dụ 3 carton, mẫu EKZ bằng RING D, băng ba làn có thùng chạy ở bước `material_flow`), giữ bố cục của 024
 
 - **Backlog:** #78, #79, #80, #81 và mục mới #83
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (sửa một phần bởi 026, 2026-11-04: thẻ nhãn khi cầm, „không khoá tour“, vật minh hoạ)
 - **Ngày:** 2026-11-04
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer, data-analyst → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-04):** chấp nhận phương án B; thùng ở bước 11 tự chạy khi tới bước (không có nút „Vorführen“); thẻ 1 có ✓ sau khi cầm cả 4 kiện (thêm STECKER C); bỏ bảng Ablauf khỏi bước 11.
