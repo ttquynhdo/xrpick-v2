@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,12 +9,16 @@ using UnityEngine.UI;
 /// #35, docs/decisions/011: marks the lesson of the open scene in the Menu with bold text and a "» " mark,
 /// so it is not shown by colour only. #54: also writes the menu title and every lesson name in the current
 /// language. Each item is found by the SceneMenuController method its toggle calls, not by its text.
+/// #42: in a research session only the next lesson (build order) can be opened, and only after the current
+/// lesson is done (ILessonCompletion or IOrderCompletion found in the scene); locked items are dimmed and
+/// not interactable (MenuLockRule).
 /// </summary>
 public class MenuCurrentLesson : MonoBehaviour
 {
     private const string Mark = "» ";
     private const string TitleKey = "menu.title";
     private const string ItemLabelName = "Title";
+    private const float LockedAlpha = 0.35f;
 
     private static readonly Dictionary<string, string> SceneByMethod = new()
     {
@@ -26,6 +31,65 @@ public class MenuCurrentLesson : MonoBehaviour
 
     [Tooltip("The heading above the lesson items.")]
     [SerializeField] private TMP_Text menuTitle;
+
+    private ILessonCompletion lesson;
+    private IOrderCompletion order;
+    private bool sourceSearched;
+
+    // OnEnable, not Start: in WelcomeScene the Menu is shown again only after the session has started.
+    private void OnEnable()
+    {
+        FindCompletionSource();
+        if (lesson != null)
+            lesson.LessonCompleted += ApplyLock;
+        if (order != null)
+            order.OrderCompleted += ApplyLock;
+
+        ApplyLock();
+    }
+
+    private void OnDisable()
+    {
+        if (lesson != null)
+            lesson.LessonCompleted -= ApplyLock;
+        if (order != null)
+            order.OrderCompleted -= ApplyLock;
+    }
+
+    private void ApplyLock()
+    {
+        string participantId = ResearchLogger.ParticipantId;
+        int current = SceneManager.GetActiveScene().buildIndex;
+        bool lessonDone = (lesson != null && lesson.IsLessonCompleted) || (order != null && order.IsCompleted);
+
+        foreach (Toggle toggle in GetComponentsInChildren<Toggle>(true))
+        {
+            if (!TryGetScene(toggle, out string scene))
+                continue;
+
+            SetOpen(toggle, MenuLockRule.IsOpen(participantId, current, BuildIndexOf(scene), lessonDone));
+        }
+    }
+
+    // One per scene: WelcomePracticeFeedback, PackageQuizController or a validator. Found, not wired, so the
+    // five Menu copies need no Inspector change.
+    private void FindCompletionSource()
+    {
+        if (sourceSearched)
+            return;
+
+        sourceSearched = true;
+        foreach (MonoBehaviour behaviour in FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (lesson == null && behaviour is ILessonCompletion lessonSource)
+                lesson = lessonSource;
+            if (order == null && behaviour is IOrderCompletion orderSource)
+                order = orderSource;
+        }
+
+        if (lesson == null && order == null)
+            Debug.LogWarning($"MenuCurrentLesson: no lesson or order completion in {SceneManager.GetActiveScene().name}; in a research session the next lesson stays locked.", this);
+    }
 
     private void Start()
     {
@@ -70,6 +134,33 @@ public class MenuCurrentLesson : MonoBehaviour
 
         scene = null;
         return false;
+    }
+
+    // A CanvasGroup with interactable off also turns the toggle off; raycasts stay blocked, so a touch on a
+    // locked item does nothing.
+    private static void SetOpen(Toggle toggle, bool open)
+    {
+        CanvasGroup group = toggle.GetComponent<CanvasGroup>();
+        if (group == null)
+        {
+            if (open)
+                return;
+            group = toggle.gameObject.AddComponent<CanvasGroup>();
+        }
+
+        group.interactable = open;
+        group.alpha = open ? 1f : LockedAlpha;
+    }
+
+    private static int BuildIndexOf(string scene)
+    {
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            if (Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)) == scene)
+                return i;
+        }
+
+        return -1;
     }
 
     private static TMP_Text LabelOf(Toggle toggle)

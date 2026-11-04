@@ -1,12 +1,13 @@
+using System;
 using Oculus.Interaction;
 using UnityEngine;
 
 /// <summary>
 /// #39: WelcomeScene practises two actions (grab the carton, press the red button). Each one shows a check
 /// mark on its instruction card the first time it is done; when both are done the next lesson in the Menu
-/// is highlighted. Marks stay once shown (no undo in a warm-up).
+/// is highlighted. Marks stay once shown (no undo in a warm-up). #42: both done = lesson done (Menu unlock).
 /// </summary>
-public class WelcomePracticeFeedback : MonoBehaviour
+public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
 {
     [Header("Actions")]
     [Tooltip("The practice carton; its first grab counts.")]
@@ -24,6 +25,10 @@ public class WelcomePracticeFeedback : MonoBehaviour
 
     private bool boxGrabbed;
     private bool buttonPressed;
+
+    public bool IsLessonCompleted => boxGrabbed && buttonPressed;
+
+    public event Action LessonCompleted;
 
     private void OnEnable()
     {
@@ -72,9 +77,10 @@ public class WelcomePracticeFeedback : MonoBehaviour
 
     private void UpdateNextLesson()
     {
-        if (boxGrabbed && buttonPressed)
+        if (IsLessonCompleted)
         {
             Show(nextLessonHighlight);
+            LessonCompleted?.Invoke();
         }
     }
 

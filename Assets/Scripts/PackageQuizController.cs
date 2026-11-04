@@ -13,7 +13,7 @@ using UnityEngine.UI;
 /// line inside the cluster. The cluster stays locked until the WMS tour reaches its last step and stays open after that.
 /// No logging yet (#28 reads AnswerChosen).
 /// </summary>
-public class PackageQuizController : MonoBehaviour
+public class PackageQuizController : MonoBehaviour, ILessonCompletion
 {
     // Loc table UI (#11, #54). The rich text (colour, bold) is part of the table entries.
     private const string ProgressKey = "concept.quiz.progress";
@@ -96,6 +96,11 @@ public class PackageQuizController : MonoBehaviour
 
     // Raised once when the questions open (#28: quiz_unlocked).
     public event Action Unlocked;
+
+    // #42: all questions answered right = lesson done (Menu unlock).
+    public bool IsLessonCompleted => IsAnswered;
+
+    public event Action LessonCompleted;
 
     private void Awake()
     {
@@ -317,6 +322,8 @@ public class PackageQuizController : MonoBehaviour
         {
             toggle.interactable = false;
         }
+
+        LessonCompleted?.Invoke();
     }
 
     // We are inside the pressed toggle's onValueChanged(true). The SDK's AnimatorOverrideLayerWeight listens after us,
