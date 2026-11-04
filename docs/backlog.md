@@ -1007,7 +1007,8 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #73 (đổi thẻ 3 ở Concept theo decision 020)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl63.md
+- **Status:** done (test 7/7 ✅, không có case test tay)
 
 ### #64 [P2] Menu: chữ các bài to hơn
 - **Type:** logic
