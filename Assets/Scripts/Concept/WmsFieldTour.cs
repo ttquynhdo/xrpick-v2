@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// #20, docs/decisions/010: walks the trainee through the WMS dialog one field at a time on a board beside the
-/// monitor. Each step shows its markers outside the screen border; nothing is drawn on the dialog itself.
+/// #20, docs/decisions/010: walks the trainee through the WMS dialog one field at a time. Each step shows its markers
+/// outside the screen border; nothing is drawn on the dialog itself. #78, decision 024: a step about one field writes
+/// its text into a caption next to that field; the other steps use the board right of the screen.
 /// The "Weiter" control is a poke toggle used as a push button. #80, docs/decisions/024: a fixed bar below the
 /// screen holds [Zurück] "Schritt n von 11" [Weiter]; "Zurück" is dimmed and not pressable at step 1.
 /// </summary>
@@ -28,6 +29,12 @@ public class WmsFieldTour : MonoBehaviour
 
         [Tooltip("Shown only during this step; placed outside the monitor border.")]
         public GameObject[] markers;
+
+        // #78, decision 024: a caption next to the field (one of the markers). Empty = the text goes on the board.
+        [Tooltip("Caption title next to the field; leave empty to use the board right of the screen.")]
+        public TMP_Text captionTitle;
+
+        public TMP_Text captionBody;
     }
 
     [SerializeField] private Step[] steps;
@@ -35,6 +42,9 @@ public class WmsFieldTour : MonoBehaviour
     [Header("Board")]
     [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text bodyText;
+
+    [Tooltip("Board panel with titleText/bodyText; hidden while a step shows its own caption (decision 024).")]
+    [SerializeField] private GameObject boardPanel;
     [SerializeField] private TMP_Text progressText;
 
     [Header("Next control")]
@@ -152,8 +162,14 @@ public class WmsFieldTour : MonoBehaviour
         SetMarkers(steps[index], true);
 
         Step step = steps[index];
-        titleText.text = Loc.Get(StepKeyPrefix + step.id + ".title");
-        bodyText.text = Loc.Get(StepKeyPrefix + step.id + ".body");
+        bool hasCaption = step.captionTitle != null && step.captionBody != null;
+        if (boardPanel != null)
+        {
+            boardPanel.SetActive(!hasCaption);
+        }
+
+        (hasCaption ? step.captionTitle : titleText).text = Loc.Get(StepKeyPrefix + step.id + ".title");
+        (hasCaption ? step.captionBody : bodyText).text = Loc.Get(StepKeyPrefix + step.id + ".body");
 
         if (progressText != null)
         {

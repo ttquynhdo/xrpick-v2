@@ -31,6 +31,9 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     // Decision 015: each toggle shows its letter and answer, so the trainee reads and presses in one place.
     private static readonly string[] Letters = { "A", "B", "C" };
 
+    // Decision 024 (5): "Richtig!" stays under the answered question this long; touches meanwhile are not rated.
+    public const float CorrectHoldSeconds = 1.5f;
+
     [Serializable]
     public class Option
     {
@@ -79,6 +82,9 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
 
     [Tooltip("Hidden while locked: the row with the answer toggles.")]
     [SerializeField] private GameObject answerArea;
+
+    [Tooltip("#78, decision 024: the whole cluster, hidden until the tour first reaches unlockStepId.")]
+    [SerializeField] private GameObject clusterRoot;
 
     private Toggle[] toggles;
     private TMP_Text[] labels;
@@ -147,7 +153,11 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         }
 
         // A disabled object stops its coroutines: never stay locked between two questions.
-        switching = false;
+        if (switching)
+        {
+            switching = false;
+            SetTogglesInteractable(true);
+        }
     }
 
     private void Start()
@@ -220,8 +230,13 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     }
 
     // Decision 020: before the tour's last step only one line says when the questions come; nothing can be pressed.
+    // #78, decision 024: with clusterRoot set, the whole cluster is hidden instead (card 3 says when it comes).
     private void ShowLocked()
     {
+        if (clusterRoot != null)
+        {
+            clusterRoot.SetActive(false);
+        }
         answerArea.SetActive(false);
         if (progressText != null)
         {
@@ -234,6 +249,10 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     private void Unlock()
     {
         IsUnlocked = true;
+        if (clusterRoot != null)
+        {
+            clusterRoot.SetActive(true);
+        }
         answerArea.SetActive(true);
         if (progressText != null)
         {
@@ -308,7 +327,7 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         if (current < questions.Length - 1)
         {
             feedbackText.text = Loc.Get(CorrectKey) + "\n" + Loc.Get(NextQuestionKey);
-            StartCoroutine(ShowQuestionNextFrame(current + 1));
+            StartCoroutine(ShowQuestionAfterHold(current + 1));
             return;
         }
 
@@ -331,12 +350,28 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
 
     // We are inside the pressed toggle's onValueChanged(true). The SDK's AnimatorOverrideLayerWeight listens after us,
     // so switching that toggle off here would reach it before the outer "true" and leave it looking selected.
-    private IEnumerator ShowQuestionNextFrame(int index)
+    // Decision 024 (5): "Richtig!" stays under the answered question for CorrectHoldSeconds, then the next question
+    // comes with the neutral how-to line. The toggles are not interactable meanwhile, so nothing is rated or logged.
+    private IEnumerator ShowQuestionAfterHold(int index)
     {
         switching = true;
-        yield return null;
+        SetTogglesInteractable(false);
+        yield return new WaitForSeconds(CorrectHoldSeconds);
         switching = false;
+        SetTogglesInteractable(true);
         ShowQuestion(index);
+        feedbackText.text = Loc.Get(HowToKey);
+    }
+
+    private void SetTogglesInteractable(bool interactable)
+    {
+        foreach (Toggle toggle in toggles)
+        {
+            if (toggle != null)
+            {
+                toggle.interactable = interactable;
+            }
+        }
     }
 
     private static string OptionKey(Question question, Option option) =>

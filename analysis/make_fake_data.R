@@ -957,6 +957,8 @@ run_concept <- function(s, person) {
     }
   }
   for (qid in names(concept_questions)) {
+    # >= 5 s also covers the 1.5 s "Richtig!" hold after a right answer (#78):
+    # no touch is generated while the toggles are not interactable.
     advance(s, runif(1, 5, 15))  # read the question and the three answers
     ask_question(s, person, "concept", qid, concept_questions[[qid]])
   }

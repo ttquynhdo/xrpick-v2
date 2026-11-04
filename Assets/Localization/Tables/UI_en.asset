@@ -246,7 +246,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627377
-    m_Localized: Read the explanation to the right of the screen. Press "Weiter".
+    m_Localized: Read the explanation next to the field. Press "Next".
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627378
@@ -254,11 +254,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627379
-    m_Localized: The questions are below the screen. Press A, B or C.
+    m_Localized: The questions come after the WMS explanation. Then press A, B or
+      C.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627381
-    m_Localized: Read the label
+    m_Localized: 1. Read the label
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627382
@@ -291,8 +292,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627389
-    m_Localized: On the screen you see an order in the warehouse management system
-      (WMS). Press "Weiter".
+    m_Localized: This is an order in the warehouse management system (WMS). Press
+      "Next".
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627390
@@ -300,8 +301,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627391
-    m_Localized: Mat.-Nr is the material number, Bez. is the name of the material.
-      Compare both with the label.
+    m_Localized: Material number and description of the material. Compare both with
+      the label.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627392
@@ -309,8 +310,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627393
-    m_Localized: This many pieces are in one carton. On the label it says VPE for
-      this.
+    m_Localized: Pieces per carton. On the label this is VPE.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627394
@@ -343,8 +343,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627401
-    m_Localized: 'Empf Kz shows the EKZ. It tells you how to put the parts in. 003
-      is EKZ 3: put the parts in one by one and in order.'
+    m_Localized: 'Here it says how you put the parts in. 003 is EKZ 3: one by one
+      and in order.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627402
@@ -352,9 +352,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: 'Here it shows 003, that is EKZ 3. Other orders can show 000 here,
-      that is EKZ 0: the parts may lie unordered or be poured in. All EKZ are on
-      the board to the right.'
+    m_Localized: Other orders can show 000 here, that is EKZ 0. Then the parts may
+      lie unordered or be poured in.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -553,10 +552,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627451
-    m_Localized: The storage container comes from the left. After each confirmation
-      it leaves over the middle lane. The order container stays on the right until
-      the order is done. Then it also leaves there. The whole process is on the board
-      on the far right.
+    m_Localized: The storage container comes from the left and leaves over the middle
+      lane, the order container only when the order is done. Now answer the questions
+      below the screen.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -735,7 +733,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307008
-    m_Localized: 'Divide Soll by Verp.-Einh.: 120 : 40 = 3. You take 3 cartons.'
+    m_Localized: 'Soll : Verp.-Einh. = 120 : 40 = 3. You take 3 cartons.'
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307009

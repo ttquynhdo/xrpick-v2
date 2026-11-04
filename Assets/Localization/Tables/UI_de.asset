@@ -251,8 +251,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627377
-    m_Localized: "Lesen Sie die Erkl\xE4rung rechts neben dem Bildschirm. Dr\xFCcken
-      Sie \u201EWeiter\u201C."
+    m_Localized: "Lesen Sie die Erkl\xE4rung neben dem Feld. Dr\xFCcken Sie \u201EWeiter\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627378
@@ -260,12 +259,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627379
-    m_Localized: "Die Fragen stehen unter dem Bildschirm. Dr\xFCcken Sie A, B oder
-      C."
+    m_Localized: "Die Fragen kommen nach der Erkl\xE4rung zum LVS. Dr\xFCcken Sie
+      dann A, B oder C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627381
-    m_Localized: Etikett lesen
+    m_Localized: 1. Etikett lesen
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627382
@@ -299,8 +298,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627389
-    m_Localized: "Auf dem Bildschirm sehen Sie einen Auftrag im Lagerverwaltungssystem
-      (LVS). Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Localized: "Das ist ein Auftrag im Lagerverwaltungssystem (LVS). Dr\xFCcken
+      Sie \u201EWeiter\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627390
@@ -308,8 +307,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627391
-    m_Localized: Mat.-Nr ist die Materialnummer, Bez. ist der Name des Materials.
-      Vergleichen Sie beides mit dem Etikett.
+    m_Localized: Materialnummer und Bezeichnung des Materials. Vergleichen Sie beides
+      mit dem Etikett.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627392
@@ -317,8 +316,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627393
-    m_Localized: "So viele St\xFCck sind in einem Karton. Auf dem Etikett steht daf\xFCr
-      VPE."
+    m_Localized: "St\xFCck pro Karton. Auf dem Etikett steht daf\xFCr VPE."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627394
@@ -351,8 +349,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627401
-    m_Localized: 'Empf Kz zeigt die EKZ. Die EKZ sagt, wie Sie die Teile einlegen.
-      003 ist EKZ 3: Legen Sie die Teile einzeln und geordnet ein.'
+    m_Localized: 'Hier steht, wie Sie die Teile einlegen. 003 ist EKZ 3: einzeln
+      und geordnet.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627402
@@ -360,9 +358,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: "Hier steht 003, also EKZ 3. Bei anderen Auftr\xE4gen kann hier
-      000 stehen, also EKZ 0: Die Teile d\xFCrfen ungeordnet liegen oder eingef\xFCllt
-      werden. Alle EKZ sehen Sie rechts daneben."
+    m_Localized: "Bei anderen Auftr\xE4gen kann hier 000 stehen, also EKZ 0. Dann
+      d\xFCrfen die Teile ungeordnet liegen oder eingef\xFCllt werden."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -559,10 +556,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627451
-    m_Localized: "Der Lagerbeh\xE4lter kommt von links. Nach jedem Best\xE4tigen
-      f\xE4hrt er \xFCber die mittlere Bahn weg. Der Auftragsbeh\xE4lter bleibt rechts,
-      bis der Auftrag erledigt ist. Dann f\xE4hrt er ebenfalls dort weg. Den ganzen
-      Ablauf sehen Sie ganz rechts."
+    m_Localized: "Der Lagerbeh\xE4lter kommt von links und f\xE4hrt \xFCber die mittlere
+      Bahn weg; der Auftragsbeh\xE4lter f\xE4hrt erst weg, wenn der Auftrag erledigt
+      ist. Beantworten Sie jetzt die Fragen unter dem Bildschirm."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -738,7 +734,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307008
-    m_Localized: 'Teilen Sie Soll durch Verp.-Einh.: 120 : 40 = 3. Sie nehmen 3 Kartons.'
+    m_Localized: 'Soll : Verp.-Einh. = 120 : 40 = 3. Sie nehmen 3 Kartons.'
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307009

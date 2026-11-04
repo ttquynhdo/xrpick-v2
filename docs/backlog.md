@@ -1219,14 +1219,15 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Test trên kính:** bắt buộc (người mới vào scene, có biết nhìn đâu trước không; đọc giải thích có phải nhìn qua lại không; nói đúng ô được chỉ không; cụm có che WMS không)
 - **Depends on:** #76 (cùng sửa `AnswerOption`), #84 (chỗ của chú thích và cụm câu hỏi), #80 (cùng thanh); decision 024; giả định D30 (hỏi người hướng dẫn, không chặn) (sửa 010, 015, 020); #77 gộp vào đây
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md, docs/decisions/025-concept-show-and-do.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl78.md
+- **Status:** verified-mcp (15/15 ✅ MCP/code, 1 case chuyển sang #79, chờ test tay H1–H3 trên kính)
 
 ### #79 [Feature] ConceptScene: dấu xong trên thẻ việc như WelcomeScene
 - **Type:** feature
 - **Scene(s):** ConceptScene
 - **Files:** ConceptScene `InstructionShelf/Panel/Cards`, Assets/Scripts/Welcome/WelcomePracticeFeedback.cs (mẫu), script mới cho Concept
 - **Problem:** Ở Welcome mỗi thẻ việc có dấu tích khi làm xong (#39), còn ở Concept ba thẻ („Read the label“, „Get to know the WMS“, „Answer the questions“) không bao giờ đổi, nên người học không biết mình đã xong việc nào. Basic/Mixed/Complex dùng khung bước hiện tại (#40) thay vì dấu tích: cần chọn một kiểu cho Concept cho nhất quán.
-- **Done when:** (025) Cầm kiện của 3 trong 4 vật tư (KABELVERBINDER A, SCHRAUBE B, RING D, STECKER C): thẻ 1 chưa có ✓. Cầm một kiện của vật tư thứ tư: thẻ 1 có ✓. (code) Đếm theo `PackageData.MaterialKey` khác nhau: cầm carton RING D hay một vòng RING D lẻ đều là RING D; cầm 2 kiện cùng vật tư chỉ tính một. 3 carton tĩnh ở bước `cartons` và các vòng trong thùng mẫu EKZ không cầm được và không tính. Cầm lại một kiện đã cầm không tính là kiện mới. Tour tới bước 11 lần đầu: thẻ 2 có ✓. Trả lời đúng câu 4: thẻ 3 có ✓ và khung xanh tắt. Lúc vào, khung xanh ở thẻ 1; lần đầu bấm Weiter (Zurück ở bước 1 bị mờ) hoặc khi thẻ 1 xong: khung sang thẻ 2; quiz mở: khung sang thẻ 3. Bấm „Von vorn“ hoặc „Zurück“: mọi ✓ đã có vẫn giữ. Không thẻ nào có chữ hay nền đỏ/xanh lá. Ảnh `instructions` (DE và EN): ✓ ở góc thẻ, không che chữ.
+- **Done when:** (từ #78) Vào ConceptScene, chưa làm gì: chỉ thẻ 1 trên giá có khung xanh. (025) Cầm kiện của 3 trong 4 vật tư (KABELVERBINDER A, SCHRAUBE B, RING D, STECKER C): thẻ 1 chưa có ✓. Cầm một kiện của vật tư thứ tư: thẻ 1 có ✓. (code) Đếm theo `PackageData.MaterialKey` khác nhau: cầm carton RING D hay một vòng RING D lẻ đều là RING D; cầm 2 kiện cùng vật tư chỉ tính một. 3 carton tĩnh ở bước `cartons` và các vòng trong thùng mẫu EKZ không cầm được và không tính. Cầm lại một kiện đã cầm không tính là kiện mới. Tour tới bước 11 lần đầu: thẻ 2 có ✓. Trả lời đúng câu 4: thẻ 3 có ✓ và khung xanh tắt. Lúc vào, khung xanh ở thẻ 1; lần đầu bấm Weiter (Zurück ở bước 1 bị mờ) hoặc khi thẻ 1 xong: khung sang thẻ 2; quiz mở: khung sang thẻ 3. Bấm „Von vorn“ hoặc „Zurück“: mọi ✓ đã có vẫn giữ. Không thẻ nào có chữ hay nền đỏ/xanh lá. Ảnh `instructions` (DE và EN): ✓ ở góc thẻ, không che chữ.
 - **Inspector work expected:** yes (badge trên 3 thẻ)
 - **Công:** S–M
 - **Test trên kính:** nhanh (thấy dấu khi xong từng việc)

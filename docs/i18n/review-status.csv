@@ -65,7 +65,7 @@ common.card.step3_title,3. Auftrag bestätigen,proposed,german-reviewer (agent),
 complex.end.next,Bitte nehmen Sie die VR-Brille ab und melden Sie sich bei der Kursleitung.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 concept.card.step1_body,Nehmen Sie jede Verpackung in die Hand. Die Erklärung steht links neben dem Bildschirm.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 concept.card.step1_title,1. Etikett lesen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-concept.card.step2_body,Lesen Sie die Erklärung rechts neben dem Bildschirm. Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.card.step2_body,Lesen Sie die Erklärung neben dem Feld. Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.card.step2_title,2. LVS kennenlernen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 concept.card.step3_title,3. Fragen beantworten,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 concept.card.task_body,Lernen Sie das Etikett und das Lagerverwaltungssystem (LVS) kennen. Beantworten Sie dann die Fragen.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
@@ -80,7 +80,7 @@ entry.warning.continue,Trotzdem starten,proposed,german-reviewer (agent),2026-11
 complex.end.code,Code: {participant_id},proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 complex.feedback.correct,Volle Kartons und loses Material stimmen mit dem Auftrag überein.,proposed,german-reviewer (agent),2026-11-03,"Agent: OK; optional 'Die vollen Kartons und das lose Material …', left to #13"
 concept.label.default_body,"Nehmen Sie eine Verpackung in die Hand. Hier sehen Sie, was auf dem Etikett steht.",proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-concept.label.default_title,Etikett lesen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
+concept.label.default_title,1. Etikett lesen,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.label.matnr,Mat.-Nr: {matnr} – die Materialnummer. Dieselbe Nummer steht im LVS.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.label.vpe,VPE: {vpe} ST – so viele Stück sind in dieser Verpackung.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.quiz.all_done,Sie haben alle Fragen richtig beantwortet. Wählen Sie jetzt im Menü „{lesson}“.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
@@ -113,11 +113,11 @@ order.feedback.too_many,Zu viel Material {name}. Rechnen Sie nach: Sollmenge get
 order.feedback.wrong_material,Im Auftragsbehälter liegt falsches Material. Nehmen Sie es heraus. Prüfen Sie die Materialnummer im LVS.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 order.feedback.wrong_title,Nicht richtig,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.tour.intro.title,Das LVS,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.intro.body,Auf dem Bildschirm sehen Sie einen Auftrag im Lagerverwaltungssystem (LVS). Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
+concept.tour.intro.body,Das ist ein Auftrag im Lagerverwaltungssystem (LVS). Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.tour.material.title,Mat.-Nr und Bez.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.material.body,"Mat.-Nr ist die Materialnummer, Bez. ist der Name des Materials. Vergleichen Sie beides mit dem Etikett.",proposed,german-reviewer (agent),2026-11-03,"Agent: OK; optional 'Bez. ist die Bezeichnung des Materials', left to #13"
+concept.tour.material.body,Materialnummer und Bezeichnung des Materials. Vergleichen Sie beides mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.tour.verp_einh.title,Verp.-Einh.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.verp_einh.body,So viele Stück sind in einem Karton. Auf dem Etikett steht dafür VPE.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
+concept.tour.verp_einh.body,Stück pro Karton. Auf dem Etikett steht dafür VPE.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.tour.soll.title,Soll,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.soll.body,So viele Stück müssen Sie kommissionieren.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.ist.title,Ist,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
@@ -125,7 +125,7 @@ concept.tour.ist.body,"Beim Wiegen zeigt Ist, wie viele Stück schon im Auftrags
 concept.tour.rest.title,Rest,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.rest.body,So viele Stück bleiben nach dem Auftrag im Lagerbehälter.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.empf_kz_003.title,Empf Kz,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.empf_kz_003.body,"Empf Kz zeigt die EKZ. Die EKZ sagt, wie Sie die Teile einlegen. 003 ist EKZ 3: Legen Sie die Teile einzeln und geordnet ein.",proposed,german-reviewer (agent),2026-11-03,Agent: changed in #55 („Die EKZ sagt“)
+concept.tour.empf_kz_003.body,"Hier steht, wie Sie die Teile einlegen. 003 ist EKZ 3: einzeln und geordnet.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.tour.not_used.title,Nicht in der Übung,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.not_used.body,Die markierten Bereiche brauchen Sie in der Übung nicht. Das Feld Anweisung bleibt in der Übung leer.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.q,"Soll 100, VPE 25: Wie viele Kartons nehmen Sie?",proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
@@ -160,11 +160,11 @@ concept.ekz.8,ESD-geschützte Teile. Nicht ohne Anweisung öffnen.,proposed,germ
 concept.ekz.9,Sonderverpackung. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen unter dem Bildschirm.,proposed,german-reviewer (agent),2026-11-03,#58; Agent: OK; wording as complex.card.step1_body_position1
 concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.tour.cartons.body,Teilen Sie Soll durch Verp.-Einh.: 120 : 40 = 3. Sie nehmen 3 Kartons.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.tour.cartons.body,Soll : Verp.-Einh. = 120 : 40 = 3. Sie nehmen 3 Kartons.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.tour.empf_kz_000.body,"Hier steht 003, also EKZ 3. Bei anderen Aufträgen kann hier 000 stehen, also EKZ 0: Die Teile dürfen ungeordnet liegen oder eingefüllt werden. Alle EKZ sehen Sie rechts daneben.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.tour.material_flow.body,"Der Lagerbehälter kommt von links. Nach jedem Bestätigen fährt er über die mittlere Bahn weg. Der Auftragsbehälter bleibt rechts, bis der Auftrag erledigt ist. Dann fährt er ebenfalls dort weg. Den ganzen Ablauf sehen Sie ganz rechts.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.card.step3_body,"Die Fragen stehen unter dem Bildschirm. Drücken Sie A, B oder C.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, also EKZ 0. Dann dürfen die Teile ungeordnet liegen oder eingefüllt werden.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
+concept.tour.material_flow.body,"Der Lagerbehälter kommt von links und fährt über die mittlere Bahn weg; der Auftragsbehälter fährt erst weg, wenn der Auftrag erledigt ist. Beantworten Sie jetzt die Fragen unter dem Bildschirm.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
+concept.card.step3_body,"Die Fragen kommen nach der Erklärung zum LVS. Drücken Sie dann A, B oder C.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.quiz.locked,Die Fragen kommen nach der Erklärung zum LVS.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.title,Ablauf am Kommissionierplatz,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
