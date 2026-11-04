@@ -4970,6 +4970,7 @@ MonoBehaviour:
   - {fileID: 9381777}
   - {fileID: 183485740}
   - {fileID: 1410884544}
+  - {fileID: 1964602097}
   sceneMenu: {fileID: 201677177}
 --- !u!4 &598130577
 Transform:
@@ -18141,6 +18142,11 @@ PrefabInstance:
 --- !u!4 &1932390009 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 975893508135683814, guid: 66c6ee167e204c6409f179c34e4be5ca, type: 3}
+  m_PrefabInstance: {fileID: 1932390008}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1964602097 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2696342114205511208, guid: 66c6ee167e204c6409f179c34e4be5ca, type: 3}
   m_PrefabInstance: {fileID: 1932390008}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1937192788
