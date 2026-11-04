@@ -28,6 +28,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Cập nhật 2026-11-03:** #71 và #72 verified-mcp (ba làn ở Basic, Mixed, Complex). Tiếp theo: #67 → #64 → #36 → #13. #67 verified-mcp (Mixed 150/50 rồi 60/20). #64 verified-mcp (2026-11-04, Menu font 18, rộng 400 px về bên phải). Tiếp theo: #36 → #13. Test kính gom vào buổi tới: #71 T5, H1–H4; #72 T6, T7.
 - **Mới 2026-11-04 (video test kính P811, English):** làm trước #36 và #13 vì #76 chặn người học ở Concept. Decision 024 chốt bố cục #78–#80 (#77 gộp vào #78); decision 025 (người dùng: học bằng nhìn và làm, không đọc chữ) thêm lớp vật thật lên trên: carton STECKER C, 3 carton 40/80/120, thùng mẫu EKZ (mục mới #83), băng ba làn có thùng chạy (#81). Thứ tự **#76 (P0, S, Concept + Complex) → #78 + #80 → #79 → #83 → #81** (#83 và #81 đổi chỗ được), rồi #82 (R, sau #80), #36 → #13 (export có chữ mới của #78–#83). Các mục ConceptScene không chạy song song với nhau. Test kính gom: #76, #78–#81, #83, cùng M1–M3 của #73.
 - **Rà lại 2026-11-04 (đo ConceptScene trong Editor):** băng ba làn của #81 nằm đúng chỗ các kiện hiện có (vòng RING D ở chỗ thùng đơn, KABELVERBINDER A ở chỗ làm việc), chỗ „bên phải trong tầm tay“ của cụm câu hỏi là chỗ Menu, giữa `Info Panel` và viền dialog chỉ có 11 cm, và thanh điều hướng ở độ sâu màn hình (z ≈ 1,07) thì tay không với tới. Vì vậy bố cục đo một lần ở mục mới #84 trước, rồi mới làm phần chạy. Thứ tự mới: **#76 (merge sau H1–H3) → #84 bố cục → #80 → #78 (+ #85 Complex) → #79 → #83 → #81 → #82** (#83 và #81 đổi chỗ được), rồi #36 → #13. #84, #78–#81, #83 làm tuần tự trên một nhánh `feat/84-concept-show-and-do` (mỗi mục vẫn có test report riêng), ra **một build** ghi `layout_version` "025", `german-reviewer` duyệt mọi chuỗi mới một lần, một buổi test kính chung. #85 (ComplexScene) làm song song được.
+- **Cập nhật 2026-11-04 (cuối ngày):** #76 merged vào `main`. Trên nhánh `feat/84-concept-show-and-do`: #84, #80, #78, #79, #83, #81 verified-mcp (chờ test kính chung), #82 done. Còn lại: #85 (Complex) → buổi test kính chung (#76 H1–H3, #84 H1–H3, #80 H1–H2, #78 H1–H3, #79 H1, #83 H1–H2, #81 H1–H2, #73 M1–M3) → merge nhánh → #36 → #13.
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
@@ -1276,7 +1277,8 @@ Nguồn: video `5. Thesis/07_presentations/com.xrise.xpick-20261104-161350-0.mp4
 - **Test trên kính:** không
 - **Depends on:** #80
 - **Decision:** docs/decisions/024-concept-captions-nav-bar.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl82.md
+- **Status:** done (selftest 7/7 ✅; chưa chạy trên log thật layout "025")
 
 ### #83 [Feature] ConceptScene: mẫu thật ở bước nhãn, số carton và EKZ
 - **Type:** feature

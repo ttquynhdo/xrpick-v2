@@ -28,7 +28,7 @@ local({
   source("analysis/analyse.R", local = TRUE)
 
   # 2. One row per study participant: P101-P115; the test ID P950 is dropped,
-  #    the pilot IDs P801-P803 are in their own set (8q).
+  #    the pilot IDs P801-P803, P811, P812 are in their own set (8q).
   stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
@@ -72,7 +72,8 @@ local({
   # 8. Every output file exists.
   expected_files <- c("error_rate_by_skill.png", "error_rate_by_skill_first_attempt.png",
                       "error_codes_by_scene.png", "time_to_correct_by_scene.png",
-                      "data_quality.csv", "data_quality.png", "wide.csv", "warnings.txt")
+                      "data_quality.csv", "data_quality.png", "wide.csv", "warnings.txt",
+                      "tour_steps.csv", "tour_time_by_step.png", "tour_back_by_step.png")
   missing_files <- expected_files[!file.exists(file.path(output_dir, expected_files))]
   if (length(missing_files) > 0) stop("missing outputs: ", paste(missing_files, collapse = ", "))
 
@@ -412,7 +413,8 @@ local({
   stopifnot(any(grepl("decision 022", warn_lines)))
 
   # 8q. Pilot set (decision 023, #75): P801 (EN), P802 (DE), P803 (EN, crash
-  #     + accepted resume) in research/pilot/ are analysed as their own set
+  #     + accepted resume), P811 (EN, layout "019") and P812 (EN, fixed tour,
+  #     8s) in research/pilot/ are analysed as their own set
   #     into output_dir/pilot/, with every main output, and never mix with
   #     the study set (logs and paper forms).
   pilot_dir <- file.path(output_dir, "pilot")
@@ -421,7 +423,7 @@ local({
   missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
   if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
   stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
-  pilot_ids <- c("P801", "P802", "P803")
+  pilot_ids <- c("P801", "P802", "P803", "P811", "P812")
   stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
             identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
   is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
@@ -432,7 +434,7 @@ local({
   p_items <- read_csv(file.path(pilot_dir, "items.csv"), show_col_types = FALSE)
   stopifnot(nrow(p_items) > 0, all(is_p8(p_items$participant_id)))
   # Paper rows join the set of their ID: study wp keeps its 16 rows (8p), the
-  # pilot wp has exactly the three pilots, all joined.
+  # pilot wp has exactly the five pilots, all joined.
   p_wp <- read_csv(file.path(pilot_dir, "wide_with_paper.csv"), show_col_types = FALSE, guess_max = 1000)
   stopifnot(identical(sort(p_wp$participant_id), pilot_ids), all(p_wp$paper_status == "joined"),
             all(p_wp$has_log), !any(is_p8(wp$participant_id)))
@@ -453,6 +455,56 @@ local({
             !any(grepl("outside research/pilot|in research/pilot", c(p_warn, warn_lines))))
   # The study report names the pilot IDs it left out.
   stopifnot(any(grepl("^Pilot IDs .*P801, P802, P803", warn_lines)))
+
+  # 8s. ConceptScene tour (#82). P812 ("025") runs a fixed tour
+  #     (make_fake_data.R p812_tour): Zurück 4 -> 3 after 1.2 s (quick, booked
+  #     on step 4), the chain 9 -> 8 -> 7 (8 -> 7 at the same t), a 10 s pause
+  #     on step 6, "Von vorn" 11 -> 1. P811 ran a "019" build: no Zurück.
+  ts <- read_csv(file.path(pilot_dir, "tour_steps.csv"), show_col_types = FALSE,
+                 col_types = cols(layout_version = col_character()))
+  stopifnot(pilot_set$n_steps == 11)
+  t812 <- ts %>% filter(participant_id == "P812") %>% arrange(step_index)
+  stopifnot(nrow(t812) == 11, all(t812$layout_version == "025"), all(t812$zurueck_available))
+  # Back count per step for the known chain: steps 4, 8 and 9, once each.
+  stopifnot(identical(as.integer(t812$back_presses), as.integer(seq_len(11) %in% c(4, 8, 9))))
+  # Next then Back within < 2 s: only 3 -> 4 -> 3 (1.2 s); 8 -> 9 -> 8 took 3.5 s,
+  # and 8 -> 7 follows a Back, not a Weiter.
+  stopifnot(identical(as.integer(t812$quick_next_back), as.integer(seq_len(11) == 4)))
+  # "Von vorn" is booked on the last step, as a restart (not a jump, not a Back).
+  stopifnot(identical(as.integer(t812$restarts), as.integer(seq_len(11) == 11)))
+  # Active time: step 4 = 1.2 + 7 s, step 6 = 2 + 4 s (the 10 s pause removed),
+  # step 8 = 6 + 0 + 4 s (three showings), step 11 = 5.001 s (until "Von vorn").
+  stopifnot(isTRUE(all.equal(t812$active_s[c(4, 6, 8, 11)], c(8.2, 6, 10, 5.001), tolerance = 1e-9)),
+            identical(as.integer(t812$shows[c(3, 8)]), c(3L, 3L)))
+  # Line order, not t: the two Back lines 9 -> 8 -> 7 share t and are both "back".
+  tie <- pilot_set$tour_shows %>% filter(participant_id == "P812") %>% group_by(t) %>% filter(n() > 1) %>% ungroup()
+  stopifnot(nrow(tie) == 2, identical(tie$step_index, c(8L, 7L)), all(tie$direction == "back"))
+  # P811 ("019"): time measured, Back counts NA (not 0).
+  t811 <- ts %>% filter(participant_id == "P811")
+  stopifnot(nrow(t811) == 11, all(t811$layout_version == "019"), !any(t811$zurueck_available),
+            all(is.na(t811$back_presses)), all(is.na(t811$quick_next_back)), !anyNA(t811$active_s))
+  stopifnot(is.na(pw8("tour_back_presses_ConceptScene", "P811")),
+            pw8("tour_back_presses_ConceptScene", "P812") == 3,
+            pw8("tour_quick_next_back_ConceptScene", "P812") == 1)
+  # A header without layout_version counts as "no Zurück", like "019".
+  stopifnot(identical(pilot_set$tour_has_zurueck(c("019", NA, "025", "026")), c(FALSE, FALSE, TRUE, TRUE)))
+  # No unexpected tour moves in the fake data (only Weiter / Zurück / Von vorn).
+  stopifnot(!any(grepl("not Weiter/Zurück/Von vorn|no Zurück button", c(p_warn, warn_lines))))
+  # Study set: every row of a visit with a tour, the random Back chains of
+  # make_fake_data.R counted (a two-step chain gives 2 Backs in one visit).
+  stopifnot(nrow(tour_steps) == 11 * nrow(distinct(tour_steps, session_id, scene_visit)),
+            all(tour_steps$zurueck_available), !anyNA(tour_steps$back_presses),
+            sum(tour_steps$back_presses) == sum(tour_shows$direction == "back"))
+  # Mixed layouts (decision 024): the pilot set mixes "019" and "025", the
+  # study set does not. Concept items and times are split by layout_version.
+  stopifnot(all(pilot_set$data_quality$mixed_layout), !any(data_quality$mixed_layout),
+            any(grepl("set mixes layout_version 019 / 025", p_warn)), !any(grepl("set mixes layout_version", warn_lines)))
+  concept_items <- p_items %>% filter(scene == "ConceptScene")
+  stopifnot(all(c("019", "025") %in% as.character(concept_items$layout_version)),
+            identical(as.character(concept_items$layout_version[concept_items$participant_id == "P811"])[1], "019"))
+  stopifnot(all(c("ConceptScene [019]", "ConceptScene [025]") %in% as.character(pilot_set$ttc_people$scene)),
+            all(c("ConceptScene [019]", "ConceptScene [025]") %in% as.character(pilot_set$item_shares$chart_scene)),
+            !any(grepl("\\[", as.character(ttc_people$scene))))
 
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.

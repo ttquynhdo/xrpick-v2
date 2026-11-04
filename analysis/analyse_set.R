@@ -13,6 +13,9 @@
 # paper_forms.csv exists) and 6 (data quality). There is no pose, frame-rate
 # or tracking data in the logs (decision 022): Q4 uses the SSQ change with
 # headset removals, pauses, early end and active time only. Rules: docs/superpowers/specs/2026-11-01-research-logger-design.md
+# The ConceptScene field tour (#82, section 13c) gives time per step and
+# "Zurueck" presses per step (tour_steps.csv); Concept data of different
+# layout_version are never pooled (section 8b, decision 024).
 # section 8. Log format: docs/research-logging-spec.md, schema_version 2
 # (decision 021). Logs with schema_version 1 are read for sessions, visits and
 # pauses, but their outcome events (v1 catalogue) are not: NA, not measured.
@@ -1099,7 +1102,7 @@ if (nrow(menu_entries) > 0) {
 
 visits <- visits_base %>%
   left_join(sessions %>% select(participant_id, session_id, session_no, build, schema_version,
-                                end_status, crash_before, start_utc),
+                                layout_version, end_status, crash_before, start_utc),
             by = "session_id") %>%
   left_join(press_visit, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(task_completed, by = c("session_id", "scene", "scene_visit")) %>%
@@ -1185,6 +1188,49 @@ for (i in seq_len(nrow(no_open))) {
 unknown_scenes <- setdiff(levels(visits$scene), scene_levels)
 if (length(unknown_scenes) > 0) {
   warn("scene(s) missing from scenes.csv (put last in charts): ", paste(unknown_scenes, collapse = ", "))
+}
+
+# ---- 8b. Layout versions: ConceptScene before / after "Zurück" (#82) -----------
+
+# Decision 024: ConceptScene changed with layout "025" (captions, tour with
+# "Zurück", quiz hidden until step 11, 1.5 s hold), so Concept numbers of a
+# "019" build (or a header without layout_version) and of a "025" build are
+# never pooled. When a set holds more than one layout, every ConceptScene
+# figure (tour, quiz, items.csv, time to correct) is split by layout_version
+# and data_quality.csv says mixed_layout. Schema 1 logs are left out of this
+# check: none of their Concept data enters a figure (outcomes not read).
+# Label for a layout in charts and keys: NA (header without the field) = "none".
+layout_label <- function(x) coalesce(as.character(x), "none")
+# The tour has "Zurück" from layout "025" on (#80); "019" and none have not.
+tour_has_zurueck <- function(layout_version) {
+  coalesce(suppressWarnings(as.integer(layout_version)) >= 25L, FALSE)
+}
+session_layout <- sessions %>% filter(!schema_version %in% 1L) %>%
+  transmute(session_id, layout_version)
+layouts_in_set <- sort(unique(layout_label(session_layout$layout_version)))
+mixed_layout_set <- length(layouts_in_set) > 1
+if (mixed_layout_set) {
+  warn("set mixes layout_version ", paste(layouts_in_set, collapse = " / "),
+       " (", paste(map_chr(layouts_in_set, function(l) paste0(l, ": ", paste(sort(unique(
+         sessions$participant_id[!sessions$schema_version %in% 1L & layout_label(sessions$layout_version) == l])),
+         collapse = ", "))), collapse = "; "),
+       "): ConceptScene figures, items.csv and tour_steps.csv are split by layout_version, never pooled (decision 024)")
+}
+# Scene names for charts: in a mixed set ConceptScene becomes one level per
+# layout ("ConceptScene [019]", "ConceptScene [025]"), in build order.
+chart_scene_levels <- levels(visits$scene)
+if (mixed_layout_set && "ConceptScene" %in% chart_scene_levels) {
+  i_concept <- match("ConceptScene", chart_scene_levels)
+  chart_scene_levels <- append(chart_scene_levels[-i_concept],
+                               paste0("ConceptScene [", layouts_in_set, "]"), after = i_concept - 1)
+}
+chart_scene <- function(scene, session_id) {
+  sc <- as.character(scene)
+  if (mixed_layout_set) {
+    lay <- layout_label(sessions$layout_version[match(session_id, sessions$session_id)])
+    sc <- if_else(sc == "ConceptScene", paste0("ConceptScene [", lay, "]"), sc)
+  }
+  factor(sc, levels = chart_scene_levels)
 }
 
 # ---- 9. Compare the rebuilt visits with summary.csv ---------------------------
@@ -1332,6 +1378,9 @@ data_quality <- sessions %>%
     schema_versions = paste(unique(schema_version), collapse = ";"),
     # Station layout per session ("NA" = schema 1 log, no layout_version).
     layout_versions = paste(unique(coalesce(layout_version, "NA")), collapse = ";"),
+    # TRUE on every row when the set holds more than one layout_version
+    # (section 8b): Concept figures are split by layout, never pooled.
+    mixed_layout = mixed_layout_set,
     n_crashes = sum(end_status == "crash"),
     # end_status of the participant = how their last session ended.
     end_status = last(end_status),
@@ -1381,7 +1430,7 @@ data_quality <- sessions %>%
                   duplicate_files), ~ coalesce(.x, 0L)),
          error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
-         mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, gap_h, n_crashes, resume_offered, resume_declined,
+         mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, mixed_layout, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, interaction_logged,
@@ -1491,6 +1540,10 @@ items <- item_attempts %>%
     # Positions without a skill in item_skills.csv: "picking" (whole position).
     skill = if_else(is.na(skill) & kind == "position", position_skill_default, skill),
     scaffolded = coalesce(scaffolded, FALSE),
+    # Header layout of the item's session (section 8b): ConceptScene items of
+    # different layouts are never pooled.
+    layout_version = sessions$layout_version[match(session_id, sessions$session_id)],
+    chart_scene = chart_scene(scene, session_id),
     scene = factor(scene, levels = levels(visits$scene))) %>%
   arrange(participant_id, scene, item)
 unmapped_items <- items %>% filter(is.na(skill)) %>% distinct(scene, item)
@@ -1498,7 +1551,7 @@ for (i in seq_len(nrow(unmapped_items))) {
   warn("quiz item ", unmapped_items$item[i], " in ", unmapped_items$scene[i],
        " is not in item_skills.csv: left out of first_attempt_by_item.png")
 }
-write_csv(items %>% select(participant_id, scene, item, kind, quiz, skill, scaffolded,
+write_csv(items %>% select(participant_id, scene, layout_version, item, kind, quiz, skill, scaffolded,
                            first_attempt_correct, attempts, reached_correct, first_attempt_codes,
                            session_id, scene_visit, repeat_visit),
           file.path(output_dir, "items.csv"), na = "")
@@ -1528,7 +1581,7 @@ skill_colours <- setNames(okabe_ito[seq_along(skill_levels)], skill_levels)
 
 title_items <- "Is the first attempt per item right more often later in the course?"
 item_shares <- items %>% filter(!is.na(skill)) %>%
-  group_by(skill, scene, item, kind, scaffolded) %>%
+  group_by(skill, scene, chart_scene, item, kind, scaffolded) %>%
   summarise(k = sum(first_attempt_correct %in% TRUE), n = n(), .groups = "drop")
 if (nrow(item_shares) == 0) {
   p_items <- empty_chart(title_items)
@@ -1542,11 +1595,12 @@ if (nrow(item_shares) == 0) {
            csv_order = match(paste(scene, item), paste(item_skills$scene, item_skills$item)),
            pos_no = suppressWarnings(as.integer(str_remove(item, "^position_"))),
            item_rank = coalesce(csv_order, 1000L + coalesce(pos_no, 0L)),
-           x_label = paste0(str_remove(as.character(scene), "(Picking)?Scene$"), "\n", item),
+           # chart_scene: "ConceptScene [019]" etc. in a mixed-layout set (8b).
+           x_label = paste0(str_remove(as.character(chart_scene), "(Picking)?Scene"), "\n", item),
            skill = factor(skill, levels = skill_levels),
            # Hollow = scaffolded (the app handed the trainee the numbers).
            fill_colour = if_else(scaffolded, "white", skill_colours[as.character(skill)])) %>%
-    arrange(as.integer(scene), item_rank) %>%
+    arrange(as.integer(chart_scene), item_rank) %>%
     mutate(x_label = factor(x_label, levels = unique(x_label)))
   p_items <- ggplot(item_shares, aes(x_label, 100 * share, colour = skill)) +
     geom_linerange(aes(ymin = 100 * lo, ymax = 100 * hi), linewidth = 0.7, alpha = 0.6) +
@@ -1623,11 +1677,14 @@ skill_rates <- counting_visits %>%
          first_attempt_skill_error = map2_lgl(skill_error_press_ids, first_skill_press_id,
                                               ~ !is.null(.x) && .y %in% .x),
          error_rate = presses_with_skill_error / skill_presses,
+         # One x position per layout for ConceptScene in a mixed set (8b).
+         chart_scene = chart_scene(scene, session_id),
          scene = factor(scene, levels = levels(visits$scene))) %>%
   select(-skill_error_press_ids, -first_skill_press_id)
 
-# Scenes with skills, in build order, so every layer uses the same x order.
-skill_scene_limits <- intersect(levels(visits$scene), unique(skill_pairs$scene))
+# Scenes with skills, in build order, so every layer uses the same x order
+# (ConceptScene split by layout in a mixed set).
+skill_scene_limits <- chart_scene_levels[str_remove(chart_scene_levels, " \\[.*\\]$") %in% skill_pairs$scene]
 
 title_q1 <- "Secondary: does the error rate per press fall across the course, per skill?"
 if (nrow(skill_rates) == 0) {
@@ -1635,9 +1692,9 @@ if (nrow(skill_rates) == 0) {
   warn("no outcome data: error_rate_by_skill.png and error_rate_by_skill_first_attempt.png are empty")
 } else {
   # Mean per scene and skill (= mean of participants, each with one visit).
-  skill_means <- skill_rates %>% group_by(scene, skill) %>%
+  skill_means <- skill_rates %>% group_by(chart_scene, skill) %>%
     summarise(mean_rate = mean(error_rate), n = n(), .groups = "drop")
-  p_skill <- ggplot(skill_rates, aes(scene, 100 * error_rate, colour = skill)) +
+  p_skill <- ggplot(skill_rates, aes(chart_scene, 100 * error_rate, colour = skill)) +
     geom_jitter(width = 0.12, height = 0, alpha = 0.55, size = 2) +
     # Lines only join scenes where a skill is tested more than once.
     geom_line(data = skill_means %>% group_by(skill) %>% filter(n() > 1),
@@ -1666,10 +1723,10 @@ title_q1b <- "First attempt: how many participants made an error of this skill?"
 if (nrow(skill_rates) == 0) {
   p_first <- empty_chart(title_q1b)
 } else {
-  first_rates <- skill_rates %>% group_by(scene, skill) %>%
+  first_rates <- skill_rates %>% group_by(chart_scene, skill) %>%
     summarise(k = sum(first_attempt_skill_error), n = n(), .groups = "drop") %>%
     mutate(share = k / n)
-  p_first <- ggplot(first_rates, aes(scene, 100 * share, colour = skill, group = skill)) +
+  p_first <- ggplot(first_rates, aes(chart_scene, 100 * share, colour = skill, group = skill)) +
     geom_line(data = first_rates %>% group_by(skill) %>% filter(n() > 1), linewidth = 0.8) +
     geom_point(size = 3) +
     geom_text(aes(label = paste0(k, "/", n)), vjust = -1, size = 3, colour = "grey20") +
@@ -1696,12 +1753,12 @@ codes_counting <- press_codes %>%
   semi_join(counting_visits %>% mutate(scene = as.character(scene)),
             by = c("session_id", "scene", "scene_visit")) %>%
   mutate(code = if_else(is.na(skill), paste0(code, " (unknown)"), code),
-         scene = factor(scene, levels = levels(visits$scene)))
+         scene = chart_scene(scene, session_id))
 if (nrow(codes_counting) == 0) {
   p_codes <- empty_chart(title_q2)
   warn("no error codes in counting visits: error_codes_by_scene.png is empty")
 } else {
-  scene_n <- counting_visits %>% group_by(scene) %>%
+  scene_n <- counting_visits %>% mutate(scene = chart_scene(scene, session_id)) %>% group_by(scene) %>%
     summarise(n_people = n_distinct(participant_id), n_presses = sum(confirm_count), .groups = "drop")
   code_totals <- codes_counting %>% count(scene, name = "n_codes")
   p_codes <- ggplot(codes_counting, aes(scene, fill = code)) +
@@ -1726,7 +1783,9 @@ ggsave(file.path(output_dir, "error_codes_by_scene.png"), p_codes, width = 10, h
 title_ttc <- "How long does it take to reach a correct order in each scene?"
 # Everyone who entered a scene with outcome logging: reached correct on the
 # counting visit, or not (no correct, or no confirm at all).
+# In a mixed-layout set ConceptScene is one group per layout (section 8b).
 ttc_people <- visits %>% filter(outcome_logged) %>%
+  mutate(scene = chart_scene(scene, session_id)) %>%
   group_by(participant_id, scene) %>%
   summarise(has_counting = any(counting & confirm_count > 0, na.rm = TRUE),
             time_to_correct_s = if (has_counting) time_to_correct_s[counting & confirm_count > 0][1] else NA_real_,
@@ -1868,6 +1927,227 @@ if (nrow(proc_long) == 0) {
 }
 ggsave(file.path(output_dir, "time_by_phase.png"), p_q3, width = 10, height = 6.5, dpi = 150, bg = "white")
 
+# ---- 13c. ConceptScene field tour (#82): time per step, Back presses --------
+
+# Every shown tour step logs one tour_step {step_id, step_index} (decision 024
+# item 9: no other tour event). R derives what the trainee pressed from the
+# change of step_index against the previous tour_step of the same visit:
+#   +1 = "Weiter" (next), -1 = "Zurück" (back), last step -> 1 = "Von vorn"
+#   (restart, a jump of -(tour_n_steps - 1)); the first line of a visit =
+#   start. Anything else ("jump", "repeat") should not happen and is warned.
+# Order = line order in the file, not t: two presses in one frame share t.
+# Direction restarts at every scene_visit (a new visit starts the tour anew).
+#
+# Per shown step: active time from its line to the next tour_step of the
+# visit, cut at the visit's first quiz_answer (the quiz then has the
+# trainee's attention; step 11 ends there) and at the visit end (scene_exit;
+# the last event of a crashed visit, then time_censored), minus paused time.
+# A step shown after the first quiz_answer (e.g. "Von vorn" during the quiz)
+# is counted in shows_after_quiz but adds no time.
+# A press is booked on the step the trainee left (the step on screen when
+# "Zurück" was pressed). quick_next_back = "Weiter" to this step, then
+# "Zurück" within < tour_quick_back_s active seconds: a likely mis-press.
+# Back counts exist only for layouts with "Zurück" ("025" on, section 8b);
+# for "019" or a header without layout_version they are NA, never 0.
+
+# Number of tour steps: taken from the logs (the highest step_index of the
+# set) unless set here; "Von vorn" is a jump from this step to 1.
+if (!exists("tour_n_steps")) tour_n_steps <- NULL
+tour_quick_back_s <- 2
+
+tour_rows <- v2_events %>%
+  filter(scene == "ConceptScene", event == "tour_step", session_id %in% outcome_sessions) %>%
+  transmute(participant_id, session_id, scene_visit, t, line,
+            step_id = map_chr(data, ~ as_chr(.x$step_id)),
+            step_index = map_int(data, ~ as_int(.x$step_index))) %>%
+  left_join(sessions %>% select(session_id, layout_version), by = "session_id")
+bad_step <- tour_rows %>% filter(is.na(step_index) | step_index < 1)
+if (nrow(bad_step) > 0) {
+  warn(nrow(bad_step), " tour_step line(s) without a valid step_index (ignored): ",
+       paste(unique(bad_step$participant_id), collapse = ", "))
+}
+tour_rows <- tour_rows %>% filter(!is.na(step_index), step_index >= 1)
+n_steps <- if (!is.null(tour_n_steps)) tour_n_steps else if (nrow(tour_rows) > 0) max(tour_rows$step_index) else NA_integer_
+# Step names per index (the tour's step_id), for the table and the charts.
+step_names <- tour_rows %>% filter(!is.na(step_id)) %>% count(step_index, step_id) %>%
+  group_by(step_index) %>% slice_max(n, n = 1, with_ties = FALSE) %>% ungroup() %>% select(-n)
+odd_names <- tour_rows %>% distinct(step_index, step_id) %>% count(step_index) %>% filter(n > 1)
+if (nrow(odd_names) > 0) {
+  warn("tour step_index with more than one step_id (renamed step? the name of the most frequent is used): ",
+       paste(odd_names$step_index, collapse = ", "))
+}
+
+# Visit facts: end of the visit and the first quiz touch.
+tour_visit_facts <- visits_base %>%
+  filter(scene == "ConceptScene") %>%
+  select(session_id, scene_visit, end_t, closed) %>%
+  left_join(presses %>% filter(scene == "ConceptScene", event == "quiz_answer") %>%
+              group_by(session_id, scene_visit) %>% summarise(first_quiz_t = min(t), .groups = "drop"),
+            by = c("session_id", "scene_visit"))
+
+tour_shows <- tour_rows %>%
+  arrange(session_id, scene_visit, line) %>%
+  group_by(session_id, scene_visit) %>%
+  mutate(prev_index = lag(step_index),
+         prev_t = lag(t),
+         next_t = lead(t)) %>%
+  ungroup() %>%
+  left_join(tour_visit_facts, by = c("session_id", "scene_visit")) %>%
+  mutate(
+    delta = step_index - prev_index,
+    direction = case_when(
+      is.na(prev_index) ~ "start",
+      delta == 1 ~ "next",
+      delta == -1 ~ "back",
+      prev_index == n_steps & step_index == 1 ~ "restart",
+      delta == 0 ~ "repeat",
+      TRUE ~ "jump"),
+    after_quiz = !is.na(first_quiz_t) & t >= first_quiz_t,
+    show_end_t = pmin(coalesce(next_t, Inf), coalesce(first_quiz_t, Inf), end_t),
+    # The visit end of a crashed visit is only its last event: censored.
+    time_censored = !after_quiz & is.na(next_t) & is.na(first_quiz_t) & !closed,
+    show_s = if_else(after_quiz, NA_real_,
+                     round(pmax(0, show_end_t - t - paused_between(session_id, t, show_end_t)), 3))) %>%
+  group_by(session_id, scene_visit) %>%
+  mutate(prev_direction = lag(direction),
+         # Active seconds the previous step stayed on screen before this press.
+         gap_s = round(t - prev_t - paused_between(session_id, prev_t, t), 3),
+         quick_back = direction == "back" & prev_direction %in% "next" & gap_s < tour_quick_back_s) %>%
+  ungroup()
+
+odd_moves <- tour_shows %>% filter(direction %in% c("jump", "repeat"))
+for (i in seq_len(nrow(odd_moves))) {
+  r <- odd_moves[i, ]
+  warn("tour_step ", r$prev_index, " -> ", r$step_index, " (", r$direction, ", not Weiter/Zurück/Von vorn): ",
+       r$participant_id, " session ", r$session_id, " visit ", r$scene_visit, " line ", r$line)
+}
+back_without_button <- tour_shows %>% filter(direction == "back", !tour_has_zurueck(layout_version)) %>%
+  distinct(participant_id, layout_version)
+for (i in seq_len(nrow(back_without_button))) {
+  warn("tour step back by 1 in a log of layout ", layout_label(back_without_button$layout_version[i]),
+       " (no Zurück button there): ", back_without_button$participant_id[i], " (not counted as Back)")
+}
+
+# One row per Concept visit with a tour and per step 1..n_steps, so a step
+# never reached is a row with shows 0 and active_s empty (not reached, not 0 s).
+visit_order_concept <- visits %>% filter(scene == "ConceptScene") %>%
+  select(session_id, scene_visit, visit_no, repeat_visit)
+tour_visits <- tour_shows %>% distinct(participant_id, session_id, scene_visit, layout_version) %>%
+  left_join(visit_order_concept, by = c("session_id", "scene_visit"))
+tour_steps <- tibble(participant_id = character(), layout_version = character(), session_id = character(),
+                     scene_visit = integer(), visit_no = integer(), repeat_visit = logical(),
+                     zurueck_available = logical(), step_index = integer(), step_id = character(),
+                     shows = integer(), shows_after_quiz = integer(), active_s = double(),
+                     time_censored = logical(), back_presses = integer(), quick_next_back = integer(),
+                     restarts = integer())
+if (nrow(tour_visits) > 0) {
+  per_step_shown <- tour_shows %>%
+    group_by(session_id, scene_visit, step_index) %>%
+    summarise(shows = n(),
+              shows_after_quiz = sum(after_quiz),
+              active_s = if (any(!after_quiz)) round(sum(show_s, na.rm = TRUE), 3) else NA_real_,
+              time_censored = any(time_censored), .groups = "drop")
+  # Presses are booked on the step that was left (prev_index).
+  per_step_left <- tour_shows %>% filter(!is.na(prev_index)) %>%
+    group_by(session_id, scene_visit, step_index = prev_index) %>%
+    summarise(ev_back = sum(direction == "back"), ev_quick = sum(quick_back),
+              ev_restart = sum(direction == "restart"), .groups = "drop")
+  tour_steps <- tour_visits %>%
+    crossing(step_index = seq_len(n_steps)) %>%
+    left_join(step_names, by = "step_index") %>%
+    left_join(per_step_shown, by = c("session_id", "scene_visit", "step_index")) %>%
+    left_join(per_step_left, by = c("session_id", "scene_visit", "step_index")) %>%
+    mutate(zurueck_available = tour_has_zurueck(layout_version),
+           shows = coalesce(shows, 0L),
+           shows_after_quiz = coalesce(shows_after_quiz, 0L),
+           time_censored = coalesce(time_censored, FALSE),
+           back_presses = if_else(zurueck_available, coalesce(ev_back, 0L), NA_integer_),
+           quick_next_back = if_else(zurueck_available, coalesce(ev_quick, 0L), NA_integer_),
+           # "Von vorn" exists in every layout.
+           restarts = coalesce(ev_restart, 0L)) %>%
+    select(participant_id, layout_version, session_id, scene_visit, visit_no, repeat_visit,
+           zurueck_available, step_index, step_id, shows, shows_after_quiz, active_s, time_censored,
+           back_presses, quick_next_back, restarts) %>%
+    arrange(participant_id, visit_no, step_index)
+}
+write_csv(tour_steps, file.path(output_dir, "tour_steps.csv"), na = "")
+
+# Step label on the x axis, e.g. "5 cartons" (step_index and step_id), in step order.
+step_label_of <- function(i) paste(i, coalesce(step_names$step_id[match(i, step_names$step_index)], ""))
+
+# Charts from the first Concept visit with a tour per participant (repeat
+# visits after a crash are second exposures). One panel per layout_version,
+# so "019" and "025" are never pooled (decision 024).
+tour_first <- tour_steps %>%
+  group_by(participant_id) %>% filter(visit_no == min(visit_no)) %>% ungroup() %>%
+  mutate(step_label = factor(step_label_of(step_index), levels = step_label_of(seq_len(max(0, n_steps, na.rm = TRUE)))),
+         layout_panel = paste0("layout ", layout_label(layout_version)))
+
+title_tour <- "Which ConceptScene tour step holds the trainee longest?"
+if (nrow(tour_first) == 0 || all(is.na(tour_first$active_s))) {
+  p_tour <- empty_chart(title_tour)
+  warn("no tour_step events: tour_time_by_step.png and tour_back_by_step.png are empty")
+} else {
+  tour_n <- tour_first %>% filter(!is.na(active_s)) %>%
+    group_by(layout_panel, step_label) %>%
+    summarise(n = n(), median_s = median(active_s), y = max(active_s), .groups = "drop")
+  p_tour <- ggplot(tour_first %>% filter(!is.na(active_s)), aes(step_label, active_s)) +
+    geom_jitter(width = 0.12, height = 0, size = 2, alpha = 0.6, colour = "#0072B2") +
+    geom_point(data = tour_n, aes(y = median_s), shape = 18, size = 4, colour = "#D55E00") +
+    geom_text(data = tour_n, aes(y = y, label = paste0("n=", n)), vjust = -0.8, size = 3, colour = "grey30") +
+    facet_wrap(~ layout_panel, ncol = 1) +
+    scale_y_continuous(expand = expansion(mult = c(0.05, 0.2))) +
+    labs(title = title_tour,
+         subtitle = paste0("Dot = one participant's active seconds on the step (all showings, pauses removed; ",
+                           "the last step ends at the first quiz answer); diamond = median.\n",
+                           "First Concept visit per participant. One panel per layout_version (never pooled, decision 024)."),
+         x = "Tour step (step_index and step_id)", y = "Active time on the step (s)") +
+    theme_minimal(base_size = 11) +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1))
+}
+ggsave(file.path(output_dir, "tour_time_by_step.png"), p_tour, width = 11,
+       height = 3 + 3 * max(1, n_distinct(tour_first$layout_panel)), dpi = 150, bg = "white")
+
+title_back <- "On which tour step do trainees press \"Zurück\"?"
+tour_back <- tour_first %>% filter(zurueck_available)
+if (nrow(tour_back) == 0) {
+  p_back <- empty_chart(title_back)
+} else {
+  back_long <- tour_back %>%
+    group_by(layout_panel, step_label) %>%
+    summarise(quick = sum(quick_next_back), other = sum(back_presses) - sum(quick_next_back),
+              people = sum(back_presses > 0), n = n(), .groups = "drop") %>%
+    pivot_longer(c(quick, other), names_to = "kind", values_to = "presses") %>%
+    mutate(kind = factor(kind, levels = c("other", "quick"),
+                         labels = c("Zurück later", paste0("Zurück < ", tour_quick_back_s, " s after Weiter"))))
+  back_n <- back_long %>% group_by(layout_panel, step_label) %>%
+    summarise(total = sum(presses), people = first(people), n = first(n), .groups = "drop")
+  p_back <- ggplot(back_long, aes(step_label, presses, fill = kind)) +
+    geom_col(colour = "white", linewidth = 0.2) +
+    geom_text(data = back_n, aes(y = total, label = paste0(people, "/", n), fill = NULL),
+              vjust = -0.4, size = 3, colour = "grey30") +
+    facet_wrap(~ layout_panel, ncol = 1) +
+    scale_fill_manual(values = c("#56B4E9", "#D55E00"), name = NULL) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.25))) +
+    labs(title = title_back,
+         subtitle = paste0("Bar = Zurück presses on the step (the step left), first Concept visit; label = participants ",
+                           "with >= 1 press / participants.\nOnly layouts with Zurück (\"025\" on); ",
+                           "\"019\" logs have no Back count (NA, not 0)."),
+         x = "Tour step (step_index and step_id)", y = "Zurück presses (count)") +
+    theme_minimal(base_size = 11) +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1), legend.position = "bottom")
+}
+ggsave(file.path(output_dir, "tour_back_by_step.png"), p_back, width = 11,
+       height = 3.5 + 3 * max(1, n_distinct(tour_back$layout_panel)), dpi = 150, bg = "white")
+
+# Per participant totals of the first Concept visit with a tour, for wide.csv.
+tour_wide <- tour_first %>%
+  group_by(participant_id) %>%
+  summarise(tour_active_s_ConceptScene = if (all(is.na(active_s))) NA_real_ else round(sum(active_s, na.rm = TRUE), 3),
+            tour_back_presses_ConceptScene = if (any(zurueck_available)) sum(back_presses) else NA_integer_,
+            tour_quick_next_back_ConceptScene = if (any(zurueck_available)) sum(quick_next_back) else NA_integer_,
+            tour_restarts_ConceptScene = sum(restarts), .groups = "drop")
+
 # ---- 14. Wide file: one row per participant (for SPSS and paper forms) ---------
 
 # Per-scene columns come from the counting visit only (repeat visits stay in
@@ -1940,6 +2220,7 @@ wide <- data_quality %>%
   select(all_of(participant_cols)) %>%
   left_join(wide_scene, by = "participant_id") %>%
   left_join(wide_process, by = "participant_id") %>%
+  left_join(tour_wide, by = "participant_id") %>%
   left_join(wide_skill, by = "participant_id")
 # A scene nobody had a counting visit for still gets its error-rate column
 # (added before sorting, so it lands in build order).
@@ -2301,7 +2582,9 @@ validity_limits <- c(
   "- Small N, one run per person: describe distributions; any test is exploratory.",
   "- Time-to-correct only covers visits that reached correct; the 'never' counts show who is missing.",
   "- Q4 (paper SSQ): the logs hold no frame-rate, frame-drop, head-movement or tracking data (decision 022). SSQ change (post - pre) can only be read against headset removals, pauses, an early end (end_status, abbruchgrund) and active time, for the whole session (no per-scene sickness).",
-  "- Q5 (paper NASA-TLX, once at the end, raw = unweighted mean): who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.")
+  "- Q5 (paper NASA-TLX, once at the end, raw = unweighted mean): who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.",
+  "- ConceptScene tour (tour_steps.csv): Back presses are derived from step_index (-1 = Zurück) and exist only for layout_version \"025\" on; \"019\" logs and headers without layout_version have NA, not 0. A Zurück < 2 s after Weiter is read as a likely mis-press, not proven. Step time ends at the next step or the first quiz answer: time spent looking elsewhere (label board, packages) is in it.",
+  "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).")
 # The pilot set (decision 023) is a try-out of the course and of this
 # analysis, not study data: say so on every pilot report.
 if (is_pilot_set) {

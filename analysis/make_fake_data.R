@@ -21,7 +21,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811, P812, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -339,11 +339,14 @@ active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s - open_pause_part
 # keypad forces "DE" for study IDs; test and pilot IDs keep the chosen one. NULL =
 # a log written before #11 (header language null).
 # schema: 2 (current); 1 only for the legacy P115 file (section 7b).
+# layout: header layout_version (schema 2 only). "025" = the current build
+# (Concept tour with "Zurück", #80); "019" = a build before #80 (no Zurück:
+# the tour only goes forward or "Von vorn"), as in the pilot session P811.
 # interaction: FALSE = a build before #29 (no "interaction" in event_groups,
 # no interaction events, via null after the first scene, empty summary columns).
 start_session <- function(person, build, start_utc, start_mode = "manual",
                           resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
-                          language = "DE", schema = 2, interaction = TRUE) {
+                          language = "DE", schema = 2, interaction = TRUE, layout = "025") {
   if (is.null(resume_scene)) resume_accepted <- NULL
   s <- new.env()
   s$pid <- person$pid
@@ -352,6 +355,7 @@ start_session <- function(person, build, start_utc, start_mode = "manual",
   s$schema <- schema
   s$interaction <- schema == 2 && interaction
   s$language <- language
+  s$layout <- layout
   # Pilot IDs log to research/pilot/; everything else here to research/ (P950,
   # a test ID, sits in research/ on purpose, see section 7).
   s$folder <- if (grepl("^P8[0-9]{2}$", s$pid)) fake_pilot else fake_research
@@ -390,7 +394,7 @@ start_session <- function(person, build, start_utc, start_mode = "manual",
   # decisions 019/024/025) and event_groups (the
   # groups this build emits; R reads a missing group as NA, not 0).
   header <- if (schema == 2) {
-    json_obj(schema_version = 2, layout_version = "025",
+    json_obj(schema_version = 2, layout_version = s$layout,
              event_groups = json_arr(c("session", "outcome", if (s$interaction) "interaction")),
              app_version = "0.2.0", build = build,
              device_model = "Oculus Quest", os_version = "Android OS 14 / API-34",
@@ -907,7 +911,13 @@ run_welcome <- function(s, practice = TRUE) {
 # (#80, decision 024): some trainees press "Zurück" (step_index - 1) to
 # reread a step, or press it by mistake right after "Weiter" (< 2 s), then
 # go on with "Weiter". The quiz opens once, also after 11 -> 10 -> 11.
-run_concept <- function(s, person) {
+# A layout "019" build has no "Zurück": no Back presses at all.
+# tour_script (#82): a fixed tour instead of the random one, a data frame
+# with one row per shown step: step (step_index), wait_s (seconds before it
+# is shown, i.e. how long the step before it stayed) and pause_after_s (a
+# focus_lost pause of that length 2 s after the step is shown; 0 = none).
+# selftest.R checks the R tour table against such a script (P812).
+run_concept <- function(s, person, tour_script = NULL) {
   unlocked <- FALSE
   show_step <- function(i) {
     emit(s, "tour_step", json_obj(step_id = tour_steps[i], step_index = i))
@@ -917,13 +927,24 @@ run_concept <- function(s, person) {
       unlocked <<- TRUE
     }
   }
-  for (i in seq_along(tour_steps)) {
+  has_back <- as.integer(s$layout) >= 25
+  if (!is.null(tour_script)) {
+    for (r in seq_len(nrow(tour_script))) {
+      advance(s, tour_script$wait_s[r])
+      show_step(tour_script$step[r])
+      if (tour_script$pause_after_s[r] > 0) {
+        advance(s, 2)
+        pause_app(s, "focus_lost", tour_script$pause_after_s[r])
+      }
+    }
+  }
+  for (i in if (is.null(tour_script)) seq_along(tour_steps) else integer(0)) {
     advance(s, runif(1, 5, 15))  # read the step, press "Weiter"
     show_step(i)
     # Back presses draw from the side stream, so the rest of the fake data
     # (and the fixed values in selftest.R) stay the same. Mostly one step back;
     # sometimes two (e.g. 9 -> 8 -> 7) before going on with "Weiter".
-    if (i >= 2 && side_chance(0.15)) {
+    if (has_back && i >= 2 && side_chance(0.15)) {
       advance(s, if (side_chance(0.3)) side_runif(0.4, 1.8) else side_runif(3, 10))
       n_back <- if (i >= 3 && side_chance(0.25)) 2 else 1
       for (k in seq_len(n_back)) {
@@ -939,7 +960,7 @@ run_concept <- function(s, person) {
   }
   # Some trainees press "Von vorn" and skim the first steps again (step_index
   # back to 1). The quiz stays open (it opens for good).
-  if (runif(1) < 0.2) {
+  if (is.null(tour_script) && runif(1) < 0.2) {
     for (i in 1:3) {
       advance(s, runif(1, 2, 6))
       emit(s, "tour_step", json_obj(step_id = tour_steps[i], step_index = i))
@@ -1065,7 +1086,7 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
 
 run_visit <- function(s, person, ...) {
   if (s$scene == "WelcomeScene") run_welcome(s)
-  else if (s$scene == "ConceptScene") run_concept(s, person)
+  else if (s$scene == "ConceptScene") run_concept(s, person, ...)
   else run_picking(s, person, ...)
 }
 
@@ -1073,9 +1094,9 @@ run_visit <- function(s, person, ...) {
 # ComplexScene order is complete (#28 calls EndSession("completed") there).
 run_full_course <- function(person, build, start_utc, special = list(), start_mode = "manual",
                             resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
-                            language = "DE") {
+                            language = "DE", layout = "025") {
   s <- start_session(person, build, start_utc, start_mode, resume_scene, resume_accepted, ended_warning,
-                     language)
+                     language, layout = layout)
   run_welcome(s)
   for (scene in scene_order[-1]) {
     go_to_scene(s, scene)
@@ -1389,6 +1410,27 @@ go_to_scene(s, "MixedPickingScene"); run_picking(s, p803)
 go_to_scene(s, "ComplexScene"); run_picking(s, p803, end_on_correct = TRUE)
 end_session(s, "completed")
 
+# P811: the English pilot session on a build before #80 (header
+# layout_version "019": no "Zurück" in the Concept tour), like the real P811
+# video session. analyse.R must give NA Back counts for it (not 0), flag the
+# pilot set as mixed_layout and split the ConceptScene figures by layout.
+# Written after every other session, so no earlier random draw changes.
+run_full_course(new_person("P811"), "aaa1111", "2026-11-06T13:00:00Z", language = "EN", layout = "019")
+
+# P812: English pilot on the "025" build with a fixed Concept tour (#82),
+# so selftest.R knows the right tour numbers:
+#   4 -> 3 after 1.2 s: a Back right after "Weiter" (< 2 s) on step 4
+#   9 -> 8 -> 7: a two-step Back chain (8 -> 7 at the same t: line order decides)
+#   a 10 s pause 2 s after step 6 is shown (step 6: 6 s active, 16 s wall)
+#   11 -> 1: "Von vorn", then 2 and 3; step 3 ends at the first quiz_answer.
+# Back presses on the step left: step 4 1, step 9 1, step 8 1 (3 in total).
+p812_tour <- data.frame(
+  step          = c(1, 2, 3, 4, 3,   4, 5, 6,  7, 8, 9, 8,   7, 8, 9, 10, 11, 1, 2, 3),
+  wait_s        = c(6, 6, 6, 6, 1.2, 5, 7, 8,  4, 6, 6, 3.5, 0, 4, 4, 5,  6,  5, 3, 3),
+  pause_after_s = c(0, 0, 0, 0, 0,   0, 0, 10, 0, 0, 0, 0,   0, 0, 0, 0,  0,  0, 0, 0))
+run_full_course(new_person("P812"), "aaa1111", "2026-11-06T14:30:00Z", language = "EN",
+                special = list(ConceptScene = list(tour_script = p812_tour)))
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1441,7 +1483,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811, P812  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -1501,7 +1543,9 @@ paper_rows <- list(
   paper_row("P950"),
   paper_row("P801"),
   paper_row("P802"),
-  paper_row("P803"))
+  paper_row("P803"),
+  paper_row("P811"),
+  paper_row("P812"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")
