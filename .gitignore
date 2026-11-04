@@ -82,6 +82,10 @@ crashlytics-build.properties
 
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+# Per-platform content-state folders (only hold the ignored .bin) and their folder .meta
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/[Aa]ndroid/
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/[Aa]ndroid.meta
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/[Ss]tandalone*
 
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
