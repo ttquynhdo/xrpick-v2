@@ -537,10 +537,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627447
-    m_Localized: "\u2022 Das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n\u2022
-      Sollmenge : VPE = volle Kartons, \xFCbrige Teile lose\n\u2022 Jede Position
-      einzeln kommissionieren und best\xE4tigen\n\u2022 Der rote Knopf ersetzt das
-      Best\xE4tigen mit dem Fu\xDF"
+    m_Localized: "\u2022 Einen Auftrag im LVS ablesen\n\u2022 Das Etikett mit dem
+      LVS vergleichen (Mat.-Nr, VPE)\n\u2022 Volle Kartons und lose Teile berechnen\n\u2022
+      Kartons nach EKZ einlegen\n\u2022 Mehrere Positionen nacheinander kommissionieren\n\u2022
+      Der rote Knopf steht f\xFCr das Best\xE4tigen mit dem Fu\xDF"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448

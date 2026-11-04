@@ -1032,7 +1032,8 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #23
-- **Status:** todo
+- **Test report:** docs/test-reports/bl65.md
+- **Status:** done (test 6/6 ✅, không có case test tay)
 
 ### #66 [P1] ComplexScene: không để kiện lạ trong thùng kho (D12)
 - **Type:** logic

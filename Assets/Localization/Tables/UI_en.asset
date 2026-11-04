@@ -527,10 +527,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627447
-    m_Localized: "\u2022 Compare the label with the WMS (Mat.-Nr, VPE)\n\u2022 Target
-      quantity : VPE = full cartons, remaining pieces loose\n\u2022 Pick and confirm
-      each position separately\n\u2022 The red button stands in for confirming with
-      your foot"
+    m_Localized: "\u2022 Read an order in the WMS\n\u2022 Compare the label with
+      the WMS (Mat.-Nr, VPE)\n\u2022 Work out full cartons and loose pieces\n\u2022
+      Place cartons according to the EKZ\n\u2022 Pick several positions one after
+      another\n\u2022 The red button stands in for confirming with your foot"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
