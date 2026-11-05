@@ -160,7 +160,7 @@ concept.ekz.8,ESD-geschützte Teile. Nicht ohne Anweisung öffnen.,proposed,germ
 concept.ekz.9,Sonderverpackung. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen unter dem Bildschirm.,proposed,german-reviewer (agent),2026-11-03,#58; Agent: OK; wording as complex.card.step1_body_position1
 concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.tour.cartons.body,Soll : Verp.-Einh. = 120 : 40 = 3 Kartons,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.cartons.body,= 3 Kartons,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#91, result line of the caption next to Soll/Verp.-Einh.)"
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, also EKZ 0: Die Teile dürfen ungeordnet liegen oder eingefüllt werden.",proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.material_flow.body,"Der Lagerbehälter kommt von links und fährt über die mittlere Bahn weg; der Auftragsbehälter fährt erst weg, wenn der Auftrag erledigt ist. In der Praxis bewegen Sie die Behälter von Hand.",proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"

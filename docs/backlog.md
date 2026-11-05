@@ -1425,7 +1425,8 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** nhanh (một lần nhìn thấy cả phép tính và carton)
 - **Depends on:** #89 (chỗ chữ của bước), #88 (cỡ carton)
 - **Decision:** docs/decisions/026-concept-study-desk.md; phần số LVS: docs/decisions/030-concept-box-hints.md (Rest cố định 120, carton STECKER C trên bàn giữ làm mẫu ngoài hai thùng)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl91.md
+- **Status:** verified-mcp (9/9 MCP/code ✅; xem lại khi đeo kính ở buổi test chung; nhánh `feat/91-cartons-next-to-fields`)
 
 ### #92 [Feature] Quy tắc „vật nào cầm được“: vật chỉ để xem trông khác kiện thật
 - **Type:** feature

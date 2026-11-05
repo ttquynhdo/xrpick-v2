@@ -11,6 +11,8 @@ using UnityEngine;
 /// paths as PositionStockSwitcher/OrderBoxConveyor (LaneRide), but no station_move events and no grabbable riders.
 /// #89: the tour bar stands between the trainee's eyes and the start of the middle lane, so the objects in
 /// hideWhileRiding are hidden from the first ride until the order container has left, then shown again.
+/// #91, decision 030: the order container leaves with the counted cartons in it (CartonCountDemo shows them at this
+/// step). Riders only get their position back on reset; whether they are shown is up to the script that owns them.
 /// </summary>
 public class LaneFlowDemo : MonoBehaviour
 {
@@ -32,6 +34,9 @@ public class LaneFlowDemo : MonoBehaviour
 
     [SerializeField] private Transform orderBox;
 
+    [Tooltip("Static cartons riding in the order container (its children ride; CartonCountDemo shows them).")]
+    [SerializeField] private Transform orderStock;
+
     [Header("Paths (world offsets, same as Basic/Mixed/Complex)")]
     [Tooltip("Offsets of the next storage container from its work spot; the first is the start in the hood, the last must be zero.")]
     [SerializeField] private Vector3[] arrivalPath = { new(-0.40f, 0f, 0.90f), new(-0.40f, 0f, 0f), Vector3.zero };
@@ -52,7 +57,7 @@ public class LaneFlowDemo : MonoBehaviour
     [SerializeField] private float orderSpeed = 0.45f;
     [SerializeField] private float cornerPause = 0.3f;
 
-    private readonly List<(Transform transform, Vector3 position, bool active)> start = new();
+    private readonly List<(Transform transform, Vector3 position, bool active, bool keepActive)> start = new();
     private readonly List<GameObject> hidden = new();
     private bool changed;
 
@@ -63,11 +68,15 @@ public class LaneFlowDemo : MonoBehaviour
         Remember(orderBox);
         foreach (Transform rider in Riders(storageStock))
         {
-            Remember(rider);
+            Remember(rider, keepActive: true);
         }
         foreach (Transform rider in Riders(nextStorageStock))
         {
-            Remember(rider);
+            Remember(rider, keepActive: true);
+        }
+        foreach (Transform rider in Riders(orderStock))
+        {
+            Remember(rider, keepActive: true);
         }
         Remember(storageStock);
         Remember(nextStorageStock);
@@ -142,7 +151,7 @@ public class LaneFlowDemo : MonoBehaviour
             yield return null;
         }
 
-        yield return RideAway(orderBox, null, orderPath, orderSpeed);
+        yield return RideAway(orderBox, orderStock, orderPath, orderSpeed);
 
         ShowViewBlockers();
     }
@@ -177,11 +186,15 @@ public class LaneFlowDemo : MonoBehaviour
 
     private IEnumerator RideAway(Transform box, Transform stock, IReadOnlyList<Vector3> path, float speed)
     {
-        yield return LaneRide.Path(box, Riders(stock), path, speed, cornerPause);
+        List<Transform> riders = Riders(stock);
+        yield return LaneRide.Path(box, riders, path, speed, cornerPause);
 
-        // Out of sight behind the monitor: switch off.
+        // Out of sight behind the monitor: switch off. The riders, not their parent, which may hold a script.
         SetActive(box, false);
-        SetActive(stock, false);
+        foreach (Transform rider in riders)
+        {
+            SetActive(rider, false);
+        }
     }
 
     private IEnumerator RideThen(Transform box, List<Transform> riders, IReadOnlyList<Vector3> path, float speed, System.Action done)
@@ -199,21 +212,25 @@ public class LaneFlowDemo : MonoBehaviour
             return;
 
         changed = false;
-        foreach ((Transform target, Vector3 position, bool active) in start)
+        foreach ((Transform target, Vector3 position, bool active, bool keepActive) in start)
         {
             if (target == null)
                 continue;
 
             target.position = position;
-            target.gameObject.SetActive(active);
+            if (!keepActive)
+            {
+                target.gameObject.SetActive(active);
+            }
         }
     }
 
-    private void Remember(Transform target)
+    // keepActive: only the position comes back on reset (riders whose visibility another script owns).
+    private void Remember(Transform target, bool keepActive = false)
     {
         if (target != null)
         {
-            start.Add((target, target.position, target.gameObject.activeSelf));
+            start.Add((target, target.position, target.gameObject.activeSelf, keepActive));
         }
     }
 

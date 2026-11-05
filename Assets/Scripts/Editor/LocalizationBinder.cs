@@ -269,9 +269,10 @@ public static class LocalizationBinder
         public string En;
         public string De;
 
-        // Pseudo rows ("= lesson.*", "(WMS labels, see prefab)") and label templates are not texts.
+        // Pseudo rows ("= lesson.*", "(WMS labels, see prefab)") and label templates are not texts. A text may start
+        // with "=" (#91: "= 3 Kartons"), so only "= <keys>.*" counts as a pseudo row.
         public bool IsText => !string.IsNullOrEmpty(Key) && !string.IsNullOrEmpty(De)
-            && !En.StartsWith("=") && !En.StartsWith("(") && !Key.StartsWith("label.");
+            && !(En.StartsWith("=") && En.EndsWith(".*")) && !En.StartsWith("(") && !Key.StartsWith("label.");
     }
 
     private static IEnumerable<Row> ReadRows()
