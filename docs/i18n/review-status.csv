@@ -157,7 +157,7 @@ concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-
 concept.tour.cartons.body,= 3 Kartons,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#91, result line of the caption next to Soll/Verp.-Einh.)"
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, das ist EKZ 0: Die Teile dürfen ungeordnet liegen wie die Tüten im Beispiel.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
-concept.tour.material_flow.body,"Der Lagerbehälter kommt von links und fährt über die mittlere Bahn weg; der Auftragsbehälter fährt erst weg, wenn der Auftrag erledigt ist. In der Praxis bewegen Sie die Behälter von Hand.",proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.material_flow.body,"Der Lagerbehälter fährt über die mittlere Bahn weg, danach der fertige Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.card.step3_body,"Drücken Sie nach der Erklärung zum LVS „Zu den Fragen“. Drücken Sie dann A, B oder C.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 concept.quiz.locked,Die Fragen kommen nach der Erklärung zum LVS.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
@@ -186,21 +186,17 @@ concept.lane.storage,Lagerbehälter,proposed,german-reviewer (agent),2026-11-04,
 concept.lane.middle,Mittlere Bahn,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 concept.lane.order,Auftragsbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 complex.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-04,Same text as concept.quiz.how_to (Agent: OK) (#85)
-concept.tour.intro.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.material.action,Nehmen Sie den Karton STECKER C in die Hand.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK (#90, split pick-up / compare)"
-concept.tour.verp_einh.action,Nehmen Sie den Karton STECKER C in die Hand.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK (#90, split pick-up / compare)"
-concept.tour.soll.action,Lesen Sie die Zahl im Feld Soll ab. Drücken Sie dann „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.intro.action,"Sehen Sie sich den Auftrag im LVS an: Dort steht, was Sie kommissionieren müssen.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
+concept.tour.material.action,"Nehmen Sie den Karton STECKER C in die Hand und prüfen Sie, ob das Etikett zu Mat.-Nr und Bez. passt.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
+concept.tour.verp_einh.action,"Vergleichen Sie die VPE auf dem Etikett mit Verp.-Einh.: So wissen Sie, wie viele Stück in einem Karton sind.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
+concept.tour.soll.action,Merken Sie sich die Zahl im Feld Soll: Im nächsten Schritt rechnen Sie damit die Anzahl Kartons aus.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.cartons.action,Legen Sie die Kartons aus dem Lagerbehälter in den Auftragsbehälter.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
-concept.tour.ist.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.rest.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.ist.action,Schauen Sie auf Ist: So viele Stück haben Sie in den Auftragsbehälter gelegt.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
+concept.tour.rest.action,"Lesen Sie Rest ab: Daran sehen Sie, wie viele Stück nach dem Auftrag im Lagerbehälter bleiben.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.empf_kz_003.action,Sehen Sie sich links neben dem Bildschirm das Beispiel „Empf Kz 003“ an.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.tour.empf_kz_000.action,Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
-concept.tour.not_used.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu. Drücken Sie dann „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
-concept.label.tag.matnr,Mat.-Nr: {matnr} – Materialnummer,proposed,german-reviewer (agent),2026-11-04,Agent: OK after its fixes (#90)
-concept.label.tag.vpe,VPE: {vpe} ST – Stück pro Karton oder Tüte,proposed,german-reviewer (agent),2026-11-04,Agent: OK after its fixes (#90)
-concept.tour.material.action_held,Vergleichen Sie Mat.-Nr und Bez. im LVS mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,Agent: OK after its fixes (#90)
-concept.tour.verp_einh.action_held,Lesen Sie die VPE auf dem Etikett ab und vergleichen Sie sie mit Verp.-Einh. im LVS.,proposed,german-reviewer (agent),2026-11-04,Agent: OK after its fixes (#90)
+concept.tour.not_used.action,Sehen Sie sich die markierten Bereiche an: Die brauchen Sie in der Übung nicht.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
+concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.hint.storage_wrong_material,In diesem Lagerbehälter liegt Material mit einer anderen Materialnummer. Nehmen Sie es heraus.,proposed,,2026-11-05,#100 new
 concept.tour.to_questions,Zu den Fragen,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 complex.card.step2_body_answered,"<b>{cartons} Kartons + {pieces} Stück</b>\nLegen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93); add a singular key if the order ever needs 1 carton
@@ -214,3 +210,5 @@ concept.quiz.label_by_matnr.783190.wrong,Vergleichen Sie Ziffer für Ziffer mit 
 concept.ekz.sample.not_grabbable,Beispiel – nicht zum Greifen.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 complex.storage.opened_carton,Der angebrochene Karton bleibt im Modul im Lagerbehälter. Nehmen Sie nur die losen Teile heraus.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 common.position.label,Position {position},proposed,claude,2026-11-05,"#97: WMS word Position, identical to EN; glossary term"
+concept.tour.material_flow.body_after,In der Praxis bewegen Sie die Behälter von Hand.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
+concept.tour.material_flow.action_after,Prüfen Sie Ihr Wissen: Drücken Sie „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"

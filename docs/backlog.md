@@ -1603,7 +1603,8 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Test trên kính:** nhanh (đọc dòng hành động, bước 11 kịp đọc)
 - **Depends on:** decision chung ConceptScene (#104–#107)
 - **Decision:** docs/decisions/036-concept-tour-v3.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl104.md
+- **Status:** verified-mcp (19/20 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`; chữ mới `proposed`, german-reviewer agent đã duyệt)
 
 ### #105 [Feature] ConceptScene: chỉ ô LVS rõ ràng: mũi tên trên màn hình tới đúng ô, chú thích thẳng hàng, marker không che nhãn
 - **Type:** feature

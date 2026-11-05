@@ -11,8 +11,11 @@ using UnityEngine.UI;
 /// #89, decision 026: one bar centred below the screen holds the step text of the steps without a caption, the
 /// "what to do" line with a hand icon for every step, and [Zurück] "Schritt n von 11" [Weiter] (poke toggles used as
 /// push buttons, #80). The bar is hidden at the start and opens through <see cref="Open"/> (card 1 done) or after
-/// <see cref="autoOpenSeconds"/>; step 1 is shown and logged only then. #90: a step with a held material shows a
-/// second action line while that material is held (pick up → compare).
+/// <see cref="autoOpenSeconds"/>; step 1 is shown and logged only then.
+/// #104, decision 036: every action line says what to do and why (no held-package variant any more). A step with
+/// <see cref="Step.hasFollowUp"/> (material_flow) first shows a short text and "watch"; <see cref="ShowFollowUp"/>
+/// (the lane demo, once the order container has left) switches it to concept.tour.&lt;id&gt;.body_after/.action_after
+/// and only then shows „Zu den Fragen“.
 /// #93, decision 026 (4): while <see cref="OffersQuestions"/> is set, the right button of the last step reads
 /// „Zu den Fragen“ and raises <see cref="QuestionsRequested"/> instead of starting over; the quiz then hides the bar
 /// through <see cref="SetBarVisible"/> and shows it again at the same step (no step change, no tour_step).
@@ -44,9 +47,9 @@ public class WmsFieldTour : MonoBehaviour
 
         public TMP_Text captionBody;
 
-        // #90, decision 026 (2): while a package of this material is held, the bar shows .action_held instead.
-        [Tooltip("Material key (e.g. stecker_c); while it is held the bar shows concept.tour.<id>.action_held. Empty = never.")]
-        public string heldMaterialKey;
+        // #104, decision 036 (3): the step waits for something to happen (the lane demo) before its second text.
+        [Tooltip("Shows .body/.action first and .body_after/.action_after after ShowFollowUp(); while the questions are offered, the right button stays hidden until then.")]
+        public bool hasFollowUp;
     }
 
     [SerializeField] private Step[] steps;
@@ -63,15 +66,15 @@ public class WmsFieldTour : MonoBehaviour
 
     [SerializeField] private TMP_Text progressText;
 
-    [Tooltip("Held packages (#90); lets a step change its action line while its material is held.")]
-    [SerializeField] private HeldLabelTags heldPackages;
-
     [Tooltip("The tour opens by itself after this many seconds if card 1 is not done yet; 0 = never.")]
     [SerializeField] private float autoOpenSeconds = 60f;
 
     [Header("Next control")]
     [SerializeField] private Toggle nextToggle;
     [SerializeField] private TMP_Text nextLabel;
+
+    [Tooltip("Whole right button incl. its poke surface; hidden while a step waits for its follow-up (#104). Empty = the toggle's GameObject.")]
+    [SerializeField] private GameObject nextButtonRoot;
 
     [Header("Back control (decision 024)")]
     [SerializeField] private Toggle backToggle;
@@ -84,6 +87,7 @@ public class WmsFieldTour : MonoBehaviour
     private bool ready;
     private bool offersQuestions;
     private bool questionsDone;
+    private bool followUpShown;
 
     // Step id of the step just shown, raised on every step change incl. the first (#73: the quiz unlocks at a step).
     public event Action<string> StepShown;
@@ -123,11 +127,6 @@ public class WmsFieldTour : MonoBehaviour
         {
             backToggle.onValueChanged.AddListener(OnBackToggled);
         }
-
-        if (heldPackages != null)
-        {
-            heldPackages.HeldChanged += ShowAction;
-        }
     }
 
     private void OnDisable()
@@ -140,11 +139,6 @@ public class WmsFieldTour : MonoBehaviour
         if (backToggle != null)
         {
             backToggle.onValueChanged.RemoveListener(OnBackToggled);
-        }
-
-        if (heldPackages != null)
-        {
-            heldPackages.HeldChanged -= ShowAction;
         }
     }
 
@@ -236,6 +230,19 @@ public class WmsFieldTour : MonoBehaviour
         }
     }
 
+    // #104: the current step's second text (after the lane demo, or when a hint keeps the demo from starting). Only
+    // steps with hasFollowUp react; later calls change nothing.
+    public void ShowFollowUp()
+    {
+        if (!IsOpen || !ready || !steps[current].hasFollowUp || followUpShown)
+            return;
+
+        followUpShown = true;
+        ShowTexts();
+        ShowAction();
+        ShowNextLabel();
+    }
+
     // Decision 024: back one step; does nothing at step 1 (no step change, no log).
     public void PreviousStep()
     {
@@ -273,6 +280,7 @@ public class WmsFieldTour : MonoBehaviour
     private void ShowStep(int index)
     {
         current = index;
+        followUpShown = false;
 
         // Steps may share a marker group: hide all first, then show the current step's.
         foreach (Step other in steps)
@@ -282,20 +290,7 @@ public class WmsFieldTour : MonoBehaviour
         SetMarkers(steps[index], true);
 
         Step step = steps[index];
-        string title = Loc.Get(StepKeyPrefix + step.id + ".title");
-        string body = Loc.Get(StepKeyPrefix + step.id + ".body");
-        bool hasCaption = step.captionTitle != null && step.captionBody != null;
-        if (hasCaption)
-        {
-            step.captionTitle.text = title;
-            step.captionBody.text = body;
-            barText.text = string.Empty;
-        }
-        else
-        {
-            barText.text = $"<b>{title}:</b> {body}";
-        }
-
+        ShowTexts();
         ShowAction();
 
         if (progressText != null)
@@ -316,8 +311,30 @@ public class WmsFieldTour : MonoBehaviour
         StepShown?.Invoke(step.id);
     }
 
+    private void ShowTexts()
+    {
+        Step step = steps[current];
+        string title = Loc.Get(StepKeyPrefix + step.id + ".title");
+        string body = Loc.Get(StepKeyPrefix + step.id + (followUpShown ? ".body_after" : ".body"));
+        bool hasCaption = step.captionTitle != null && step.captionBody != null;
+        if (hasCaption)
+        {
+            step.captionTitle.text = title;
+            step.captionBody.text = body;
+            barText.text = string.Empty;
+        }
+        else
+        {
+            barText.text = $"<b>{title}:</b> {body}";
+        }
+    }
+
     private void ShowNextLabel()
     {
+        // #104: „Zu den Fragen“ comes only after the step's follow-up (watch first).
+        bool waiting = offersQuestions && IsLastStep && steps[current].hasFollowUp && !followUpShown;
+        (nextButtonRoot != null ? nextButtonRoot : nextToggle.gameObject).SetActive(!waiting);
+
         if (nextLabel == null)
             return;
 
@@ -325,7 +342,7 @@ public class WmsFieldTour : MonoBehaviour
         nextLabel.text = Loc.Get(key);
     }
 
-    // The "what to do" line of the current step; also called when a package is grabbed or released (#90).
+    // The "what to do" line of the current step (#104: task + purpose).
     private void ShowAction()
     {
         if (!IsOpen || !ready)
@@ -338,9 +355,7 @@ public class WmsFieldTour : MonoBehaviour
             return;
         }
 
-        bool held = heldPackages != null && !string.IsNullOrEmpty(step.heldMaterialKey)
-                    && heldPackages.IsMaterialHeld(step.heldMaterialKey);
-        actionText.text = Loc.Get(StepKeyPrefix + step.id + (held ? ".action_held" : ".action"));
+        actionText.text = Loc.Get(StepKeyPrefix + step.id + (followUpShown ? ".action_after" : ".action"));
     }
 
     private static void SetMarkers(Step step, bool active)

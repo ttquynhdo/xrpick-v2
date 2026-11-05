@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// #90/#100: puts a small world-space tag beside a package as seen from the head, so it never covers the package,
-/// and turns it to face the eyes. Shared by HeldLabelTags and ConceptBoxHints.
+/// and turns it to face the eyes. Used by ConceptBoxHints (HeldLabelTags was removed in #104).
 /// </summary>
 public static class TagPlacement
 {

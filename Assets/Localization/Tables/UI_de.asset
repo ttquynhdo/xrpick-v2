@@ -550,9 +550,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627451
-    m_Localized: "Der Lagerbeh\xE4lter kommt von links und f\xE4hrt \xFCber die mittlere
-      Bahn weg; der Auftragsbeh\xE4lter f\xE4hrt erst weg, wenn der Auftrag erledigt
-      ist. In der Praxis bewegen Sie die Beh\xE4lter von Hand."
+    m_Localized: "Der Lagerbeh\xE4lter f\xE4hrt \xFCber die mittlere Bahn weg, danach
+      der fertige Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -828,19 +827,23 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156674924544
-    m_Localized: "Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Localized: "Sehen Sie sich den Auftrag im LVS an: Dort steht, was Sie kommissionieren
+      m\xFCssen."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810624
-    m_Localized: Nehmen Sie den Karton STECKER C in die Hand.
+    m_Localized: "Nehmen Sie den Karton STECKER C in die Hand und pr\xFCfen Sie,
+      ob das Etikett zu Mat.-Nr und Bez. passt."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810625
-    m_Localized: Nehmen Sie den Karton STECKER C in die Hand.
+    m_Localized: "Vergleichen Sie die VPE auf dem Etikett mit Verp.-Einh.: So wissen
+      Sie, wie viele St\xFCck in einem Karton sind."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810626
-    m_Localized: "Lesen Sie die Zahl im Feld Soll ab. Dr\xFCcken Sie dann \u201EWeiter\u201C."
+    m_Localized: "Merken Sie sich die Zahl im Feld Soll: Im n\xE4chsten Schritt rechnen
+      Sie damit die Anzahl Kartons aus."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810627
@@ -848,11 +851,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810628
-    m_Localized: "Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Localized: "Schauen Sie auf Ist: So viele St\xFCck haben Sie in den Auftragsbeh\xE4lter
+      gelegt."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810629
-    m_Localized: "Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Localized: "Lesen Sie Rest ab: Daran sehen Sie, wie viele St\xFCck nach dem
+      Auftrag im Lagerbeh\xE4lter bleiben."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810630
@@ -865,29 +870,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632
-    m_Localized: "Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Localized: "Sehen Sie sich die markierten Bereiche an: Die brauchen Sie in
+      der \xDCbung nicht."
     m_Metadata:
       m_Items: []
   - m_Id: 727156763004928
-    m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu. Dr\xFCcken Sie
-      dann \u201EZu den Fragen\u201C."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 735937718784000
-    m_Localized: "Mat.-Nr: {matnr} \u2013 Materialnummer"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 735937823641600
-    m_Localized: "VPE: {vpe} ST \u2013 St\xFCck pro Karton oder T\xFCte"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 735937823641601
-    m_Localized: Vergleichen Sie Mat.-Nr und Bez. im LVS mit dem Etikett.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 735937823641602
-    m_Localized: Lesen Sie die VPE auf dem Etikett ab und vergleichen Sie sie mit
-      Verp.-Einh. im LVS.
+    m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu."
     m_Metadata:
       m_Items: []
   - m_Id: 762340292038656
@@ -957,6 +945,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1029442483654656
     m_Localized: Position {position}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1077644968726528
+    m_Localized: "In der Praxis bewegen Sie die Beh\xE4lter von Hand."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1077645040029696
+    m_Localized: "Pr\xFCfen Sie Ihr Wissen: Dr\xFCcken Sie \u201EZu den Fragen\u201C."
     m_Metadata:
       m_Items: []
   references:

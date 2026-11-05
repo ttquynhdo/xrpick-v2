@@ -17,6 +17,8 @@ using UnityEngine;
 /// reaches Soll. The cartons lying in each container ride with it (colliders and interactables off, Ist frozen on the
 /// sample WMS); any reset puts all of them back to their scene-start pose, grabbable. While the demo moves cartons,
 /// ConceptBoxHints logs no container_* events.
+/// #104, decision 036 (3): when the order container has left (or a hint keeps the demo waiting) the tour shows the
+/// step's second text and „Zu den Fragen“ (WmsFieldTour.ShowFollowUp).
 /// </summary>
 public class LaneFlowDemo : MonoBehaviour
 {
@@ -162,6 +164,8 @@ public class LaneFlowDemo : MonoBehaviour
 
         while (boxHints != null && !boxHints.IsClear)
         {
+            // Decision 036: a hint must not keep the trainee from the questions.
+            tour.ShowFollowUp();
             yield return null;
         }
 
@@ -204,6 +208,7 @@ public class LaneFlowDemo : MonoBehaviour
         }
         yield return RideAway(orderBox, orderRiders, orderPath, orderSpeed);
 
+        tour.ShowFollowUp();
         ShowViewBlockers();
     }
 

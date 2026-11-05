@@ -551,9 +551,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627451
-    m_Localized: The storage container comes from the left and leaves over the middle
-      lane; the order container leaves only when the order is done. In practice you
-      move the containers by hand.
+    m_Localized: The storage container leaves over the middle lane, then the finished
+      order container.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
@@ -831,19 +830,22 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156674924544
-    m_Localized: Press "Next".
+    m_Localized: 'Look at the order in the WMS: it shows what you must pick.'
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810624
-    m_Localized: Pick up the STECKER C carton.
+    m_Localized: Pick up the STECKER C carton and check that its label matches Mat.-Nr
+      and Bez.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810625
-    m_Localized: Pick up the STECKER C carton.
+    m_Localized: 'Compare the VPE on the label with Verp.-Einh.: it tells you how
+      many pieces are in one carton.'
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810626
-    m_Localized: Read the number in the Soll field. Then press "Next".
+    m_Localized: 'Remember the number in the Soll field: in the next step you work
+      out the number of cartons from it.'
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810627
@@ -851,11 +853,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810628
-    m_Localized: Press "Next".
+    m_Localized: 'Look at Ist: it shows how many pieces you have put into the order
+      container.'
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810629
-    m_Localized: Press "Next".
+    m_Localized: 'Read Rest: it shows how many pieces stay in the storage container
+      after the order.'
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810630
@@ -868,29 +872,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632
-    m_Localized: Press "Next".
+    m_Localized: 'Look at the marked areas: you don''t need them in the exercise.'
     m_Metadata:
       m_Items: []
   - m_Id: 727156763004928
-    m_Localized: Watch the containers on the roller conveyor. Then press "To the
-      questions".
-    m_Metadata:
-      m_Items: []
-  - m_Id: 735937718784000
-    m_Localized: "Mat.-Nr: {matnr} \u2013 material number"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 735937823641600
-    m_Localized: "VPE: {vpe} ST \u2013 pieces per carton or bag"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 735937823641601
-    m_Localized: Compare Mat.-Nr and Bez. in the WMS with the label.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 735937823641602
-    m_Localized: Read the VPE on the label and compare it with Verp.-Einh. in the
-      WMS.
+    m_Localized: Watch the containers on the roller conveyor.
     m_Metadata:
       m_Items: []
   - m_Id: 762340292038656
@@ -962,6 +948,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1029442483654656
     m_Localized: Position {position}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1077644968726528
+    m_Localized: In practice you move the containers by hand.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1077645040029696
+    m_Localized: 'Check what you have learnt: press "To the questions".'
     m_Metadata:
       m_Items: []
   references:
