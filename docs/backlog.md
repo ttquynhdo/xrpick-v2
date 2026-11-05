@@ -38,7 +38,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   4. **Cuối:** #36 (thay bằng #88) → #13 export EN–DE (có mọi chữ mới), một build, một buổi test kính chung.
 - **Người dùng chốt 2026-11-04: sửa hết một lượt, tuần tự, rồi mới test một lần.** Thứ tự (rà chồng chéo 026–029):
   1. **#88** trước (cỡ carton quyết ô EKZ Mixed, carton đếm Concept, thùng mẫu EKZ, vòng trên carton Complex; có thể dựng lại lưới 6 ô Basic). **#95** xen vào lúc nào cũng được (chỉ prefab và mesh).
-  2. Concept: **#89** (mở đầu bằng bước đo bố cục bàn học cho mọi vật mới, như #84) → **#90** → **#91** → **#94 phần Concept** → **#92** (cần thùng mẫu mới) → **#93 phần Concept**.
+  2. Concept: **#89** (mở đầu bằng bước đo bố cục bàn học cho mọi vật mới, như #84) → **#90** → **#91** (+ số LVS khớp với thùng, bổ sung 2026-11-05) → **#100** (báo kiện sai/thừa trong thùng, cần `solution-decision`) → **#94 phần Concept** → **#92** (cần thùng mẫu mới) → **#93 phần Concept**.
   3. **#94 phần Mixed** → **#93 phần Complex** → **#96** → **#92 phần Complex** (carton đã mở, người dùng chốt 2026-11-04: quy tắc vật chỉ để xem cho mọi scene).
   3c. **#99** (chờ 12 s trước khi thùng chạy, Basic/Mixed/Complex): sau chuỗi Mixed/Complex ở bước 3, trước #87.
   4. **#87** (sau mọi mục đổi chữ thẻ, chạy công cụ slot một lần) → **#86** → **#97**.
@@ -1418,12 +1418,13 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Scene(s):** ConceptScene
 - **Files:** ConceptScene `Carton Count Demo`, `Tour Markers`, Assets/Scripts/Concept/CartonCountDemo.cs, docs/i18n/strings-todo.csv (`concept.tour.cartons.*`)
 - **Problem:** (R8) „120 : 40 = 3 Kartons“ nằm trên bảng bên phải, Soll và Verp.-Einh. ở nửa trái màn hình, 3 carton có thẻ 40/80/120 trong thùng đơn phía dưới bên phải: ba chỗ, người học tự ghép.
-- **Done when:** Ở bước `cartons`, ảnh `wms`: phép tính nằm sát hai ô Soll và Verp.-Einh., ngoài viền, có dấu nối từ „120“ và „40“. Ở bước `cartons`, ảnh `container`: thẻ 40/80/120 trên carton cùng màu/kiểu với ô LVS tương ứng. Ở bước `cartons`: thanh có dòng chỉ xuống thùng đơn. Rời bước `cartons` rồi quay lại: demo chạy lại từ đầu. Không vẽ gì lên dialog.
+- **Done when:** Ở bước `cartons`, ảnh `wms`: phép tính nằm sát hai ô Soll và Verp.-Einh., ngoài viền, có dấu nối từ „120“ và „40“. Ở bước `cartons`, ảnh `container`: thẻ 40/80/120 trên carton cùng màu/kiểu với ô LVS tương ứng. Ở bước `cartons`: thanh có dòng chỉ xuống thùng đơn. Rời bước `cartons` rồi quay lại: demo chạy lại từ đầu. Không vẽ gì lên dialog. (giả định: thùng kho có 6 carton STECKER C như bây giờ, carton STECKER C trên bàn không tính vào thùng nào) Lúc vào scene: thùng đơn rỗng, LVS hiện Soll 120, Ist 0, Rest 120 (6 carton − 3 carton của đơn). Ở bước `cartons`: mỗi lần một carton đếm hiện trong thùng đơn thì thùng kho bớt đúng một carton, và Ist trên LVS đổi 0 → 40 → 80 → 120 cùng lúc với thẻ trên carton; Rest giữ 120. Rời bước `cartons`: thùng kho lại có 6 carton, thùng đơn rỗng, Ist 0. Ở bước 11, khi hai thùng không có kiện sai: thùng đơn có 3 carton đếm, LVS hiện Ist 120, thùng kho có 3 carton; sau 4 s thùng kho chạy đi, rồi thùng đơn mang 3 carton (decision 030). (code) Chú thích `concept.tour.ist.body` / `.rest.body` và decision 010 (Ist chỉ khi cân; „không có kiện STECKER C trong scene“ đã cũ từ #84) được rà lại cho khớp; chữ đổi qua `localize-strings` + `german-reviewer`.
+- **Bổ sung (người dùng 2026-11-05):** số trên LVS phải khớp với cái thật sự nằm trong thùng đơn và thùng kho. Hiện tại LVS hiện Ist 40, Rest 360 (thùng kho phải có 440 = 11 carton), trong khi thùng đơn rỗng và thùng kho có 6 carton = 240 (`SampleWmsOrder` trên `WMS_Monitor`, `Stock STECKER C`). `SampleWmsOrder` hiện cố định, không bao giờ báo `ContentsChanged`, nên muốn Ist chạy theo demo phải sửa code. Decision 030 (2026-11-05): carton STECKER C trên bàn giữ làm mẫu đọc nhãn ngoài hai thùng; Ist chạy theo thùng đơn thuộc #100.
 - **Inspector work expected:** yes
-- **Công:** S
+- **Công:** S–M (thêm phần số LVS)
 - **Test trên kính:** nhanh (một lần nhìn thấy cả phép tính và carton)
 - **Depends on:** #89 (chỗ chữ của bước), #88 (cỡ carton)
-- **Decision:** docs/decisions/026-concept-study-desk.md
+- **Decision:** docs/decisions/026-concept-study-desk.md; phần số LVS: docs/decisions/030-concept-box-hints.md (Rest cố định 120, carton STECKER C trên bàn giữ làm mẫu ngoài hai thùng)
 - **Status:** todo
 
 ### #92 [Feature] Quy tắc „vật nào cầm được“: vật chỉ để xem trông khác kiện thật
@@ -1525,6 +1526,19 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Công:** S
 - **Test trên kính:** nhanh (đọc kịp thẻ kết quả, 12 s có quá dài không, có ai cố cầm kiện trong thùng đang chờ không)
 - **Depends on:** — ; nằm trong cùng build "029" (đổi thời gian của sự kiện `station_move_*`). Mỗi lần đổi thùng thêm ~12 s, cả khoá thêm ~1 phút (5 lần), kiểm với quy tắc 25 phút ở buổi test
+- **Status:** todo
+
+### #100 [Feature] ConceptScene: báo ngay khi người học bỏ kiện sai hoặc thừa vào thùng kho / thùng đơn
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene `PlasticBox_Storage`, `PlasticBox_Order`, `Interactables` (4 kiện cầm được), Assets/Scripts/Concept/ (script mới, có thể dùng lại `OrderRule`/`OrderContents` của `XRPick.Orders`), Assets/Scripts/Concept/LaneFlowDemo.cs:145, Assets/Scripts/Concept/CartonCountDemo.cs, docs/i18n/strings-todo.csv (`order.feedback.wrong_material`, `order.feedback.too_many` hoặc key `concept.*` mới), docs/research-logging-spec.md, analysis/
+- **Problem:** (người dùng 2026-11-05) Kiện tĩnh trong hai thùng không cầm được, nhưng 4 kiện trên mép bàn (KABELVERBINDER A, SCHRAUBE B, STECKER C, carton RING D đã mở + 15 vòng) thì cầm được và bỏ được vào thùng kho hoặc thùng đơn. Hiện ConceptScene không có counter hay validator (decision 025: „đặt sai không được báo“), nên bỏ gì vào thùng cũng không có phản hồi; ở bước `cartons` một carton thêm nằm lẫn với 3 carton đếm (thùng có 4 carton trong khi phép tính nói 3), và ở bước 11 thùng đơn chạy đi bỏ lại kiện bên trong (`RideAway(orderBox, null, …)`). Người dùng muốn dùng chính lúc đó để dạy: vật khác Mat.-Nr trong thùng kho thì báo bỏ ra, quá số lượng trong thùng đơn thì báo bỏ ra. Các bài khác chỉ báo lỗi thùng đơn sau khi bấm nút đỏ, chưa bài nào kiểm thùng kho; người dùng chọn chỉ làm ở ConceptScene, các bài khác giữ nguyên.
+- **Done when:** Vào ConceptScene: thùng đơn rỗng, LVS hiện Soll 120, Ist 0, Rest 120. Bỏ carton STECKER C cầm được vào thùng đơn trước bước `cartons`: LVS hiện Ist 40, Rest 120, không có lời nhắc. Ở bước `cartons`, khi 3 carton đếm đã ở trong thùng đơn, bỏ carton STECKER C vào thùng đơn: sau khoảng 0,5 s LVS hiện Ist 160 và cạnh carton đó hiện thẻ vàng chữ `order.feedback.too_many`; lấy carton ra: thẻ tắt, Ist 120. Bỏ KABELVERBINDER A, SCHRAUBE B, carton RING D đã mở hoặc một vòng RING D vào thùng đơn: cạnh kiện đó hiện thẻ vàng chữ `order.feedback.wrong_material`, Ist không đổi; lấy ra: thẻ tắt. Bỏ KABELVERBINDER A, SCHRAUBE B, carton RING D đã mở hoặc một vòng RING D vào thùng kho: cạnh kiện đó hiện thẻ vàng `concept.hint.storage_wrong_material`; lấy ra: thẻ tắt. Bỏ carton STECKER C vào thùng kho: không có thẻ, Rest vẫn 120. Bỏ một vòng RING D vào thùng đơn rồi một túi SCHRAUBE B vào thùng kho: chỉ có thẻ ở kiện được thả trước; lấy kiện đó ra: thẻ hiện ở kiện còn lại. Cầm một kiện đưa qua thùng mà không thả: không có thẻ. Cầm lại kiện đang có thẻ: thẻ vàng tắt, thẻ nhãn của #90 hiện. Không thẻ nào ghi một con số đích. Ở bước 11, khi một vòng RING D nằm trong thùng đơn: thẻ vàng hiện cạnh vòng, không thùng nào chạy, thanh vẫn hiện; lấy vòng ra: demo bắt đầu. Ở bước 11, khi một carton STECKER C cầm được nằm trong thùng kho: carton chạy theo thùng kho; chọn „Von vorn“: carton nằm lại chỗ cũ trên bàn và cầm được. Không có gì vẽ lên dialog LVS. (code) Logic sai/thừa là hàm thuần trong `XRPick.Orders` có EditMode test; kiện nhận diện qua `GetComponentInParent<PackageData>()`, mỗi kiện đếm một lần. (code) Lời nhắc không ghi `quiz_answer` hay `tour_step`, không đổi `ConceptCardTracker` hay số lượt thử của Concept; Concept không ghi `container_*`. (code) `concept_hint_shown`/`concept_hint_cleared` ghi `container`, `reason`, `object_id`, `material_key`, `tour_step_id`; spec, `make_fake_data.R`, `analyse_set.R` sửa cùng lúc, `selftest.R` xanh, `data-analyst` duyệt; build có `layout_version` "029". (code) Key mới và chú thích `concept.tour.ist.body`/`.rest.body` qua `localize-strings` + `german-reviewer`; decision 010 và 025 ghi là đã bị 030 sửa một phần.
+- **Inspector work expected:** yes (trigger trên hai thùng, chỗ đặt lời nhắc)
+- **Công:** M
+- **Test trên kính:** bắt buộc (tay thật thả kiện vào thùng, đọc lời nhắc từ chỗ đứng)
+- **Depends on:** #91 (số LVS, carton đếm); trước #92 (#92 đổi vẻ ngoài carton đếm và kiện trong thùng kho). Giả định D12, A8 chưa có người hướng dẫn xác nhận (không chặn)
+- **Decision:** docs/decisions/030-concept-box-hints.md
 - **Status:** todo
 
 ## Feature – Log dữ liệu nghiên cứu

@@ -1,7 +1,7 @@
 # Quyết định 010: Dạy các trường WMS trong ConceptScene trên màn hình chỉ xem; Basic chỉ nhắc ngắn
 
 - **Backlog:** #20 (gộp cùng nhánh với #45; quyết định luôn phần "đặt `WMS_Monitor` vào Concept" của #45)
-- **Trạng thái:** accepted (chi tiết „đáp án in trên thẻ câu hỏi“ sửa bởi 015, 2026-11-02)
+- **Trạng thái:** accepted (chi tiết „đáp án in trên thẻ câu hỏi“ sửa bởi 015, 2026-11-02; đơn mẫu cố định và „không có kiện STECKER C trong scene“ sửa bởi 030, 2026-11-05: Ist theo thùng đơn, Rest 120)
 - **Ngày:** 2026-11-01
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer, german-reviewer, data-analyst → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-01):** chấp nhận C; làm #20 và #45 chung một nhánh (sửa `ConceptScene.unity` một lần); đơn mẫu trong Concept hiện `Empf Kz` `003`; không cho khung sáng hay đánh dấu nào trên vùng dialog (chỉ chú thích ngoài viền màn hình).
