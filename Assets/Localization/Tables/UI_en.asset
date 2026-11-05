@@ -342,7 +342,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627401
     m_Localized: 'Here it says how you put the parts in: 003 is EKZ 3, that is one
-      by one and in order.'
+      by one and in order, like the cartons in the example.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627402
@@ -351,7 +351,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627403
     m_Localized: 'Other orders can show 000 here, that is EKZ 0: the parts may lie
-      unordered or be poured in.'
+      unordered, like the bags in the example.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -384,7 +384,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627417
-    m_Localized: 'Empf Kz 003: how do you put the parts into the order container?'
+    m_Localized: 'Empf Kz 003: how do you put the cartons into the order container?'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627418
@@ -396,7 +396,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627420
-    m_Localized: 'Empf Kz 000: how may you put the parts into the order container?'
+    m_Localized: 'Empf Kz 000: how may you put the bags into the order container?'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627421
@@ -670,11 +670,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473
-    m_Localized: With 003 the parts must lie one by one and in order.
+    m_Localized: With 003 the cartons must lie one by one and in order.
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182474
-    m_Localized: With 000 the parts may lie unordered.
+    m_Localized: With 000 the bags may lie unordered.
     m_Metadata:
       m_Items: []
   - m_Id: 287914819719168
@@ -876,11 +876,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810630
-    m_Localized: "Look at the example \u201EEmpf Kz 003\u201C between the containers."
+    m_Localized: "Look at the example \u201EEmpf Kz 003\u201C to the left of the
+      screen."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810631
-    m_Localized: Compare the two examples between the containers.
+    m_Localized: Compare the two examples to the left of the screen.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632

@@ -641,6 +641,38 @@ for (i in seq_len(nrow(exit_checks))) {
 v2_events <- visit_events %>%
   semi_join(sessions %>% filter(!schema_version %in% 1L), by = "session_id")
 
+# Empf Kz of a picking position (#94, decision 028) where line.empf_kz is not
+# logged. The field came with the build that made Mixed position 1 Empf Kz
+# "003" (3 snap places), and that build kept layout_version "029" (an earlier
+# "029" build had "000" there). So the field itself, not the layout, tells the
+# build: has_empf_kz = the session logged line.empf_kz on its presses.
+#   Basic "003" always (6 snap places, #41).
+#   has_empf_kz TRUE: Mixed position 1 "003" (normally logged anyway).
+#   has_empf_kz FALSE (presses without the field = a build before #94):
+#     Mixed position 1 "000".
+#   has_empf_kz NA (no press in the session): "000" up to layout "025",
+#     unknown (NA) for Mixed position 1 from "029" (either build possible).
+#   Mixed position 2 and both Complex positions "000"; quiz touches NA.
+expected_empf_kz <- function(scene, position, has_empf_kz, layout_version) {
+  sc <- as.character(scene)
+  from_029 <- coalesce(suppressWarnings(as.integer(layout_version)) >= 29L, FALSE)
+  case_when(is.na(position) ~ NA_character_,
+            sc == "BasicPickingScene" ~ "003",
+            sc == "MixedPickingScene" & position == 1L & has_empf_kz %in% TRUE ~ "003",
+            sc == "MixedPickingScene" & position == 1L & is.na(has_empf_kz) & from_029 ~ NA_character_,
+            sc %in% c("MixedPickingScene", "ComplexScene") ~ "000",
+            TRUE ~ NA_character_)
+}
+# An EKZ-3 opportunity (the denominator of ekz_placement at a position): a
+# rated red-button press at an Empf Kz "003" position whose OrderRule result
+# was right (no code but EKZ_PLACEMENT), because the validator checks the snap
+# places only once the quantity is right. A press with TOO_FEW etc. never had
+# its placement rated, so it is no EKZ attempt (neither right nor wrong).
+is_ekz_opportunity <- function(event, empf_kz, codes) {
+  rule_ok <- map_lgl(codes, ~ all(.x %in% "EKZ_PLACEMENT"))
+  event == "confirm_pressed" & empf_kz %in% "003" & rule_ok
+}
+
 # One row per rated attempt: a red-button press (confirm_pressed) or a quiz
 # touch (quiz_answer). The app counts attempt_no separately for the two, so a
 # press is identified by press_id (its row here), never by attempt_no.
@@ -662,6 +694,8 @@ presses <- v2_events %>% filter(event %in% c("confirm_pressed", "quiz_answer")) 
             line_item = map_chr(data, ~ as_chr(.x$line$item)),
             soll = map_int(data, ~ as_int(.x$line$soll)),
             vpe = map_int(data, ~ as_int(.x$line$vpe)),
+            # Empf Kz of the position (#94, layout "029" on); NA in older logs.
+            empf_kz_logged = map_chr(data, ~ as_chr(.x$line$empf_kz)),
             required_full = map_int(data, ~ as_int(.x$line$required_full)),
             required_loose = map_int(data, ~ as_int(.x$line$required_loose)),
             placed_full = map_int(data, ~ as_int(.x$line$placed_full)),
@@ -681,7 +715,16 @@ presses <- v2_events %>% filter(event %in% c("confirm_pressed", "quiz_answer")) 
          # Attempts that summary.csv counts in confirm_count: rated red-button
          # presses, and quiz touches in ConceptScene. The Complex remainder quiz
          # is only in the events (it shows up in items, not in visit totals).
-         counted = event == "confirm_pressed" | !quiz %in% "complex_remainder") %>%
+         counted = event == "confirm_pressed" | !quiz %in% "complex_remainder",
+         layout_version = sessions$layout_version[match(session_id, sessions$session_id)]) %>%
+  # Empf Kz (#94, decision 028): the logged one, else what the build had
+  # (expected_empf_kz above; the session's presses tell the build).
+  group_by(session_id) %>%
+  mutate(has_empf_kz = if (any(event == "confirm_pressed")) any(!is.na(empf_kz_logged)) else NA) %>%
+  ungroup() %>%
+  mutate(empf_kz_expected = expected_empf_kz(scene, position, has_empf_kz, layout_version),
+         empf_kz = coalesce(empf_kz_logged, empf_kz_expected),
+         ekz_opportunity = is_ekz_opportunity(event, empf_kz, codes)) %>%
   # scaffolded = the app handed the trainee the numbers for this item
   # (item_skills.csv: Complex position 1). Kept out of the skill rates.
   left_join(item_skills %>% select(scene, item, scaffolded), by = c("scene", "item")) %>%
@@ -694,6 +737,47 @@ for (i in seq_len(nrow(invariant_breaks))) {
   warn("invariant correct == (error_codes empty) broken: ", r$participant_id, " ", r$scene,
        " visit ", r$scene_visit, " ", r$event, " attempt ", r$attempt_no, " (correct = ", r$correct,
        ", codes = ", paste(r$codes[[1]], collapse = ";"), ")")
+}
+
+# Empf Kz checks (#94). A logged empf_kz that differs from the current orders
+# (an order changed without telling R?) is warned; R uses the logged one. A
+# session that logs the field on some presses but not on others, a "025"-or-
+# older log with the field, and a "029" log without it (a build from before
+# #94: Mixed position 1 read as Empf Kz 000) are warned too, and
+# EKZ_PLACEMENT where the app can't write it (not "003", or next to an
+# OrderRule code) is a contract break.
+empf_kz_diff <- presses %>% filter(event == "confirm_pressed", !is.na(empf_kz_logged),
+                                   !is.na(empf_kz_expected), empf_kz_logged != empf_kz_expected) %>%
+  distinct(participant_id, scene, position, empf_kz_logged, empf_kz_expected)
+for (i in seq_len(nrow(empf_kz_diff))) {
+  r <- empf_kz_diff[i, ]
+  warn("line.empf_kz ", r$empf_kz_logged, " at ", r$scene, " position ", r$position, " for ", r$participant_id,
+       ", but the course has ", r$empf_kz_expected, " there: the logged value is used ",
+       "(order changed? update expected_empf_kz in analyse_set.R)")
+}
+empf_kz_sessions <- presses %>% filter(event == "confirm_pressed") %>%
+  group_by(participant_id, session_id, layout_version) %>%
+  summarise(n_with = sum(!is.na(empf_kz_logged)), n_without = sum(is.na(empf_kz_logged)), .groups = "drop") %>%
+  mutate(lay = suppressWarnings(as.integer(layout_version)))
+for (r in split(empf_kz_sessions, seq_len(nrow(empf_kz_sessions)))) {
+  if (r$n_with > 0 && r$n_without > 0) {
+    warn("line.empf_kz on only ", r$n_with, " of ", r$n_with + r$n_without, " confirm_pressed lines: ",
+         r$participant_id, " session ", r$session_id, " (missing ones read as the build without the field)")
+  } else if (r$n_with > 0 && !coalesce(r$lay >= 29L, FALSE)) {
+    warn("line.empf_kz in a log of layout ", coalesce(r$layout_version, "none"), " (only builds from #94, layout ",
+         "\"029\", write it): ", r$participant_id, " session ", r$session_id)
+  } else if (r$n_with == 0 && coalesce(r$lay >= 29L, FALSE)) {
+    warn("layout ", r$layout_version, " log without line.empf_kz: a build from before #94, Mixed position 1 read ",
+         "as Empf Kz 000 (not rated for placement): ", r$participant_id, " session ", r$session_id)
+  }
+}
+ekz_misplaced <- presses %>%
+  filter(map_lgl(codes, ~ "EKZ_PLACEMENT" %in% .x), !ekz_opportunity)
+for (i in seq_len(nrow(ekz_misplaced))) {
+  r <- ekz_misplaced[i, ]
+  warn("EKZ_PLACEMENT where the app does not rate placement: ", r$participant_id, " ", r$scene,
+       " visit ", r$scene_visit, " position ", r$position, " (Empf Kz ", coalesce(r$empf_kz, "NA"),
+       ", codes ", paste(r$codes[[1]], collapse = ";"), "): not counted in the ekz_placement rate")
 }
 
 # Every attempt needs its item (position / question_id), and attempt_in_position
@@ -1261,6 +1345,36 @@ if (mixed_p1_scaffold) {
        "first_attempt_by_item.png and time_by_phase.png is split, never pooled; items.csv and ",
        "process_by_position.csv carry scaffold_level")
 }
+# Mixed position 1 (#94, decision 028): builds before #94 had Empf Kz 000
+# there (cartons put in any way, never rated), from #94 Empf Kz 003 (3 snap
+# places, EKZ_PLACEMENT possible). Same order line, one more thing to get
+# right, so position_1 results of the two levels are never pooled (like
+# Complex above). The level of a session = the Empf Kz of its first Mixed
+# position-1 press (logged, else expected_empf_kz). Both builds can say
+# layout "029", so the split is by Empf Kz, not by layout.
+mixed_p1_session <- presses %>%
+  filter(scene == "MixedPickingScene", event == "confirm_pressed", position %in% 1L, !is.na(empf_kz)) %>%
+  arrange(session_id, t, line) %>%
+  distinct(session_id, .keep_all = TRUE) %>%
+  select(session_id, participant_id, layout_version, empf_kz)
+mixed_m1_ekz <- n_distinct(mixed_p1_session$empf_kz) > 1
+if (mixed_m1_ekz) {
+  warn("set mixes Mixed position_1 Empf Kz (",
+       paste(map_chr(sort(unique(mixed_p1_session$empf_kz)), function(l) paste0(l, ": ", paste(sort(unique(
+         mixed_p1_session$participant_id[mixed_p1_session$empf_kz == l])), collapse = ", "))), collapse = "; "),
+       "; #94): MixedPickingScene position_1 in first_attempt_by_item.png and time_by_phase.png ",
+       "is split, never pooled; items.csv and process_by_position.csv carry empf_kz")
+}
+# empf_kz column of process_by_position.csv for a position without a press:
+# expected_empf_kz with what the session's presses tell about the build.
+item_empf_kz <- function(scene, item, session_id) {
+  pos <- suppressWarnings(as.integer(str_remove(item, "^position_")))
+  has <- presses %>% filter(event == "confirm_pressed") %>% distinct(session_id, has_empf_kz)
+  expected_empf_kz(scene, if_else(str_detect(coalesce(item, ""), "^position_"), pos, NA_integer_),
+                   has$has_empf_kz[match(session_id, has$session_id)],
+                   sessions$layout_version[match(session_id, sessions$session_id)])
+}
+
 # scaffold_level column: set for Complex position_1 only, NA elsewhere.
 p1_scaffold_level <- function(scene, item, session_id) {
   if_else(as.character(scene) == "ComplexScene" & item == "position_1",
@@ -1268,10 +1382,16 @@ p1_scaffold_level <- function(scene, item, session_id) {
           NA_character_)
 }
 # Item name for charts: "position_1 [019/025]" / "position_1 [029]" for
-# Complex in a set that mixes the two levels, else the item itself.
+# Complex in a set that mixes the two levels, "position_1 [Empf Kz 000]" /
+# "[Empf Kz 003]" for Mixed in a set that mixes them (#94), else the item.
 chart_item <- function(scene, item, session_id) {
   lev <- p1_scaffold_level(scene, item, session_id)
-  if_else(mixed_p1_scaffold & !is.na(lev), paste0(item, " [", p1_level_label[lev], "]"), item)
+  m1 <- if_else(as.character(scene) == "MixedPickingScene" & item == "position_1",
+                mixed_p1_session$empf_kz[match(session_id, mixed_p1_session$session_id)],
+                NA_character_)
+  case_when(mixed_p1_scaffold & !is.na(lev) ~ paste0(item, " [", p1_level_label[lev], "]"),
+            mixed_m1_ekz & !is.na(m1) ~ paste0(item, " [Empf Kz ", m1, "]"),
+            TRUE ~ item)
 }
 
 # ---- 9. Compare the rebuilt visits with summary.csv ---------------------------
@@ -1574,6 +1694,7 @@ items <- item_attempts %>%
             attempts = n(),
             reached_correct = any(correct %in% TRUE),
             first_attempt_codes = paste(first(codes), collapse = ";"),
+            empf_kz = first(empf_kz),
             .groups = "drop") %>%
   mutate(first_attempt_codes = na_if(first_attempt_codes, "")) %>%
   left_join(item_skills, by = c("scene", "item")) %>%
@@ -1595,7 +1716,7 @@ for (i in seq_len(nrow(unmapped_items))) {
   warn("quiz item ", unmapped_items$item[i], " in ", unmapped_items$scene[i],
        " is not in item_skills.csv: left out of first_attempt_by_item.png")
 }
-write_csv(items %>% select(participant_id, scene, layout_version, item, kind, quiz, skill, scaffolded, scaffold_level,
+write_csv(items %>% select(participant_id, scene, layout_version, item, kind, quiz, skill, scaffolded, scaffold_level, empf_kz,
                            first_attempt_correct, attempts, reached_correct, first_attempt_codes,
                            session_id, scene_visit, repeat_visit),
           file.path(output_dir, "items.csv"), na = "")
@@ -1686,12 +1807,18 @@ counting_visits <- visits %>% filter(counting, confirm_count > 0)
 # so they are left out: numerator AND denominator.
 press_skill_tests <- presses %>%
   filter(counted, !scaffolded, !is.na(item)) %>%
-  select(participant_id, session_id, scene, scene_visit, t, line, press_id, event, item) %>%
+  select(participant_id, session_id, scene, scene_visit, t, line, press_id, event, item, ekz_opportunity) %>%
   left_join(item_skills %>% filter(!is.na(skill)) %>% select(scene, item, item_skill = skill),
             by = c("scene", "item")) %>%
   left_join(skill_pairs %>% rename(scene_skill = skill), by = "scene", relationship = "many-to-many") %>%
-  # Item with a skill: only that skill. Position without one: every scene skill.
-  filter(if_else(is.na(item_skill), event == "confirm_pressed", scene_skill == item_skill)) %>%
+  # Item with a skill: only that skill. Position without one: every scene skill,
+  # except ekz_placement, which a press tests only at an EKZ-3 opportunity
+  # (Empf Kz "003", quantity right; #94, decision 028). So Mixed position 2,
+  # Mixed position 1 before layout "029" and wrong-quantity presses never
+  # enter its denominator.
+  filter(if_else(is.na(item_skill), event == "confirm_pressed", scene_skill == item_skill),
+         is.na(item_skill) & scene_skill == "ekz_placement" & ekz_opportunity |
+           !(is.na(item_skill) & scene_skill == "ekz_placement")) %>%
   transmute(participant_id, session_id, scene, scene_visit, t, line, press_id, skill = scene_skill)
 
 # Per visit and skill: skill_presses = attempts that tested the skill (the
@@ -1755,7 +1882,8 @@ if (nrow(skill_rates) == 0) {
          subtitle = paste0("Dots = one participant's first visit with >= 1 confirm; diamond = mean. ",
                            "Denominator = attempts at items of this skill (Concept: touches on its questions;
 ",
-                           "picking: every press, a position tests all skills of its scene). ",
+                           "picking: every press, a position tests all skills of its scene;\n",
+                           "ekz_placement only presses with the right quantity at an Empf Kz 003 position). ",
                            "Scaffolded Complex position 1 left out. ",
                            "Indication only: fixed scene order, no control group."),
          x = "Scene (build order)", y = "Attempts at this skill with its error (%)") +
@@ -1915,6 +2043,10 @@ grab_t <- grabs %>% select(session_id, scene, scene_visit, g_t = start_t)
 change_t <- container_rows %>% select(session_id, scene, scene_visit, c_t = t)
 press_t <- presses %>% filter(event == "confirm_pressed") %>%
   select(session_id, scene, scene_visit, position, p_t = t)
+first_press_empf_kz <- presses %>% filter(event == "confirm_pressed", !is.na(position)) %>%
+  arrange(t, line) %>%
+  distinct(session_id, scene, scene_visit, position, .keep_all = TRUE) %>%
+  transmute(key = paste(session_id, scene, scene_visit, position), empf_kz)
 process <- proc_positions %>%
   rowwise() %>%
   mutate(
@@ -1936,11 +2068,15 @@ process <- proc_positions %>%
          # Complex position_1 scaffold level (#93, section 8b): split when mixed.
          layout_version = sessions$layout_version[match(session_id, sessions$session_id)],
          scaffold_level = p1_scaffold_level(scene, item, session_id),
+         # Empf Kz of the position (#94): logged at its first press, else from the layout.
+         empf_kz = coalesce(first_press_empf_kz$empf_kz[match(paste(session_id, scene, scene_visit, position),
+                                                              first_press_empf_kz$key)],
+                            item_empf_kz(scene, item, session_id)),
          chart_item = chart_item(scene, item, session_id),
          scene = factor(scene, levels = levels(visits$scene))) %>%
   arrange(participant_id, scene, scene_visit, position)
 write_csv(process %>% select(participant_id, session_id, scene, scene_visit, counting, repeat_visit,
-                             layout_version, position, scaffolded, scaffold_level, completed, presses,
+                             layout_version, position, scaffolded, scaffold_level, empf_kz, completed, presses,
                              read_s, pick_s, check_s, position_s),
           file.path(output_dir, "process_by_position.csv"), na = "")
 
@@ -1951,7 +2087,8 @@ proc_long <- process %>% filter(counting, completed) %>%
   mutate(phase = factor(phase, levels = c("read_s", "pick_s", "check_s"),
                         labels = c("read (start -> first grab)", "pick (first grab -> last box change)",
                                    "check (last box change -> correct press)")),
-         # chart_item keeps Complex position 1 split by scaffold level (#93).
+         # chart_item keeps Complex position 1 split by scaffold level (#93)
+         # and Mixed position 1 by Empf Kz (#94).
          slot = paste0(str_remove(as.character(scene), "PickingScene|Scene"), "\n",
                        str_replace(str_replace(chart_item, "^position_", "position "), " \\[", "\n[")))
 if (nrow(proc_long) == 0) {
@@ -2883,6 +3020,7 @@ validity_limits <- c(
   "- Q5 (paper NASA-TLX, once at the end, raw = unweighted mean): who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.",
   "- ConceptScene tour (tour_steps.csv): Back presses are derived from step_index (-1 = Zurück) and exist only for layout_version \"025\" on; \"019\" logs and headers without layout_version have NA, not 0. A Zurück < 2 s after Weiter is read as a likely mis-press, not proven. Step time ends at the next step or the first quiz answer: time spent looking elsewhere (label board, packages) is in it.",
   "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).",
+  "- Mixed position_1 (#94, decision 028): builds before #94 had Empf Kz 000 there (placement never rated), from #94 (line.empf_kz logged, layout \"029\") Empf Kz 003 (3 snap places, EKZ_PLACEMENT possible); an earlier \"029\" build without the field counts as 000. In a set with both, position_1 is split ([Empf Kz 000] / [Empf Kz 003]) in first_attempt_by_item.png and time_by_phase.png; the per-scene Mixed numbers (error_rate_MixedPickingScene, time_to_correct, error codes) still pool both and an Empf Kz 003 visit can have more presses (EKZ retries). The ekz_placement rate counts only presses with the right quantity at an Empf Kz 003 position (EKZ opportunities): its n is small and a wrong-quantity press is no EKZ attempt.",
   "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card). In a set with both levels position_1 is split in first_attempt_by_item.png and time_by_phase.png; the per-scene Complex numbers (time_to_correct_by_scene.png, error_codes_by_scene.png) still pool both levels.",
   "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): putting packages into the Concept containers is voluntary and not logged otherwise (no container_* in Concept), so hint counts have no denominator and are never an error rate or an attempt. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts lane_demo_delay_s (4 s) after the step; older layouts have NA, not 0.")
 # The pilot set (decision 023) is a try-out of the course and of this

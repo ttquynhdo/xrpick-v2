@@ -194,11 +194,48 @@ local({
               by = c("session_id", "scene_visit"))
   stopifnot(nrow(ce) > 0, all(ce$skill_presses == ce$n_ekz))
   # Picking scenes: a position without a skill tests every scene skill, so the
-  # denominator is every counted press (Basic: both skills, same count).
-  bs <- skill_rates %>% filter(scene == "BasicPickingScene")
+  # denominator is every counted press, except ekz_placement (#94, decision
+  # 028): only presses with the right quantity (no code but EKZ_PLACEMENT) at
+  # an Empf Kz "003" position, the only presses whose placement the app rates.
+  bs <- skill_rates %>% filter(scene == "BasicPickingScene", skill == "calculate_quantity")
   stopifnot(nrow(bs) > 0, all(bs$skill_presses == visits$confirm_count[match(
     paste(bs$session_id, "BasicPickingScene", bs$scene_visit),
     paste(visits$session_id, visits$scene, visits$scene_visit))]))
+  be <- skill_rates %>% filter(scene == "BasicPickingScene", skill == "ekz_placement") %>%
+    left_join(presses %>% filter(scene == "BasicPickingScene", event == "confirm_pressed",
+                                 map_lgl(codes, ~ all(.x %in% "EKZ_PLACEMENT"))) %>%
+                count(session_id, scene_visit, name = "n_rule_ok"),
+              by = c("session_id", "scene_visit"))
+  stopifnot(nrow(be) > 0, all(be$skill_presses == be$n_rule_ok),
+            # Fewer than all presses somewhere: wrong-quantity presses are left out.
+            any(be$skill_presses < visits$confirm_count[match(paste(be$session_id, "BasicPickingScene", be$scene_visit),
+                                                             paste(visits$session_id, visits$scene, visits$scene_visit))]))
+  # Study set: all "025" builds, so Mixed position 1 was Empf Kz 000 and Mixed
+  # has no ekz_placement rate (not measured = no row, never 0 %).
+  stopifnot(!any(skill_rates$scene == "MixedPickingScene" & skill_rates$skill == "ekz_placement"),
+            all(presses$empf_kz[presses$scene == "MixedPickingScene" & presses$event == "confirm_pressed"] == "000"),
+            all(is.na(presses$empf_kz_logged)),
+            all(presses$empf_kz[presses$scene == "BasicPickingScene" & presses$event == "confirm_pressed"] == "003"),
+            !any(grepl("set mixes Mixed position_1 Empf Kz", warn_lines)),
+            !any(grepl("EKZ_PLACEMENT where the app does not rate", warn_lines)))
+  # Empf Kz rule and the EKZ-3 opportunity rule, called directly. The field
+  # tells the build (has_empf_kz); a "029" log without it is a build before
+  # #94 (Mixed position 1 = 000); a session without presses from "029" on
+  # leaves Mixed position 1 unknown.
+  stopifnot(identical(expected_empf_kz(c("BasicPickingScene", "MixedPickingScene", "MixedPickingScene",
+                                         "MixedPickingScene", "MixedPickingScene", "MixedPickingScene",
+                                         "MixedPickingScene", "ComplexScene", "ConceptScene"),
+                                       c(1L, 1L, 1L, 1L, 1L, 1L, 2L, 1L, NA),
+                                       c(FALSE, FALSE, TRUE, FALSE, NA, NA, TRUE, TRUE, NA),
+                                       c("019", "025", "029", "029", "025", "029", "029", "029", "029")),
+                      c("003", "000", "003", "000", "000", NA, "000", "000", NA)),
+            identical(is_ekz_opportunity(rep("confirm_pressed", 5), c("003", "003", "003", "000", NA),
+                                         list(character(0), "EKZ_PLACEMENT", c("TOO_FEW"), character(0),
+                                              character(0))),
+                      c(TRUE, TRUE, FALSE, FALSE, FALSE)))
+  # items.csv and process_by_position.csv carry empf_kz (#94).
+  stopifnot("empf_kz" %in% names(read_csv(file.path(output_dir, "items.csv"), show_col_types = FALSE)),
+            "empf_kz" %in% names(read_csv(file.path(output_dir, "process_by_position.csv"), show_col_types = FALSE)))
 
   # Complex attempts_to_correct = red-button presses (confirm_pressed) of the
   # visit; remainder-quiz touches are not counted. If the C# logger counts
@@ -576,6 +613,45 @@ local({
             all(is.na(pp$scaffold_level[!(pp$scene == "ComplexScene" & pp$position == 1)])))
   # The hint event names are in the catalogue (no "not in the v2 catalogue" note for them).
   stopifnot(all(c("concept_hint_shown", "concept_hint_cleared") %in% pilot_set$known_events))
+
+  # 8u. Mixed position 1 Empf Kz (#94, decision 028). P813 ("029") logs
+  #     line.empf_kz; its fixed Mixed presses: TOO_FEW, TOO_FEW, EKZ_PLACEMENT,
+  #     correct (position 1, "003"), correct (position 2, "000"). EKZ
+  #     opportunities = presses 3 and 4 only; quantity tested by all 5.
+  pm <- pilot_set$presses %>% filter(participant_id == "P813", scene == "MixedPickingScene") %>% arrange(t)
+  stopifnot(identical(pm$empf_kz_logged, c("003", "003", "003", "003", "000")),
+            identical(pm$ekz_opportunity, c(FALSE, FALSE, TRUE, TRUE, FALSE)),
+            all(is.na(pilot_set$presses$empf_kz_logged[pilot_set$presses$participant_id != "P813"])))
+  m813 <- pilot_set$skill_rates %>% filter(participant_id == "P813", scene == "MixedPickingScene")
+  stopifnot(identical(m813$skill_presses[m813$skill == "ekz_placement"], 2L),
+            identical(m813$presses_with_skill_error[m813$skill == "ekz_placement"], 1L),
+            isTRUE(m813$first_attempt_skill_error[m813$skill == "ekz_placement"]),
+            identical(m813$skill_presses[m813$skill == "calculate_quantity"], 5L),
+            identical(m813$presses_with_skill_error[m813$skill == "calculate_quantity"], 2L))
+  # "025"/"019" Mixed visits never measured placement: no ekz_placement row.
+  stopifnot(!any(pilot_set$skill_rates$scene == "MixedPickingScene" & pilot_set$skill_rates$skill == "ekz_placement" &
+                   pilot_set$skill_rates$participant_id != "P813"))
+  # Mixed position_1 is split by Empf Kz in the item and phase charts, never pooled.
+  pi <- read_csv(file.path(pilot_dir, "items.csv"), show_col_types = FALSE,
+                 col_types = cols(.default = col_guess(), empf_kz = col_character(), layout_version = col_character()))
+  mi <- pi %>% filter(scene == "MixedPickingScene")
+  stopifnot(identical(mi$empf_kz[mi$participant_id == "P813" & mi$item == "position_1"], "003"),
+            isFALSE(mi$first_attempt_correct[mi$participant_id == "P813" & mi$item == "position_1"]),
+            identical(mi$attempts[mi$participant_id == "P813" & mi$item == "position_1"], 4),
+            all(mi$empf_kz[mi$participant_id != "P813" | mi$item == "position_2"] == "000"),
+            all(is.na(pi$empf_kz[pi$kind == "quiz"])))
+  mx <- as.character(pilot_set$item_shares$x_label[pilot_set$item_shares$scene == "MixedPickingScene"])
+  stopifnot(all(c("Mixed\nposition_1\n[Empf Kz 000]", "Mixed\nposition_1\n[Empf Kz 003]", "Mixed\nposition_2") %in% mx),
+            !"Mixed\nposition_1" %in% mx,
+            any(grepl("set mixes Mixed position_1 Empf Kz", p_warn)),
+            !any(grepl("EKZ_PLACEMENT where the app does not rate", p_warn)),
+            !any(grepl("line.empf_kz on only|line.empf_kz in a log|log without line.empf_kz|line.empf_kz [0-9]", p_warn)))
+  stopifnot(all(c("Mixed\nposition 1\n[Empf Kz 000]", "Mixed\nposition 1\n[Empf Kz 003]") %in% slots))
+  ppe <- read_csv(file.path(pilot_dir, "process_by_position.csv"), show_col_types = FALSE,
+                  col_types = cols(.default = col_guess(), empf_kz = col_character()))
+  stopifnot(identical(ppe$empf_kz[ppe$participant_id == "P813" & ppe$scene == "MixedPickingScene"], c("003", "000")),
+            all(ppe$empf_kz[ppe$scene == "BasicPickingScene"] == "003"),
+            all(ppe$empf_kz[ppe$scene == "ComplexScene"] == "000"))
 
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.

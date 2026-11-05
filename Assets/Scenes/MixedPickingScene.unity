@@ -287,6 +287,203 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1201789166}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &67462566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 67462571}
+  - component: {fileID: 67462570}
+  - component: {fileID: 67462569}
+  - component: {fileID: 67462568}
+  - component: {fileID: 67462567}
+  m_Layer: 0
+  m_Name: BoxSnapper (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &67462567
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67462566}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+--- !u!54 &67462568
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67462566}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!23 &67462569
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67462566}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &67462570
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67462566}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &67462571
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67462566}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.50795, y: 0.546, z: 0.9508}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 980817740}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &87547757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 87547758}
+  - component: {fileID: 87547759}
+  m_Layer: 0
+  m_Name: SnapInteractor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &87547758
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87547757}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1868659462}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &87547759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87547757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2756c251a8363df4f9d4b30ee6414bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractor
+  _activeState: {fileID: 0}
+  _interactableFilters: []
+  _candidateTiebreaker: {fileID: 0}
+  _maxIterationsPerFrame: 3
+  _data: {fileID: 0}
+  _pointableElement: {fileID: 1868659466}
+  _rigidbody: {fileID: 1868659465}
+  _distanceThreshold: 0.01
+  _snapPoseTransform: {fileID: 0}
+  _defaultInteractable: {fileID: 0}
+  _timeOutInteractable: {fileID: 0}
+  _timeOut: 0
 --- !u!1 &88704744
 GameObject:
   m_ObjectHideFlags: 0
@@ -3830,6 +4027,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 447496041}
+    - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 447496043}
+    - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 447496042}
   m_SourcePrefab: {fileID: 100100000, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
 --- !u!1 &447496038 stripped
 GameObject:
@@ -3854,7 +4057,7 @@ MonoBehaviour:
     soll: 150
     vpe: 50
     materialNumber: 512304
-    empfKz: 000
+    empfKz: 003
     weightKg: 0.6
   - materialKey: screw_b
     materialName: SCHRAUBE B
@@ -3889,8 +4092,125 @@ MonoBehaviour:
   - {x: 4.546, y: 0, z: 3.678}
   speed: 0.45
   cornerPause: 1
-  carriedWithContainer: []
+  carriedWithContainer:
+  - {fileID: 1123640035}
+  - {fileID: 1992498747}
+  - {fileID: 67462568}
   stationStock: {fileID: 1961666389}
+--- !u!114 &447496042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 447496038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ec6017124fdfa8499256aa8a39eaa00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EkzPlacementCheck
+  places:
+  - {fileID: 1212152253}
+  - {fileID: 1845363376}
+  - {fileID: 980817742}
+  snapSound: {fileID: 447496043}
+--- !u!82 &447496043
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 447496038}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 25a99cec3fc16184490a8fbfe21d1528, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.8
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &497650118
 GameObject:
   m_ObjectHideFlags: 0
@@ -5388,6 +5708,62 @@ RectTransform:
   m_AnchoredPosition: {x: 0.5, y: -0.015000045}
   m_SizeDelta: {x: 180, y: 70.2}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &652411986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 652411987}
+  - component: {fileID: 652411988}
+  m_Layer: 0
+  m_Name: SnapInteractor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &652411987
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652411986}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1729880472}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &652411988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652411986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2756c251a8363df4f9d4b30ee6414bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractor
+  _activeState: {fileID: 0}
+  _interactableFilters: []
+  _candidateTiebreaker: {fileID: 0}
+  _maxIterationsPerFrame: 3
+  _data: {fileID: 0}
+  _pointableElement: {fileID: 1729880476}
+  _rigidbody: {fileID: 1729880475}
+  _distanceThreshold: 0.01
+  _snapPoseTransform: {fileID: 0}
+  _defaultInteractable: {fileID: 0}
+  _timeOutInteractable: {fileID: 0}
+  _timeOut: 0
 --- !u!1 &658414184
 GameObject:
   m_ObjectHideFlags: 0
@@ -6121,6 +6497,62 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &742415348
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 742415349}
+  - component: {fileID: 742415350}
+  m_Layer: 0
+  m_Name: SnapInteractor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &742415349
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 742415348}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1298809671}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &742415350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 742415348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2756c251a8363df4f9d4b30ee6414bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractor
+  _activeState: {fileID: 0}
+  _interactableFilters: []
+  _candidateTiebreaker: {fileID: 0}
+  _maxIterationsPerFrame: 3
+  _data: {fileID: 0}
+  _pointableElement: {fileID: 1298809675}
+  _rigidbody: {fileID: 1298809674}
+  _distanceThreshold: 0.01
+  _snapPoseTransform: {fileID: 0}
+  _defaultInteractable: {fileID: 0}
+  _timeOutInteractable: {fileID: 0}
+  _timeOut: 0
 --- !u!1 &746538996
 GameObject:
   m_ObjectHideFlags: 0
@@ -6828,6 +7260,62 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7021829363036516599, guid: 8a86cba2ac6cb234584526890635e087, type: 3}
   m_PrefabInstance: {fileID: 851847346}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &854721184
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 854721185}
+  - component: {fileID: 854721186}
+  m_Layer: 0
+  m_Name: SnapInteractor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &854721185
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854721184}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 893102326}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &854721186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854721184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2756c251a8363df4f9d4b30ee6414bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractor
+  _activeState: {fileID: 0}
+  _interactableFilters: []
+  _candidateTiebreaker: {fileID: 0}
+  _maxIterationsPerFrame: 3
+  _data: {fileID: 0}
+  _pointableElement: {fileID: 893102330}
+  _rigidbody: {fileID: 893102329}
+  _distanceThreshold: 0.01
+  _snapPoseTransform: {fileID: 0}
+  _defaultInteractable: {fileID: 0}
+  _timeOutInteractable: {fileID: 0}
+  _timeOut: 0
 --- !u!1 &884476755
 GameObject:
   m_ObjectHideFlags: 0
@@ -7006,6 +7494,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1183072912}
+    - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 854721185}
     - targetCorrespondingSourceObject: {fileID: 6291559308731629643, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1118067515}
@@ -7987,6 +8478,72 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &980817739
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 980817740}
+  - component: {fileID: 980817742}
+  - component: {fileID: 980817741}
+  m_Layer: 0
+  m_Name: SnapInteractable
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &980817740
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 980817739}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.2892, y: 0.5165, z: -0.2326}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 67462571}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &980817741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 980817739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1397d30d2aecb5a4d9d645617f571f76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnapInteractableVisuals
+  snapInteractable: {fileID: 980817742}
+  hoverMaterial: {fileID: 2100000, guid: 8e281e3f688863a48a9eac4a8f75ddf2, type: 2}
+--- !u!114 &980817742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 980817739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06bd28341d3e86a4c8ab52b1a0269c7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
+  _interactorFilters: []
+  _maxInteractors: 1
+  _maxSelectingInteractors: -1
+  _data: {fileID: 0}
+  _rigidbody: {fileID: 67462568}
+  _snapPoseDelegate: {fileID: 0}
+  _movementProvider: {fileID: 0}
 --- !u!1 &989842529
 GameObject:
   m_ObjectHideFlags: 0
@@ -8166,6 +8723,62 @@ MonoBehaviour:
   references:
     version: 2
     RefIds: []
+--- !u!1 &991265097
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 991265098}
+  - component: {fileID: 991265099}
+  m_Layer: 0
+  m_Name: SnapInteractor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &991265098
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 991265097}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1023735624}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &991265099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 991265097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2756c251a8363df4f9d4b30ee6414bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractor
+  _activeState: {fileID: 0}
+  _interactableFilters: []
+  _candidateTiebreaker: {fileID: 0}
+  _maxIterationsPerFrame: 3
+  _data: {fileID: 0}
+  _pointableElement: {fileID: 1023735628}
+  _rigidbody: {fileID: 1023735627}
+  _distanceThreshold: 0.01
+  _snapPoseTransform: {fileID: 0}
+  _defaultInteractable: {fileID: 0}
+  _timeOutInteractable: {fileID: 0}
+  _timeOut: 0
 --- !u!1 &991477043
 GameObject:
   m_ObjectHideFlags: 0
@@ -8303,6 +8916,62 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1201789166}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1002998285
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1002998286}
+  - component: {fileID: 1002998287}
+  m_Layer: 0
+  m_Name: SnapInteractor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1002998286
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002998285}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1464743976}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1002998287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002998285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2756c251a8363df4f9d4b30ee6414bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractor
+  _activeState: {fileID: 0}
+  _interactableFilters: []
+  _candidateTiebreaker: {fileID: 0}
+  _maxIterationsPerFrame: 3
+  _data: {fileID: 0}
+  _pointableElement: {fileID: 1464743980}
+  _rigidbody: {fileID: 1464743979}
+  _distanceThreshold: 0.01
+  _snapPoseTransform: {fileID: 0}
+  _defaultInteractable: {fileID: 0}
+  _timeOutInteractable: {fileID: 0}
+  _timeOut: 0
 --- !u!1 &1003400447
 GameObject:
   m_ObjectHideFlags: 0
@@ -8580,6 +9249,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2019901489}
+    - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 991265098}
     - targetCorrespondingSourceObject: {fileID: 6291559308731629643, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1933858557}
@@ -9351,6 +10023,147 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118067514}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1123640033
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1123640038}
+  - component: {fileID: 1123640037}
+  - component: {fileID: 1123640036}
+  - component: {fileID: 1123640035}
+  - component: {fileID: 1123640034}
+  m_Layer: 0
+  m_Name: BoxSnapper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &1123640034
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123640033}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+--- !u!54 &1123640035
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123640033}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!23 &1123640036
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123640033}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1123640037
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123640033}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1123640038
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123640033}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.50795, y: 0.546, z: 0.7058}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1212152251}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1134533466
 GameObject:
   m_ObjectHideFlags: 0
@@ -10985,6 +11798,72 @@ Transform:
   - {fileID: 64243223}
   m_Father: {fileID: 784709518}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1212152250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1212152251}
+  - component: {fileID: 1212152253}
+  - component: {fileID: 1212152252}
+  m_Layer: 0
+  m_Name: SnapInteractable
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1212152251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1212152250}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.2892, y: 0.5165, z: -0.2326}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1123640038}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1212152252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1212152250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1397d30d2aecb5a4d9d645617f571f76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnapInteractableVisuals
+  snapInteractable: {fileID: 1212152253}
+  hoverMaterial: {fileID: 2100000, guid: 8e281e3f688863a48a9eac4a8f75ddf2, type: 2}
+--- !u!114 &1212152253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1212152250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06bd28341d3e86a4c8ab52b1a0269c7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
+  _interactorFilters: []
+  _maxInteractors: 1
+  _maxSelectingInteractors: -1
+  _data: {fileID: 0}
+  _rigidbody: {fileID: 1123640035}
+  _snapPoseDelegate: {fileID: 0}
+  _movementProvider: {fileID: 0}
 --- !u!1001 &1216224044
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11313,6 +12192,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 312499179}
+    - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 742415349}
     - targetCorrespondingSourceObject: {fileID: 6291559308731629643, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 363815380}
@@ -12370,6 +13252,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 346790162}
+    - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1002998286}
     - targetCorrespondingSourceObject: {fileID: 6291559308731629643, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1440231351}
@@ -14781,6 +15666,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 637412895}
+    - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 652411987}
     - targetCorrespondingSourceObject: {fileID: 6291559308731629643, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1737117685}
@@ -15885,6 +16773,72 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!1 &1845363373
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1845363374}
+  - component: {fileID: 1845363376}
+  - component: {fileID: 1845363375}
+  m_Layer: 0
+  m_Name: SnapInteractable
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1845363374
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845363373}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.2892, y: 0.5165, z: -0.2326}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1992498750}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1845363375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845363373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1397d30d2aecb5a4d9d645617f571f76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnapInteractableVisuals
+  snapInteractable: {fileID: 1845363376}
+  hoverMaterial: {fileID: 2100000, guid: 8e281e3f688863a48a9eac4a8f75ddf2, type: 2}
+--- !u!114 &1845363376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845363373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06bd28341d3e86a4c8ab52b1a0269c7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
+  _interactorFilters: []
+  _maxInteractors: 1
+  _maxSelectingInteractors: -1
+  _data: {fileID: 0}
+  _rigidbody: {fileID: 1992498747}
+  _snapPoseDelegate: {fileID: 0}
+  _movementProvider: {fileID: 0}
 --- !u!1001 &1868659461
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15959,6 +16913,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 319165989}
+    - targetCorrespondingSourceObject: {fileID: 3626837130670254357, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 87547758}
     - targetCorrespondingSourceObject: {fileID: 6291559308731629643, guid: 2bbf3381616564c4c99d243d8eda9503, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1958109495}
@@ -17153,6 +18110,7 @@ MonoBehaviour:
   resultCard: {fileID: 638325707}
   instructionText: {fileID: 0}
   stationStock: {fileID: 1961666389}
+  placementCheck: {fileID: 447496042}
 --- !u!4 &1961666388
 Transform:
   m_ObjectHideFlags: 0
@@ -17209,6 +18167,147 @@ MonoBehaviour:
   cornerPause: 0.3
   startDelay: 0.6
   clearDistance: 0.7
+--- !u!1 &1992498745
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1992498750}
+  - component: {fileID: 1992498749}
+  - component: {fileID: 1992498748}
+  - component: {fileID: 1992498747}
+  - component: {fileID: 1992498746}
+  m_Layer: 0
+  m_Name: BoxSnapper (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &1992498746
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992498745}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+--- !u!54 &1992498747
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992498745}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!23 &1992498748
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992498745}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1992498749
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992498745}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1992498750
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992498745}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.50795, y: 0.546, z: 0.8283}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1845363374}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2004438575
 GameObject:
   m_ObjectHideFlags: 0
@@ -18412,3 +19511,6 @@ SceneRoots:
   - {fileID: 1193807755}
   - {fileID: 1815888070}
   - {fileID: 1506251341}
+  - {fileID: 1123640038}
+  - {fileID: 1992498750}
+  - {fileID: 67462571}

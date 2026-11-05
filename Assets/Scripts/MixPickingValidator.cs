@@ -36,6 +36,10 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
     [Tooltip("Optional. Storage containers on the station lanes (IStationStock).")]
     [SerializeField] private MonoBehaviour stationStock;
 
+    // #94, decision 028: positions with Empf Kz 003 need every carton in its own snap place, as in Basic.
+    [Tooltip("Optional. Snap places in the order container for positions with Empf Kz 003.")]
+    [SerializeField] private EkzPlacementCheck placementCheck;
+
     private string initialInstruction;
 
     private void Awake()
@@ -52,6 +56,10 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         {
             container.ContentsChanged += ClearResult;
         }
+        if (placementCheck != null)
+        {
+            placementCheck.PlacementChanged += ClearResult;
+        }
     }
 
     private void OnDisable()
@@ -59,6 +67,10 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         if (container != null)
         {
             container.ContentsChanged -= ClearResult;
+        }
+        if (placementCheck != null)
+        {
+            placementCheck.PlacementChanged -= ClearResult;
         }
     }
 
@@ -71,6 +83,19 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         if (resultCard != null)
         {
             resultCard.SetActive(false);
+        }
+
+        // #94: without the snap places an Empf Kz 003 position would accept loose cartons silently.
+        if (placementCheck == null && container != null)
+        {
+            foreach (OrderLine line in container.OrderLines)
+            {
+                if (EkzPlacementCheck.NeedsPlaces(line))
+                {
+                    Debug.LogError($"MixedPickingValidator: placementCheck is not assigned, but {line.materialName} has Empf Kz {line.empfKz}.", this);
+                    break;
+                }
+            }
         }
     }
 
@@ -116,11 +141,22 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         // #6: one rule decides right/wrong (docs/decisions/005, 006); #21: only the current position.
         OrderResult result = container.CheckOrder();
 
+        // #94: quantity errors come first; the placement is checked only once the quantity is right (decision 003, D6).
+        bool placementWrong = result.Correct && EkzPlacementCheck.NeedsPlaces(container.CurrentLine)
+            && placementCheck != null && !placementCheck.AllPlaced(container.CurrentPositionPackages);
+        bool correct = result.Correct && !placementWrong;
+
         // #28, decision 021: logged before the position advances.
-        ResearchLogger.LogConfirmPressed(result, container.CurrentPosition, container.PositionCount);
-        if (result.Correct)
+        ResearchLogger.LogConfirmPressed(result, container.CurrentPosition, container.PositionCount, placementWrong);
+        if (correct)
         {
             ResearchLogger.LogPositionCompleted(container.CurrentPosition);
+        }
+
+        if (placementWrong)
+        {
+            ShowResult(OrderFeedback.Title(), ResultCardStyle.Wrong, OrderFeedback.ExplainEkz3Placement());
+            return;
         }
 
         // #14: the instruction stays visible in both cases; the feedback never prints target numbers.

@@ -100,6 +100,9 @@ public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositioned
 
     public bool Contains(PackageData package) => packagesInside.Contains(package);
 
+    // #94: the packages the current position is rated on (finished positions excluded).
+    public IEnumerable<PackageData> CurrentPositionPackages => CurrentPackages();
+
     // Rates only the current position (decision 012).
     public OrderResult CheckOrder()
     {

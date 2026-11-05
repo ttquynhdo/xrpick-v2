@@ -184,22 +184,43 @@ order_positions <- list(
   ComplexScene      = list(make_position("ring_d", 55, 25, counts_loose = TRUE),
                            make_position("training_b", 156, 50, counts_loose = TRUE)))
 
+# Empf Kz of an order position (#94, decision 028): Basic "003" (6 snap
+# places); Mixed position 1 "003" from layout "029" on (3 snap places), "000"
+# in older builds; Mixed position 2 and both Complex positions "000".
+layout_at_least <- function(layout, v) !is.null(layout) && isTRUE(as.integer(layout) >= v)
+position_empf_kz <- function(scene, pos_no, layout) {
+  if (scene == "BasicPickingScene") return("003")
+  if (scene == "MixedPickingScene" && pos_no == 1 && layout_at_least(layout, 29)) return("003")
+  "000"
+}
+
 # The "line" object of confirm_pressed: the current position only, with what
 # lies in the box. placed_loose is NULL wherever required_loose is NULL.
-line_obj <- function(pos, placed_full, placed_loose) {
-  json_obj(item = pos$item, soll = pos$soll, vpe = pos$vpe,
-           required_full = pos$required_full, required_loose = pos$required_loose,
-           placed_full = placed_full,
-           placed_loose = if (is.null(pos$required_loose)) NULL else placed_loose)
+# empf_kz exists only in logs of layout "029" on (#94); empf_kz = NULL leaves
+# the key out, as an older build wrote it.
+line_obj <- function(pos, placed_full, placed_loose, empf_kz = NULL) {
+  fields <- list(item = pos$item, soll = pos$soll, vpe = pos$vpe)
+  if (!is.null(empf_kz)) fields$empf_kz <- empf_kz
+  fields <- c(fields, list(required_full = pos$required_full, required_loose = pos$required_loose,
+                           placed_full = placed_full,
+                           placed_loose = if (is.null(pos$required_loose)) NULL else placed_loose))
+  structure(fields, class = "json_obj")
 }
 
 # Skills a red-button press can fail on, per picking scene. Same skills as
 # scene_skills.csv, minus check_material: no scene has foreign material in its
-# storage box (D12, #71), so WRONG_MATERIAL is never drawn.
+# storage box (D12, #71), so WRONG_MATERIAL is never drawn. ekz_placement is
+# only drawn at a position with Empf Kz "003" (position_skills below).
 picking_skill_list <- list(
   BasicPickingScene = c("calculate_quantity", "ekz_placement"),
-  MixedPickingScene = "calculate_quantity",
+  MixedPickingScene = c("calculate_quantity", "ekz_placement"),
   ComplexScene      = c("calculate_quantity", "calculate_loose"))
+
+# Skills one position tests: its scene's skills, ekz_placement only at "003".
+position_skills <- function(scene, empf_kz) {
+  sk <- picking_skill_list[[scene]]
+  if (empf_kz == "003") sk else setdiff(sk, "ekz_placement")
+}
 
 # Quiz questions: answer keys, the right key, and the skill (same content as
 # item_skills.csv). Answer keys are always strings, also the numbers.
@@ -242,7 +263,9 @@ err <- function(code, item = NULL) list(code = code, item = item)
 # One rated press at position pos_no: what lies in the box and which error
 # codes it gets. k = attempt at this position. force_wrong makes sure the
 # press is wrong (for "gave up"/crash cases); force_right is the safety stop.
-draw_attempt <- function(scene, pos_no, person, k, force_wrong = FALSE, force_right = FALSE) {
+# empf_kz: the position's Empf Kz; EKZ_PLACEMENT is possible only at "003".
+draw_attempt <- function(scene, pos_no, person, k, force_wrong = FALSE, force_right = FALSE,
+                         empf_kz = position_empf_kz(scene, pos_no, "025")) {
   pos <- order_positions[[scene]][[pos_no]]
   full <- pos$required_full
   loose <- pos$required_loose  # NULL outside ComplexScene
@@ -255,11 +278,12 @@ draw_attempt <- function(scene, pos_no, person, k, force_wrong = FALSE, force_ri
     if (!is.null(loose)) loose <- 0
     codes <- list(err("EMPTY"))
   } else if (!force_right) {
-    skills <- picking_skill_list[[scene]]
+    skills <- position_skills(scene, empf_kz)
     wrong <- vapply(skills, function(sk) runif(1) < p_error(person, sk, k, scaffolded), logical(1))
     if (force_wrong && !any(wrong)) wrong[1] <- TRUE
 
-    # Codes in OrderRule order: quantity, loose pieces, then (Basic) EKZ 3.
+    # Codes in OrderRule order: quantity, loose pieces, then EKZ 3 (Basic,
+    # Mixed position 1 from layout "029").
     if (wrong["calculate_quantity"]) {
       delta <- sample(c(-2, -1, 1, 2), 1)
       full <- full + delta
@@ -270,7 +294,8 @@ draw_attempt <- function(scene, pos_no, person, k, force_wrong = FALSE, force_ri
       loose <- loose + delta
       codes <- c(codes, list(err(if (delta < 0) "MISSING_LOOSE" else "EXTRA_LOOSE", pos$item)))
     }
-    # EKZ_PLACEMENT only when the 6 cartons are there but one lies loose.
+    # EKZ_PLACEMENT only when the cartons are all there but one lies loose
+    # (the validator checks the places only once the quantity is right).
     if (isTRUE(wrong["ekz_placement"]) && !wrong["calculate_quantity"]) {
       codes <- c(codes, list(err("EKZ_PLACEMENT")))
     }
@@ -667,7 +692,9 @@ press_confirm <- function(s, pos_no, k, attempt, correct = length(attempt$codes)
   emit(s, "confirm_pressed", json_obj(
     attempt_no = s$v$attempts, position = pos_no,
     position_count = length(order_positions[[s$scene]]), attempt_in_position = k,
-    line = line_obj(attempt$pos, attempt$placed_full, attempt$placed_loose),
+    line = line_obj(attempt$pos, attempt$placed_full, attempt$placed_loose,
+                    empf_kz = if (layout_at_least(s$layout, 29))
+                      position_empf_kz(s$scene, pos_no, s$layout) else NULL),
     foreign = json_arr(list()), correct = correct,
     error_codes = codes_json(attempt$codes), time_since_scene_enter_s = at))
   correct
@@ -832,9 +859,10 @@ place_to <- function(s, pos_no, placed_full, placed_loose) {
       if (have < targets[[form]]) put_in(s, item, pos_no, form) else take_out(s, item, pos_no, form)
     }
   }
-  # Basic, same contents as before (after EKZ_PLACEMENT): a carton inside is
-  # straightened, a grab without a container change.
-  if (!changed && s$scene == "BasicPickingScene" && nrow(s$v$box) > 0) {
+  # Empf Kz 003 (Basic, Mixed position 1 from "029"), same contents as before
+  # (after EKZ_PLACEMENT): a carton inside is straightened, a grab without a
+  # container change.
+  if (!changed && position_empf_kz(s$scene, pos_no, s$layout) == "003" && nrow(s$v$box) > 0) {
     last <- nrow(s$v$box)
     pick_and_drop(s, s$v$box$obj[last], s$v$box$item[last])
   }
@@ -1107,7 +1135,8 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
         pos_done <- press_confirm(s, pos_no, k, attempt, f$correct)
       } else {
         attempt <- draw_attempt(scene, pos_no, person, k, force_wrong = give_up,
-                                force_right = (k >= 8 && !give_up))
+                                force_right = (k >= 8 && !give_up),
+                                empf_kz = position_empf_kz(scene, pos_no, s$layout))
         place_to(s, pos_no, attempt$placed_full, attempt$placed_loose)
         pos_done <- press_confirm(s, pos_no, k, attempt)
       }
@@ -1119,7 +1148,7 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
     # Position correct: position_completed, then the boxes ride.
     advance(s, 0.001)
     emit(s, "position_completed", json_obj(position = pos_no, attempts_in_position = k))
-    for (sk in picking_skill_list[[scene]]) practise(person, sk)
+    for (sk in position_skills(scene, position_empf_kz(scene, pos_no, s$layout))) practise(person, sk)
 
     if (pos_no < length(positions)) {
       ride_between_positions(s, pos_no)
@@ -1553,13 +1582,25 @@ p813_hints <- list(
     advance(s, 2)
   })
 
+# Mixed on "029" (#94, decision 028): position 1 is Empf Kz 003 with 3 snap
+# places. Fixed presses like the real Editor test log of #94: 2 cartons
+# (TOO_FEW), 2 again (TOO_FEW), 3 with one loose (EKZ_PLACEMENT, item null),
+# 3 in place (correct); position 2 ("000") right at once. So selftest.R knows:
+# Mixed ekz_placement opportunities 2 (presses 3 and 4), 1 with the error,
+# first opportunity wrong; calculate_quantity tested by all 5 presses, 2 errors.
+p813_mixed <- list(
+  "1" = list(fixed_press(2, list(err("TOO_FEW", "connector_a"))),
+             fixed_press(2, list(err("TOO_FEW", "connector_a"))),
+             fixed_press(3, list(err("EKZ_PLACEMENT"))),
+             fixed_press(3, list())),
+  "2" = list(fixed_press(3, list())))
+
 p813 <- new_person("P813")
 s <- start_session(p813, "aaa1111", "2026-11-06T16:00:00Z", language = "EN", layout = "029")
 run_welcome(s)
 go_to_scene(s, "ConceptScene"); run_concept(s, p813, hints = p813_hints)
-for (scene in c("BasicPickingScene", "MixedPickingScene")) {
-  go_to_scene(s, scene); run_visit(s, p813)
-}
+go_to_scene(s, "BasicPickingScene"); run_visit(s, p813)
+go_to_scene(s, "MixedPickingScene"); run_picking(s, p813, forced = p813_mixed)
 go_to_scene(s, "ComplexScene"); run_picking(s, p813, end_on_correct = TRUE)
 end_session(s, "completed")
 

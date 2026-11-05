@@ -4,7 +4,7 @@ namespace XRPick.Research.Tests
 {
     public class OutcomeEventsTests
     {
-        private static readonly OrderLine Connector = new OrderLine("connector_a", "KABELVERBINDER A", 150, 50);
+        private static readonly OrderLine Connector = new OrderLine("connector_a", "KABELVERBINDER A", 150, 50) { empfKz = "003" };
         private static readonly OrderLine Ring = new OrderLine("ring_d", "RING D", 55, 25);
 
         private static ContainerContents Full(string key, int n)
@@ -25,7 +25,7 @@ namespace XRPick.Research.Tests
                 OutcomeEvents.ConfirmErrors(result, false), 41.2).ToJson();
             Assert.AreEqual(
                 "{\"attempt_no\":1,\"position\":1,\"position_count\":2,\"attempt_in_position\":1," +
-                "\"line\":{\"item\":\"connector_a\",\"soll\":150,\"vpe\":50,\"required_full\":3,\"required_loose\":null," +
+                "\"line\":{\"item\":\"connector_a\",\"soll\":150,\"vpe\":50,\"empf_kz\":\"003\",\"required_full\":3,\"required_loose\":null," +
                 "\"placed_full\":2,\"placed_loose\":null}," +
                 "\"foreign\":[]," +
                 "\"correct\":false," +

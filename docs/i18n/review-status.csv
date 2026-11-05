@@ -124,7 +124,7 @@ concept.tour.ist.body,"Beim Wiegen zeigt Ist, wie viele Stück schon im Auftrags
 concept.tour.rest.title,Rest,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.rest.body,So viele Stück bleiben nach dem Auftrag im Lagerbehälter.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.empf_kz_003.title,Empf Kz,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.empf_kz_003.body,"Hier steht, wie Sie die Teile einlegen: 003 ist EKZ 3, also einzeln und geordnet.",proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.empf_kz_003.body,"Hier steht, wie Sie die Teile einlegen: 003 ist EKZ 3, also einzeln und geordnet wie die Kartons im Beispiel.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.tour.not_used.title,Nicht in der Übung,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.not_used.body,Die markierten Bereiche brauchen Sie hier nicht. Das Feld Anweisung bleibt leer.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.quiz.cartons_from_soll.q,"Soll 100, VPE 25: Wie viele Kartons nehmen Sie?",proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
@@ -139,13 +139,13 @@ concept.quiz.material_by_matnr.screw_b,SCHRAUBE B,proposed,german-reviewer (agen
 concept.quiz.material_by_matnr.ring_d,RING D,proposed,german-reviewer (agent),2026-11-03,"material name, never translated"
 concept.quiz.material_by_matnr.connector_a.wrong,Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.material_by_matnr.ring_d.wrong,Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.ekz_003.q,Empf Kz 003: Wie geben Sie die Teile in den Auftragsbehälter?,proposed,german-reviewer (agent),2026-11-03,Agent: changed in #55 („geben“ instead of „legen“)
+concept.quiz.ekz_003.q,Empf Kz 003: Wie geben Sie die Kartons in den Auftragsbehälter?,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.quiz.ekz_003.ordered,Einzeln und geordnet einlegen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.ekz_003.poured,Ungeordnet einfüllen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.ekz_003.poured.wrong,Bei 003 müssen die Teile einzeln und geordnet liegen.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.ekz_000.q,Empf Kz 000: Wie dürfen Sie die Teile in den Auftragsbehälter geben?,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
+concept.quiz.ekz_003.poured.wrong,Bei 003 müssen die Kartons einzeln und geordnet liegen.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
+concept.quiz.ekz_000.q,Empf Kz 000: Wie dürfen Sie die Tüten in den Auftragsbehälter geben?,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.quiz.ekz_000.ordered,Nur einzeln und geordnet einlegen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.ekz_000.ordered.wrong,Bei 000 dürfen die Teile ungeordnet liegen.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
+concept.quiz.ekz_000.ordered.wrong,Bei 000 dürfen die Tüten ungeordnet liegen.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.quiz.ekz_000.poured,Einfüllen ist erlaubt,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.ekz.title,EKZ-Übersicht,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.in_training,In der Übung,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
@@ -161,7 +161,7 @@ complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen unter dem B
 concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.cartons.body,= 3 Kartons,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#91, result line of the caption next to Soll/Verp.-Einh.)"
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, also EKZ 0: Die Teile dürfen ungeordnet liegen oder eingefüllt werden.",proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, das ist EKZ 0: Die Teile dürfen ungeordnet liegen wie die Tüten im Beispiel.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.tour.material_flow.body,"Der Lagerbehälter kommt von links und fährt über die mittlere Bahn weg; der Auftragsbehälter fährt erst weg, wenn der Auftrag erledigt ist. In der Praxis bewegen Sie die Behälter von Hand.",proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.card.step3_body,"Drücken Sie nach der Erklärung zum LVS „Zu den Fragen“. Drücken Sie dann A, B oder C.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 concept.quiz.locked,Die Fragen kommen nach der Erklärung zum LVS.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
@@ -198,8 +198,8 @@ concept.tour.soll.action,Lesen Sie die Zahl im Feld Soll ab. Drücken Sie dann �
 concept.tour.cartons.action,Schauen Sie in den Auftragsbehälter rechts.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.ist.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.rest.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.empf_kz_003.action,Sehen Sie sich das Beispiel „Empf Kz 003“ zwischen den Behältern an.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.empf_kz_000.action,Vergleichen Sie die beiden Beispiele zwischen den Behältern.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.empf_kz_003.action,Sehen Sie sich links neben dem Bildschirm das Beispiel „Empf Kz 003“ an.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
+concept.tour.empf_kz_000.action,Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.tour.not_used.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu. Drücken Sie dann „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 concept.label.tag.matnr,Mat.-Nr: {matnr} – Materialnummer,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"

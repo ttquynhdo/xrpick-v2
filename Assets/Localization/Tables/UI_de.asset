@@ -347,7 +347,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627401
     m_Localized: 'Hier steht, wie Sie die Teile einlegen: 003 ist EKZ 3, also einzeln
-      und geordnet.'
+      und geordnet wie die Kartons im Beispiel.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627402
@@ -355,8 +355,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: "Bei anderen Auftr\xE4gen kann hier 000 stehen, also EKZ 0: Die
-      Teile d\xFCrfen ungeordnet liegen oder eingef\xFCllt werden."
+    m_Localized: "Bei anderen Auftr\xE4gen kann hier 000 stehen, das ist EKZ 0: Die
+      Teile d\xFCrfen ungeordnet liegen wie die T\xFCten im Beispiel."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -389,7 +389,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627417
-    m_Localized: "Empf Kz 003: Wie geben Sie die Teile in den Auftragsbeh\xE4lter?"
+    m_Localized: "Empf Kz 003: Wie geben Sie die Kartons in den Auftragsbeh\xE4lter?"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627418
@@ -401,7 +401,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627420
-    m_Localized: "Empf Kz 000: Wie d\xFCrfen Sie die Teile in den Auftragsbeh\xE4lter
+    m_Localized: "Empf Kz 000: Wie d\xFCrfen Sie die T\xFCten in den Auftragsbeh\xE4lter
       geben?"
     m_Metadata:
       m_Items: []
@@ -670,11 +670,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473
-    m_Localized: "Bei 003 m\xFCssen die Teile einzeln und geordnet liegen."
+    m_Localized: "Bei 003 m\xFCssen die Kartons einzeln und geordnet liegen."
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182474
-    m_Localized: "Bei 000 d\xFCrfen die Teile ungeordnet liegen."
+    m_Localized: "Bei 000 d\xFCrfen die T\xFCten ungeordnet liegen."
     m_Metadata:
       m_Items: []
   - m_Id: 287914819719168
@@ -877,12 +877,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810630
-    m_Localized: "Sehen Sie sich das Beispiel \u201EEmpf Kz 003\u201C zwischen den
-      Beh\xE4ltern an."
+    m_Localized: "Sehen Sie sich links neben dem Bildschirm das Beispiel \u201EEmpf
+      Kz 003\u201C an."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810631
-    m_Localized: "Vergleichen Sie die beiden Beispiele zwischen den Beh\xE4ltern."
+    m_Localized: Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632

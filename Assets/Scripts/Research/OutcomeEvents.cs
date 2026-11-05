@@ -151,6 +151,7 @@ public static class OutcomeEvents
             .Add("item", line.Line.materialKey)
             .Add("soll", line.Line.soll)
             .Add("vpe", line.Line.vpe)
+            .Add("empf_kz", line.Line.empfKz)
             .Add("required_full", line.Line.RequiredFull)
             .Add("required_loose", countsLoose ? line.Line.RequiredLoose : (int?)null)
             .Add("placed_full", line.PlacedFull)

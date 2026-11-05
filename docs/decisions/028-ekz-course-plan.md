@@ -53,6 +53,11 @@ Hiện EKZ 3 được dạy ở Concept, luyện và chấm một lần ở Basi
 - D4 sai: làm theo mục „Nếu giả định sai“ của 003, áp cho cả Mixed.
 - Người hướng dẫn chỉ ra một vật thật là EKZ 3 (ví dụ phụ kiện có van): mở mục mới cho vật mẫu ở Concept trước; đưa vào bài thực hành chỉ sau #96.
 
+## Bổ sung 2026-11-05 (khi làm #94)
+- **`layout_version`:** giữ "029". Cả đợt 026–030 chỉ đổi một lần (backlog, khối „Người dùng chốt 2026-11-04“ mục 5), và chưa có build "029" nào dùng với người tham gia. Vì vậy câu „`layout_version` đã tăng“ được hiểu là so với build đã test ("025"). R phân biệt Mixed vị trí 1 có Empf Kz 000 hay 003 dựa vào việc log có trường `confirm_pressed.line.empf_kz` hay không. Không dựa vào `layout_version`, vì các build "029" của #100 và #93 vẫn để 000.
+- **Mẫu số `ekz_placement`:** chỉ tính những lần bấm có số lượng đúng ở vị trí 003. Basic cũng đổi theo (trước đây là mọi lần bấm), nên tỉ lệ EKZ của Basic đã báo trước đây phải tính lại.
+- **Chỗ đặt thùng mẫu Concept:** cả dải bàn dưới màn hình (z 0,45–0,97) là băng ba làn. Mặt bàn trước lại cách chú thích Empf Kz khoảng 45–50°. Vì vậy hai thùng mẫu đặt trên `RearBench`, bên trái màn hình, ngay dưới chú thích. Bàn sau của Concept được nới sang trái tới x −1,02, nằm phía trên làn trái giống bàn ở Basic/Mixed nằm trên làn giữa. Thùng chạy qua bên dưới. Mẫu 003 có 2 carton, mẫu 000 có 2 túi, cùng cỡ với kiện thật (#88).
+
 ## Done when (thay câu điều kiện của #94)
 - Ở ConceptScene, mẫu EKZ 003 là carton KABELVERBINDER A xếp thẳng trong ô, mẫu EKZ 000 là túi SCHRAUBE B đổ vào; cả hai nằm trên bàn học, không nằm trên làn nào.
 - Ở ConceptScene, đứng nhìn chú thích Empf Kz thì thấy được hai thùng mẫu mà không phải quay người.

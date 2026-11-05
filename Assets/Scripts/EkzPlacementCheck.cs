@@ -4,7 +4,7 @@ using Oculus.Interaction;
 using UnityEngine;
 
 /// <summary>
-/// #41, docs/decisions/003: EKZ 3 in BasicPickingScene. Each carton in the order container must sit in its
+/// #41, docs/decisions/003: EKZ 3 in BasicPickingScene (#94, decision 028: also Mixed position 1). Each carton in the order container must sit in its
 /// own snap place (one by one, aligned). Tracks which cartons are snapped from the SnapInteractable events;
 /// the validator asks only when the trainee confirms. Quantity counting never reads this.
 /// </summary>
@@ -16,7 +16,13 @@ public class EkzPlacementCheck : MonoBehaviour
     [Tooltip("Optional: played when a carton snaps into a place (the signal must not be colour only).")]
     [SerializeField] private AudioSource snapSound;
 
+    // #94, decision 028: Empf Kz 003 (EKZ 3) is the only class rated by placement.
+    private const string OrderedEmpfKz = "003";
+
     private readonly HashSet<PackageData> snapped = new();
+
+    /// <summary>True when the order line asks for every carton in its own place (Empf Kz 003).</summary>
+    public static bool NeedsPlaces(OrderLine line) => line != null && line.empfKz == OrderedEmpfKz;
 
     // Raised when a carton snaps into or leaves a place, so an old result can be cleared (#4).
     public event Action PlacementChanged;

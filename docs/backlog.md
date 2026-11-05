@@ -38,7 +38,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   4. **Cuối:** #36 (thay bằng #88) → #13 export EN–DE (có mọi chữ mới), một build, một buổi test kính chung.
 - **Người dùng chốt 2026-11-04: sửa hết một lượt, tuần tự, rồi mới test một lần.** Thứ tự (rà chồng chéo 026–029):
   1. **#88** trước (cỡ carton quyết ô EKZ Mixed, carton đếm Concept, thùng mẫu EKZ, vòng trên carton Complex; có thể dựng lại lưới 6 ô Basic). **#95** xen vào lúc nào cũng được (chỉ prefab và mesh).
-  2. Concept: **#89** (mở đầu bằng bước đo bố cục bàn học cho mọi vật mới, như #84) → **#90** → **#91** (+ số LVS khớp với thùng, bổ sung 2026-11-05) → **#100** (báo kiện sai/thừa trong thùng, cần `solution-decision`) → **#94 phần Concept** → **#92** (cần thùng mẫu mới) → **#93 phần Concept**.
+  2. Concept: **#89** (mở đầu bằng bước đo bố cục bàn học cho mọi vật mới, như #84) → **#90** → **#91** (+ số LVS khớp với thùng, bổ sung 2026-11-05) → **#100** (báo kiện sai/thừa trong thùng, cần `solution-decision`) → **#94 phần Concept** (verified-mcp 2026-11-05, cùng phần Mixed) → **#92** (cần thùng mẫu mới) → **#93 phần Concept**.
   3. **#94 phần Mixed** → **#93 phần Complex** → **#96** → **#92 phần Complex** (carton đã mở, người dùng chốt 2026-11-04: quy tắc vật chỉ để xem cho mọi scene).
   3c. **#99** (chờ 12 s trước khi thùng chạy, Basic/Mixed/Complex): sau chuỗi Mixed/Complex ở bước 3, trước #87.
   4. **#87** (sau mọi mục đổi chữ thẻ, chạy công cụ slot một lần) → **#86** → **#97**.
@@ -1467,7 +1467,8 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** bắt buộc (Mixed: xếp carton vào ô và đổ túi bằng tay thật; Concept: thấy thùng mẫu khi đọc chú thích)
 - **Depends on:** decision 026 (bàn học Concept, chỗ đặt thùng mẫu); giả định D4, D34 (câu hỏi D35–D38)
 - **Decision:** docs/decisions/028-ekz-course-plan.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl94.md
+- **Status:** verified-mcp (19/19 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/94-ekz-course-plan`; layout "029", phân biệt bằng `line.empf_kz`; thùng mẫu Concept trên bàn sau bên trái màn hình, xem bổ sung decision 028)
 
 ### #95 [P2] Băng chuyền: ray thừa ở ba làn, tấm gỗ vắt trên băng ở trạm trống
 - **Type:** bug
