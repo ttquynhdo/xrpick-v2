@@ -13,7 +13,13 @@ public static class InteractionEvents
     // No facilitator_end: Beenden ends the session before WelcomeScene loads, so no scene_enter follows.
 
     // container_enter / container_exit .container: the order container is the only counted one.
+    // concept_hint_* .container (#100): order or storage.
     public const string ContainerOrder = "order";
+    public const string ContainerStorage = "storage";
+
+    // concept_hint_* .reason (#100, decision 030); same codes as OrderRule's errors.
+    public const string HintWrongMaterial = "WRONG_MATERIAL";
+    public const string HintTooMany = "TOO_MANY";
 
     public static JsonFields GrabStart(string objectId, string materialKey)
     {
@@ -34,6 +40,19 @@ public static class InteractionEvents
             .Add("object_id", objectId)
             .Add("material_key", materialKey)
             .Add("count_after", countAfter);
+    }
+
+    /// <summary>#100: a hint tag beside a wrong or extra package in a ConceptScene container.</summary>
+    /// <param name="tourStepId">Tour step shown at that moment; null before the tour bar opens.</param>
+    public static JsonFields ConceptHint(string container, string reason, string objectId, string materialKey,
+        string tourStepId)
+    {
+        return new JsonFields()
+            .Add("container", container)
+            .Add("reason", reason)
+            .Add("object_id", objectId)
+            .Add("material_key", materialKey)
+            .Add("tour_step_id", tourStepId);
     }
 
     public static JsonFields MenuSelect(string targetScene, bool blocked)

@@ -50,6 +50,17 @@ public sealed partial class ResearchLogger
         });
     }
 
+    /// <summary>
+    /// #100: a ConceptScene hint tag appeared beside a package (shown) or went away (cleared: the package was taken out
+    /// or picked up, or a hint on another package replaced it). Leaving the scene while a tag is shown logs nothing.
+    /// </summary>
+    public static void LogConceptHint(bool shown, string container, string reason, string objectId,
+        string materialKey, string tourStepId)
+    {
+        Log(shown ? "concept_hint_shown" : "concept_hint_cleared",
+            InteractionEvents.ConceptHint(container, reason, objectId, materialKey, tourStepId));
+    }
+
     /// <param name="blocked">The item was locked by the research lock (#42); the scene does not change.</param>
     public static void LogMenuSelect(string targetScene, bool blocked)
     {

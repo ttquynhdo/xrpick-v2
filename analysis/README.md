@@ -56,7 +56,7 @@ participant's data is lost silently: check it in `warnings.txt`.
 | `P000`, `P900`–`P999` | test | `research/practice/` | any | none (dropped) |
 
 `analyse.R` runs the same analysis on each set and writes **all** outputs (charts,
-`items.csv`, `tour_steps.csv`, `wide.csv`, `wide_with_paper.csv`, `data_quality.*`, `warnings.txt`)
+`items.csv`, `tour_steps.csv`, `concept_hints*.csv`, `wide.csv`, `wide_with_paper.csv`, `data_quality.*`, `warnings.txt`)
 into the set's folder. The ID range decides the set, the folder only checks it:
 a pilot ID outside `research/pilot/` stays in the pilot set and is warned in
 `output/pilot/warnings.txt` ("pilot ID outside research/pilot/"); a study ID inside
@@ -183,6 +183,8 @@ RStudio. Without Rscript on PATH use the full path, e.g.
 | `tour_steps.csv` | 2, 3 | ConceptScene field tour (#82): one row per participant, Concept visit (`session_id`, `scene_visit`, `visit_no`, `repeat_visit`) and tour step 1 … n (`step_index`, `step_id`; n = highest `step_index` in the set unless `tour_n_steps` is set before sourcing). `layout_version` of the session's header (empty = not in the header), `zurueck_available` (TRUE from layout `"025"` on). `shows` = how often the step was shown; `active_s` = active seconds on the step over all showings (from its `tour_step` to the next one, the first `quiz_answer` of the visit or the visit end, pauses removed; empty when never shown before the quiz); `shows_after_quiz` = showings after the first quiz answer (no time); `time_censored` = the step was on screen when a crashed visit stopped. Presses are booked on the step the trainee **left**, from the change of `step_index` between consecutive `tour_step` lines of the visit in file line order (not `t`): `back_presses` (−1 = „Zurück“), `quick_next_back` („Weiter“ to this step, then „Zurück“ within < 2 active seconds: a likely mis-press), `restarts` (last step → 1 = „Von vorn“). `back_presses` and `quick_next_back` are empty (NA, not 0) for layout `"019"` or no layout: those builds had no „Zurück“. A step never reached has `shows` 0 and empty `active_s`. Other jumps are warned. |
 | `tour_time_by_step.png` | 3 | Active seconds per tour step, one dot per participant (first Concept visit with a tour), diamond = median, `n` per step; one panel per `layout_version`. |
 | `tour_back_by_step.png` | 2 | „Zurück“ presses per tour step (the step left), split into < 2 s after „Weiter“ (likely mis-press) and later (rereading), label = participants with ≥ 1 press / participants; layouts with „Zurück“ only. |
+| `concept_hints.csv` | 2, 6 | ConceptScene hint tags (#100, decision 030, layout `"029"` on): one row per tag shown (`concept_hint_shown` paired with the next `concept_hint_cleared` of the visit in file line order). `container` (`order` / `storage`), `reason` (`WRONG_MATERIAL` / `TOO_MANY`), `object_id`, `material_key`, `tour_step_id` (step on screen when it appeared; empty = before the tour bar opened), `cleared_step_id`, `shown_t` / `end_t` (visit time), `shown_s` (active seconds, pauses removed), `ended_by` (`cleared`; `scene_exit` = still shown when the scene was left; `crash` = still shown at the last event of a crashed visit, a lower bound; `next_shown_without_cleared` = contract break), `removed_by_grab` (TRUE = the trainee picked that package up while it was shown; FALSE = the station cleared it, e.g. `TOO_MANY` when the demo cartons left with the step; empty when not cleared). A cleared without a shown before it is warned and ignored. **Not attempts**: hints never enter `confirm_count`, `items.csv` or an error rate. |
+| `concept_hints_by_visit.csv` | 2, 6 | One row per Concept visit of a session with the `interaction` group: `hints_logged` (TRUE from layout `"029"` on), `hints_shown`, `hints_order_wrong_material`, `hints_order_too_many`, `hints_storage_wrong_material`, `hints_removed_by_grab`, `hints_open_at_exit`, `hint_shown_s` (total active seconds), `hint_max_shown_s`, `material_flow_demo_due` / `_held` (showings of step `material_flow` that lasted past the lane demo's start, `lane_demo_delay_s` = 4 s, and those where a tag held it), `material_flow_wait_max_s` / `material_flow_wait_s` (active seconds the demo waited for the station to be clear: from the demo start until the chain of tags ends, cut at the next step), `material_flow_wait_censored`, `hint_contract_breaks`. Every hint column is empty (NA, not 0) for layouts before `"029"`; the demo columns are empty when the demo was never due. Putting packages into the Concept containers is voluntary and unlogged (no `container_*` in Concept): counts, never a rate. |
 | `wide_with_paper.csv` | 4, 5 | Only with a paper file: `wide.csv` + the paper columns (see *Paper forms*). The file to give SPSS for questions 4 and 5. |
 | `ssq_pre_post.png` | 4 | SSQ subscales and total before and after, one line per participant with both forms, `n` per panel. Colour = the log shows a headset removal, a pause or an end other than `completed`. No frame-rate or head-movement data (decision 022). |
 | `tlx_vs_attempts.png` | 5 | Raw NASA-TLX against rated attempts over the whole course and the trainee's active time (minutes, facilitator tail removed), `n` per panel. Hollow = did not finish (fewer scenes). |
@@ -283,7 +285,8 @@ Concept column per measure: split it by `layout_versions` before comparing.
 - Time-to-correct only covers visits that reached correct; read it with the `never` counts.
 - Q4: no frame-rate, frame-drop, head-movement or tracking data exist (decision 022). The SSQ change can only be set against headset removals, pauses, an early end (`end_status`, `abbruchgrund`) and active time, for the whole session; sickness per scene can't be analysed. Pre-existing symptoms are why the change (post − pre) is used, not post alone.
 - Q5: NASA-TLX is asked once at the end (raw, unweighted). Who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.
-- Concept tour (`tour_steps.csv`): a „Zurück“ < 2 s after „Weiter“ is read as a likely mis-press, not proven; step time runs until the next step, so looking at the label board or packages during a step is in it. Never pool Concept numbers of different `layout_version`.
+- Concept tour (`tour_steps.csv`): a „Zurück“ < 2 s after „Weiter“ is read as a likely mis-press, not proven; step time runs until the next step, so looking at the label board or packages during a step is in it. Never pool Concept numbers of different `layout_version` (`"025"` and `"029"` are split too: decision 030 changed the Concept station).
+- Concept hint tags (`concept_hints*.csv`): one tag at a time, so a second wrong package gets its tag only when the first is gone; hint counts have no denominator (placing packages in Concept is voluntary and not logged) and are not errors or attempts.
 
 ## If the logger format changes
 
@@ -321,7 +324,10 @@ removed field bumps `schema_version`.
    Biểu đồ chính cho câu hỏi 1 là `first_attempt_by_item.png` (lần thử đầu tiên ở
    mỗi câu hỏi / mỗi vị trí); hai biểu đồ `error_rate_by_skill*.png` chỉ là phụ.
    Tour ở ConceptScene: `tour_steps.csv`, `tour_time_by_step.png` (thời gian mỗi
-   bước) và `tour_back_by_step.png` (bấm „Zurück“ ở bước nào). Nếu `warnings.txt`
+   bước) và `tour_back_by_step.png` (bấm „Zurück“ ở bước nào). Thẻ nhắc vàng ở
+   ConceptScene (từ layout "029"): `concept_hints.csv` (mỗi thẻ một dòng) và
+   `concept_hints_by_visit.csv` (đếm theo thùng × lý do, thời gian demo ba làn phải
+   chờ ở bước `material_flow`); đây không phải lượt thử hay tỉ lệ lỗi. Nếu `warnings.txt`
    báo "set mixes layout_version", số liệu ConceptScene đã được tách theo
    `layout_version`; không gộp lại.
 7. Khi trình bày kết quả, luôn ghi kèm các giới hạn ở mục *Validity limits*: chỉ là

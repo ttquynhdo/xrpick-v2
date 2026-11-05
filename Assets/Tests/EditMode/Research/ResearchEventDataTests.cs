@@ -87,7 +87,7 @@ namespace XRPick.Research.Tests
             string json = ResearchEventData.Header("0.1.0", "868fea7", "Quest", "Android", "P101", "s1", mode,
                 "DE", "controllers", 72).ToJson();
             StringAssert.Contains(expected, json);
-            StringAssert.StartsWith("{\"schema_version\":2,\"layout_version\":\"019\",", json);
+            StringAssert.StartsWith("{\"schema_version\":2,\"layout_version\":\"" + ResearchEventData.LayoutVersion + "\",", json);
         }
 
         [Test]

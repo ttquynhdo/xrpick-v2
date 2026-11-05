@@ -207,3 +207,4 @@ concept.label.tag.matnr,Mat.-Nr: {matnr} – Materialnummer,proposed,german-revi
 concept.label.tag.vpe,VPE: {vpe} ST – Stück pro Karton oder Tüte,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
 concept.tour.material.action_held,Vergleichen Sie Mat.-Nr und Bez. im LVS mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
 concept.tour.verp_einh.action_held,Lesen Sie die VPE auf dem Etikett ab und vergleichen Sie sie mit Verp.-Einh. im LVS.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
+concept.hint.storage_wrong_material,In diesem Lagerbehälter liegt Material mit einer anderen Materialnummer. Nehmen Sie es heraus.,proposed,,2026-11-05,#100 new

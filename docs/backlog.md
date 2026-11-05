@@ -1540,7 +1540,8 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** bắt buộc (tay thật thả kiện vào thùng, đọc lời nhắc từ chỗ đứng)
 - **Depends on:** #91 (số LVS, carton đếm); trước #92 (#92 đổi vẻ ngoài carton đếm và kiện trong thùng kho). Giả định D12, A8 chưa có người hướng dẫn xác nhận (không chặn)
 - **Decision:** docs/decisions/030-concept-box-hints.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl100.md
+- **Status:** verified-mcp (24/24 ✅, chờ test tay M1–M3)
 
 ## Feature – Log dữ liệu nghiên cứu
 

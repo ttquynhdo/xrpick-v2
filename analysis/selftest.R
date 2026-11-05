@@ -28,7 +28,7 @@ local({
   source("analysis/analyse.R", local = TRUE)
 
   # 2. One row per study participant: P101-P115; the test ID P950 is dropped,
-  #    the pilot IDs P801-P803, P811, P812 are in their own set (8q).
+  #    the pilot IDs P801-P803, P811-P813 are in their own set (8q).
   stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
@@ -423,7 +423,7 @@ local({
   missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
   if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
   stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
-  pilot_ids <- c("P801", "P802", "P803", "P811", "P812")
+  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813")
   stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
             identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
   is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
@@ -505,6 +505,54 @@ local({
   stopifnot(all(c("ConceptScene [019]", "ConceptScene [025]") %in% as.character(pilot_set$ttc_people$scene)),
             all(c("ConceptScene [019]", "ConceptScene [025]") %in% as.character(pilot_set$item_shares$chart_scene)),
             !any(grepl("\\[", as.character(ttc_people$scene))))
+
+  # 8t. ConceptScene hint tags (#100, decision 030). P813 ran a "029" build
+  #     with a fixed set of tags (make_fake_data.R p813_hints): one stray
+  #     cleared (warned, ignored), 6 tags, one moved to another package in
+  #     the same frame, TOO_MANY cleared by the step change, a 22.5 s wait at
+  #     material_flow, one tag still shown when the scene was left.
+  stopifnot(file.exists(file.path(pilot_dir, "concept_hints.csv")),
+            file.exists(file.path(pilot_dir, "concept_hints_by_visit.csv")),
+            file.exists(file.path(output_dir, "concept_hints_by_visit.csv")))
+  h813 <- pilot_set$concept_hints %>% filter(participant_id == "P813") %>% arrange(hint_no)
+  stopifnot(nrow(h813) == 6, all(h813$layout_version == "029"),
+            identical(h813$container, c("order", "order", "storage", "order", "order", "storage")),
+            identical(h813$reason, c("WRONG_MATERIAL", "WRONG_MATERIAL", "WRONG_MATERIAL", "TOO_MANY",
+                                     "WRONG_MATERIAL", "WRONG_MATERIAL")),
+            identical(h813$tour_step_id, c(NA, "material", "material", "cartons", "material_flow", "material_flow")),
+            identical(h813$ended_by, c(rep("cleared", 5), "scene_exit")),
+            identical(h813$removed_by_grab, c(TRUE, TRUE, TRUE, FALSE, TRUE, NA)),
+            h813$cleared_step_id[4] == "ist")
+  # Active seconds shown: 0.5 s settle is before shown, the grab ends it 0.011 s later.
+  stopifnot(isTRUE(all.equal(h813$shown_s[c(1, 2, 3, 5)], c(6.011, 5.011, 4.811, 25.011), tolerance = 1e-9)))
+  # The moved tag: the bag's shown has the ring's cleared t.
+  stopifnot(h813$shown_t[3] == h813$end_t[2])
+  v813 <- pilot_set$concept_hints_by_visit %>% filter(participant_id == "P813")
+  stopifnot(nrow(v813) == 1, isTRUE(v813$hints_logged), v813$hints_shown == 6,
+            v813$hints_order_wrong_material == 3, v813$hints_order_too_many == 1,
+            v813$hints_storage_wrong_material == 2, v813$hints_removed_by_grab == 4,
+            v813$hints_open_at_exit == 1, v813$hint_contract_breaks == 1,
+            v813$material_flow_demo_held == 1, isFALSE(v813$material_flow_wait_censored),
+            abs(v813$material_flow_wait_max_s - 22.512) < 0.002)
+  stopifnot(any(grepl("concept_hint_cleared without a preceding", p_warn) & grepl("P813", p_warn)),
+            sum(grepl("concept_hint_", p_warn, fixed = TRUE)) == 1, !any(grepl("concept_hint_", warn_lines, fixed = TRUE)))
+  # Older layouts: no tags existed, so every hint column is NA (not 0).
+  old_v <- pilot_set$concept_hints_by_visit %>% filter(participant_id != "P813")
+  stopifnot(nrow(old_v) > 0, !any(old_v$hints_logged), all(is.na(old_v$hints_shown)),
+            all(is.na(old_v$hint_shown_s)), all(is.na(old_v$material_flow_wait_max_s)))
+  stopifnot(nrow(concept_hints_by_visit) > 0, !any(concept_hints_by_visit$hints_logged),
+            all(is.na(concept_hints_by_visit$hints_shown)), nrow(concept_hints) == 0)
+  # Hints are not attempts: P813's Concept confirm_count = its quiz touches.
+  c813 <- pilot_set$visits %>% filter(participant_id == "P813", scene == "ConceptScene")
+  q813 <- pilot_set$presses %>% filter(participant_id == "P813", scene == "ConceptScene")
+  stopifnot(nrow(c813) == 1, c813$confirm_count == nrow(q813), all(q813$event == "quiz_answer"))
+  # "029" is its own Concept layout, never pooled with "025" (decision 024).
+  stopifnot(any(grepl("set mixes layout_version 019 / 025 / 029", p_warn)),
+            "ConceptScene [029]" %in% as.character(pilot_set$item_shares$chart_scene),
+            identical(pilot_set$tour_has_zurueck("029"), TRUE),
+            all(ts$zurueck_available[ts$participant_id == "P813"]))
+  # The hint event names are in the catalogue (no "not in the v2 catalogue" note for them).
+  stopifnot(all(c("concept_hint_shown", "concept_hint_cleared") %in% pilot_set$known_events))
 
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.

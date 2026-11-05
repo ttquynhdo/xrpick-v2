@@ -13,6 +13,9 @@ using UnityEngine;
 /// hideWhileRiding are hidden from the first ride until the order container has left, then shown again.
 /// #91, decision 030: the order container leaves with the counted cartons in it (CartonCountDemo shows them at this
 /// step). Riders only get their position back on reset; whether they are shown is up to the script that owns them.
+/// #100, decision 030 item 5: the containers only ride once no hint is shown (ConceptBoxHints); until then the bar stays.
+/// A sample-material carton the trainee put into the storage container rides with it (colliders and interactables
+/// off, as in PositionStockSwitcher) and is back on the desk, grabbable, after a reset.
 /// </summary>
 public class LaneFlowDemo : MonoBehaviour
 {
@@ -37,6 +40,9 @@ public class LaneFlowDemo : MonoBehaviour
     [Tooltip("Static cartons riding in the order container (its children ride; CartonCountDemo shows them).")]
     [SerializeField] private Transform orderStock;
 
+    [Tooltip("Hints on wrong or extra packages; the demo waits until none is shown.")]
+    [SerializeField] private ConceptBoxHints boxHints;
+
     [Header("Paths (world offsets, same as Basic/Mixed/Complex)")]
     [Tooltip("Offsets of the next storage container from its work spot; the first is the start in the hood, the last must be zero.")]
     [SerializeField] private Vector3[] arrivalPath = { new(-0.40f, 0f, 0.90f), new(-0.40f, 0f, 0f), Vector3.zero };
@@ -59,6 +65,7 @@ public class LaneFlowDemo : MonoBehaviour
 
     private readonly List<(Transform transform, Vector3 position, bool active, bool keepActive)> start = new();
     private readonly List<GameObject> hidden = new();
+    private readonly List<PlacedRider> placedRiders = new();
     private bool changed;
 
     private void Awake()
@@ -128,7 +135,21 @@ public class LaneFlowDemo : MonoBehaviour
         changed = true;
         yield return new WaitForSeconds(startDelay);
 
+        while (boxHints != null && !boxHints.IsClear)
+        {
+            yield return null;
+        }
+
         HideViewBlockers();
+        List<Transform> storageRiders = Riders(storageStock);
+        if (boxHints != null)
+        {
+            foreach ((Transform placed, Vector3 startPosition, Quaternion startRotation) in boxHints.SampleInStorage())
+            {
+                placedRiders.Add(new PlacedRider(placed, startPosition, startRotation));
+                storageRiders.Add(placed);
+            }
+        }
 
         // The next storage container starts in the hood.
         List<Transform> nextRiders = Riders(nextStorageStock);
@@ -143,7 +164,7 @@ public class LaneFlowDemo : MonoBehaviour
         }
 
         bool arrived = false;
-        StartCoroutine(RideAway(storageBox, storageStock, departurePath, storageSpeed));
+        StartCoroutine(RideAway(storageBox, storageRiders, departurePath, storageSpeed));
         StartCoroutine(RideThen(nextStorageBox, nextRiders, arrival, storageSpeed, () => arrived = true));
 
         while (!arrived)
@@ -151,7 +172,7 @@ public class LaneFlowDemo : MonoBehaviour
             yield return null;
         }
 
-        yield return RideAway(orderBox, orderStock, orderPath, orderSpeed);
+        yield return RideAway(orderBox, Riders(orderStock), orderPath, orderSpeed);
 
         ShowViewBlockers();
     }
@@ -184,9 +205,8 @@ public class LaneFlowDemo : MonoBehaviour
         hidden.Clear();
     }
 
-    private IEnumerator RideAway(Transform box, Transform stock, IReadOnlyList<Vector3> path, float speed)
+    private IEnumerator RideAway(Transform box, List<Transform> riders, IReadOnlyList<Vector3> path, float speed)
     {
-        List<Transform> riders = Riders(stock);
         yield return LaneRide.Path(box, riders, path, speed, cornerPause);
 
         // Out of sight behind the monitor: switch off. The riders, not their parent, which may hold a script.
@@ -208,6 +228,12 @@ public class LaneFlowDemo : MonoBehaviour
     {
         StopAllCoroutines();
         ShowViewBlockers();
+        foreach (PlacedRider rider in placedRiders)
+        {
+            rider.Restore();
+        }
+        placedRiders.Clear();
+
         if (!changed)
             return;
 
@@ -246,6 +272,58 @@ public class LaneFlowDemo : MonoBehaviour
         }
 
         return riders;
+    }
+
+    // A grabbable package the trainee put into the storage container: it rides like the static cartons and comes back
+    // to where it lay when the scene started (on the desk), grabbable again.
+    private sealed class PlacedRider
+    {
+        private readonly Transform transform;
+        private readonly Vector3 position;
+        private readonly Quaternion rotation;
+        private readonly List<Collider> colliders = new();
+        private readonly List<Behaviour> interactables = new();
+
+        public PlacedRider(Transform transform, Vector3 position, Quaternion rotation)
+        {
+            this.transform = transform;
+            this.position = position;
+            this.rotation = rotation;
+
+            foreach (Collider collider in transform.GetComponentsInChildren<Collider>())
+            {
+                if (collider.enabled)
+                {
+                    collider.enabled = false;
+                    colliders.Add(collider);
+                }
+            }
+            foreach (Behaviour behaviour in transform.GetComponentsInChildren<Behaviour>())
+            {
+                if (behaviour is Oculus.Interaction.IInteractable && behaviour.enabled)
+                {
+                    behaviour.enabled = false;
+                    interactables.Add(behaviour);
+                }
+            }
+        }
+
+        public void Restore()
+        {
+            if (transform == null)
+                return;
+
+            transform.gameObject.SetActive(true);
+            transform.SetPositionAndRotation(position, rotation);
+            foreach (Collider collider in colliders)
+            {
+                collider.enabled = true;
+            }
+            foreach (Behaviour behaviour in interactables)
+            {
+                behaviour.enabled = true;
+            }
+        }
     }
 
     private static void SetActive(Transform target, bool active)

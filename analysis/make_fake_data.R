@@ -7,7 +7,9 @@
 # position_completed, task_completed, quiz_answer, quiz_unlocked, tour_step,
 # station_move_start/_arrived, welcome_practice_done) and the interaction
 # events of #29 (grab_start/_end, container_enter/_exit, menu_select,
-# end_control_opened/_cancelled, scene_enter.via). Header event_groups =
+# end_control_opened/_cancelled, scene_enter.via) and, for the layout "029"
+# pilot P813, the ConceptScene hint tags of #100 (concept_hint_shown / _cleared,
+# section 5b3). Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
 # perf, floor-drop or tracking events: decision 022 dropped #30 and #74, the
@@ -21,7 +23,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811, P812, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P813, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -906,6 +908,52 @@ run_welcome <- function(s, practice = TRUE) {
   maybe_unity_error(s)
 }
 
+# ---- 5b3. ConceptScene hint tags (#100, decision 030, layout "029" on) ----
+
+# ConceptBoxHints writes concept_hint_shown when a yellow tag appears beside a
+# package that has lain in a container (order / storage), not held, for 0.5 s,
+# and concept_hint_cleared when it goes away (picked up again, or the state
+# changed, e.g. the demo cartons left with the step). One tag at a time, so
+# shown / cleared alternate per visit; when the tag moves to another package,
+# the old cleared comes right before the new shown (same frame). Leaving the
+# scene while a tag is shown writes nothing. Hints are not attempts: no
+# quiz_answer, no confirm_*, nothing in summary.csv; Concept writes no
+# container_* either. tour_step_id = the step on screen (null before the
+# tour bar opens).
+hint_event <- function(s, shown, container, reason, obj, item) {
+  emit(s, if (shown) "concept_hint_shown" else "concept_hint_cleared",
+       json_obj(container = container, reason = reason, object_id = obj, material_key = item,
+                tour_step_id = s$tour_step))
+}
+
+# Carry a desk package into a container and let go (grab events as in the
+# other scenes, no container_* in Concept). With a reason the tag appears
+# 0.5 s after the package lies still (ConceptBoxHintRule.SettleSeconds).
+hint_put <- function(s, obj, item, container, reason = NULL, carry_s = 1) {
+  grab_start(s, obj, item)
+  advance(s, carry_s)
+  grab_end(s, obj, item)
+  if (!is.null(reason)) {
+    advance(s, 0.5)
+    hint_event(s, TRUE, container, reason, obj, item)
+  }
+}
+
+# Pick the package up again after after_s (the tag goes in the next frame)
+# and put it back on the desk. next_hint: the tag that moves to another
+# package in the same frame (list(container, reason, obj, item)).
+hint_take <- function(s, obj, item, container, reason, after_s, next_hint = NULL) {
+  advance(s, after_s)
+  grab_start(s, obj, item)
+  advance(s, 0.011)
+  hint_event(s, FALSE, container, reason, obj, item)
+  if (!is.null(next_hint)) {
+    hint_event(s, TRUE, next_hint$container, next_hint$reason, next_hint$obj, next_hint$item)
+  }
+  advance(s, 0.8)
+  grab_end(s, obj, item)
+}
+
 # ConceptScene: 11 tour steps ("Weiter"), the quiz opens at material_flow,
 # then the 4 questions in order, each touched until right. Layout "025"
 # (#80, decision 024): some trainees press "Zurück" (step_index - 1) to
@@ -917,10 +965,25 @@ run_welcome <- function(s, practice = TRUE) {
 # is shown, i.e. how long the step before it stayed) and pause_after_s (a
 # focus_lost pause of that length 2 s after the step is shown; 0 = none).
 # selftest.R checks the R tour table against such a script (P812).
-run_concept <- function(s, person, tour_script = NULL) {
+# hints (#100, layout "029"): named list of functions(s) run in the random
+# tour: "before" before the tour bar opens, a step_id at the end of that
+# step's forward showing (after any Back chain), "end" after the quiz, right
+# before the trainee leaves the scene. A hint function may set
+# s$on_next_step: it runs right after the next tour_step line, for a tag the
+# step change clears (TOO_MANY when the demo cartons leave with "cartons").
+run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
   unlocked <- FALSE
+  s$tour_step <- NULL
+  s$on_next_step <- NULL
+  run_hint <- function(key) if (!is.null(hints[[key]])) hints[[key]](s)
   show_step <- function(i) {
     emit(s, "tour_step", json_obj(step_id = tour_steps[i], step_index = i))
+    s$tour_step <- tour_steps[i]
+    if (!is.null(s$on_next_step)) {
+      f <- s$on_next_step
+      s$on_next_step <- NULL
+      f(s)
+    }
     if (tour_steps[i] == "material_flow" && !unlocked) {
       advance(s, 0.001)
       emit(s, "quiz_unlocked")
@@ -938,6 +1001,7 @@ run_concept <- function(s, person, tour_script = NULL) {
       }
     }
   }
+  run_hint("before")
   for (i in if (is.null(tour_script)) seq_along(tour_steps) else integer(0)) {
     advance(s, runif(1, 5, 15))  # read the step, press "Weiter"
     show_step(i)
@@ -956,6 +1020,7 @@ run_concept <- function(s, person, tour_script = NULL) {
         show_step(i - k)         # "Weiter" again
       }
     }
+    run_hint(tour_steps[i])
     if (i == 5) maybe_pause(s)
   }
   # Some trainees press "Von vorn" and skim the first steps again (step_index
@@ -985,6 +1050,7 @@ run_concept <- function(s, person, tour_script = NULL) {
   }
   complete_task(s)
   advance(s, runif(1, 3, 10))  # read the feedback, then press the menu
+  run_hint("end")
 }
 
 # ComplexScene before position 1: the remainder quiz (full cartons, loose
@@ -1431,6 +1497,72 @@ p812_tour <- data.frame(
 run_full_course(new_person("P812"), "aaa1111", "2026-11-06T14:30:00Z", language = "EN",
                 special = list(ConceptScene = list(tour_script = p812_tour)))
 
+# P813: English pilot on the "029" build (decision 030, #100): the Concept
+# containers react to what the trainee puts in. A fixed set of hint tags, so
+# selftest.R knows the numbers (object ids: Concept desk packages):
+#   before the tour bar opens: a stray concept_hint_cleared without a shown
+#     (a contract break R must warn about and ignore), then KABELVERBINDER A
+#     into the order container: order / WRONG_MATERIAL, tour_step_id null,
+#     picked up again after 6 s (shown 6.011 s)
+#   step material: a RING D ring into the order container (order /
+#     WRONG_MATERIAL), then a SCHRAUBE B bag into the storage container (no tag
+#     yet, one tag at a time); the ring is taken out 2.5 s later and the tag
+#     moves to the bag in the same frame (storage / WRONG_MATERIAL), bag out 4 s later
+#   step cartons: the STECKER C carton into the order container next to the 3
+#     counted cartons: order / TOO_MANY; cleared by the next step (the demo
+#     cartons leave), not by the trainee
+#   step material_flow: a ring into the order container right after the step
+#     (tag 1.5 s after it), taken out 25 s later: the lane demo (startDelay
+#     4 s) waits 1.5 + 25.011 - 4 = 22.511 s
+#   end: KABELVERBINDER A into the storage container (storage /
+#     WRONG_MATERIAL), then the trainee leaves the scene: shown, never cleared.
+p813_hints <- list(
+  before = function(s) {
+    advance(s, 3)
+    hint_event(s, FALSE, "order", "WRONG_MATERIAL", "Interactables/GG_Package", "connector_a")
+    advance(s, 2)
+    hint_put(s, "Interactables/GG_Package", "connector_a", "order", "WRONG_MATERIAL")
+    hint_take(s, "Interactables/GG_Package", "connector_a", "order", "WRONG_MATERIAL", 6)
+  },
+  material = function(s) {
+    ring <- "Interactables/VPE_OpenedPackage/Rings/ring (2)"
+    bag <- "Interactables/PlasticBag_GG"
+    advance(s, 2)
+    hint_put(s, ring, "ring_d", "order", "WRONG_MATERIAL")
+    advance(s, 1.5)
+    hint_put(s, bag, "screw_b", "storage")
+    hint_take(s, ring, "ring_d", "order", "WRONG_MATERIAL", 2.5,
+              next_hint = list(container = "storage", reason = "WRONG_MATERIAL", obj = bag, item = "screw_b"))
+    hint_take(s, bag, "screw_b", "storage", "WRONG_MATERIAL", 4)
+  },
+  cartons = function(s) {
+    carton <- "Interactables/STECKER_C_Package"
+    advance(s, 2.5)  # the 3 counted cartons are in (0.6 s apart)
+    hint_put(s, carton, "stecker_c", "order", "TOO_MANY")
+    s$on_next_step <- function(s) {
+      advance(s, 0.017)  # next frame: Ist back to 40, the tag goes
+      hint_event(s, FALSE, "order", "TOO_MANY", carton, "stecker_c")
+    }
+  },
+  material_flow = function(s) {
+    hint_put(s, "Interactables/VPE_OpenedPackage/Rings/ring (5)", "ring_d", "order", "WRONG_MATERIAL")
+    hint_take(s, "Interactables/VPE_OpenedPackage/Rings/ring (5)", "ring_d", "order", "WRONG_MATERIAL", 25)
+  },
+  end = function(s) {
+    hint_put(s, "Interactables/GG_Package", "connector_a", "storage", "WRONG_MATERIAL")
+    advance(s, 2)
+  })
+
+p813 <- new_person("P813")
+s <- start_session(p813, "aaa1111", "2026-11-06T16:00:00Z", language = "EN", layout = "029")
+run_welcome(s)
+go_to_scene(s, "ConceptScene"); run_concept(s, p813, hints = p813_hints)
+for (scene in c("BasicPickingScene", "MixedPickingScene")) {
+  go_to_scene(s, scene); run_visit(s, p813)
+}
+go_to_scene(s, "ComplexScene"); run_picking(s, p813, end_on_correct = TRUE)
+end_session(s, "completed")
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1483,7 +1615,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811, P812  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P813  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -1545,7 +1677,8 @@ paper_rows <- list(
   paper_row("P802"),
   paper_row("P803"),
   paper_row("P811"),
-  paper_row("P812"))
+  paper_row("P812"),
+  paper_row("P813"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

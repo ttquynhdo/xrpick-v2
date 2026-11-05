@@ -35,6 +35,19 @@ namespace XRPick.Research.Tests
         }
 
         [Test]
+        public void ConceptHint_HasContainerReasonObjectMaterialAndStep()
+        {
+            Assert.AreEqual(
+                "{\"container\":\"storage\",\"reason\":\"WRONG_MATERIAL\",\"object_id\":\"Interactables/GG_Package\"," +
+                "\"material_key\":\"connector_a\",\"tour_step_id\":\"cartons\"}",
+                InteractionEvents.ConceptHint(InteractionEvents.ContainerStorage, InteractionEvents.HintWrongMaterial,
+                    "Interactables/GG_Package", "connector_a", "cartons").ToJson());
+            StringAssert.Contains("\"tour_step_id\":null",
+                InteractionEvents.ConceptHint(InteractionEvents.ContainerOrder, InteractionEvents.HintTooMany, "a",
+                    "stecker_c", null).ToJson());
+        }
+
+        [Test]
         public void MenuSelect_HasTargetSceneAndBlockedNoItemLabel()
         {
             string json = InteractionEvents.MenuSelect("BasicPickingScene", true).ToJson();

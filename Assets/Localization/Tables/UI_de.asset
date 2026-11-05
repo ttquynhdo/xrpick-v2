@@ -916,6 +916,11 @@ MonoBehaviour:
       Verp.-Einh. im LVS.
     m_Metadata:
       m_Items: []
+  - m_Id: 762340292038656
+    m_Localized: "In diesem Lagerbeh\xE4lter liegt Material mit einer anderen Materialnummer.
+      Nehmen Sie es heraus."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

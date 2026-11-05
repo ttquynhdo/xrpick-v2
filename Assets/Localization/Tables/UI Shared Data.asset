@@ -839,6 +839,10 @@ MonoBehaviour:
     m_Key: concept.tour.verp_einh.action_held
     m_Metadata:
       m_Items: []
+  - m_Id: 762340292038656
+    m_Key: concept.hint.storage_wrong_material
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

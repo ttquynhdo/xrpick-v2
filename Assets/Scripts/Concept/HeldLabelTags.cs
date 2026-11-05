@@ -139,20 +139,7 @@ public class HeldLabelTags : MonoBehaviour
 
     private void PlaceTag(RectTransform tag, HeldPackage package, Bounds bounds, int side, Vector3 eyes)
     {
-        Vector3 toPackage = bounds.center - eyes;
-        Vector3 right = Vector3.Cross(Vector3.up, toPackage).normalized;
-        if (right == Vector3.zero)
-        {
-            right = Vector3.right;
-        }
-
-        // Half the package's width as seen from the head, plus the gap and half the tag.
-        Vector3 e = bounds.extents;
-        float packageHalf = Mathf.Abs(e.x * right.x) + Mathf.Abs(e.y * right.y) + Mathf.Abs(e.z * right.z);
-        float tagHalf = tag.rect.width * tag.lossyScale.x * 0.5f;
-
-        Vector3 position = bounds.center + right * (side * (packageHalf + gap + tagHalf));
-        tag.SetPositionAndRotation(position, Quaternion.LookRotation(position - eyes, Vector3.up));
+        TagPlacement.Beside(tag, bounds, side, eyes, gap);
 
         if (package.ShownOn != tag)
         {
@@ -206,27 +193,6 @@ public class HeldLabelTags : MonoBehaviour
 
         public RectTransform ShownOn { get; set; }
 
-        public Bounds Bounds()
-        {
-            bool found = false;
-            var bounds = new Bounds(Grabbable.transform.position, Vector3.zero);
-            foreach (Renderer renderer in renderers)
-            {
-                if (renderer == null || !renderer.enabled || !renderer.gameObject.activeInHierarchy)
-                    continue;
-
-                if (found)
-                {
-                    bounds.Encapsulate(renderer.bounds);
-                }
-                else
-                {
-                    bounds = renderer.bounds;
-                    found = true;
-                }
-            }
-
-            return bounds;
-        }
+        public Bounds Bounds() => TagPlacement.Of(renderers, Grabbable.transform.position);
     }
 }

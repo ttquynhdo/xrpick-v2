@@ -282,7 +282,8 @@ known_events <- c("header", "session_start", "session_end", "scene_enter", "scen
                   "crash_recovered", "confirm_pressed", "confirm_ignored", "position_completed",
                   "task_completed", "quiz_answer", "quiz_unlocked", "tour_step",
                   "station_move_start", "station_move_arrived", "welcome_practice_done",
-                  "grab_start", "grab_end", "container_enter", "container_exit")
+                  "grab_start", "grab_end", "container_enter", "container_exit",
+                  "concept_hint_shown", "concept_hint_cleared")
 # Decision 022 dropped #30 (pose, perf) and #74 (floor drops, input mode,
 # tracking): the app must never write these. If one turns up, the build is not
 # the study build (or the decision was reopened): warn, don't read them.
@@ -306,7 +307,8 @@ if (length(unknown_events) > 0) {
 # language (#11): "DE" / "EN", fixed for the whole session (chosen on the
 # keypad before the code; there is no language_change event). NA = a log from
 # a build before #11, which wrote null.
-# Schema 2 adds layout_version ("019" = three-lane station, decision 019; "025" = same plus the Concept tour with Zurück, decisions 024/025) and
+# Schema 2 adds layout_version ("019" = three-lane station, decision 019; "025" = same plus the Concept tour with Zurück, decisions 024/025;
+# "029" = plus the Concept containers that count and give hint tags, decision 030 / #100) and
 # event_groups (the groups this build emits). A group missing from
 # event_groups means "not measured" (NA), never 0. Logs without the key
 # (schema 1) keep event_groups NA.
@@ -942,7 +944,8 @@ outcome_sessions <- session_outcome$session_id[session_outcome$outcome_measured]
 # event_groups key (no header line): yes when the session has any of its events.
 # A session without the group has NA interaction numbers, never 0.
 interaction_event_names <- c("grab_start", "grab_end", "container_enter", "container_exit",
-                             "menu_select", "end_control_opened", "end_control_cancelled")
+                             "menu_select", "end_control_opened", "end_control_cancelled",
+                             "concept_hint_shown", "concept_hint_cleared")
 session_interaction <- sessions %>%
   transmute(session_id, participant_id,
             interaction_measured = case_when(
@@ -1201,7 +1204,10 @@ if (length(unknown_scenes) > 0) {
 # check: none of their Concept data enters a figure (outcomes not read).
 # Label for a layout in charts and keys: NA (header without the field) = "none".
 layout_label <- function(x) coalesce(as.character(x), "none")
-# The tour has "Zurück" from layout "025" on (#80); "019" and none have not.
+# The tour has "Zurück" from layout "025" on (#80, "029" too); "019" and none have not.
+# Layout "029" (decision 030) changes the Concept station again (Ist follows the
+# order container, hint tags, the lane demo waits for a clear station), so
+# "025" and "029" Concept data are split like any two layouts.
 tour_has_zurueck <- function(layout_version) {
   coalesce(suppressWarnings(as.integer(layout_version)) >= 25L, FALSE)
 }
@@ -2148,6 +2154,251 @@ tour_wide <- tour_first %>%
             tour_quick_next_back_ConceptScene = if (any(zurueck_available)) sum(quick_next_back) else NA_integer_,
             tour_restarts_ConceptScene = sum(restarts), .groups = "drop")
 
+# ---- 13d. ConceptScene hint tags (#100, decision 030) -------------------------
+
+# From layout "029" on, a yellow tag appears beside a package the trainee laid
+# into the Concept order container (another material, or a STECKER C carton
+# that brings Ist above Soll) or storage container (another material):
+# concept_hint_shown when it appears, concept_hint_cleared when it goes. One
+# tag at a time, so in file line order shown / cleared alternate per visit;
+# when the tag moves to another package, the old cleared and the new shown
+# share a frame. A shown without cleared = the scene was left (or the app
+# crashed) while the tag was shown. Hints are NOT attempts: nothing here
+# feeds confirm_count, items.csv or an error rate. Putting packages into the
+# Concept containers is voluntary and Concept writes no container_*, so
+# there is no denominator: hint counts are counts, never a rate.
+# Before layout "029" the tags did not exist: hint columns are NA (not
+# measured), never 0.
+# material_flow wait: at tour step material_flow the lane demo starts
+# lane_demo_delay_s after the step is shown, but only once no tag is shown
+# (LaneFlowDemo waits for ConceptBoxHints.IsClear). Wait per showing =
+# active seconds from that start until the chain of tags (a tag moving on in
+# the same frame continues the chain) ends, cut at the next tour_step or the
+# visit end.
+
+if (!exists("lane_demo_delay_s")) lane_demo_delay_s <- 4
+hint_chain_gap_s <- 0.05
+hints_logged <- function(layout_version) {
+  coalesce(suppressWarnings(as.integer(layout_version)) >= 29L, FALSE)
+}
+hint_event_names <- c("concept_hint_shown", "concept_hint_cleared")
+hint_reasons <- c("WRONG_MATERIAL", "TOO_MANY")
+hint_containers <- c("order", "storage")
+
+hint_lines <- ix_events %>% filter(event %in% hint_event_names) %>%
+  transmute(participant_id, session_id, scene = as.character(scene), scene_visit, t, line, event,
+            container = map_chr(data, ~ as_chr(.x$container)),
+            reason = map_chr(data, ~ as_chr(.x$reason)),
+            object_id = map_chr(data, ~ as_chr(.x$object_id)),
+            material_key = map_chr(data, ~ as_chr(.x$material_key)),
+            tour_step_id = map_chr(data, ~ as_chr(.x$tour_step_id))) %>%
+  left_join(sessions %>% select(session_id, layout_version), by = "session_id")
+
+# Contract checks: hints only in ConceptScene, only from layout "029" on,
+# only the fixed codes (storage has no TOO_MANY). Such lines are not read.
+bad_hint_scene <- hint_lines %>% filter(scene != "ConceptScene")
+if (nrow(bad_hint_scene) > 0) {
+  warn(nrow(bad_hint_scene), " concept_hint_* line(s) outside ConceptScene (not read): ",
+       paste(unique(bad_hint_scene$participant_id), collapse = ", "))
+}
+bad_hint_layout <- hint_lines %>% filter(scene == "ConceptScene", !hints_logged(layout_version)) %>%
+  distinct(participant_id, layout_version)
+for (i in seq_len(nrow(bad_hint_layout))) {
+  warn("concept_hint_* in a log of layout ", layout_label(bad_hint_layout$layout_version[i]),
+       " (hints exist from \"029\" on): ", bad_hint_layout$participant_id[i], " (not read)")
+}
+bad_hint_code <- hint_lines %>%
+  filter(!container %in% hint_containers | !reason %in% hint_reasons |
+           (container %in% "storage" & reason %in% "TOO_MANY") | is.na(object_id))
+if (nrow(bad_hint_code) > 0) {
+  warn(nrow(bad_hint_code), " concept_hint_* line(s) with an unknown container / reason, storage TOO_MANY ",
+       "or no object_id (not read): ", paste(unique(bad_hint_code$participant_id), collapse = ", "))
+}
+hint_lines <- hint_lines %>%
+  filter(scene == "ConceptScene", hints_logged(layout_version)) %>%
+  anti_join(bad_hint_code, by = c("session_id", "line")) %>%
+  arrange(session_id, scene_visit, line)
+
+# Visit ends: scene_exit, or the last event of a crashed visit.
+concept_visit_ends <- visits %>% filter(scene == "ConceptScene") %>%
+  select(session_id, scene_visit, visit_end_t = end_t, closed)
+
+# Pair the lines of one visit in file line order. A cleared with no shown
+# before it, or a second shown before the cleared, breaks the contract: warned
+# below; an orphan cleared is ignored, a double shown ends the earlier tag.
+pair_hint_lines <- function(d) {
+  out <- list()
+  open <- NULL
+  for (i in seq_len(nrow(d))) {
+    r <- d[i, ]
+    if (r$event == "concept_hint_shown") {
+      if (!is.null(open)) {
+        out[[length(out) + 1]] <- tibble(open, end_t = r$t, ended_by = "next_shown_without_cleared",
+                                         cleared_step_id = NA_character_, problem = "shown_twice")
+      }
+      open <- r
+    } else if (is.null(open)) {
+      out[[length(out) + 1]] <- tibble(r, end_t = r$t, ended_by = NA_character_,
+                                       cleared_step_id = r$tour_step_id, problem = "cleared_without_shown")
+    } else {
+      same <- identical(r$object_id, open$object_id) && identical(r$container, open$container) &&
+        identical(r$reason, open$reason)
+      out[[length(out) + 1]] <- tibble(open, end_t = r$t, ended_by = "cleared",
+                                       cleared_step_id = r$tour_step_id,
+                                       problem = if (same) NA_character_ else "cleared_other_tag")
+      open <- NULL
+    }
+  }
+  if (!is.null(open)) {
+    out[[length(out) + 1]] <- tibble(open, end_t = NA_real_, ended_by = "visit_end",
+                                     cleared_step_id = NA_character_, problem = NA_character_)
+  }
+  bind_rows(out)
+}
+
+hint_pairs <- hint_lines %>%
+  group_by(session_id, scene_visit) %>%
+  group_modify(~ pair_hint_lines(.x)) %>%
+  ungroup()
+if (nrow(hint_pairs) == 0) {
+  hint_pairs <- tibble(session_id = character(), scene_visit = integer(), participant_id = character(),
+                       scene = character(), t = double(), line = integer(), event = character(),
+                       container = character(), reason = character(), object_id = character(),
+                       material_key = character(), tour_step_id = character(), layout_version = character(),
+                       end_t = double(), ended_by = character(), cleared_step_id = character(),
+                       problem = character())
+}
+hint_problems <- hint_pairs %>% filter(!is.na(problem))
+for (i in seq_len(nrow(hint_problems))) {
+  r <- hint_problems[i, ]
+  warn(switch(r$problem,
+              cleared_without_shown = "concept_hint_cleared without a preceding concept_hint_shown (ignored): ",
+              shown_twice = "concept_hint_shown while another tag was still shown (the first ends there): ",
+              cleared_other_tag = "concept_hint_cleared names another tag than the shown one (paired anyway): "),
+       r$participant_id, " ConceptScene visit ", r$scene_visit, " line ", r$line)
+}
+
+# Grab lines of the Concept visits, to tell a tag the trainee removed (a
+# grab_start of the same package while the tag was shown) from one the
+# station cleared (e.g. TOO_MANY when the demo cartons leave with the step).
+concept_grab_starts <- grab_rows %>% filter(scene == "ConceptScene", event == "grab_start") %>%
+  select(session_id, scene_visit, object_id, grab_t = t)
+
+concept_hints <- hint_pairs %>%
+  filter(!problem %in% "cleared_without_shown") %>%
+  rename(shown_t = t, shown_line = line) %>%
+  left_join(concept_visit_ends, by = c("session_id", "scene_visit")) %>%
+  mutate(ended_by = case_when(ended_by != "visit_end" ~ ended_by,
+                              closed %in% TRUE ~ "scene_exit",
+                              TRUE ~ "crash"),
+         # A tag still shown at the visit end lasts until the scene exit
+         # (or, after a crash, the last event: a lower bound).
+         hint_end_t = coalesce(end_t, visit_end_t)) %>%
+  select(-end_t, -visit_end_t, -closed)
+concept_hints <- concept_hints %>%
+  mutate(row_id = row_number()) %>%
+  left_join(concept_grab_starts, by = c("session_id", "scene_visit", "object_id"),
+            relationship = "many-to-many") %>%
+  group_by(row_id) %>%
+  summarise(across(-grab_t, first),
+            removed_by_grab = any(!is.na(grab_t) & grab_t > shown_t & grab_t <= hint_end_t),
+            .groups = "drop") %>%
+  mutate(cleared = ended_by == "cleared",
+         # Only a cleared tag can say who removed it.
+         removed_by_grab = if_else(cleared, removed_by_grab, NA),
+         shown_s = round(hint_end_t - shown_t - paused_between(session_id, shown_t, hint_end_t), 3)) %>%
+  group_by(session_id, scene_visit) %>%
+  mutate(hint_no = row_number()) %>%
+  ungroup() %>%
+  left_join(visits %>% filter(scene == "ConceptScene") %>% select(session_id, scene_visit, visit_no, repeat_visit),
+            by = c("session_id", "scene_visit")) %>%
+  select(participant_id, layout_version, session_id, scene_visit, visit_no, repeat_visit, hint_no,
+         container, reason, object_id, material_key, tour_step_id, cleared_step_id,
+         shown_t, end_t = hint_end_t, shown_s, ended_by, cleared, removed_by_grab) %>%
+  arrange(participant_id, visit_no, hint_no)
+write_csv(concept_hints, file.path(output_dir, "concept_hints.csv"), na = "")
+
+# material_flow wait per showing of that step: does a tag chain cover the
+# moment the demo would start? Chains = tags that follow each other within
+# hint_chain_gap_s (the tag moved on in the same frame).
+hint_chains <- concept_hints %>%
+  arrange(session_id, scene_visit, shown_t) %>%
+  group_by(session_id, scene_visit) %>%
+  mutate(new_chain = is.na(lag(end_t)) | shown_t > lag(end_t) + hint_chain_gap_s,
+         chain = cumsum(new_chain)) %>%
+  group_by(session_id, scene_visit, chain) %>%
+  summarise(chain_start = first_or_na(shown_t), chain_end = last_or_na(end_t),
+            chain_open = any(ended_by == "crash"), .groups = "drop")
+flow_shows <- tour_shows %>%
+  filter(step_id %in% "material_flow", hints_logged(layout_version)) %>%
+  transmute(session_id, scene_visit, demo_t = t + lane_demo_delay_s,
+            step_end_t = coalesce(next_t, end_t), step_crashed = is.na(next_t) & !closed) %>%
+  filter(step_end_t > demo_t) %>%
+  mutate(show_id = row_number())
+flow_waits <- flow_shows %>%
+  left_join(hint_chains, by = c("session_id", "scene_visit"), relationship = "many-to-many") %>%
+  mutate(covers = !is.na(chain_start) & chain_start <= demo_t & chain_end > demo_t) %>%
+  group_by(show_id, session_id, scene_visit, demo_t, step_end_t, step_crashed) %>%
+  summarise(wait_end_t = if (any(covers)) min(max(chain_end[covers]), first(step_end_t)) else NA_real_,
+            wait_open = any(covers & chain_open), .groups = "drop") %>%
+  mutate(held = !is.na(wait_end_t),
+         wait_s = if_else(held, round(wait_end_t - demo_t - paused_between(session_id, demo_t, wait_end_t), 3), 0),
+         # Still waiting when the app died, or when the step was left: a lower bound.
+         wait_censored = held & (wait_open | (wait_end_t >= step_end_t & step_crashed)))
+
+# One row per Concept visit of a session that logged the interaction group:
+# counts per container x reason, seconds shown, the material_flow wait.
+hint_visit_counts <- concept_hints %>%
+  group_by(session_id, scene_visit) %>%
+  summarise(hints_shown = n(),
+            hints_order_wrong_material = sum(container == "order" & reason == "WRONG_MATERIAL"),
+            hints_order_too_many = sum(container == "order" & reason == "TOO_MANY"),
+            hints_storage_wrong_material = sum(container == "storage" & reason == "WRONG_MATERIAL"),
+            hints_removed_by_grab = sum(removed_by_grab %in% TRUE),
+            hints_open_at_exit = sum(!cleared),
+            hint_shown_s = round(sum(shown_s), 3),
+            hint_max_shown_s = last_or_na(shown_s), .groups = "drop")
+hint_visit_waits <- flow_waits %>%
+  group_by(session_id, scene_visit) %>%
+  summarise(material_flow_demo_due = n(),
+            material_flow_demo_held = sum(held),
+            material_flow_wait_max_s = last_or_na(wait_s),
+            material_flow_wait_s = round(sum(wait_s), 3),
+            material_flow_wait_censored = any(wait_censored), .groups = "drop")
+hint_visit_breaks <- hint_problems %>% count(session_id, scene_visit, name = "hint_contract_breaks")
+hint_count_cols <- c("hints_shown", "hints_order_wrong_material", "hints_order_too_many",
+                     "hints_storage_wrong_material", "hints_removed_by_grab", "hints_open_at_exit",
+                     "hint_contract_breaks")
+concept_hints_by_visit <- visits %>%
+  filter(scene == "ConceptScene", interaction_logged %in% TRUE) %>%
+  select(participant_id, layout_version, session_id, scene_visit, visit_no, repeat_visit) %>%
+  mutate(hints_logged = hints_logged(layout_version)) %>%
+  left_join(hint_visit_counts, by = c("session_id", "scene_visit")) %>%
+  left_join(hint_visit_waits, by = c("session_id", "scene_visit")) %>%
+  left_join(hint_visit_breaks, by = c("session_id", "scene_visit")) %>%
+  mutate(across(all_of(hint_count_cols), ~ if_else(hints_logged, coalesce(as.integer(.x), 0L), NA_integer_)),
+         hint_shown_s = if_else(hints_logged, coalesce(hint_shown_s, 0), NA_real_),
+         # No tag: no longest tag (NA, not 0).
+         hint_max_shown_s = if_else(hints_logged, hint_max_shown_s, NA_real_),
+         # Demo columns: NA when not measured or the demo was never due in
+         # the visit (material_flow not reached or left within the delay).
+         material_flow_demo_due = if_else(hints_logged, coalesce(material_flow_demo_due, 0L), NA_integer_),
+         material_flow_demo_held = if_else(hints_logged, coalesce(material_flow_demo_held, 0L), NA_integer_),
+         across(c(material_flow_wait_max_s, material_flow_wait_s, material_flow_wait_censored),
+                ~ if_else(hints_logged & material_flow_demo_due > 0, .x, NA))) %>%
+  select(participant_id, layout_version, session_id, scene_visit, visit_no, repeat_visit, hints_logged,
+         hints_shown, hints_order_wrong_material, hints_order_too_many, hints_storage_wrong_material,
+         hints_removed_by_grab, hints_open_at_exit, hint_shown_s, hint_max_shown_s,
+         material_flow_demo_due, material_flow_demo_held, material_flow_wait_max_s, material_flow_wait_s,
+         material_flow_wait_censored, hint_contract_breaks) %>%
+  arrange(participant_id, visit_no)
+write_csv(concept_hints_by_visit, file.path(output_dir, "concept_hints_by_visit.csv"), na = "")
+if (any(concept_hints_by_visit$hints_logged)) {
+  message("Concept hint tags (layout 029 on): ", sum(concept_hints_by_visit$hints_shown, na.rm = TRUE),
+          " shown in ", sum(concept_hints_by_visit$hints_logged), " visit(s); longest material_flow wait ",
+          suppressWarnings(max(concept_hints_by_visit$material_flow_wait_max_s, na.rm = TRUE)), " s")
+}
+
 # ---- 14. Wide file: one row per participant (for SPSS and paper forms) ---------
 
 # Per-scene columns come from the counting visit only (repeat visits stay in
@@ -2584,7 +2835,8 @@ validity_limits <- c(
   "- Q4 (paper SSQ): the logs hold no frame-rate, frame-drop, head-movement or tracking data (decision 022). SSQ change (post - pre) can only be read against headset removals, pauses, an early end (end_status, abbruchgrund) and active time, for the whole session (no per-scene sickness).",
   "- Q5 (paper NASA-TLX, once at the end, raw = unweighted mean): who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.",
   "- ConceptScene tour (tour_steps.csv): Back presses are derived from step_index (-1 = Zurück) and exist only for layout_version \"025\" on; \"019\" logs and headers without layout_version have NA, not 0. A Zurück < 2 s after Weiter is read as a likely mis-press, not proven. Step time ends at the next step or the first quiz answer: time spent looking elsewhere (label board, packages) is in it.",
-  "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).")
+  "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).",
+  "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): putting packages into the Concept containers is voluntary and not logged otherwise (no container_* in Concept), so hint counts have no denominator and are never an error rate or an attempt. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts lane_demo_delay_s (4 s) after the step; older layouts have NA, not 0.")
 # The pilot set (decision 023) is a try-out of the course and of this
 # analysis, not study data: say so on every pilot report.
 if (is_pilot_set) {

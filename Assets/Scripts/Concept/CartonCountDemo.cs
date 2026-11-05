@@ -113,7 +113,7 @@ public class CartonCountDemo : MonoBehaviour
 
         if (order != null)
         {
-            order.SetIstPieces(count * order.CurrentLine.vpe);
+            order.SetShownPieces(count * order.CurrentLine.vpe);
         }
     }
 
