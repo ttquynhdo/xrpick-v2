@@ -40,6 +40,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   1. **#88** trước (cỡ carton quyết ô EKZ Mixed, carton đếm Concept, thùng mẫu EKZ, vòng trên carton Complex; có thể dựng lại lưới 6 ô Basic). **#95** xen vào lúc nào cũng được (chỉ prefab và mesh).
   2. Concept: **#89** (mở đầu bằng bước đo bố cục bàn học cho mọi vật mới, như #84) → **#90** → **#91** (+ số LVS khớp với thùng, bổ sung 2026-11-05) → **#100** (báo kiện sai/thừa trong thùng, cần `solution-decision`) → **#94 phần Concept** (verified-mcp 2026-11-05, cùng phần Mixed) → **#92** (cần thùng mẫu mới) → **#93 phần Concept**.
   3. **#94 phần Mixed** → **#93 phần Complex** → **#96** → **#92 phần Complex** (carton đã mở, người dùng chốt 2026-11-04: quy tắc vật chỉ để xem cho mọi scene).
+  3b'. **Rà lại 2026-11-05:** #96 bỏ (không phải lỗi, vòng kinematic). Mới **#101** (decision 031: mẫu 003 3 carton, thẻ mẫu mang hình của bảng EKZ). Thứ tự còn lại: **#101 → #92 (Concept + Complex cùng lúc) → #99 → #87 → #86 → #97**, rồi bước 5–6 dưới đây.
   3c. **#99** (chờ 12 s trước khi thùng chạy, Basic/Mixed/Complex): sau chuỗi Mixed/Complex ở bước 3, trước #87.
   4. **#87** (sau mọi mục đổi chữ thẻ, chạy công cụ slot một lần) → **#86** → **#97**.
   5. Hợp đồng log: các mục trên **không** tự đổi `layout_version`; cuối đợt đổi một lần "025" → "029" (build có 026–029), `data-analyst` sửa spec + `make_fake_data.R` + `analyse_set.R` một lần (tách Concept, Complex `position_1`, Mixed theo layout), `selftest.R` xanh.
@@ -1433,7 +1434,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Scene(s):** ConceptScene, ComplexScene (+ mọi scene có vật như thế, tìm ở bước kiểm kê)
 - **Files:** ConceptScene `Carton Count Demo`, `Stock STECKER C`, `Layout Slots/EKZ Sample 003|000`, `Lane Flow Demo` riders; ComplexScene `VPE_OpenedPackage`, `SB_OpenedPackage`
 - **Problem:** (R9) Carton đếm, carton trong thùng kho và thùng mẫu EKZ dùng đúng mô hình và nhãn của kiện cầm được nhưng không có `Grabbable`/collider: tay xuyên qua, không phản hồi. Người học nghi ngờ không biết vật nào trong cảnh tương tác được.
-- **Done when:** Ảnh `container` ở bước `cartons` và ảnh của bước 8–9: carton đếm và thùng mẫu EKZ nhìn khác hẳn kiện cầm được ngay từ chỗ đứng (bán trong suốt + viền). Đưa tay vào carton đếm: hiện „Nur zum Ansehen“; tay rời ra thì chữ tắt. `Stock STECKER C` theo phương án chọn sau khi thử kính (mặc định 1–2 carton) và cũng hiện „Nur zum Ansehen“ khi chạm. Ở bước 11 demo ba làn vẫn chạy như #81. Complex: carton đã mở `VPE_OpenedPackage` (vị trí 1) và `SB_OpenedPackage` (vị trí 2) nhìn khác hẳn carton cầm được (cùng kiểu bán trong suốt + viền), còn vòng RING D và vòng kẹp bên trong vẫn đặc như kiện thật và cầm được như trước; chạm carton đã mở thì hiện „Nur zum Ansehen“. (code) Bước kiểm kê đầu mục: mọi object trông như kiện (mesh carton/túi, có nhãn) mà không có `Grabbable` ở cả 5 scene được liệt kê trong test report, và mỗi object đều mang kiểu vật chỉ để xem. (code) Không vật minh hoạ nào có `PackageData` hay `Grabbable`, nên không ghi `grab_*`; `OrderContents.Form` của carton đã mở (`VPEOpenedDisplay`) và Rest không đổi. (code) Quy tắc „vật nào cầm được“ được ghi vào CLAUDE.md.
+- **Done when:** Ảnh `container` ở bước `cartons` và ảnh của bước 8–9: carton đếm và thùng mẫu EKZ nhìn khác hẳn kiện cầm được ngay từ chỗ đứng (bán trong suốt + viền). Đưa tay vào carton đếm: hiện „Nur zum Ansehen“; tay rời ra thì chữ tắt. `Stock STECKER C` giữ đủ 6 carton (người dùng 2026-11-05: màn đếm của #91 và Rest 120 cần đủ 6), cùng kiểu bán trong suốt + viền, và cũng hiện „Nur zum Ansehen“ khi chạm. Hai thùng mẫu EKZ (#101) chỉ đổi kiểu nhìn, không có chữ khi chạm (nằm sau bàn, ngoài tầm tay; decision 031). Ở bước 11 demo ba làn vẫn chạy như #81. Complex: carton đã mở `VPE_OpenedPackage` (vị trí 1) và `SB_OpenedPackage` (vị trí 2) nhìn khác hẳn carton cầm được (cùng kiểu bán trong suốt + viền), còn vòng RING D và vòng kẹp bên trong vẫn đặc như kiện thật và cầm được như trước; chạm carton đã mở thì hiện „Nur zum Ansehen“. (code) Bước kiểm kê đầu mục: mọi object trông như kiện (mesh carton/túi, có nhãn) mà không có `Grabbable` ở cả 5 scene được liệt kê trong test report, và mỗi object đều mang kiểu vật chỉ để xem. (code) Không vật minh hoạ nào có `PackageData` hay `Grabbable`, nên không ghi `grab_*`; `OrderContents.Form` của carton đã mở (`VPEOpenedDisplay`) và Rest không đổi. (code) Quy tắc „vật nào cầm được“ được ghi vào CLAUDE.md.
 - **Bổ sung (người dùng 2026-11-04):** quy tắc áp cho mọi object ở mọi kịch bản: vật trông như kiện mà không cầm được thì phải trông khác hẳn, gồm cả carton đã mở ở Complex.
 - **Inspector work expected:** yes
 - **Công:** S–M
@@ -1493,7 +1494,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Công:** S
 - **Test trên kính:** bắt buộc (đặt vòng bằng tay thật)
 - **Depends on:** — (decision 028: Complex giữ RING D và vòng kẹp; vật mới R19 hoãn)
-- **Status:** todo
+- **Status:** dropped (người dùng 2026-11-05: không phải lỗi. Cả 29 rigidbody ở ComplexScene là kinematic, không trọng lực: vòng nằm yên chỗ thả, không đẩy được vòng khác. Ist nhảy 54/55/56 là do vòng đang cầm đi vào/ra trigger của `PiecesContainerCounter` (đếm cả vật đang cầm); `WRONG_MATERIAL ring_d` là vòng bị lấy ra trước khi xác nhận vị trí 1 rồi bỏ lại vào ở vị trí 2. Vòng nằm lồng vào carton chỉ là chuyện nhìn; mở mục mới nếu buổi test kính thấy cần)
 
 ### #97 [Feature] Dấu ✓ trên thẻ việc ở Basic, Mixed và Complex như Welcome/Concept
 - **Type:** feature
@@ -1544,6 +1545,19 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Decision:** docs/decisions/030-concept-box-hints.md
 - **Test report:** docs/test-reports/bl100.md
 - **Status:** verified-mcp (24/24 ✅, chờ test tay M1–M3)
+
+### #101 [Feature] ConceptScene: mẫu EKZ 003 có 3 carton cùng hướng, thẻ mẫu mang hình của bảng EKZ
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene `Layout Slots/EKZ Sample 003|000` (carton, túi, thẻ), `EKZ Overview` (pictogram dòng 0 và 3, chỉ đọc để copy)
+- **Problem:** (người dùng 2026-11-05, sau #94) Mẫu 003 chỉ có 2 carton nên không thấy được „xếp có thứ tự, cùng hướng“; từ chỗ đứng chỉ đọc được 1 nắp. Mẫu 000 là 2 túi gần như ngay ngắn. Bảng EKZ-Übersicht ở bên phải, mẫu và chú thích ở bên trái (quay đầu khoảng 96°), và không có gì cho thấy dòng nào trên bảng ứng với mẫu nào.
+- **Done when:** Ở ConceptScene bước 8, mẫu 003 có 3 carton KABELVERBINDER A thẳng một cột, cùng hướng, nhãn nắp quay cùng một phía. Ảnh từ chỗ đứng (mắt (0, 1,6, 0), nhìn về chú thích Empf Kz) đọc được cả 3 nắp carton thành một hàng. Ở bước 8 và 9, mẫu 000 có túi SCHRAUBE B nằm nghiêng theo các hướng khác nhau, chồng lên nhau; không carton hay túi nào xuyên thành thùng mẫu. Ở bước 8 và 9, thẻ mẫu 003 có pictogram giống dòng EKZ 3 trên bảng và chữ „Empf Kz 003 = EKZ 3“; thẻ mẫu 000 có pictogram dòng EKZ 0 và „Empf Kz 000 = EKZ 0“; ở EN thẻ giống hệt. Ở bước 9, bảng hiện bên phải như decision 018, dòng 0 và 3 mang đúng pictogram đã thấy trên thẻ mẫu. Ở bước 1–7, 10 và 11 không thấy mẫu nào. (code) Tour vẫn 11 `step_id` cùng index; `ekz_003`/`ekz_000` không đổi chữ hay đáp án; `layout_version` vẫn "029". (code) Mẫu không có `PackageData`, `Grabbable` hay collider, không nằm trong `Hint Zone` nào; `PackageStandardizer.Check()` không báo mẫu.
+- **Inspector work expected:** yes (carton, túi, thẻ của hai mẫu)
+- **Công:** S
+- **Test trên kính:** nhanh (đọc 3 nắp và thẻ mẫu từ chỗ đứng; có nhận ra cùng hình trên bảng không)
+- **Depends on:** #94; làm trước #92 (#92 đổi vẻ ngoài của mẫu). D36 không chặn (decision 031: túi đúng với cả hai câu trả lời)
+- **Decision:** docs/decisions/031-concept-ekz-samples-link-board.md
+- **Status:** todo
 
 ## Feature – Log dữ liệu nghiên cứu
 
