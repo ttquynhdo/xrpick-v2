@@ -73,6 +73,10 @@ Mục tiêu: học xong ConceptScene, người học biết EKZ có 8 mức (0, 
 - (code) Tour vẫn 11 `step_id` cùng index; `ekz_003`/`ekz_000` không đổi chữ hay đáp án; `layout_version` vẫn "029".
 - (code) Mẫu không có `PackageData`, `Grabbable` hay collider, không nằm trong `Hint Zone` nào; `PackageStandardizer.Check()` không báo mẫu.
 
+## Bổ sung 2026-11-05 (khi làm #101)
+- Bàn sau chỉ sâu 34 cm (z 0,97–1,31), nên 3 carton xếp nối theo chiều sâu (36 cm) không vừa. 3 carton nằm nắp lên thành **một hàng từ trái sang phải** khi nhìn từ chỗ đứng (carton xoay 90°, nhãn nắp giữ hướng đọc). Thùng 003 rộng 40 × 21 cm, nằm dưới chú thích Empf Kz. Thùng 000 hẹp lại còn 21 × 32 cm, ở bên trái.
+- Ở Mixed vị trí 1, 3 ô nằm theo cột dọc của thùng đơn. Mẫu vẫn cho thấy cùng ý: 3 carton cùng hướng, sát nhau.
+
 ## Câu hỏi mở
 D36, D35, D38, D22 (đã có trong danh sách câu hỏi cho người hướng dẫn).
 

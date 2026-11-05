@@ -1557,7 +1557,8 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** nhanh (đọc 3 nắp và thẻ mẫu từ chỗ đứng; có nhận ra cùng hình trên bảng không)
 - **Depends on:** #94; làm trước #92 (#92 đổi vẻ ngoài của mẫu). D36 không chặn (decision 031: túi đúng với cả hai câu trả lời)
 - **Decision:** docs/decisions/031-concept-ekz-samples-link-board.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl101.md
+- **Status:** verified-mcp (11/12 ✅, chờ test tay H1 trên kính; nhánh `feat/101-concept-ekz-samples`; 3 carton xếp hàng ngang vì bàn sau chỉ sâu 34 cm, thùng 000 hẹp lại 21 cm)
 
 ## Feature – Log dữ liệu nghiên cứu
 
