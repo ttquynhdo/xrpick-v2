@@ -904,7 +904,10 @@ ignored_counts <- v2_events %>% filter(event == "confirm_ignored") %>%
 #
 # wait_s = time the trainee is blocked by a box change BEFORE task_completed.
 #   The red button is blocked from the moment a position is done (the box
-#   starts after a 0.6 s startDelay) until the new storage box stands at the
+#   starts after PositionStockSwitcher.startDelay, never assumed here: the
+#   interval runs from the logged trigger to the logged arrived line, so the
+#   delay is whatever the build did; layout "033" waits 4 s, "032" and older
+#   0.6 s, decision 033) until the new storage box stands at the
 #   work spot (storage_in arrived). The old box (storage_out) keeps riding
 #   after that, but the trainee can already work. So there is one blocked
 #   interval per storage_in ride: from its trigger to its arrived line.
@@ -1015,6 +1018,65 @@ if (nrow(ride_rows) > 0) {
     summarise(ev_wait_after_done_s = round(sum(after_s), 3), .groups = "drop")
 }
 wait_stats <- full_join(wait_before, wait_after, by = c("session_id", "scene", "scene_visit"))
+
+# Start delay per ride (decision 033, #99): logged trigger -> station_move_start,
+# active time. Taken from the data, never assumed. Trigger = position_completed
+# of the position the ride belongs to (storage_out / order_box: that position;
+# storage_in p > 1: position p - 1); storage_in position 1 (Complex box 1):
+# the last quiz_answer before it. Layout "033" waits 4 s after a correct
+# confirm (Complex box 1 still 0.6 s), "032" and older 0.6 s, so the two
+# station_wait groups are never pooled: station_waits.csv carries the group,
+# data_quality.csv says mixed_station_wait, and a delay far from what the
+# layout promises is warned (e.g. a build whose Inspector value was not set).
+station_wait_group <- function(layout_version) {
+  lay <- suppressWarnings(as.integer(layout_version))
+  case_when(is.na(lay) ~ NA_character_, lay >= 33L ~ "033_on", TRUE ~ "before_033")
+}
+# Only the rides decision 033 changed are checked: storage_out and
+# storage_in p > 1 start startDelay after the correct confirm. NA (not
+# checked) for order_box (it waits until the storage box has cleared the
+# station, so its delay is startDelay + the clearing ride) and for Complex
+# box 1 (revealDelay after the quiz, unchanged by 033).
+expected_start_delay_s <- function(layout_version, what, position) {
+  group <- station_wait_group(layout_version)
+  checked <- !is.na(group) & (what == "storage_out" | (what == "storage_in" & position > 1L))
+  if_else(checked, if_else(group == "033_on", 4, 0.6), NA_real_)
+}
+station_waits <- ride_rows %>%
+  mutate(done_position = if_else(what == "storage_in", position - 1L, position)) %>%
+  left_join(pos_done_t, by = c("session_id", "scene", "scene_visit", "done_position")) %>%
+  left_join(quiz_trigger %>% transmute(session_id, scene, scene_visit, position,
+                                       what = "storage_in", quiz_trigger_t),
+            by = c("session_id", "scene", "scene_visit", "position", "what")) %>%
+  mutate(trigger_t = if_else(what == "storage_in" & position == 1L, quiz_trigger_t, done_t),
+         start_delay_s = if_else(is.na(trigger_t), NA_real_,
+                                 round(start_t - trigger_t - paused_between(session_id, trigger_t, start_t), 3)),
+         ride_s = if_else(is.na(arrived_t), NA_real_,
+                          round(arrived_t - start_t - paused_between(session_id, start_t, arrived_t), 3))) %>%
+  left_join(sessions %>% select(session_id, participant_id, layout_version), by = "session_id") %>%
+  mutate(station_wait_group = station_wait_group(layout_version),
+         expected_delay_s = expected_start_delay_s(layout_version, what, position),
+         # 0.5 s slack: frame timing and the 0.001 s steps between log lines.
+         delay_unexpected = coalesce(abs(start_delay_s - expected_delay_s) > 0.5, FALSE)) %>%
+  select(participant_id, session_id, layout_version, station_wait_group, scene, scene_visit, what, position,
+         trigger_t, start_t, arrived_t, start_delay_s, expected_delay_s, delay_unexpected, ride_s) %>%
+  arrange(participant_id, session_id, scene_visit, start_t)
+odd_delay <- station_waits %>% filter(delay_unexpected)
+for (i in seq_len(nrow(odd_delay))) {
+  warn(odd_delay$participant_id[i], " ", odd_delay$scene[i], " ", odd_delay$what[i], " position ",
+       odd_delay$position[i], ": station start delay ", odd_delay$start_delay_s[i], " s, layout ",
+       coalesce(odd_delay$layout_version[i], "none"), " expects ", odd_delay$expected_delay_s[i],
+       " s (startDelay set differently in this build?)")
+}
+station_wait_groups_in_set <- sort(unique(na.omit(station_wait_group(
+  sessions$layout_version[!sessions$schema_version %in% 1L]))))
+mixed_station_wait_set <- length(station_wait_groups_in_set) > 1
+if (mixed_station_wait_set) {
+  warn("set mixes station start delays (layout before \"033\": 0.6 s, from \"033\": 4 s, decision 033): ",
+       "wait_s / wait_after_done_s / station_waits.csv are split by station_wait_group, never pooled; ",
+       "time_to_correct_by_scene.png uses time_to_correct_s minus wait_s")
+}
+write_csv(station_waits, file.path(output_dir, "station_waits.csv"), na = "")
 
 # Sessions that measured outcomes (rule at the top of this section).
 session_outcome <- sessions %>%
@@ -1246,6 +1308,14 @@ visits <- visits_base %>%
     attempts_to_correct = tc_attempts_to_correct,
     time_to_first_confirm_s = coalesce(tc_time_to_first_confirm_s, time_to_first_confirm_presses),
     time_to_correct_s = tc_time_to_correct_s,
+    # Decision 033: Mixed and Complex time_to_correct_s (logged by the app)
+    # spans the box change, so it holds the start delay (0.6 s up to "032",
+    # 4 s from "033"). Net = minus wait_s (both active time, wait_s cut at
+    # task_completed), comparable across layouts; used in the chart.
+    time_to_correct_net_s = if_else(red_button & !is.na(time_to_correct_s),
+                                    round(time_to_correct_s - coalesce(wait_s, 0), 3), NA_real_),
+    # "before_033" / "033_on" (NA without layout_version): never pool wait_s across groups.
+    station_wait_group = if_else(red_button, station_wait_group(layout_version), NA_character_),
     # Error rate per visit: share of presses with >= 1 code; NA when 0 presses.
     error_rate = if_else(!is.na(confirm_count) & confirm_count > 0,
                          presses_with_error / confirm_count, NA_real_),
@@ -1571,6 +1641,9 @@ data_quality <- sessions %>%
     # TRUE on every row when the set holds more than one layout_version
     # (section 8b): Concept figures are split by layout, never pooled.
     mixed_layout = mixed_layout_set,
+    # TRUE on every row when the set holds builds with the 0.6 s and the 4 s
+    # station start delay (decision 033): wait_s is split, never pooled.
+    mixed_station_wait = mixed_station_wait_set,
     n_crashes = sum(end_status == "crash"),
     # end_status of the participant = how their last session ended.
     end_status = last(end_status),
@@ -1620,7 +1693,7 @@ data_quality <- sessions %>%
                   duplicate_files), ~ coalesce(.x, 0L)),
          error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
-         mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, mixed_layout, gap_h, n_crashes, resume_offered, resume_declined,
+         mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, mixed_layout, mixed_station_wait, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, interaction_logged,
@@ -1991,7 +2064,11 @@ ttc_people <- visits %>% filter(outcome_logged) %>%
   mutate(scene = chart_scene(scene, session_id)) %>%
   group_by(participant_id, scene) %>%
   summarise(has_counting = any(counting & confirm_count > 0, na.rm = TRUE),
-            time_to_correct_s = if (has_counting) time_to_correct_s[counting & confirm_count > 0][1] else NA_real_,
+            # Picking scenes: minus the box-change wait (decision 033), so the
+            # 0.6 s and 4 s start-delay builds stay comparable; Concept: as logged.
+            time_to_correct_s = if (has_counting) {
+              coalesce(time_to_correct_net_s, time_to_correct_s)[counting & confirm_count > 0][1]
+            } else NA_real_,
             reached = has_counting & !is.na(time_to_correct_s), .groups = "drop")
 if (!any(ttc_people$reached)) {
   p_ttc <- empty_chart(title_ttc)
@@ -2011,7 +2088,7 @@ if (!any(ttc_people$reached)) {
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.25))) +
     labs(title = title_ttc,
          subtitle = paste0("Active time (pauses removed) from scene start to the first correct confirm, ",
-                           "counting visit. 'never' = no correct confirm in it (survivor bias)."),
+                           "counting visit, box-change waits (wait_s) removed. 'never' = no correct confirm in it (survivor bias)."),
          x = "Scene (build order)", y = "Time to correct (s, active)") +
     theme_minimal(base_size = 11) +
     theme(axis.text.x = element_text(angle = 25, hjust = 1))
@@ -3186,6 +3263,7 @@ validity_limits <- c(
   "- Mixed position_1 (#94, decision 028): builds before #94 had Empf Kz 000 there (placement never rated), from #94 (line.empf_kz logged, layout \"029\") Empf Kz 003 (3 snap places, EKZ_PLACEMENT possible); an earlier \"029\" build without the field counts as 000. In a set with both, position_1 is split ([Empf Kz 000] / [Empf Kz 003]) in first_attempt_by_item.png and time_by_phase.png; the per-scene Mixed numbers (error_rate_MixedPickingScene, time_to_correct, error codes) still pool both and an Empf Kz 003 visit can have more presses (EKZ retries). The ekz_placement rate counts only presses with the right quantity at an Empf Kz 003 position (EKZ opportunities): its n is small and a wrong-quantity press is no EKZ attempt.",
   "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card). In a set with both levels position_1 is split in first_attempt_by_item.png and time_by_phase.png; the per-scene Complex numbers (time_to_correct_by_scene.png, error_codes_by_scene.png) still pool both levels.",
   "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts lane_demo_delay_s (4 s) after the step; older layouts have NA, not 0.",
+  "- Station start delay (decision 033, station_waits.csv): from layout \"033\" the boxes wait 4 s after a correct confirm before they ride (Complex box 1 after the remainder quiz: 0.6 s), before \"033\" 0.6 s. wait_s, wait_after_done_s and the per-scene active_s include this wait, so they are never pooled across station_wait_group; time_to_correct_by_scene.png uses time_to_correct_s minus wait_s for the picking scenes (wide.csv keeps the logged time_to_correct_s). wait_after_done_s starts at the first ride, not at task_completed, so it leaves out the start delay after the last confirm.",
   "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).")
 # The pilot set (decision 023) is a try-out of the course and of this
 # analysis, not study data: say so on every pilot report.

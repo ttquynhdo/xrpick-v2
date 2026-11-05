@@ -25,7 +25,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P814, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P815, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -382,6 +382,8 @@ active_s <- function(s) round(s$t - s$v$enter_t - s$v$paused_s - open_pause_part
 # layout: header layout_version (schema 2 only). "025" = the current build
 # (Concept tour with "Zurück", #80); "019" = a build before #80 (no Zurück:
 # the tour only goes forward or "Von vorn"), as in the pilot session P811.
+# "033" (decision 033, #99): the boxes wait 4 s instead of 0.6 s after a
+# correct confirm before station_move_start (pilot P815).
 # interaction: FALSE = a build before #29 (no "interaction" in event_groups,
 # no interaction events, via null after the first scene, empty summary columns).
 start_session <- function(person, build, start_utc, start_mode = "manual",
@@ -899,10 +901,32 @@ ride_wait <- function(s, press_position) {
   }
 }
 
+# PositionStockSwitcher.startDelay after a correct confirm: 0.6 s up to
+# layout "032", 4 s from "033" (decision 033, #99). station_move_start is
+# written after it. The first Complex box after the remainder quiz keeps
+# 0.6 s in every layout (ride_first_box_in has no extra delay here).
+station_start_delay <- function(layout) if (layout_at_least(layout, 33)) 4 else 0.6
+
+# The wait before the boxes start. From "033" the station already counts as
+# moving during the wait, so a trainee may press the red button then
+# (confirm_ignored station_moving). Extra random draws only for "033" builds,
+# so older fake participants keep exactly the same numbers.
+start_delay_wait <- function(s, press_position) {
+  delay <- station_start_delay(s$layout)
+  if (layout_at_least(s$layout, 33) && runif(1) < 0.5) {
+    early <- runif(1, 1.0, 3.0)
+    advance(s, early)
+    ignore_confirm(s, "station_moving", press_position)
+    advance(s, delay - early)
+  } else {
+    advance(s, delay)
+  }
+}
+
 # Between positions: the old storage box leaves (storage_out, the position
 # just done), the next one comes in (storage_in, the new position).
 ride_between_positions <- function(s, done_pos) {
-  advance(s, 0.6)  # PositionStockSwitcher startDelay
+  start_delay_wait(s, done_pos + 1)  # PositionStockSwitcher startDelay
   emit(s, "station_move_start", json_obj(what = "storage_out", position = done_pos))
   advance(s, 0.001)
   emit(s, "station_move_start", json_obj(what = "storage_in", position = done_pos + 1))
@@ -923,7 +947,7 @@ ride_first_box_in <- function(s) {
 # Order done: the last storage box leaves, the order box follows once the
 # storage box has cleared the station (OrderBoxConveyor.stationStock).
 ride_order_end <- function(s, last_pos) {
-  advance(s, 0.6)
+  advance(s, station_start_delay(s$layout))  # same startDelay as between positions
   emit(s, "station_move_start", json_obj(what = "storage_out", position = last_pos))
   advance(s, 1.2)
   emit(s, "station_move_start", json_obj(what = "order_box", position = last_pos))
@@ -1718,6 +1742,15 @@ p814 <- new_person("P814")
 run_full_course(p814, "aaa1111", "2026-11-06T18:00:00Z", language = "EN", layout = "032",
                 special = list(ConceptScene = list(hints = p814_hints)))
 
+# P815: a layout "033" build (decision 033, #99). Same Concept as "032"
+# (p814_hints: STECKER C cartons from the storage container); in Basic, Mixed
+# and Complex the boxes wait 4 s after a correct confirm before
+# station_move_start (Complex box 1 after the remainder quiz still 0.6 s).
+# analyse.R must take the wait from the data and never pool it with "032".
+p815 <- new_person("P815")
+run_full_course(p815, "bbb2222", "2026-11-06T20:00:00Z", language = "EN", layout = "033",
+                special = list(ConceptScene = list(hints = p814_hints)))
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1770,7 +1803,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P814  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P815  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -1834,7 +1867,8 @@ paper_rows <- list(
   paper_row("P811"),
   paper_row("P812"),
   paper_row("P813"),
-  paper_row("P814"))
+  paper_row("P814"),
+  paper_row("P815"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

@@ -10,8 +10,9 @@ public static class ResearchEventData
     // Station layout: "019" = three lanes (decision 019); "025" = plus the ConceptScene of decisions 024/025
     // (three lanes in Concept, tour with Zurück, #80); "029" = plus the Concept containers that count and hint
     // (decision 030, #91/#100: Ist follows the order container, concept_hint_* events); "032" = Concept picks from the storage container (decision 032, #92: grabbable
-    // storage cartons, container_* in Concept for order and storage, quiz label_by_matnr). R tells logs apart by it.
-    public const string LayoutVersion = "032";
+    // storage cartons, container_* in Concept for order and storage, quiz label_by_matnr); "033" = picking scenes wait 4 s
+    // after a correct confirm before the containers ride (decision 033, #99). R tells logs apart by it.
+    public const string LayoutVersion = "033";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
     public static readonly string[] EventGroups = { "session", "outcome", "interaction" };

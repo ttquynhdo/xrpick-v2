@@ -28,7 +28,7 @@ local({
   source("analysis/analyse.R", local = TRUE)
 
   # 2. One row per study participant: P101-P115; the test ID P950 is dropped,
-  #    the pilot IDs P801-P803, P811-P814 are in their own set (8q).
+  #    the pilot IDs P801-P803, P811-P815 are in their own set (8q).
   stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
@@ -460,7 +460,7 @@ local({
   missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
   if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
   stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
-  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814")
+  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815")
   stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
             identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
   is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
@@ -574,7 +574,7 @@ local({
   stopifnot(any(grepl("concept_hint_cleared without a preceding", p_warn) & grepl("P813", p_warn)),
             sum(grepl("concept_hint_", p_warn, fixed = TRUE)) == 1, !any(grepl("concept_hint_", warn_lines, fixed = TRUE)))
   # Older layouts: no tags existed, so every hint column is NA (not 0).
-  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814"))
+  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815"))
   stopifnot(nrow(old_v) > 0, !any(old_v$hints_logged), all(is.na(old_v$hints_shown)),
             all(is.na(old_v$hint_shown_s)), all(is.na(old_v$material_flow_wait_max_s)))
   stopifnot(nrow(concept_hints_by_visit) > 0, !any(concept_hints_by_visit$hints_logged),
@@ -623,7 +623,7 @@ local({
                                                       pilot_set$visits$scene == "ConceptScene"]))
   # Older layouts: NA, not 0; no container warnings on the fake data.
   stopifnot(all(is.na(pilot_set$concept_containers_by_visit$order_enters[
-              pilot_set$concept_containers_by_visit$participant_id != "P814"])),
+              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815")])),
             !any(concept_containers_by_visit$containers_logged),
             !any(grepl("container_\\* line|ConceptScene (order|storage) container", c(p_warn, warn_lines))))
   # label_by_matnr replaces material_by_matnr from "032", same skill.
@@ -641,13 +641,15 @@ local({
             all(cp1$scaffold_level[cp1$participant_id %in% c("P811", "P812")] == "quiz_visible"),
             all(is.na(p_items$scaffold_level[!(p_items$scene == "ComplexScene" & p_items$item == "position_1")])))
   cx <- as.character(pilot_set$item_shares$x_label[pilot_set$item_shares$scene == "ComplexScene"])
-  stopifnot(all(c("Complex\nposition_1\n[019/025]", "Complex\nposition_1\n[029]", "Complex\nposition_2") %in% cx),
+  # The result_on_card label lists every layout of that level: P813 "029",
+  # P814 "032", P815 "033".
+  stopifnot(all(c("Complex\nposition_1\n[019/025]", "Complex\nposition_1\n[029/032/033]", "Complex\nposition_2") %in% cx),
             !"Complex\nposition_1" %in% cx,
             any(grepl("set mixes Complex position_1 scaffold", p_warn)),
             !any(grepl("set mixes Complex position_1 scaffold", warn_lines)),
             !any(grepl("\\[", as.character(item_shares$x_label))))
   slots <- levels(pilot_set$proc_long$slot)
-  stopifnot(all(c("Complex\nposition 1\n[019/025]", "Complex\nposition 1\n[029]", "Complex\nposition 2") %in% slots))
+  stopifnot(all(c("Complex\nposition 1\n[019/025]", "Complex\nposition 1\n[029/032/033]", "Complex\nposition 2") %in% slots))
   pp <- read_csv(file.path(pilot_dir, "process_by_position.csv"), show_col_types = FALSE,
                  col_types = cols(layout_version = col_character()))
   stopifnot(all(c("layout_version", "scaffold_level") %in% names(pp)),
@@ -656,6 +658,45 @@ local({
             all(is.na(pp$scaffold_level[!(pp$scene == "ComplexScene" & pp$position == 1)])))
   # The hint event names are in the catalogue (no "not in the v2 catalogue" note for them).
   stopifnot(all(c("concept_hint_shown", "concept_hint_cleared") %in% pilot_set$known_events))
+
+  # 8v. Station start delay (#99, decision 033). P815 ran a "033" build: the
+  #     boxes start 4 s after a correct confirm (storage_out, storage_in p > 1),
+  #     P814 ("032") and the study set 0.6 s. R takes the delay from the data
+  #     (trigger -> station_move_start), never assumes it, and never pools the
+  #     two groups.
+  stopifnot(file.exists(file.path(pilot_dir, "station_waits.csv")),
+            file.exists(file.path(output_dir, "station_waits.csv")))
+  stopifnot(identical(pilot_set$station_wait_group(c("019", "032", "033", "034", NA)),
+                      c("before_033", "before_033", "033_on", "033_on", NA)))
+  sw <- pilot_set$station_waits
+  sw815 <- sw %>% filter(participant_id == "P815", !is.na(expected_delay_s))
+  sw814 <- sw %>% filter(participant_id == "P814", !is.na(expected_delay_s))
+  stopifnot(nrow(sw815) == 6, all(sw815$station_wait_group == "033_on"), all(abs(sw815$start_delay_s - 4) < 0.05),
+            nrow(sw814) == 6, all(sw814$station_wait_group == "before_033"), all(abs(sw814$start_delay_s - 0.6) < 0.05),
+            !any(sw$delay_unexpected), !any(station_waits$delay_unexpected),
+            all(station_waits$station_wait_group[!is.na(station_waits$expected_delay_s)] == "before_033"),
+            !any(grepl("station start delay", c(p_warn, warn_lines))))
+  # Complex box 1 (after the quiz) and the order box are not checked (NA).
+  stopifnot(all(is.na(sw$expected_delay_s[sw$what == "order_box" |
+                                            (sw$what == "storage_in" & sw$position == 1)])))
+  # wait_s = the logged delay + the storage_in ride, whatever the delay was.
+  for (pid in c("P814", "P815")) {
+    v <- pilot_set$visits %>% filter(participant_id == pid, scene == "MixedPickingScene")
+    r <- sw %>% filter(participant_id == pid, scene == "MixedPickingScene", what == "storage_in", position == 2)
+    stopifnot(nrow(v) == 1, nrow(r) == 1, abs(v$wait_s - (r$start_delay_s + r$ride_s)) < 0.01,
+              v$station_wait_group == if (pid == "P815") "033_on" else "before_033",
+              abs(v$time_to_correct_net_s - (v$time_to_correct_s - v$wait_s)) < 0.002)
+    # read_s of position 2 starts when its box has arrived: the wait is not in it.
+    pr <- pilot_set$process %>% filter(participant_id == pid, scene == "MixedPickingScene", position == 2)
+    stopifnot(nrow(pr) == 1, abs(pr$start_t - r$arrived_t) < 0.002)
+  }
+  w815 <- pilot_set$visits$wait_s[pilot_set$visits$participant_id == "P815" & pilot_set$visits$scene == "MixedPickingScene"]
+  w814 <- pilot_set$visits$wait_s[pilot_set$visits$participant_id == "P814" & pilot_set$visits$scene == "MixedPickingScene"]
+  stopifnot(w815 - w814 > 2.5)
+  # Never pooled: the pilot set mixes both groups and says so, the study set does not.
+  stopifnot(all(pilot_set$data_quality$mixed_station_wait), !any(data_quality$mixed_station_wait),
+            any(grepl("set mixes station start delays", p_warn)),
+            !any(grepl("set mixes station start delays", warn_lines)))
 
   # 8u. Mixed position 1 Empf Kz (#94, decision 028). P813 ("029") logs
   #     line.empf_kz; its fixed Mixed presses: TOO_FEW, TOO_FEW, EKZ_PLACEMENT,

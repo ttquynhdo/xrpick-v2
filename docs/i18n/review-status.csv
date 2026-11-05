@@ -29,7 +29,7 @@ complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026
 complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
 complex.end.summary,"• Einen Auftrag im LVS ablesen\n• Das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n• Volle Kartons und lose Teile berechnen\n• Kartons nach EKZ einlegen\n• Mehrere Positionen nacheinander kommissionieren\n• Der rote Knopf steht für das Bestätigen mit dem Fuß",proposed,german-reviewer (agent),2026-11-04,#65
 basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,,2026-11-03,#62
-mixed.feedback.position_done,Position {position} ist erledigt.\nLesen Sie im LVS die Angaben von Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-01,#21
+mixed.feedback.position_done,"Position {position} ist erledigt.\nDer Lagerbehälter fährt weg, der nächste kommt von links. Sehen Sie den Behältern auf der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab.",proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie die Kartons nach der EKZ in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-01,#41
 order.feedback.ekz3_loose,Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.,proposed,german-reviewer (agent),2026-11-01,"#41, ""Nicht alle"" per reviewer"
 concept.tour.material_flow.title,Weg der Behälter,proposed,german-reviewer (agent),2026-11-02,#49
@@ -49,10 +49,11 @@ complex.example.body,"Soll 64 ST, VPE 20 ST
 2. 64 - 60 = 4 lose Teile
 Kontrolle: 60 + 4 = 64 ST",proposed,german-reviewer (agent),2026-11-02,#19
 complex.feedback.position_done,"Position {done} ist erledigt.
-Lesen Sie im LVS die Angaben zu Position {next} ab.",proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+Der Lagerbehälter fährt weg, der nächste kommt von links. Sehen Sie den Behältern auf der Rollenbahn zu.
+Lesen Sie dann im LVS die Angaben zu Position {next} ab.",proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-02,#53 (quiz hint moved to card 1)
 complex.card.step1_body_position1,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll), VPE (<nobr>Verp.-Einh.</nobr>) und EKZ (<nobr>Empf Kz</nobr>). Beantworten Sie dann die Fragen unter dem Bildschirm. Das „Beispiel“ rechts daneben hilft beim Rechnen.",proposed,,2026-11-03,#62
-basic.result.correct.text,Der Auftrag ist richtig. Wählen Sie jetzt im Menü „4. Mehrere Positionen“.,proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional '… auswählen', left to #13"
+basic.result.correct.text,Der Auftrag ist richtig.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.\nWählen Sie danach im Menü „4. Mehrere Positionen“.,proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 basic.result.correct.title,Richtig!,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 basic.result.incorrect.title,Nicht richtig,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 basic.step1.text,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll), VPE (<nobr>Verp.-Einh.</nobr>), EKZ (<nobr>Empf Kz</nobr>). Rest: So viele Stück bleiben nach dem Auftrag im Lagerbehälter.",proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional 'Restmenge (Rest):' for parallel form, left to #13"
@@ -77,7 +78,7 @@ entry.resume.restart,Neu beginnen,proposed,german-reviewer (agent),2026-11-02,"A
 entry.testmode,Testmodus – wird nicht ausgewertet,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.warning.continue,Trotzdem starten,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 complex.end.code,Code: {participant_id},proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-complex.feedback.correct,Volle Kartons und loses Material stimmen mit dem Auftrag überein.,proposed,german-reviewer (agent),2026-11-03,"Agent: OK; optional 'Die vollen Kartons und das lose Material …', left to #13"
+complex.feedback.correct,Volle Kartons und loses Material stimmen mit dem Auftrag überein.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 concept.label.default_body,"Nehmen Sie eine Verpackung in die Hand. Hier sehen Sie, was auf dem Etikett steht.",proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.label.default_title,1. Etikett lesen,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.label.matnr,Mat.-Nr: {matnr} – die Materialnummer. Dieselbe Nummer steht im LVS.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
@@ -101,7 +102,7 @@ lesson.concept,2. Grundlagen,proposed,german-reviewer (agent),2026-11-03,Agent:
 lesson.mixed,4. Mehrere Positionen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 lesson.welcome,1. Einführung,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 menu.title,MENÜ,proposed,german-reviewer (agent),2026-11-03,Agent: OK; new in #54 (was English MENU)
-mixed.feedback.correct,Alle Materialien und Mengen stimmen mit dem Auftrag überein.\nWählen Sie jetzt im Menü „{next_lesson}“.,proposed,german-reviewer (agent),2026-11-03,"Agent: OK; length checked on the Result card in en (#54), fits"
+mixed.feedback.correct,Alle Materialien und Mengen stimmen mit dem Auftrag überein.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.\nWählen Sie danach im Menü „{next_lesson}“.,proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 order.feedback.empty,Der Auftragsbehälter ist leer. Legen Sie das Material des Auftrags hinein.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 order.feedback.extra_loose,Zu viel loses Material {name}. Rechnen Sie nach: Sollmenge minus Stückzahl der vollen Kartons.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 order.feedback.missing_loose,Zu wenig loses Material {name}. Rechnen Sie nach: Sollmenge minus Stückzahl der vollen Kartons.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)

@@ -63,8 +63,13 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
     [Tooltip("Wait at each corner in seconds.")]
     [SerializeField] private float cornerPause = 0.3f;
 
-    [Tooltip("Seconds between the confirm and the first movement, so the result card is read first.")]
-    [SerializeField] private float startDelay = 0.6f;
+    // #99, decision 033: time to read the result card and look at the station before a box moves after a confirm.
+    [Tooltip("Seconds between a correct confirm and the first movement, so the result card is read first (decision 033: 4 s).")]
+    [SerializeField] private float startDelay = 4f;
+
+    // #99: the first box of ComplexScene comes in after the division question, not after a confirm.
+    [Tooltip("Seconds before the first box rides in after RevealFirstSet.")]
+    [SerializeField] private float revealDelay = 0.6f;
 
     [Tooltip("A leaving box has left the station once it is this far from the work spot (metres).")]
     [SerializeField] private float clearDistance = 0.7f;
@@ -163,7 +168,7 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
             return;
 
         firstRevealed = true;
-        StartArrival(0);
+        StartArrival(0, revealDelay);
     }
 
     private void OnLineAdvanced(int position)
@@ -175,7 +180,7 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
 
         // Activate the next box now (hidden in the hood): the container computes Rest right after this event.
         StartDeparture(next - 1);
-        StartArrival(next);
+        StartArrival(next, startDelay);
     }
 
     private void OnOrderCompleted()
@@ -186,7 +191,7 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
         }
     }
 
-    private void StartArrival(int index)
+    private void StartArrival(int index, float delay)
     {
         StockSet set = sets[index];
         var riders = new List<Transform>();
@@ -212,7 +217,7 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
         }
 
         var ride = new Ride(box, riders, path, hideAtEnd: false);
-        StartRide(ride, () => ride.Done, OutcomeEvents.MoveStorageIn, index + 1);
+        StartRide(ride, () => ride.Done, OutcomeEvents.MoveStorageIn, index + 1, delay);
     }
 
     private void StartDeparture(int index)
@@ -238,25 +243,26 @@ public class PositionStockSwitcher : MonoBehaviour, IStationStock
         Vector3 start = box.position;
         var ride = new Ride(box, riders, departurePath, hideAtEnd: true);
         StartRide(ride, () => ride.Done || (box.position - start).magnitude >= clearDistance,
-            OutcomeEvents.MoveStorageOut, index + 1);
+            OutcomeEvents.MoveStorageOut, index + 1, startDelay);
     }
 
     // what and position go into station_move_start / _arrived (#28, decision 021): the position just finished
-    // for a box leaving, the new one for a box arriving.
-    private void StartRide(Ride ride, Func<bool> clearOfStation, string what, int position)
+    // for a box leaving, the new one for a box arriving. The station counts as moving from here on, also during
+    // the delay (#99): the red button is ignored and the riders can't be grabbed while the trainee reads.
+    private void StartRide(Ride ride, Func<bool> clearOfStation, string what, int position, float delay)
     {
         rides.Add(ride);
         blockingRides++;
         ride.Freeze();
-        StartCoroutine(RunRide(ride, what, position));
+        StartCoroutine(RunRide(ride, what, position, delay));
         StartCoroutine(WaitUntilClear(clearOfStation));
     }
 
-    private IEnumerator RunRide(Ride ride, string what, int position)
+    private IEnumerator RunRide(Ride ride, string what, int position, float delay)
     {
-        if (startDelay > 0f)
+        if (delay > 0f)
         {
-            yield return new WaitForSeconds(startDelay);
+            yield return new WaitForSeconds(delay);
         }
 
         ResearchLogger.LogStationMove(false, what, position);

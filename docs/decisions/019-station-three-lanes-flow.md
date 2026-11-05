@@ -1,7 +1,7 @@
 # Quyết định 019: Ba làn ở trạm, thùng chạy tự động ở Mixed/Complex, bảng 10 bước ở Concept
 
 - **Backlog:** #71 (Mixed, Complex, Concept, Welcome); Basic tách thành #72
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (một câu về thời gian sửa bởi 033)
 - **Ngày:** 2026-11-03
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer, data-analyst → decision-synthesizer (hai vòng)
 - **Lựa chọn của người dùng (2026-11-03):** phương án D' (ba làn, học viên không tự kéo thùng, có cách cho thấy cả quy trình thật). Basic tách thành mục riêng. Thùng kho 1 của Complex trượt vào từ trái sau quiz. Thùng kế tiếp ẩn, chỉ chạy vào khi cần. **Làn giữa là dải con lăn ở giữa hai thùng** (người dùng đọc ảnh, sửa bản nháp coi khe chỉ là cầu nối). Làn trái va cột giá thẻ thì dời cột. Chữ Đức theo bản nháp, qua `german-reviewer`.
@@ -41,7 +41,7 @@ Bảng bấm giờ „OIS2 Kommi2“ (`old/LOU2_TC-K2+TMA_OIS2.xlsx`, hàng 10�
 - Thùng kho kế tiếp ẩn tới khi cần, hiện ra ở đoạn làn trái khuất dưới/sau bàn sau, chạy tới rồi rẽ vào chỗ làm việc. Bắt đầu cùng lúc với thùng cũ đi (bước 9 „parallel“).
 - Thùng kho cũ cùng kiện bên trong (kiện đang cầm trên tay không bị mang; carton mở của Complex đi theo) trượt ngang sang làn giữa rồi chạy ra sau, dưới bàn sau. Thùng chỉ tắt khi đã khuất, không biến mất trong tầm nhìn.
 - Kiện trong thùng đang chạy không cầm được, cầm được lại khi thùng dừng, đúng kích thước (không đổi scale, hết lỗi `GrabFreeTransformer`). Nút đỏ không có tác dụng khi thùng chạy. Một kiện đếm một lần. Đường đi của thùng kho không cắt trigger thùng đơn. Coroutine dừng sạch ở `OnDisable`.
-- Thẻ kết quả hiện trước, rồi mới có chuyển động. **Logic** (`AdvanceToNextLine` / `LineAdvanced`, counter, validator) đổi position ngay khi xác nhận (giữ thứ tự log). **Hiển thị** (dialog WMS, highlight thẻ 1 của #40) đổi khi thùng mới đã dừng (giả định D27). Từ lúc bấm tới lúc thùng mới dừng ≈≤ 4 s.
+- Thẻ kết quả hiện trước, rồi mới có chuyển động. **Logic** (`AdvanceToNextLine` / `LineAdvanced`, counter, validator) đổi position ngay khi xác nhận (giữ thứ tự log). **Hiển thị** (dialog WMS, highlight thẻ 1 của #40) đổi khi thùng mới đã dừng (giả định D27). Từ lúc bấm tới lúc thùng mới dừng ≈≤ 4 s *(sửa bởi decision 033: chờ 4 s để đọc thẻ rồi mới chạy, tổng khoảng 7 s)*.
 - **Complex:** thùng kho 1 ẩn lúc đầu; trả lời đúng cả hai câu quiz thì nó chạy vào từ làn trái thay cho phóng to (`RevealFirstSet` vẫn là điểm kích hoạt).
 
 **3. Cho thấy 10 bước (không thêm thao tác)**

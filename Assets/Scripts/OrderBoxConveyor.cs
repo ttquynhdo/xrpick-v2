@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Oculus.Interaction;
@@ -50,6 +51,12 @@ public class OrderBoxConveyor : MonoBehaviour
     /// counters stop logging container_enter/exit (a ride or a held package left behind is not a trainee action).
     /// </summary>
     public bool IsShipped { get; private set; }
+
+    /// <summary>
+    /// #99, decision 033: raised once when the order container really starts to move (after the storage container
+    /// has left), so cues and the end panel can follow the ride.
+    /// </summary>
+    public event Action Departed;
 
     private void OnEnable()
     {
@@ -162,6 +169,7 @@ public class OrderBoxConveyor : MonoBehaviour
         // #28, decision 021: logged when the box really starts; Complex has ended the session by then (spec 4.2).
         int position = LastPosition();
         ResearchLogger.LogStationMove(false, OutcomeEvents.MoveOrderBox, position);
+        Departed?.Invoke();
         yield return LaneRide.Path(transform, riders, path, speed, cornerPause);
         ResearchLogger.LogStationMove(true, OutcomeEvents.MoveOrderBox, position);
         slide = null;

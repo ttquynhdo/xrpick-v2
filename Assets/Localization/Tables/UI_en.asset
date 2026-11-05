@@ -160,7 +160,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627358
     m_Localized: "The order is correct.\nThe order container moves onto the middle
-      lane and leaves.\nNow choose \u201C4.\_Several positions\u201D in the menu."
+      lane and leaves. Watch the containers on the roller conveyor.\nThen choose
+      \u201C4.\_Several positions\u201D in the menu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
@@ -217,15 +218,16 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627371
     m_Localized: "All materials and quantities match the order.\nThe order container
-      moves onto the middle lane and leaves.\nNext, choose \u201C{next_lesson}\u201D
-      in the menu."
+      moves onto the middle lane and leaves. Watch the containers on the roller conveyor.\nNext,
+      choose \u201C{next_lesson}\u201D in the menu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
     m_Localized: 'The full cartons and the loose material match the order.
 
       The
-      order container moves onto the middle lane and leaves.'
+      order container moves onto the middle lane and leaves. Watch the containers
+      on the roller conveyor.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
@@ -526,10 +528,10 @@ MonoBehaviour:
     m_Localized: 'Position {position} is done.
 
       The storage container leaves;
-      the next one comes from the left.
+      the next one comes from the left. Watch the containers on the roller conveyor.
 
-      Then read the data of position {next_position}
-      in the WMS.'
+      Then
+      read the data of position {next_position} in the WMS.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
@@ -602,8 +604,11 @@ MonoBehaviour:
   - m_Id: 7615942627464
     m_Localized: 'Position {done} is done.
 
-      Read the details of position {next}
-      in the WMS.'
+      The storage container leaves; the
+      next one comes from the left. Watch the containers on the roller conveyor.
+
+      Then
+      read the details of position {next} in the WMS.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465

@@ -162,8 +162,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627358
     m_Localized: "Der Auftrag ist richtig.\nDer Auftragsbeh\xE4lter wechselt auf
-      die mittlere Bahn und f\xE4hrt weg.\nW\xE4hlen Sie jetzt im Men\xFC \u201E4.\_Mehrere
-      Positionen\u201C."
+      die mittlere Bahn und f\xE4hrt weg. Sehen Sie den Beh\xE4ltern auf der Rollenbahn
+      zu.\nW\xE4hlen Sie danach im Men\xFC \u201E4.\_Mehrere Positionen\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
@@ -223,13 +223,15 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627371
     m_Localized: "Alle Materialien und Mengen stimmen mit dem Auftrag \xFCberein.\nDer
-      Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg.\nW\xE4hlen
-      Sie jetzt im Men\xFC \u201E{next_lesson}\u201C."
+      Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg. Sehen
+      Sie den Beh\xE4ltern auf der Rollenbahn zu.\nW\xE4hlen Sie danach im Men\xFC
+      \u201E{next_lesson}\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
     m_Localized: "Volle Kartons und loses Material stimmen mit dem Auftrag \xFCberein.\nDer
-      Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg."
+      Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg. Sehen
+      Sie den Beh\xE4ltern auf der Rollenbahn zu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
@@ -532,8 +534,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627448
     m_Localized: "Position {position} ist erledigt.\nDer Lagerbeh\xE4lter f\xE4hrt
-      weg, der n\xE4chste kommt von links.\nLesen Sie dann im LVS die Angaben von
-      Position {next_position} ab."
+      weg, der n\xE4chste kommt von links. Sehen Sie den Beh\xE4ltern auf der Rollenbahn
+      zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
@@ -605,10 +607,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
-    m_Localized: 'Position {done} ist erledigt.
-
-      Lesen Sie im LVS die Angaben
-      zu Position {next} ab.'
+    m_Localized: "Position {done} ist erledigt.\nDer Lagerbeh\xE4lter f\xE4hrt weg,
+      der n\xE4chste kommt von links. Sehen Sie den Beh\xE4ltern auf der Rollenbahn
+      zu.\nLesen Sie dann im LVS die Angaben zu Position {next} ab."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465

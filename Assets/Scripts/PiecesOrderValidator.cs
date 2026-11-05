@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using Oculus.Interaction;
 using TMPro;
 using UnityEngine;
 
@@ -45,7 +48,22 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     [Tooltip("Optional. Storage containers on the station lanes (IStationStock).")]
     [SerializeField] private MonoBehaviour stationStock;
 
+    // #99, decision 033: the end panel stands in front of the monitor and would hide the middle lane while the
+    // order container leaves, so it becomes visible only a little after that ride has started.
+    [Tooltip("Optional. Order container conveyor; Congratulations stays invisible until it has started to move.")]
+    [SerializeField] private OrderBoxConveyor orderBoxConveyor;
+
+    [Tooltip("Seconds after the order container starts to move before Congratulations becomes visible.")]
+    [SerializeField] private float congratulationsDelay = 2f;
+
+    // A panel that never shows would hide the end of the course and the participant code.
+    [Tooltip("Show Congratulations after this many seconds even if the order container never starts.")]
+    [SerializeField] private float congratulationsFallback = 15f;
+
     private string initialInstruction;
+    private CanvasGroup congratulationsGroup;
+    private readonly List<MonoBehaviour> hiddenInteractables = new();
+    private bool orderBoxDeparted;
 
     private void Awake()
     {
@@ -68,6 +86,10 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         if (containerCounter != null)
         {
             containerCounter.ContentsChanged -= ClearResult;
+        }
+        if (orderBoxConveyor != null)
+        {
+            orderBoxConveyor.Departed -= OnOrderBoxDeparted;
         }
     }
 
@@ -143,7 +165,10 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         {
             ResultCardStyle.Show(titleText, feedbackText, OrderFeedback.CorrectTitle(), ResultCardStyle.Correct,
                 Loc.Get(CorrectKey));
+            // Active at once (ParticipantCodeLabel reads the code before EndSession below), but invisible until
+            // the order container has started to leave (#99).
             congratulationsPanel.SetActive(true);
+            HideCongratulationsUntilDeparture();
             if (instructionText != null)
             {
                 instructionText.text = string.Empty;
@@ -173,6 +198,72 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         {
             congratulationsPanel.SetActive(false);
         }
+    }
+
+    private void HideCongratulationsUntilDeparture()
+    {
+        if (orderBoxConveyor == null)
+            return;
+
+        if (!congratulationsPanel.TryGetComponent(out congratulationsGroup))
+        {
+            congratulationsGroup = congratulationsPanel.AddComponent<CanvasGroup>();
+        }
+        congratulationsGroup.alpha = 0f;
+        congratulationsGroup.blocksRaycasts = false;
+
+        // An invisible panel must not take touches either.
+        foreach (MonoBehaviour behaviour in congratulationsPanel.GetComponentsInChildren<MonoBehaviour>())
+        {
+            if (behaviour is IInteractable && behaviour.enabled)
+            {
+                behaviour.enabled = false;
+                hiddenInteractables.Add(behaviour);
+            }
+        }
+
+        orderBoxDeparted = false;
+        orderBoxConveyor.Departed += OnOrderBoxDeparted;
+        StartCoroutine(ShowCongratulationsLater());
+    }
+
+    private void OnOrderBoxDeparted()
+    {
+        orderBoxConveyor.Departed -= OnOrderBoxDeparted;
+        orderBoxDeparted = true;
+    }
+
+    private IEnumerator ShowCongratulationsLater()
+    {
+        float waited = 0f;
+        while (!orderBoxDeparted && waited < congratulationsFallback)
+        {
+            waited += Time.deltaTime;
+            yield return null;
+        }
+
+        if (orderBoxDeparted && congratulationsDelay > 0f)
+        {
+            yield return new WaitForSeconds(congratulationsDelay);
+        }
+
+        if (orderBoxConveyor != null)
+        {
+            orderBoxConveyor.Departed -= OnOrderBoxDeparted;
+        }
+        if (congratulationsGroup != null)
+        {
+            congratulationsGroup.alpha = 1f;
+            congratulationsGroup.blocksRaycasts = true;
+        }
+        foreach (MonoBehaviour behaviour in hiddenInteractables)
+        {
+            if (behaviour != null)
+            {
+                behaviour.enabled = true;
+            }
+        }
+        hiddenInteractables.Clear();
     }
 
     private void ShowCard()
