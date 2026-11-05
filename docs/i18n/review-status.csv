@@ -32,7 +32,7 @@ complex.end.summary,"<b>Sie kennen jetzt:</b>\n• die Felder im LVS\n• Lagerb
 basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,,2026-11-03,#62
 mixed.feedback.position_done,"Position {position} ist erledigt.\nDer Lagerbehälter fährt weg, der nächste kommt von links. Sehen Sie den Behältern auf der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab.",proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie sie so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,german-reviewer (agent),2026-11-05,#87
-order.feedback.ekz3_loose,Nicht alle Kartons liegen geordnet. Bei Empf Kz 003: Legen Sie die Kartons einzeln und geordnet ein.,proposed,german-reviewer (agent),2026-11-01,"#41, ""Nicht alle"" per reviewer"
+order.feedback.ekz3_loose,"Bei Empf Kz 003 liegt jeder Karton einzeln und geordnet, nie übereinander. Legen Sie Kartons mit Warnzeichen auf einen freien Platz.",proposed,german-reviewer (agent),2026-11-05,"Agent proposal (#108, decision 037)"
 concept.tour.material_flow.title,Weg der Behälter,proposed,german-reviewer (agent),2026-11-02,#49
 complex.quiz.q_cartons,Wie viele volle Kartons nehmen Sie für diese Position?,proposed,,2026-11-02,#19
 complex.quiz.q_loose,Wie viele lose Teile nehmen Sie zusätzlich?,proposed,,2026-11-02,#19

@@ -60,6 +60,10 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         {
             placementCheck.PlacementChanged += ClearResult;
         }
+        if (stationStock is IStationStock stock)
+        {
+            stock.Settled += HidePlacesAfterPosition;
+        }
     }
 
     private void OnDisable()
@@ -71,6 +75,20 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         if (placementCheck != null)
         {
             placementCheck.PlacementChanged -= ClearResult;
+        }
+        if (stationStock is IStationStock stock)
+        {
+            stock.Settled -= HidePlacesAfterPosition;
+        }
+    }
+
+    // #108, decision 037 (1): the places shown after a placement error stay until the next position's storage
+    // container has stopped (the same moment the cards turn to the next position, decision 035).
+    private void HidePlacesAfterPosition()
+    {
+        if (placementCheck != null && container != null && !EkzPlacementCheck.NeedsPlaces(container.CurrentLine))
+        {
+            placementCheck.ShowPlaces(false);
         }
     }
 
@@ -104,6 +122,11 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
     {
         if (IsCompleted)
             return;
+
+        if (placementCheck != null)
+        {
+            placementCheck.ClearMarks();
+        }
 
         if (feedbackText != null)
         {
@@ -156,6 +179,10 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         if (placementWrong)
         {
             ShowResult(OrderFeedback.Title(), ResultCardStyle.Wrong, OrderFeedback.ExplainEkz3Placement());
+            // #108, decision 037 (1, 3): from the first placement error the places stay visible for this position,
+            // and the loose cartons are marked until the result is cleared.
+            placementCheck.ShowPlaces(true);
+            placementCheck.MarkLoose(container.CurrentPositionPackages);
             return;
         }
 

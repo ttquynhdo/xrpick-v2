@@ -1282,7 +1282,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Size: {x: 0.32, y: 0.22, z: 0.2}
   m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
 --- !u!54 &74329910
 Rigidbody:
@@ -1423,7 +1423,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Size: {x: 0.32, y: 0.22, z: 0.2}
   m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
 --- !u!54 &74952658
 Rigidbody:
@@ -2338,7 +2338,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
   m_UseReflectionProbes: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -3599,7 +3599,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
   m_UseReflectionProbes: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -3989,7 +3989,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Size: {x: 0.32, y: 0.22, z: 0.2}
   m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
 --- !u!54 &273594242
 Rigidbody:
@@ -5231,12 +5231,12 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
+  m_fontSize: 34.65
   m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5350,7 +5350,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
   _interactorFilters: []
   _maxInteractors: 1
-  _maxSelectingInteractors: -1
+  _maxSelectingInteractors: 1
   _data: {fileID: 0}
   _rigidbody: {fileID: 74329910}
   _snapPoseDelegate: {fileID: 0}
@@ -5815,7 +5815,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -10454,6 +10454,13 @@ MonoBehaviour:
   - {fileID: 1992283365}
   - {fileID: 1066993943}
   snapSound: {fileID: 786606229}
+  showPlacesAtStart: 1
+  outlineMaterial: {fileID: 2100000, guid: 3b007082e2269ab409c2d276f6e05dc2, type: 2}
+  outlineSize: {x: 0.166, y: 0.111}
+  outlineStroke: 0.008
+  warningSprite: {fileID: 21300000, guid: efed5fd53de8b8b4cadc08e143488fa0, type: 3}
+  warningColor: {r: 1, g: 0.82, b: 0.1, a: 1}
+  markSize: 0.05
 --- !u!82 &786606229
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10768,7 +10775,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Size: {x: 0.32, y: 0.22, z: 0.2}
   m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
 --- !u!54 &857841241
 Rigidbody:
@@ -11746,6 +11753,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 916427141}
+    - targetCorrespondingSourceObject: {fileID: 6168147286285378791, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 916427142}
   m_SourcePrefab: {fileID: 100100000, guid: d86126e18a8dc524b84f068109cf10a6, type: 3}
 --- !u!65 &916427140 stripped
 BoxCollider:
@@ -11781,6 +11791,28 @@ MonoBehaviour:
   - {fileID: 74952658}
   - {fileID: 273594242}
   stationStock: {fileID: 1935371804}
+--- !u!114 &916427142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786606210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 979285c3c1f3e91489e92965d7860d3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartonSettler
+  containerZone: {fileID: 916427140}
+  places:
+  - {fileID: 1907378841}
+  - {fileID: 341786218}
+  - {fileID: 2036517851}
+  - {fileID: 1423246928}
+  - {fileID: 1992283365}
+  - {fileID: 1066993943}
+  stationStock: {fileID: 1935371804}
+  conveyor: {fileID: 916427141}
 --- !u!1001 &917222264
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12592,7 +12624,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
   _interactorFilters: []
   _maxInteractors: 1
-  _maxSelectingInteractors: -1
+  _maxSelectingInteractors: 1
   _data: {fileID: 0}
   _rigidbody: {fileID: 857841241}
   _snapPoseDelegate: {fileID: 0}
@@ -15203,7 +15235,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Size: {x: 0.32, y: 0.22, z: 0.2}
   m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
 --- !u!54 &1342360181
 Rigidbody:
@@ -15967,7 +15999,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
   _interactorFilters: []
   _maxInteractors: 1
-  _maxSelectingInteractors: -1
+  _maxSelectingInteractors: 1
   _data: {fileID: 0}
   _rigidbody: {fileID: 273594242}
   _snapPoseDelegate: {fileID: 0}
@@ -20835,7 +20867,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.25996655, y: 0.21321058, z: 0.14976966}
+  m_Size: {x: 0.32, y: 0.22, z: 0.2}
   m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
 --- !u!54 &1888890480
 Rigidbody:
@@ -21089,7 +21121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
   _interactorFilters: []
   _maxInteractors: 1
-  _maxSelectingInteractors: -1
+  _maxSelectingInteractors: 1
   _data: {fileID: 0}
   _rigidbody: {fileID: 1888890480}
   _snapPoseDelegate: {fileID: 0}
@@ -21701,7 +21733,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
   _interactorFilters: []
   _maxInteractors: 1
-  _maxSelectingInteractors: -1
+  _maxSelectingInteractors: 1
   _data: {fileID: 0}
   _rigidbody: {fileID: 1342360181}
   _snapPoseDelegate: {fileID: 0}
@@ -22312,7 +22344,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.SnapInteractable
   _interactorFilters: []
   _maxInteractors: 1
-  _maxSelectingInteractors: -1
+  _maxSelectingInteractors: 1
   _data: {fileID: 0}
   _rigidbody: {fileID: 74952658}
   _snapPoseDelegate: {fileID: 0}

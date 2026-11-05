@@ -111,6 +111,8 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
         else if (placementWrong)
         {
             ShowIncorrect(OrderFeedback.ExplainEkz3Placement());
+            // #108, decision 037 (3): the loose cartons get a warning mark until the result is cleared.
+            placementCheck.MarkLoose(calc.PackagesInside);
         }
         else
         {
@@ -135,6 +137,11 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
     {
         if (IsCompleted)
             return;
+
+        if (placementCheck != null)
+        {
+            placementCheck.ClearMarks();
+        }
 
         if (correct != null)
         {
