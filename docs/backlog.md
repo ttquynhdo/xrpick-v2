@@ -1351,7 +1351,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Scene(s):** WelcomeScene
 - **Files:** WelcomeScene `Info Panel` (canvas `Welcome`), docs/i18n/strings-todo.csv (`welcome.panel.goals`, `welcome.panel.*`)
 - **Problem:** (R1) Chữ sát lề trái, dòng sát nhau, bản EN mục 1 „…warehouse management system (WMS)“ xuống dòng (ghi chú CSV đòi mỗi mục một dòng). Năm mục tiêu là một danh sách liền, người học không thấy phần nào là kiến thức (đọc LVS, nhãn) và phần nào là thực hành (nhặt, EKZ, nhiều vị trí).
-- **Done when:** Ở WelcomeScene, cảnh `entry` sau khi nhập mã, bảng có lề trái và phải bằng nhau, ít nhất bằng chiều cao một chữ. Mỗi mục tiêu nằm trên đúng một dòng ở cả DE và EN. Các mục chia hai cụm, mỗi cụm có câu dẫn riêng kết thúc bằng „:“: cụm 1 „Sie verstehen …:“ (bài 2, chứa tên đầy đủ „Lagerverwaltungssystem (LVS)“), cụm 2 „Sie können:“ (bài 3–5). Trong mỗi cụm các mục xếp theo thứ tự bài; mục EKZ không ghi „EKZ 3“. Font các mục không nhỏ hơn font thân thẻ. Hai dòng hướng dẫn thao tác (vàng) nằm thành khối riêng dưới hai cụm. Khoảng cách giữa các dòng rộng hơn hiện nay (so ảnh trước/sau). Bảng không che Menu, giá thẻ hay thùng. (code) Mỗi dòng/cụm là một key, không ghép câu từ mảnh chữ. (code) Chữ mới có key + EN + DE qua `localize-strings` + `german-reviewer`.
+- **Done when:** Ở WelcomeScene, cảnh `entry` sau khi nhập mã, bảng có lề trái và phải bằng nhau, ít nhất bằng chiều cao một chữ. Mỗi mục tiêu nằm trên đúng một dòng ở cả DE và EN. Các mục chia hai cụm, mỗi cụm có câu dẫn riêng kết thúc bằng „:“: cụm 1 „Sie verstehen …:“ (bài 2, chứa tên đầy đủ „Lagerverwaltungssystem (LVS)“), cụm 2 „Sie können:“ (bài 3–5). Trong mỗi cụm các mục xếp theo thứ tự bài; mục EKZ không ghi „EKZ 3“. Font các mục không nhỏ hơn font thân thẻ. Hai dòng hướng dẫn thao tác (vàng) nằm thành khối riêng dưới hai cụm. Khoảng cách giữa các dòng rộng hơn hiện nay (so ảnh trước/sau). Bảng không che Menu, giá thẻ hay thùng. (code) Mỗi dòng/cụm là một key, không ghép câu từ mảnh chữ. (code) Chữ mới có key + EN + DE qua `localize-strings` + `german-reviewer`. (bổ sung 2026-11-05, #87) Các mục xếp theo thứ tự bài (Concept, Basic, Mixed, Complex) và dùng đúng lời của câu đậm trên thẻ mục tiêu từng bài: Concept „die Angaben im LVS ablesen und mit dem Etikett vergleichen“, Basic „Kartons nach EKZ einlegen“, Mixed „mehrere Positionen nacheinander kommissionieren“, Complex „ausrechnen, wie viele volle Kartons und lose Teile Sie brauchen“ (german-reviewer: „Kartons berechnen“ sai kết hợp động từ); `complex.end.summary` dòng 1–5 đổi theo cùng lời.
 - **Inspector work expected:** yes (padding, line spacing, kích thước bảng)
 - **Công:** S
 - **Test trên kính:** nhanh (đọc bảng từ chỗ đứng, DE và EN)
@@ -1370,7 +1370,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** nhanh (đọc thẻ từ chỗ đứng ở 5 bài; thẻ kem có bị lóa trên gỗ không)
 - **Depends on:** decision 027; làm trước #86 và #97
 - **Decision:** docs/decisions/027-task-card-template-welcome-goals.md
-- **Status:** todo
+- **Status:** in progress (nhánh `feat/87-task-card-template`; 2026-11-05 chữ xong: tiêu đề „Darum geht es“, 5 thẻ mục tiêu, thẻ bước Mixed/Complex + Basic thẻ 2 trong `strings-todo.csv`, qua german-reviewer + instructional-design-reviewer, chưa `ImportCsv`; còn: kiểu thẻ kem, công cụ slot, 5 scene, test — cần UnityMCP)
 
 ### #88 [Feature] Chuẩn kiện và nhãn: một cỡ cho mỗi loại kiện ở mọi bài, một nhãn nhỏ trên nắp
 - **Type:** feature
