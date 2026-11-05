@@ -48,5 +48,14 @@ Mục tiêu: nhìn lướt là thấy mục tiêu bài rồi đến các bước
 - Thẻ kem bị lóa trên gỗ khi đeo kính → nền đen + viền/dải đầu thẻ trung tính (chỉ sửa `InstructionCardLook`).
 - Người học vẫn không nhận ra thẻ mục tiêu → đổi „Aufgabe“ thành „Ihre Aufgabe“ (một key + glossary).
 
+## Bổ sung 2026-11-05 (người dùng): thẻ mục tiêu nói bài học gì và vì sao
+Người dùng gộp vào #87: nhìn lướt thẻ mục tiêu là hiểu bài này học gì và vì sao, các thẻ bước chỉ bổ trợ, và thẻ mục tiêu không lặp lại các bước. Điều này thay mục 4 ở chỗ nói về thẻ mục tiêu (thân thẻ không còn là mệnh lệnh việc phải làm):
+- Thân thẻ đúng 2 câu, cùng khuôn ở cả 5 bài. **Câu 1 in đậm** „Sie lernen, … zu …“ (EN „You learn to …“) = kỹ năng mới của bài. Câu 2 thường „So …“ (EN „That way …“) = vì sao (điều tốt ở trạm thật, hoặc bài sau cần nó). Chữ đậm là tín hiệu để nhìn lướt; không thêm chữ dẫn kiểu „Ziel:“. Thẻ bước giữ khuôn mệnh lệnh „Verb + Sie“.
+- Không lặp bước: thẻ mục tiêu gọi tên kỹ năng, thẻ bước nói cách làm. Thẻ mục tiêu không có nơi chốn/đồ vật cụ thể (thùng, nút, „Weiter“), nhãn WMS, số của đơn, và không lặp nguyên câu hay tiêu đề bước; trùng một từ chỉ kỹ năng („kommissionieren“, „EKZ“) thì được (lý do: cấm hẳn mọi động từ của bước thì không gọi được tên kỹ năng của Basic và Mixed).
+- Câu 1 khớp với mục tương ứng của `welcome.panel.goals` / `complex.end.summary`, nên người học thấy cùng một mục tiêu ở bảng Welcome, trên thẻ bài và trong tổng kết.
+- Tiêu đề „Aufgabe“ không còn khớp với nội dung mới. Chốt khi bắt đầu #87 qua `german-reviewer` (ứng viên: giữ „Aufgabe“, „Darum geht es“, „Ihr Ziel“); vẫn tránh „Lernziel“ (giọng trường học, xem bảng xung đột ở trên).
+- Khi bắt đầu #87, `instructional-design-reviewer` kiểm nháp chữ của cả 5 bài theo các quy tắc trên. Lý do của câu 2 không được bịa ra quy tắc nghiệp vụ: chỉ dùng những gì tài liệu yêu cầu hay các giả định đã ghi nói tới (ví dụ EKZ theo D4).
+- Thấy khi rà: thứ tự 5 mục trên `welcome.panel.goals` không theo thứ tự bài (mục 3 „volle Kartons und lose Teile“ là Complex, mục 4 EKZ là Basic). #86 sắp lại theo thứ tự bài khi làm bảng hai cụm.
+
 ## Câu hỏi còn mở
 - D33 (người hướng dẫn, không chặn): chỉ ghi „LVS“ trong các mục có đủ không khi tên đầy đủ đứng ở tiêu đề cụm 1. Giả định: đủ.
