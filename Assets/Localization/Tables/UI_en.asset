@@ -19,7 +19,7 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 1045303296
-    m_Localized: Task
+    m_Localized: What this is about
     m_Metadata:
       m_Items: []
   - m_Id: 1112412160
@@ -123,7 +123,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627350
-    m_Localized: Pick the order shown in the warehouse management system (WMS).
+    m_Localized: '<b>You learn to place cartons according to the EKZ.</b>
+
+      That
+      way the goods arrive undamaged.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627351
@@ -141,8 +144,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627354
-    m_Localized: Work out how many cartons you need. Put the cartons into the order
-      container as the EKZ requires.
+    m_Localized: Work out how many cartons you need. Put them into the order container
+      the way the <nobr>Empf Kz</nobr> requires.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627355
@@ -231,9 +234,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
-    m_Localized: Read the label and the details in the WMS. Work out the number of
-      cartons. Put them from the storage container into the order container. Then
-      answer the questions.
+    m_Localized: '<b>You learn to read the data in the WMS and compare it with the
+      label.</b>
+
+      That way you take the right material in the right amount
+      in every order.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627374
@@ -413,7 +418,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627424
-    m_Localized: Practise two simple hand movements.
+    m_Localized: '<b>You learn to work with your hands in VR.</b>
+
+      That way
+      you can focus fully on the order later.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627425
@@ -465,14 +473,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627436
-    m_Localized: Pick the order shown in the warehouse management system (WMS). Work
-      on the two positions one after the other.
+    m_Localized: '<b>You learn to pick several positions one after another.</b>
+
+      That
+      way material and quantity are right for every position, even when packaging
+      and EKZ change.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627437
-    m_Localized: 'Read for the current position: material number (<nobr>Mat.-Nr</nobr>),
-      target quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>) and EKZ (<nobr>Empf
-      Kz</nobr>).'
+    m_Localized: 'Read for the current position: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
+      and <nobr>Empf Kz</nobr>.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627438
@@ -480,33 +490,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627439
-    m_Localized: Work out how many packages you need. Put the packages into the order
-      container.
+    m_Localized: Work out how many packages you need. Put them into the order container
+      as the <nobr>Empf Kz</nobr> requires.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627440
-    m_Localized: Check in the WMS that Ist equals Soll. Then press the red button
-      (F6).
+    m_Localized: Check that Ist equals Soll. Then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627441
-    m_Localized: Pick the order shown in the warehouse management system (WMS). The
-      order has two positions with loose material. Work on both one after the other.
+    m_Localized: '<b>You learn to work out how many full cartons and loose pieces
+      you need.</b>
+
+      That way the quantity is right even when it doesn''t fit
+      into full cartons.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627442
-    m_Localized: 'Read in the WMS: material number (<nobr>Mat.-Nr</nobr>), target
-      quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>) and EKZ (<nobr>Empf Kz</nobr>).'
+    m_Localized: 'Read in the WMS: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
+      and <nobr>Empf Kz</nobr>.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627443
-    m_Localized: Work out how many full cartons and loose pieces you need. Put the
-      cartons into the order container first, then the loose pieces.
+    m_Localized: Work out how many you need. Put the full cartons into the order
+      container first, then the loose pieces.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627444
-    m_Localized: Count the full cartons and the loose pieces. Check in the WMS that
-      Ist equals Soll. Then press the red button (F6).
+    m_Localized: Count the cartons and loose pieces and check that Ist equals Soll.
+      Then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627445
@@ -617,10 +629,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627466
-    m_Localized: 'Read in the WMS: material number (<nobr>Mat.-Nr</nobr>), target
-      quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>) and EKZ (<nobr>Empf Kz</nobr>).
-      Then answer the questions below the screen. The "Example" board directly below
-      them helps with the calculation.'
+    m_Localized: "Read in the WMS: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
+      and <nobr>Empf Kz</nobr>. Then answer the questions below the screen \u2013
+      the \"Example\" right below them helps with the maths."
     m_Metadata:
       m_Items: []
   - m_Id: 15832974233600
@@ -792,14 +803,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 346260058804224
-    m_Localized: Check in the WMS that Ist equals Soll. Then press the red button
-      (F6). After that the WMS shows position 2.
+    m_Localized: Check that Ist equals Soll. Then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 346260226576384
-    m_Localized: Count the full cartons and the loose pieces. Check in the WMS that
-      Ist equals Soll. Then press the red button (F6). After that the storage container
-      leaves and the next one comes from the left. The WMS shows position 2.
+    m_Localized: Count the cartons and loose pieces and check that Ist equals Soll.
+      Then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 350226641457152

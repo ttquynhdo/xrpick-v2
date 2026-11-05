@@ -1370,7 +1370,8 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** nhanh (đọc thẻ từ chỗ đứng ở 5 bài; thẻ kem có bị lóa trên gỗ không)
 - **Depends on:** decision 027; làm trước #86 và #97
 - **Decision:** docs/decisions/027-task-card-template-welcome-goals.md
-- **Status:** in progress (nhánh `feat/87-task-card-template`; 2026-11-05 chữ xong: tiêu đề „Darum geht es“, 5 thẻ mục tiêu, thẻ bước Mixed/Complex + Basic thẻ 2 trong `strings-todo.csv`, qua german-reviewer + instructional-design-reviewer, chưa `ImportCsv`; còn: kiểu thẻ kem, công cụ slot, 5 scene, test — cần UnityMCP)
+- **Test report:** docs/test-reports/bl87.md
+- **Status:** verified-mcp (14/16 MCP/code ✅, D10 một phần (mixed thẻ 2 dài hơn 4 ký tự theo instructional-design-reviewer), chờ test tay H1 đọc thẻ trên kính DE/EN; nhánh `feat/87-task-card-template`)
 
 ### #88 [Feature] Chuẩn kiện và nhãn: một cỡ cho mỗi loại kiện ở mọi bài, một nhãn nhỏ trên nắp
 - **Type:** feature
