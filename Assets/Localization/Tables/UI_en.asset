@@ -932,8 +932,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 970336154554368
-    m_Localized: The opened carton stays in the module in the storage container.
-      Take out only the loose pieces.
+    m_Localized: Take out only the loose pieces; the carton stays here.
     m_Metadata:
       m_Items: []
   - m_Id: 1017753042292736

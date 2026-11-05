@@ -1698,7 +1698,8 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Công:** M (4 scene, tuần tự)
 - **Test trên kính:** nhanh
 - **Depends on:** —; không chạy cùng mục khác sửa cùng scene
-- **Status:** todo
+- **Status:** verified-mcp (18/21 ✅ MCP/code, chờ test tay H1–H3 trên kính; nhánh `feat/111-box-signs`; người dùng 2026-11-06: xếp lại carton Complex để biển không bị che, Basic cùng quy tắc)
+- **Test report:** docs/test-reports/bl111.md
 
 ### #112 [P3] Đĩa kết thúc phiên của người điều phối ra khỏi tầm nhìn của người học
 - **Type:** cleanup

@@ -100,6 +100,7 @@ Mỗi vật và mỗi chữ trong scene phải gắn với một dòng của b�
 - **Carton đã mở ở Complex (`VPE_OpenedPackage`, `SB_OpenedPackage`):**
   - ký hiệu trên vách ngoài hoặc nắp, hướng về chỗ đứng, không che vòng;
   - dòng lý do trên `Storage Label` của thùng kho, cùng ý với câu A13 hiện có;
+  - **Đã sửa ở #111 (2026-11-06):** ký hiệu và dòng lý do gộp thành một tờ dán phẳng trên vách trước của carton đã mở (`Opened Carton Note`, „Nehmen Sie nur die losen Teile heraus, der Karton bleibt hier.“, không còn „Modul“); `Opened Carton Mark` và thẻ nổi trên `Storage Label` bỏ đi;
   - câu về Anbruch ở dòng kết quả vị trí 1 bỏ đi, để chỉ nói một lần;
   - vòng bên trong vẫn cầm được. `VPEOpenedDisplay` và Rest không đổi.
 - **Cảnh nền:** kệ hàng ở xa và các trạm trống cách khoảng 7 m, ngoài khu bàn làm việc, không cần ký hiệu.
