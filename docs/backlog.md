@@ -1468,7 +1468,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** decision 026 (bàn học Concept, chỗ đặt thùng mẫu); giả định D4, D34 (câu hỏi D35–D38)
 - **Decision:** docs/decisions/028-ekz-course-plan.md
 - **Test report:** docs/test-reports/bl94.md
-- **Status:** verified-mcp (19/19 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/94-ekz-course-plan`; layout "029", phân biệt bằng `line.empf_kz`; thùng mẫu Concept trên bàn sau bên trái màn hình, xem bổ sung decision 028)
+- **Status:** verified-mcp (19/19 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/94-ekz-course-plan`, commit 3ae591f; layout "029", phân biệt bằng `line.empf_kz`; thùng mẫu Concept trên bàn sau bên trái màn hình, xem bổ sung decision 028)
 
 ### #95 [P2] Băng chuyền: ray thừa ở ba làn, tấm gỗ vắt trên băng ở trạm trống
 - **Type:** bug
