@@ -1,7 +1,7 @@
 # Quyết định 031: ConceptScene bước 8–9: mẫu EKZ 003/000 giống bài thực hành, thẻ mẫu mang pictogram của bảng EKZ
 
 - **Backlog:** #101 (bổ sung cho #94; liên quan #92, #57)
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (sửa một phần bởi 032, 2026-11-05: mẫu mang ký hiệu bàn tay gạch chéo, thẻ 003 thêm một dòng lý do; không bán trong suốt)
 - **Ngày:** 2026-11-05
 - **Thay thế (một phần):** 028 (câu „Mẫu 003 có 2 carton“ trong phần bổ sung 2026-11-05). Decision 018 giữ nguyên.
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer, data-analyst → decision-synthesizer.

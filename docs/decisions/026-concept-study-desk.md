@@ -1,7 +1,7 @@
 # Quyết định 026: ConceptScene có một „bàn học“ dưới màn hình (thanh tour ở giữa chứa chữ của bước, đổi qua lại tour ↔ câu hỏi), thẻ nhãn cạnh kiện đang cầm, vật chỉ để xem trông khác kiện thật; cụm câu hỏi ở Concept và Complex thu lại khi xong
 
 - **Backlog:** #89, #90, #91, #92, #93 (một quyết định chung)
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (mục 5 bị thay bởi 032, 2026-11-05: vật trông như kiện thì cầm được, ngoại lệ có ký hiệu bàn tay gạch chéo + một dòng lý do, không bán trong suốt, không chữ khi chạm)
 - **Ngày:** 2026-11-04
 - **Thay thế (một phần):** 024 (mục 1, 3, 4, 7, 8, 9), 025 (thẻ nhãn khi cầm, „không khoá tour“), 020 (mục 3), 016/#85 (lúc ẩn cụm Complex). Phần còn lại của các quyết định đó giữ nguyên.
 - **Ý kiến đã xét:** unity-reviewer, data-analyst, xr-ux-reviewer, instructional-design-reviewer → decision-synthesizer. Không hỏi requirements-analyst (không quy tắc nghiệp vụ nào đổi, chỉ đổi chỗ, lúc hiện và hình dạng). Mọi chuỗi mới qua `localize-strings` + `german-reviewer` khi làm.

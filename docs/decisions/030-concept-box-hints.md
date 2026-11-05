@@ -1,7 +1,7 @@
 # Quyết định 030: ConceptScene: LVS mẫu đếm theo thùng đơn, kiện sai hoặc thừa trong hai thùng được báo ngay bằng thẻ cạnh kiện
 
 - **Backlog:** #100 (+ phần bổ sung 2026-11-05 của #91)
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (sửa một phần bởi 032, 2026-11-05: Concept không còn kiện vật liệu khác, nên lời nhắc sai vật liệu không có vật để kích hoạt; code giữ nguyên)
 - **Ngày:** 2026-11-05
 - **Ý kiến đã xét:** unity-reviewer, requirements-analyst, xr-ux-reviewer, data-analyst, instructional-design-reviewer → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-05):** chấp nhận phương án C, với ba mặc định của khuyến nghị: bước 11 chờ tới khi hai thùng sạch, mỗi lúc chỉ một thẻ lời nhắc, ba carton đếm hiện lại ở bước 11. Trước đó người dùng đã chọn: kiểm thùng kho chỉ ở ConceptScene, các bài khác giữ nguyên.
