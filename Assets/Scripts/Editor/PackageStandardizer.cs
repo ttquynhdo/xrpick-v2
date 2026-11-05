@@ -38,6 +38,10 @@ public static class PackageStandardizer
     private const float BagLabelHeightShare = 0.45f;
     private const float BagEdgeMargin = 0.005f;
     private const float LabelLift = 0.0015f;
+    // #103: the hidden front sticker keeps a solid collider; it must lie on the carton's front face, or the hand
+    // grabs the carton from that far away. Size as on the Basic/Mixed cartons: 90 % of the face width, 80 % of its height.
+    private const float StickerWidthShare = 0.9f;
+    private const float StickerHeightShare = 0.8f;
 
     // The longest lines that must fit: carton names on the lid, the Mat.-Nr line on a bag label.
     private const string LongestCartonLine = "SCHLAUCHSCHELLE B";
@@ -88,6 +92,7 @@ public static class PackageStandardizer
 
             FitSize(filter, CartonSize);
             HideFrontSticker(filter.transform);
+            FitFrontSticker(filter, report);
             PlaceLidLabel(filter, fontSize);
         }
 
@@ -125,6 +130,10 @@ public static class PackageStandardizer
                 errors.Add($"{path}: mesh {filter.sharedMesh.name}, not {CartonMeshName}");
 
             CheckSize(errors, path, filter, cartonSize);
+            float overhang = StickerOverhang(filter);
+            if (overhang > SizeTolerance)
+                errors.Add($"{path}: front sticker collider sticks out of the carton by {overhang:F3} m");
+
             if (Vector3.Angle(filter.transform.up, Vector3.up) > 1f)
                 errors.Add($"{path}: lid not up");
 
@@ -252,6 +261,60 @@ public static class PackageStandardizer
             text.gameObject.SetActive(false);
             Record(text.gameObject);
         }
+    }
+
+    // Complex's cartons got the smaller SM_box_1 mesh in #88, but their sticker stayed where the old mesh's front was:
+    // 7 cm in front of the carton and 3 cm above its lid. Moves a sticker that sticks out onto the front face.
+    private static void FitFrontSticker(MeshFilter filter, StringBuilder report)
+    {
+        if (StickerOverhang(filter) <= SizeTolerance)
+            return;
+
+        Transform sticker = filter.transform.Find("Cube");
+        var collider = sticker.GetComponent<BoxCollider>();
+        if (sticker.localRotation != Quaternion.identity)
+        {
+            report.AppendLine($"  sticker of {PathOf(filter.transform)} is rotated, not moved");
+            return;
+        }
+
+        Bounds face = filter.sharedMesh.bounds;
+        var scale = new Vector3(
+            face.size.x * StickerWidthShare / collider.size.x,
+            face.size.y * StickerHeightShare / collider.size.y,
+            sticker.localScale.z);
+        var centre = new Vector3(face.center.x, face.center.y, face.min.z);
+
+        Undo.RecordObject(sticker, "Front sticker on the front face");
+        sticker.localScale = scale;
+        sticker.localPosition = centre - Vector3.Scale(collider.center, scale);
+        Record(sticker);
+        report.AppendLine($"  sticker of {PathOf(filter.transform)} moved onto the front face");
+    }
+
+    // How far (world metres) the sticker's collider reaches outside the carton mesh; 0 when there is none.
+    private static float StickerOverhang(MeshFilter filter)
+    {
+        Transform sticker = filter.transform.Find("Cube");
+        var collider = sticker != null ? sticker.GetComponent<BoxCollider>() : null;
+        if (collider == null)
+            return 0f;
+
+        Bounds mesh = filter.sharedMesh.bounds;
+        Vector3 scale = Abs(filter.transform.lossyScale);
+        float worst = 0f;
+        for (int i = 0; i < 8; i++)
+        {
+            var corner = new Vector3(
+                ((i & 1) == 0 ? -0.5f : 0.5f) * collider.size.x,
+                ((i & 2) == 0 ? -0.5f : 0.5f) * collider.size.y,
+                ((i & 4) == 0 ? -0.5f : 0.5f) * collider.size.z) + collider.center;
+            Vector3 local = filter.transform.InverseTransformPoint(sticker.TransformPoint(corner));
+            Vector3 outside = Vector3.Max(Vector3.zero, Vector3.Max(mesh.min - local, local - mesh.max));
+            worst = Mathf.Max(worst, Vector3.Scale(outside, scale).magnitude);
+        }
+
+        return worst;
     }
 
     private static void PlaceLidLabel(MeshFilter filter, float fontSize)
