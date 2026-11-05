@@ -12,8 +12,9 @@ welcome.card.step2_body,Drücken Sie mit der Fingerspitze den roten Knopf. Spät
 welcome.title,Willkommen bei XPick!,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.subtitle,Ein VR-Training für die Kommissionierung im Lager,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.panel.title,Das lernen Sie,proposed,german-reviewer (agent),2026-11-01,#25
-welcome.panel.goals,"Am Ende des Kurses können Sie:\n• einen Auftrag im Lagerverwaltungssystem (LVS) ablesen\n• das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n• volle Kartons und lose Teile berechnen\n• Kartons nach EKZ einlegen\n• mehrere Positionen nacheinander kommissionieren",proposed,german-reviewer (agent),2026-11-02,#23
-welcome.panel.duration,Dauer: etwa 5 Minuten pro Lektion,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.panel.know,<b>Sie kennen:</b>\n• die Felder im Lagerverwaltungssystem (LVS)\n• Lagerbehälter und Auftragsbehälter\n• den Unterschied zwischen Empf Kz 003 und 000,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#86, decision 034)"
+welcome.panel.can,"<b>Sie können:</b>\n• die Angaben im LVS ablesen und mit dem Etikett vergleichen\n• Kartons nach EKZ einlegen\n• mehrere Positionen nacheinander kommissionieren\n• ausrechnen, wie viele volle Kartons und lose Teile Sie brauchen",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#86, decision 034)"
+welcome.panel.duration,"Dauer: 5 Lektionen, je etwa 5 Minuten",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#86, decision 034)"
 common.panel.see_cards,Ihre Aufgaben stehen links auf den Karten.,proposed,german-reviewer (agent),2026-11-02,#35
 welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-01,#25
 mixed.card.task_body,"<b>Sie lernen, mehrere Positionen nacheinander zu kommissionieren.</b>\nSo stimmen bei jeder Position Material und Menge, auch wenn Verpackung und EKZ wechseln.",proposed,german-reviewer (agent),2026-11-05,#87
@@ -27,7 +28,7 @@ complex.card.step2_body,"Rechnen Sie aus, wie viele Sie brauchen. Legen Sie zuer
 complex.card.step3_body,"Zählen Sie Kartons und lose Teile nach und prüfen Sie, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,german-reviewer (agent),2026-11-05,#87
 complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
 complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
-complex.end.summary,"• Einen Auftrag im LVS ablesen\n• Das Etikett mit dem LVS vergleichen (Mat.-Nr, VPE)\n• Volle Kartons und lose Teile berechnen\n• Kartons nach EKZ einlegen\n• Mehrere Positionen nacheinander kommissionieren\n• Der rote Knopf steht für das Bestätigen mit dem Fuß",proposed,german-reviewer (agent),2026-11-04,#65
+complex.end.summary,"<b>Sie kennen jetzt:</b>\n• die Felder im LVS\n• Lagerbehälter und Auftragsbehälter\n• den Unterschied zwischen Empf Kz 003 und 000\n<b>Sie können jetzt:</b>\n• die Angaben im LVS ablesen und mit dem Etikett vergleichen\n• Kartons nach EKZ einlegen\n• mehrere Positionen nacheinander kommissionieren\n• ausrechnen, wie viele volle Kartons und lose Teile Sie brauchen\n\nAm echten Kommissionierplatz bestätigen Sie mit dem Fuß.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#86, decision 034)"
 basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,,2026-11-03,#62
 mixed.feedback.position_done,"Position {position} ist erledigt.\nDer Lagerbehälter fährt weg, der nächste kommt von links. Sehen Sie den Behältern auf der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab.",proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie sie so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,german-reviewer (agent),2026-11-05,#87

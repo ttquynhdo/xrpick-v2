@@ -453,15 +453,8 @@ MonoBehaviour:
     m_Localized: What you will learn
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627432
-    m_Localized: "By the end of the course you will be able to:\n\u2022 read an order
-      in the warehouse management system (WMS)\n\u2022 compare the label with the
-      WMS (Mat.-Nr, VPE)\n\u2022 work out full cartons and loose pieces\n\u2022 place
-      cartons according to the EKZ\n\u2022 pick several positions one after another"
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627433
-    m_Localized: 'Duration: about 5 minutes per lesson'
+    m_Localized: 'Duration: 5 lessons, about 5 minutes each'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627434
@@ -530,10 +523,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627447
-    m_Localized: "\u2022 Read an order in the WMS\n\u2022 Compare the label with
-      the WMS (Mat.-Nr, VPE)\n\u2022 Work out full cartons and loose pieces\n\u2022
-      Place cartons according to the EKZ\n\u2022 Pick several positions one after
-      another\n\u2022 The red button stands in for confirming with your foot"
+    m_Localized: "<b>You now know:</b>\n\u2022 the fields in the WMS\n\u2022 storage
+      containers and order containers\n\u2022 the difference between Empf Kz 003
+      and 000\n<b>You can now:</b>\n\u2022 read the data in the WMS and compare it
+      with the label\n\u2022 place cartons according to the EKZ\n\u2022 pick several
+      positions one after another\n\u2022 work out how many full cartons and loose
+      pieces you need\n\nAt the real picking station you confirm with your foot."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
@@ -950,6 +945,19 @@ MonoBehaviour:
   - m_Id: 970336154554368
     m_Localized: The opened carton stays in the module in the storage container.
       Take out only the loose pieces.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1017753042292736
+    m_Localized: "<b>You know:</b>\n\u2022 the fields in the warehouse management
+      system (WMS)\n\u2022 storage containers and order containers\n\u2022 the difference
+      between Empf Kz 003 and 000"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1017753113595904
+    m_Localized: "<b>You can:</b>\n\u2022 read the data in the WMS and compare it
+      with the label\n\u2022 place cartons according to the EKZ\n\u2022 pick several
+      positions one after another\n\u2022 work out how many full cartons and loose
+      pieces you need"
     m_Metadata:
       m_Items: []
   references:

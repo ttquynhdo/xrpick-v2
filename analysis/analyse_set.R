@@ -2823,6 +2823,105 @@ if (any(concept_containers_by_visit$containers_logged)) {
           " of ", sum(concept_containers_by_visit$containers_logged), " visit(s) reached Soll by hand")
 }
 
+# ---- 13f. Course objectives (#86, decision 034): coverage per objective ------
+
+# objectives.csv lists the course objectives (D = declarative, P = procedural)
+# and what evidence the logs hold for each. item_skills.csv (quiz questions,
+# Mixed positions) and skill_map.csv (error codes) carry the objective_id.
+# One row per objective:
+#   rated    share = first attempts that were right / first attempts that
+#            tested the objective, pooled over persons, scenes and items
+#            (k / n, Wilson interval). An attempt tests the objective when
+#            (a) its item has the objective in item_skills.csv: the whole
+#                first attempt at the item counts (quiz, Mixed position), or
+#            (b) it is the first unscaffolded red-button press at a position
+#                of a scene that lists the code's skill in scene_skills.csv
+#                (same rule as the skill rates): right = none of the
+#                objective's codes. EKZ_PLACEMENT (P2) only at the first EKZ
+#                opportunity of an Empf Kz 003 position (quantity right).
+#   observed D2: persons with a ConceptScene visit of layout "032" on; share =
+#            persons with at least one container_enter into the order container.
+#            P0: persons with an outcome-logged visit of all three picking
+#            scenes; share = persons who completed (task_completed) each of
+#            them. Who never reached a scene is left out, not counted as 0.
+#   none     n and share NA: not measured, never 0 %.
+# Pooling mixes scenes and layouts: read with items.csv for the change over
+# the course (this table says what each objective rests on, not improvement).
+objectives <- read_csv(file.path(analysis_folder, "objectives.csv"), show_col_types = FALSE,
+                       col_types = cols(.default = col_character()))
+item_objectives <- item_skills %>%
+  mutate(objective_id = na_if(trimws(coalesce(objective_id, "")), "")) %>%
+  filter(!is.na(objective_id)) %>% select(scene, item, objective_id)
+code_objectives <- skill_map %>%
+  mutate(objective_id = na_if(trimws(coalesce(as.character(objective_id), "")), "")) %>%
+  filter(!is.na(objective_id), !is.na(skill)) %>%
+  select(code = error_code, skill, objective_id) %>%
+  inner_join(scene_skills, by = "skill", relationship = "many-to-many") %>%
+  distinct(scene, objective_id, code)
+unknown_objectives <- setdiff(c(item_objectives$objective_id, code_objectives$objective_id),
+                              objectives$objective_id)
+for (o in unknown_objectives) warn("objective_id ", o, " in item_skills.csv / skill_map.csv is not in objectives.csv")
+
+# (a) Whole first attempt at an item mapped to an objective.
+obj_item_tests <- item_attempts %>%
+  mutate(scene = as.character(scene)) %>%
+  inner_join(item_objectives, by = c("scene", "item")) %>%
+  group_by(participant_id, scene, item, objective_id) %>%
+  summarise(correct = first(correct), .groups = "drop")
+# Objectives rated by EKZ_PLACEMENT: tested only at an EKZ opportunity.
+ekz_objectives <- unique(code_objectives$objective_id[code_objectives$code == "EKZ_PLACEMENT"])
+# (b) First press at a position that tested an objective through its codes.
+obj_code_tests <- item_attempts %>%
+  mutate(scene = as.character(scene)) %>%
+  filter(event == "confirm_pressed", !scaffolded) %>%
+  inner_join(code_objectives %>% distinct(scene, objective_id), by = "scene",
+             relationship = "many-to-many") %>%
+  filter(ekz_opportunity | !objective_id %in% ekz_objectives) %>%
+  arrange(participant_id, scene, item, objective_id, t, line) %>%
+  group_by(participant_id, scene, item, objective_id) %>%
+  slice(1) %>% ungroup() %>%
+  mutate(correct = map2_lgl(codes, paste(scene, objective_id), function(cs, so) {
+    !any(cs %in% code_objectives$code[paste(code_objectives$scene, code_objectives$objective_id) == so])
+  })) %>%
+  select(participant_id, scene, item, objective_id, correct)
+obj_rated <- bind_rows(obj_item_tests, obj_code_tests) %>%
+  group_by(objective_id) %>%
+  summarise(n_persons = n_distinct(participant_id), n = n(), k = sum(correct %in% TRUE),
+            sources = paste(sort(unique(paste0(str_remove(scene, "(Picking)?Scene"), ":", item))), collapse = ";"),
+            .groups = "drop")
+
+# Observed: D2 (Concept order container) and P0 (all picking scenes completed).
+d2_persons <- concept_containers_by_visit %>% filter(containers_logged) %>%
+  group_by(participant_id) %>% summarise(done = any(order_enters > 0), .groups = "drop")
+p0_persons <- visits %>% filter(outcome_logged %in% TRUE, scene %in% red_button_scenes) %>%
+  group_by(participant_id, scene) %>% summarise(done = any(completed %in% TRUE), .groups = "drop") %>%
+  group_by(participant_id) %>% filter(n_distinct(scene) == length(red_button_scenes)) %>%
+  summarise(done = all(done), .groups = "drop")
+obs_row <- function(id, d, src) tibble(objective_id = id, n_persons = nrow(d), n = nrow(d),
+                                       k = sum(d$done), sources = src)
+obj_observed <- bind_rows(obs_row("D2", d2_persons, "Concept:container_enter order"),
+                          obs_row("P0", p0_persons, "Basic/Mixed/Complex:task_completed"))
+
+objectives_summary <- objectives %>%
+  left_join(bind_rows(obj_rated %>% semi_join(objectives %>% filter(evidence == "rated"), by = "objective_id"),
+                      obj_observed %>% semi_join(objectives %>% filter(evidence == "observed"), by = "objective_id")),
+            by = "objective_id") %>%
+  mutate(measure = case_when(evidence == "rated" ~ "first_attempt_correct",
+                             objective_id == "D2" ~ "did_order_container_enter",
+                             objective_id == "P0" ~ "completed_all_picking_scenes",
+                             TRUE ~ NA_character_),
+         # Not measured stays NA; a measured objective with no data yet has n 0 and share NA.
+         n_persons = if_else(evidence == "none", NA_integer_, coalesce(n_persons, 0L)),
+         n = if_else(evidence == "none", NA_integer_, coalesce(n, 0L)),
+         k = if_else(evidence == "none", NA_integer_, coalesce(k, 0L)),
+         share = if_else(coalesce(n, 0L) > 0, round(k / n, 3), NA_real_))
+objectives_summary <- objectives_summary %>%
+  bind_cols(wilson(objectives_summary$k, objectives_summary$n) %>%
+              mutate(across(everything(), ~ if_else(coalesce(objectives_summary$n, 0L) > 0, round(.x, 3), NA_real_))) %>%
+              rename(share_lo = lo, share_hi = hi)) %>%
+  select(objective_id, knowledge_type, evidence, measure, n_persons, n, k, share, share_lo, share_hi, sources)
+write_csv(objectives_summary, file.path(output_dir, "objectives_summary.csv"), na = "")
+
 # ---- 14. Wide file: one row per participant (for SPSS and paper forms) ---------
 
 # Per-scene columns come from the counting visit only (repeat visits stay in

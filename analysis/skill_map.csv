@@ -1,9 +1,9 @@
-error_code,skill,description
-EMPTY,calculate_quantity,Confirm pressed with nothing of the current position in the box
-WRONG_MATERIAL,check_material,A material (item = material key) not in the order or not of the current position is in the box
-TOO_FEW,calculate_quantity,Fewer full cartons of the ordered item than required
-TOO_MANY,calculate_quantity,More full cartons of the ordered item than required
-MISSING_LOOSE,calculate_loose,Fewer loose pieces than required (Complex only)
-EXTRA_LOOSE,calculate_loose,More loose pieces than required (Complex only)
-EKZ_PLACEMENT,ekz_placement,"Right quantity at an Empf Kz 003 position, but a carton not lying ordered in its own snap place (EKZ 3; Basic 6 places, Mixed position 1 3 places from layout 029)"
-WRONG_ANSWER,,Quiz touch rated wrong; skill comes from item_skills.csv by question_id
+error_code,skill,description,objective_id
+EMPTY,calculate_quantity,Confirm pressed with nothing of the current position in the box,P4a
+WRONG_MATERIAL,check_material,A material (item = material key) not in the order or not of the current position is in the box,P1
+TOO_FEW,calculate_quantity,Fewer full cartons of the ordered item than required,P4a
+TOO_MANY,calculate_quantity,More full cartons of the ordered item than required,P4a
+MISSING_LOOSE,calculate_loose,Fewer loose pieces than required (Complex only),P4b
+EXTRA_LOOSE,calculate_loose,More loose pieces than required (Complex only),P4b
+EKZ_PLACEMENT,ekz_placement,"Right quantity at an Empf Kz 003 position, but a carton not lying ordered in its own snap place (EKZ 3; Basic 6 places, Mixed position 1 3 places from layout 029)",P2
+WRONG_ANSWER,,Quiz touch rated wrong; skill comes from item_skills.csv by question_id,

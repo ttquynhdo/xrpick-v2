@@ -1,0 +1,10 @@
+objective_id,knowledge_type,description,taught_scene,practised_scene,evidence,evidence_source
+D1,declarative,"Knows the LVS fields (Mat.-Nr, Bez., Verp.-Einh., Soll, Ist, Rest, Empf Kz)",ConceptScene,BasicPickingScene;MixedPickingScene;ComplexScene,none,tour_step exposure time only (tour_steps.csv); no rated item
+D2,declarative,Knows storage container (Lagerbehaelter) and order container (Auftragsbehaelter),ConceptScene,BasicPickingScene;MixedPickingScene;ComplexScene,observed,container_enter container=order in ConceptScene (layout 032 on)
+D3,declarative,Knows the difference between Empf Kz 003 and 000,ConceptScene,BasicPickingScene;MixedPickingScene,rated,quiz ekz_003; quiz ekz_000
+P0,procedural,"Work flow: read LVS and storage container, pick, confirm (step cards 1-2-3)",WelcomeScene,BasicPickingScene;MixedPickingScene;ComplexScene,observed,task_completed in all three picking scenes; reading order not rated
+P1,procedural,Reads the LVS and compares the carton label with it,ConceptScene,BasicPickingScene;MixedPickingScene;ComplexScene,rated,quiz label_by_matnr (material_by_matnr before layout 032); WRONG_MATERIAL where scene_skills lists check_material
+P2,procedural,Places cartons by EKZ (Empf Kz 003 snap places),ConceptScene,BasicPickingScene;MixedPickingScene,rated,EKZ_PLACEMENT at the first EKZ opportunity of an Empf Kz 003 position
+P3,procedural,Picks several positions one after another,MixedPickingScene,MixedPickingScene;ComplexScene,rated,first attempt per position in MixedPickingScene (item_skills.csv)
+P4a,procedural,Calculates full cartons from Soll : Verp.-Einh.,ConceptScene,BasicPickingScene;MixedPickingScene;ComplexScene,rated,quiz cartons_from_soll; Complex quiz cartons; TOO_FEW/TOO_MANY/EMPTY at unscaffolded positions
+P4b,procedural,Calculates the loose remainder,ComplexScene,ComplexScene,rated,Complex quiz loose; MISSING_LOOSE/EXTRA_LOOSE at unscaffolded positions

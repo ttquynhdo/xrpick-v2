@@ -675,7 +675,9 @@ local({
             nrow(sw814) == 6, all(sw814$station_wait_group == "before_033"), all(abs(sw814$start_delay_s - 0.6) < 0.05),
             !any(sw$delay_unexpected), !any(station_waits$delay_unexpected),
             all(station_waits$station_wait_group[!is.na(station_waits$expected_delay_s)] == "before_033"),
-            !any(grepl("station start delay", c(p_warn, warn_lines))))
+            # Only the per-ride warning (": station start delay <s> s"); the
+            # pilot set's "set mixes station start delays" is expected (below).
+            !any(grepl(": station start delay ", c(p_warn, warn_lines), fixed = TRUE)))
   # Complex box 1 (after the quiz) and the order box are not checked (NA).
   stopifnot(all(is.na(sw$expected_delay_s[sw$what == "order_box" |
                                             (sw$what == "storage_in" & sw$position == 1)])))
@@ -698,6 +700,47 @@ local({
             any(grepl("set mixes station start delays", p_warn)),
             !any(grepl("set mixes station start delays", warn_lines)))
 
+  # 8w. Course objectives (#86, decision 034): objectives_summary.csv has one
+  #     row per objectives.csv row; evidence "none" is NA (never 0 %), rated
+  #     objectives are the pooled first attempts, observed D2/P0 per person.
+  for (os_set in list(list(o = objectives_summary, it = items, v = visits, dir = output_dir),
+                      list(o = pilot_set$objectives_summary, it = pilot_set$items, v = pilot_set$visits,
+                           dir = pilot_dir))) {
+    os <- os_set$o
+    stopifnot(file.exists(file.path(os_set$dir, "objectives_summary.csv")),
+              identical(os$objective_id, c("D1", "D2", "D3", "P0", "P1", "P2", "P3", "P4a", "P4b")),
+              all(os$knowledge_type == if_else(startsWith(os$objective_id, "D"), "declarative", "procedural")))
+    none <- os %>% filter(evidence == "none")
+    stopifnot(identical(none$objective_id, "D1"), is.na(none$n), is.na(none$n_persons), is.na(none$share),
+              is.na(none$share_lo))
+    # A measured objective without data has n 0 and share NA, never 0 %.
+    stopifnot(all(is.na(os$share[os$n %in% 0L])), all(!is.na(os$share[which(os$n > 0)])))
+    rated <- os %>% filter(evidence == "rated")
+    stopifnot(all(rated$n > 0), all(rated$share >= 0 & rated$share <= 1),
+              all(rated$share_lo <= rated$share & rated$share <= rated$share_hi))
+    # D3 = the two EKZ quiz questions, P3 = the Mixed positions, whole first attempt (items.csv).
+    d3_items <- os_set$it %>% filter(scene == "ConceptScene", item %in% c("ekz_003", "ekz_000"))
+    mx_items <- os_set$it %>% filter(scene == "MixedPickingScene", kind == "position")
+    stopifnot(os$n[os$objective_id == "D3"] == nrow(d3_items),
+              os$k[os$objective_id == "D3"] == sum(d3_items$first_attempt_correct %in% TRUE),
+              os$n[os$objective_id == "P3"] == nrow(mx_items),
+              os$k[os$objective_id == "P3"] == sum(mx_items$first_attempt_correct %in% TRUE))
+    # Scaffolded Complex position 1 never counts; EKZ placement only in Basic/Mixed.
+    stopifnot(!any(grepl("Complex:position_1", os$sources, fixed = TRUE)),
+              !grepl("Complex", os$sources[os$objective_id == "P2"]))
+    # P0: persons with an outcome-logged visit of all 3 picking scenes; done = completed each.
+    p0 <- os_set$v %>% filter(outcome_logged %in% TRUE,
+                              scene %in% c("BasicPickingScene", "MixedPickingScene", "ComplexScene")) %>%
+      group_by(participant_id, scene) %>% summarise(done = any(completed %in% TRUE), .groups = "drop") %>%
+      group_by(participant_id) %>% filter(n() == 3) %>% summarise(done = all(done), .groups = "drop")
+    stopifnot(os$n[os$objective_id == "P0"] == nrow(p0), os$k[os$objective_id == "P0"] == sum(p0$done))
+  }
+  # D2 (Concept order container, layout "032" on): the study set has no such
+  # log (n 0, share NA); the pilot set has P814 and P815.
+  stopifnot(objectives_summary$n[objectives_summary$objective_id == "D2"] == 0,
+            is.na(objectives_summary$share[objectives_summary$objective_id == "D2"]),
+            pilot_set$objectives_summary$n[pilot_set$objectives_summary$objective_id == "D2"] >= 1)
+
   # 8u. Mixed position 1 Empf Kz (#94, decision 028). P813 ("029") logs
   #     line.empf_kz; its fixed Mixed presses: TOO_FEW, TOO_FEW, EKZ_PLACEMENT,
   #     correct (position 1, "003"), correct (position 2, "000"). EKZ
@@ -705,7 +748,9 @@ local({
   pm <- pilot_set$presses %>% filter(participant_id == "P813", scene == "MixedPickingScene") %>% arrange(t)
   stopifnot(identical(pm$empf_kz_logged, c("003", "003", "003", "003", "000")),
             identical(pm$ekz_opportunity, c(FALSE, FALSE, TRUE, TRUE, FALSE)),
-            all(is.na(pilot_set$presses$empf_kz_logged[pilot_set$presses$participant_id != "P813"])))
+            # Builds before layout "029" never log the field (P814/P815 are later builds).
+            all(is.na(pilot_set$presses$empf_kz_logged[
+              !coalesce(suppressWarnings(as.integer(pilot_set$presses$layout_version)) >= 29L, FALSE)])))
   m813 <- pilot_set$skill_rates %>% filter(participant_id == "P813", scene == "MixedPickingScene")
   stopifnot(identical(m813$skill_presses[m813$skill == "ekz_placement"], 2L),
             identical(m813$presses_with_skill_error[m813$skill == "ekz_placement"], 1L),
@@ -713,8 +758,12 @@ local({
             identical(m813$skill_presses[m813$skill == "calculate_quantity"], 5L),
             identical(m813$presses_with_skill_error[m813$skill == "calculate_quantity"], 2L))
   # "025"/"019" Mixed visits never measured placement: no ekz_placement row.
-  stopifnot(!any(pilot_set$skill_rates$scene == "MixedPickingScene" & pilot_set$skill_rates$skill == "ekz_placement" &
-                   pilot_set$skill_rates$participant_id != "P813"))
+  # Builds from layout "029" on (P813, and the later P814/P815) have Empf Kz 003 there.
+  ekz_builds <- pilot_set$sessions$participant_id[
+    coalesce(suppressWarnings(as.integer(pilot_set$sessions$layout_version)) >= 29L, FALSE)]
+  stopifnot("P813" %in% ekz_builds,
+            !any(pilot_set$skill_rates$scene == "MixedPickingScene" & pilot_set$skill_rates$skill == "ekz_placement" &
+                   !pilot_set$skill_rates$participant_id %in% ekz_builds))
   # Mixed position_1 is split by Empf Kz in the item and phase charts, never pooled.
   pi <- read_csv(file.path(pilot_dir, "items.csv"), show_col_types = FALSE,
                  col_types = cols(.default = col_guess(), empf_kz = col_character(), layout_version = col_character()))
@@ -722,7 +771,7 @@ local({
   stopifnot(identical(mi$empf_kz[mi$participant_id == "P813" & mi$item == "position_1"], "003"),
             isFALSE(mi$first_attempt_correct[mi$participant_id == "P813" & mi$item == "position_1"]),
             identical(mi$attempts[mi$participant_id == "P813" & mi$item == "position_1"], 4),
-            all(mi$empf_kz[mi$participant_id != "P813" | mi$item == "position_2"] == "000"),
+            all(mi$empf_kz[!mi$participant_id %in% ekz_builds | mi$item == "position_2"] == "000"),
             all(is.na(pi$empf_kz[pi$kind == "quiz"])))
   mx <- as.character(pilot_set$item_shares$x_label[pilot_set$item_shares$scene == "MixedPickingScene"])
   stopifnot(all(c("Mixed\nposition_1\n[Empf Kz 000]", "Mixed\nposition_1\n[Empf Kz 003]", "Mixed\nposition_2") %in% mx),

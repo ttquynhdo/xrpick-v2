@@ -1,7 +1,7 @@
 # Quyết định 027: Mẫu thẻ nhiệm vụ chung (thẻ „Aufgabe“ nền kem, slot đều do công cụ đặt, ván co theo thẻ) và bảng mục tiêu Welcome hai cụm
 
 - **Backlog:** #87 (mẫu thẻ), #86 (bảng Welcome) (một quyết định chung)
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted; mục 5 (câu dẫn hai cụm Welcome) và cách hiểu D33 bị thay bởi decision 034
 - **Ngày:** 2026-11-04
 - **Ý kiến đã xét:** instructional-design-reviewer, xr-ux-reviewer, unity-reviewer, german-reviewer → decision-synthesizer. Không hỏi requirements-analyst (không quy tắc nghiệp vụ nào đổi, chỉ hình thức và chữ).
 - **Lựa chọn của người dùng (2026-11-04):** chấp nhận phương án A, thẻ mục tiêu **nền kem**. Rút gọn dần chữ qua các bài (fading) để thành mục backlog riêng.

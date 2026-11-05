@@ -415,10 +415,6 @@ MonoBehaviour:
     m_Key: welcome.panel.title
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627432
-    m_Key: welcome.panel.goals
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627433
     m_Key: welcome.panel.duration
     m_Metadata:
@@ -857,6 +853,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 970336154554368
     m_Key: complex.storage.opened_carton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1017753042292736
+    m_Key: welcome.panel.know
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1017753113595904
+    m_Key: welcome.panel.can
     m_Metadata:
       m_Items: []
   m_Metadata:
