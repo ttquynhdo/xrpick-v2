@@ -1,35 +1,36 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// #83, docs/decisions/025: at the tour step "cartons" three static STECKER C cartons appear one after the other in
-/// the order container, each with its running total (40, 80, 120 = Soll), so Soll : Verp.-Einh. is seen, not only
-/// read. Leaving the step hides them; coming back starts again from the first. View only: no Grabbable, no log.
-/// #91, decisions 026/030: each carton that appears is taken from the storage container (one static carton hides) and
-/// Ist on the sample WMS counts along. At the step "material_flow" all three are in the order container at once, so
-/// the order container leaves with them (LaneFlowDemo).
+/// #83 / #91, docs/decisions/025, 030: the tour step "cartons" makes Soll : Verp.-Einh. seen, not only read.
+/// #92, docs/decisions/032: the trainee puts the cartons into the order container from the storage container; nothing
+/// appears by itself. At this step a running total in LVS-field style (40, 80, „120 = Soll“) stands above the carton
+/// laid down last, as long as the count does not exceed the order (then ConceptBoxHints shows its too-many hint).
+/// Ist itself comes from ConceptBoxHints → SampleWmsOrder. View only: no log.
 /// </summary>
 public class CartonCountDemo : MonoBehaviour
 {
     [SerializeField] private WmsFieldTour tour;
 
-    [Tooltip("Tour step id that shows the cartons one after the other.")]
+    [Tooltip("Tour step id that shows the running total.")]
     [SerializeField] private string stepId = "cartons";
 
-    [Tooltip("Tour step id that shows all cartons at once (the order is complete).")]
-    [SerializeField] private string fullStepId = "material_flow";
+    [Tooltip("Reads which sample cartons lie in the order container.")]
+    [SerializeField] private ConceptBoxHints boxHints;
 
-    [Tooltip("The cartons in the order they appear, each with its total label as a child; inactive in the scene.")]
-    [SerializeField] private GameObject[] cartons;
-
-    [Tooltip("Static cartons in the storage container, hidden in this order as the cartons appear.")]
-    [SerializeField] private GameObject[] storageCartons;
-
-    [Tooltip("Sample WMS order; its Ist shows the pieces of the cartons shown.")]
+    [Tooltip("Sample WMS order; Soll and Verp.-Einh. give how many totals there are.")]
     [SerializeField] private SampleWmsOrder order;
 
-    [Tooltip("Seconds between two cartons.")]
-    [SerializeField] private float interval = 0.6f;
+    [Tooltip("Total tags in order (1 carton, 2 cartons, …), inactive world-space canvases.")]
+    [SerializeField] private RectTransform[] totals;
+
+    [Tooltip("Eyes; empty = Camera.main.")]
+    [SerializeField] private Transform head;
+
+    [Tooltip("Gap between the carton's top and the tag's bottom edge, in metres.")]
+    [SerializeField] private float gap = 0.015f;
+
+    private bool atStep;
 
     private void OnEnable()
     {
@@ -46,82 +47,76 @@ public class CartonCountDemo : MonoBehaviour
             tour.StepShown -= HandleStepShown;
         }
 
-        StopAllCoroutines();
-        ShowCount(0);
+        atStep = false;
+        ShowTotal(-1, null);
     }
 
     private void Start()
     {
         RequiredReference.IsMissing(tour, nameof(tour), this);
+        RequiredReference.IsMissing(boxHints, nameof(boxHints), this);
         RequiredReference.IsMissing(order, nameof(order), this);
-        if (cartons == null || cartons.Length == 0)
+        if (totals == null || totals.Length == 0)
         {
-            Debug.LogError("CartonCountDemo: cartons is empty.", this);
+            Debug.LogError("CartonCountDemo: totals is empty.", this);
         }
+
+        ShowTotal(-1, null);
     }
 
     private void HandleStepShown(string shownStepId)
     {
-        StopAllCoroutines();
-
-        if (shownStepId == stepId)
+        atStep = shownStepId == stepId;
+        if (!atStep)
         {
-            ShowCount(0);
-            StartCoroutine(ShowInTurn());
-        }
-        else if (shownStepId == fullStepId)
-        {
-            ShowCount(cartons.Length);
-        }
-        else
-        {
-            ShowCount(0);
+            ShowTotal(-1, null);
         }
     }
 
-    private IEnumerator ShowInTurn()
+    private void LateUpdate()
     {
-        for (int i = 1; i <= cartons.Length; i++)
-        {
-            if (i > 1)
-            {
-                yield return new WaitForSeconds(interval);
-            }
+        if (!atStep || boxHints == null || order == null || totals == null)
+            return;
 
-            ShowCount(i);
+        List<Transform> placed = boxHints.SampleIn(ConceptBox.Order);
+        int vpe = Mathf.Max(order.CurrentLine.vpe, 1);
+        int needed = Mathf.Min(order.CurrentLine.soll / vpe, totals.Length);
+        int count = placed.Count;
+
+        if (count == 0 || count > needed)
+        {
+            ShowTotal(-1, null);
+            return;
         }
+
+        ShowTotal(count - 1, placed[count - 1]);
     }
 
-    // The first count cartons in the order container, as many static ones gone from the storage container.
-    private void ShowCount(int count)
+    // Shows totals[index] above the carton (index -1 = none).
+    private void ShowTotal(int index, Transform carton)
     {
-        if (cartons != null)
+        if (totals == null)
+            return;
+
+        for (int i = 0; i < totals.Length; i++)
         {
-            for (int i = 0; i < cartons.Length; i++)
+            if (totals[i] != null)
             {
-                SetActive(cartons[i], i < count);
+                totals[i].gameObject.SetActive(i == index);
             }
         }
 
-        if (storageCartons != null)
-        {
-            for (int i = 0; i < storageCartons.Length; i++)
-            {
-                SetActive(storageCartons[i], i >= count);
-            }
-        }
+        if (index < 0 || carton == null || totals[index] == null)
+            return;
 
-        if (order != null)
-        {
-            order.SetShownPieces(count * order.CurrentLine.vpe);
-        }
-    }
-
-    private static void SetActive(GameObject target, bool active)
-    {
-        if (target != null)
-        {
-            target.SetActive(active);
-        }
+        Transform eyes = head != null ? head : Camera.main != null ? Camera.main.transform : null;
+        Bounds bounds = TagPlacement.Of(carton.GetComponentsInChildren<Renderer>(), carton.position);
+        RectTransform tag = totals[index];
+        float halfHeight = tag.rect.height * tag.lossyScale.y * 0.5f;
+        Vector3 position = new(bounds.center.x, bounds.max.y + gap + halfHeight, bounds.center.z);
+        Quaternion rotation = eyes != null
+            ? Quaternion.LookRotation(position - eyes.position, Vector3.up)
+            : tag.rotation;
+        tag.SetPositionAndRotation(position, rotation);
     }
 }

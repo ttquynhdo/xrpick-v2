@@ -49,8 +49,7 @@ complex.example.body,"Soll 64 ST, VPE 20 ST
 2. 64 - 60 = 4 lose Teile
 Kontrolle: 60 + 4 = 64 ST",proposed,german-reviewer (agent),2026-11-02,#19
 complex.feedback.position_done,"Position {done} ist erledigt.
-Der angebrochene Karton mit der Anbruchmenge bleibt im Modul im Lagerbehälter.
-Lesen Sie im LVS die Angaben von Position {next} ab.",proposed,german-reviewer (agent),2026-11-02,#19
+Lesen Sie im LVS die Angaben zu Position {next} ab.",proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-02,#53 (quiz hint moved to card 1)
 complex.card.step1_body_position1,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll), VPE (<nobr>Verp.-Einh.</nobr>) und EKZ (<nobr>Empf Kz</nobr>). Beantworten Sie dann die Fragen unter dem Bildschirm. Das „Beispiel“ rechts daneben hilft beim Rechnen.",proposed,,2026-11-03,#62
 basic.result.correct.text,Der Auftrag ist richtig. Wählen Sie jetzt im Menü „4. Mehrere Positionen“.,proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional '… auswählen', left to #13"
@@ -63,12 +62,12 @@ common.button.f6,F6,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 common.card.step1_title,1. Angaben im LVS ablesen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 common.card.step3_title,3. Auftrag bestätigen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 complex.end.next,Bitte nehmen Sie die VR-Brille ab und melden Sie sich bei der Kursleitung.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-concept.card.step1_body,Nehmen Sie jede Verpackung in die Hand und lesen Sie ihr Etikett.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.card.step1_body,Nehmen Sie einen Karton aus dem Lagerbehälter und lesen Sie das Etikett.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 concept.card.step1_title,1. Etikett lesen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 concept.card.step2_body,Lesen Sie die Erklärung neben dem Feld. Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.card.step2_title,2. LVS kennenlernen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 concept.card.step3_title,3. Fragen beantworten,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-concept.card.task_body,Lernen Sie das Etikett und das Lagerverwaltungssystem (LVS) kennen. Beantworten Sie dann die Fragen.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+concept.card.task_body,Lesen Sie das Etikett und die Angaben im LVS. Berechnen Sie die Anzahl der Kartons. Legen Sie sie aus dem Lagerbehälter in den Auftragsbehälter. Beantworten Sie dann die Fragen.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 entry.confirm.correct,Korrigieren,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.confirm.yes,Ja,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.keypad.delete,Löschen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
@@ -133,12 +132,6 @@ concept.quiz.cartons_from_soll.2.wrong,2 Kartons sind nur 50 Stück.,proposed,ge
 concept.quiz.cartons_from_soll.4,4 Kartons,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.25,25 Kartons,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.25.wrong,25 ist die VPE: die Stückzahl in einem Karton. Teilen Sie Soll durch VPE.,proposed,german-reviewer (agent),2026-11-03,"Agent: OK; optional 'durch die VPE', left to #13"
-concept.quiz.material_by_matnr.q,Welches Material hat die Mat.-Nr 738190?,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.material_by_matnr.connector_a,KABELVERBINDER A,proposed,german-reviewer (agent),2026-11-03,"material name, never translated"
-concept.quiz.material_by_matnr.screw_b,SCHRAUBE B,proposed,german-reviewer (agent),2026-11-03,"material name, never translated"
-concept.quiz.material_by_matnr.ring_d,RING D,proposed,german-reviewer (agent),2026-11-03,"material name, never translated"
-concept.quiz.material_by_matnr.connector_a.wrong,Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.material_by_matnr.ring_d.wrong,Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.ekz_003.q,Empf Kz 003: Wie geben Sie die Kartons in den Auftragsbehälter?,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.quiz.ekz_003.ordered,Einzeln und geordnet einlegen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.ekz_003.poured,Ungeordnet einfüllen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
@@ -195,18 +188,26 @@ concept.tour.intro.action,Drücken Sie „Weiter“.,proposed,german-reviewer (a
 concept.tour.material.action,Nehmen Sie den Karton STECKER C in die Hand.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK (#90, split pick-up / compare)"
 concept.tour.verp_einh.action,Nehmen Sie den Karton STECKER C in die Hand.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK (#90, split pick-up / compare)"
 concept.tour.soll.action,Lesen Sie die Zahl im Feld Soll ab. Drücken Sie dann „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.cartons.action,Schauen Sie in den Auftragsbehälter rechts.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.cartons.action,Legen Sie die Kartons aus dem Lagerbehälter in den Auftragsbehälter.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 concept.tour.ist.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.rest.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.empf_kz_003.action,Sehen Sie sich links neben dem Bildschirm das Beispiel „Empf Kz 003“ an.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.tour.empf_kz_000.action,Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.tour.not_used.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu. Drücken Sie dann „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
-concept.label.tag.matnr,Mat.-Nr: {matnr} – Materialnummer,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
-concept.label.tag.vpe,VPE: {vpe} ST – Stück pro Karton oder Tüte,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
-concept.tour.material.action_held,Vergleichen Sie Mat.-Nr und Bez. im LVS mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
-concept.tour.verp_einh.action_held,Lesen Sie die VPE auf dem Etikett ab und vergleichen Sie sie mit Verp.-Einh. im LVS.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
+concept.label.tag.matnr,Mat.-Nr: {matnr} – Materialnummer,proposed,german-reviewer (agent),2026-11-04,Agent: OK after its fixes (#90)
+concept.label.tag.vpe,VPE: {vpe} ST – Stück pro Karton oder Tüte,proposed,german-reviewer (agent),2026-11-04,Agent: OK after its fixes (#90)
+concept.tour.material.action_held,Vergleichen Sie Mat.-Nr und Bez. im LVS mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,Agent: OK after its fixes (#90)
+concept.tour.verp_einh.action_held,Lesen Sie die VPE auf dem Etikett ab und vergleichen Sie sie mit Verp.-Einh. im LVS.,proposed,german-reviewer (agent),2026-11-04,Agent: OK after its fixes (#90)
 concept.hint.storage_wrong_material,In diesem Lagerbehälter liegt Material mit einer anderen Materialnummer. Nehmen Sie es heraus.,proposed,,2026-11-05,#100 new
 concept.tour.to_questions,Zu den Fragen,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
-complex.card.step2_body_answered,"<b>{cartons} Kartons + {pieces} Stück</b>\nLegen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#93); add a singular key if the order ever needs 1 carton"
+complex.card.step2_body_answered,"<b>{cartons} Kartons + {pieces} Stück</b>\nLegen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93); add a singular key if the order ever needs 1 carton
 concept.tour.material_flow.action_done,Wählen Sie jetzt im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
+concept.quiz.label_by_matnr.q,Im LVS steht die Mat.-Nr 738190. Welches Etikett passt?,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+concept.quiz.label_by_matnr.738910,Mat.-Nr: 738910,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+concept.quiz.label_by_matnr.738190,Mat.-Nr: 738190,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+concept.quiz.label_by_matnr.783190,Mat.-Nr: 783190,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+concept.quiz.label_by_matnr.738910.wrong,Vergleichen Sie Ziffer für Ziffer mit 738190.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+concept.quiz.label_by_matnr.783190.wrong,Vergleichen Sie Ziffer für Ziffer mit 738190.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+concept.ekz.sample.not_grabbable,Beispiel – nicht zum Greifen.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+complex.storage.opened_carton,Der angebrochene Karton bleibt im Modul im Lagerbehälter. Nehmen Sie nur die losen Teile heraus.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review

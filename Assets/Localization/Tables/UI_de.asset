@@ -233,8 +233,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
-    m_Localized: Lernen Sie das Etikett und das Lagerverwaltungssystem (LVS) kennen.
-      Beantworten Sie dann die Fragen.
+    m_Localized: "Lesen Sie das Etikett und die Angaben im LVS. Berechnen Sie die
+      Anzahl der Kartons. Legen Sie sie aus dem Lagerbeh\xE4lter in den Auftragsbeh\xE4lter.
+      Beantworten Sie dann die Fragen."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627374
@@ -242,7 +243,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627375
-    m_Localized: Nehmen Sie jede Verpackung in die Hand und lesen Sie ihr Etikett.
+    m_Localized: "Nehmen Sie einen Karton aus dem Lagerbeh\xE4lter und lesen Sie
+      das Etikett."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627376
@@ -382,10 +384,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627411
     m_Localized: 'Soll 100, VPE 25: Wie viele Kartons nehmen Sie?'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627415
-    m_Localized: Welches Material hat die Mat.-Nr 738190?
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627417
@@ -607,9 +605,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
-    m_Localized: "Position {done} ist erledigt.\nDer angebrochene Karton mit der
-      Anbruchmenge bleibt im Modul im Lagerbeh\xE4lter.\nLesen Sie im LVS die Angaben
-      von Position {next} ab."
+    m_Localized: 'Position {done} ist erledigt.
+
+      Lesen Sie im LVS die Angaben
+      zu Position {next} ab.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465
@@ -647,26 +646,6 @@ MonoBehaviour:
   - m_Id: 33687669182467
     m_Localized: "25 ist die VPE: die St\xFCckzahl in einem Karton. Teilen Sie Soll
       durch VPE."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182468
-    m_Localized: KABELVERBINDER A
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182469
-    m_Localized: SCHRAUBE B
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182470
-    m_Localized: RING D
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182471
-    m_Localized: Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182472
-    m_Localized: Vergleichen Sie die Mat.-Nr auf den Etiketten mit 738190.
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473
@@ -865,7 +844,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810627
-    m_Localized: "Schauen Sie in den Auftragsbeh\xE4lter rechts."
+    m_Localized: "Legen Sie die Kartons aus dem Lagerbeh\xE4lter in den Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810628
@@ -928,6 +907,39 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 773084278558720
     m_Localized: "W\xE4hlen Sie jetzt im Men\xFC die n\xE4chste Lektion."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336074862592
+    m_Localized: Im LVS steht die Mat.-Nr 738190. Welches Etikett passt?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360064
+    m_Localized: 'Mat.-Nr: 738910'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360065
+    m_Localized: 'Mat.-Nr: 738190'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360066
+    m_Localized: 'Mat.-Nr: 783190'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360067
+    m_Localized: "Vergleichen Sie Ziffer f\xFCr Ziffer mit 738190."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360068
+    m_Localized: "Vergleichen Sie Ziffer f\xFCr Ziffer mit 738190."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360069
+    m_Localized: "Beispiel \u2013 nicht zum Greifen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336154554368
+    m_Localized: "Der angebrochene Karton bleibt im Modul im Lagerbeh\xE4lter. Nehmen
+      Sie nur die losen Teile heraus."
     m_Metadata:
       m_Items: []
   references:

@@ -9,7 +9,9 @@
 # events of #29 (grab_start/_end, container_enter/_exit, menu_select,
 # end_control_opened/_cancelled, scene_enter.via) and, for the layout "029"
 # pilot P813, the ConceptScene hint tags of #100 (concept_hint_shown / _cleared,
-# section 5b3). Header event_groups =
+# section 5b3) and, for the layout "032" pilot P814 (#92, decision 032), the
+# ConceptScene container_enter / _exit of both containers (order, storage;
+# section 5b4) and the quiz question label_by_matnr. Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
 # perf, floor-drop or tracking events: decision 022 dropped #30 and #74, the
@@ -23,7 +25,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P813, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P814, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -230,6 +232,17 @@ concept_questions <- list(
                            skill = "check_material"),
   ekz_003           = list(keys = c("ordered", "poured"), right = "ordered", skill = "ekz_placement"),
   ekz_000           = list(keys = c("ordered", "poured"), right = "poured", skill = "ekz_placement"))
+# Layout "032" (#92, decision 032): material_by_matnr is replaced by
+# label_by_matnr (which label matches the Mat.-Nr shown in the LVS; the keys
+# are the three Mat.-Nr on the labels). Same skill, new question_id.
+concept_questions_for <- function(layout) {
+  if (!layout_at_least(layout, 32)) return(concept_questions)
+  q <- concept_questions
+  names(q)[names(q) == "material_by_matnr"] <- "label_by_matnr"
+  q$label_by_matnr <- list(keys = c("738910", "738190", "783190"), right = "738190",
+                           skill = "check_material")
+  q
+}
 remainder_questions <- list(
   cartons = list(keys = c("1", "2", "3"), right = "2", skill = "calculate_quantity"),
   loose   = list(keys = c("5", "20", "55"), right = "5", skill = "calculate_loose"))
@@ -945,9 +958,9 @@ run_welcome <- function(s, practice = TRUE) {
 # shown / cleared alternate per visit; when the tag moves to another package,
 # the old cleared comes right before the new shown (same frame). Leaving the
 # scene while a tag is shown writes nothing. Hints are not attempts: no
-# quiz_answer, no confirm_*, nothing in summary.csv; Concept writes no
-# container_* either. tour_step_id = the step on screen (null before the
-# tour bar opens).
+# quiz_answer, no confirm_*, nothing in summary.csv. Up to layout "029"
+# Concept writes no container_*; from "032" it does (section 5b4).
+# tour_step_id = the step on screen (null before the tour bar opens).
 hint_event <- function(s, shown, container, reason, obj, item) {
   emit(s, if (shown) "concept_hint_shown" else "concept_hint_cleared",
        json_obj(container = container, reason = reason, object_id = obj, material_key = item,
@@ -982,6 +995,56 @@ hint_take <- function(s, obj, item, container, reason, after_s, next_hint = NULL
   grab_end(s, obj, item)
 }
 
+# ---- 5b4. ConceptScene containers (#92, decision 032, layout "032" on) ----
+
+# The only grabbable packages are 6 STECKER C cartons that start in the
+# storage container (no event for them at scene start). ConceptBoxHints
+# writes container_exit when a carton in a container is grabbed (it counts
+# only packages lying there, not held) and container_enter when it is let go
+# inside one; container = order or storage, count_after = packages in that
+# container now. The lane demo at material_flow moves cartons itself and
+# logs nothing; any step shown after material_flow puts all 6 back into the
+# storage container (unlogged), so the counts start again at storage 6 /
+# order 0. Concept container_* are not in summary.csv (stays empty).
+concept_cartons <- sprintf("Interactables/STECKER C Karton %d", 1:6)
+concept_cc <- function(s) {
+  if (is.null(s$v$cc)) list(order = character(0), storage = concept_cartons) else s$v$cc
+}
+# A tour step replaced material_flow: LaneFlowDemo.ResetStation.
+concept_left_flow <- function(s) {
+  if (identical(s$tour_step, "material_flow")) s$v$cc <- NULL
+}
+concept_container <- function(s, entered, obj, container) {
+  cc <- concept_cc(s)
+  cc[[container]] <- if (entered) c(cc[[container]], obj) else setdiff(cc[[container]], obj)
+  s$v$cc <- cc
+  emit(s, if (entered) "container_enter" else "container_exit",
+       json_obj(container = container, object_id = obj, material_key = "stecker_c",
+                count_after = length(cc[[container]])))
+}
+# Grab a carton (from: the container it lies in, NULL = desk), carry it, let
+# it go in to (NULL = desk). The exit and the enter come one frame after the
+# grab_start / grab_end. reason: the hint tag that appears 0.5 s after it
+# lies in to; clears: the tag on it that goes when it is grabbed.
+concept_move <- function(s, obj, from, to, carry_s = 1.5, reason = NULL, clears = NULL) {
+  grab_start(s, obj, "stecker_c")
+  if (!is.null(from)) {
+    advance(s, 0.011)
+    concept_container(s, FALSE, obj, from)
+    if (!is.null(clears)) hint_event(s, FALSE, from, clears, obj, "stecker_c")
+  }
+  advance(s, carry_s)
+  grab_end(s, obj, "stecker_c")
+  if (!is.null(to)) {
+    advance(s, 0.011)
+    concept_container(s, TRUE, obj, to)
+    if (!is.null(reason)) {
+      advance(s, 0.5)
+      hint_event(s, TRUE, to, reason, obj, "stecker_c")
+    }
+  }
+}
+
 # ConceptScene: 11 tour steps ("Weiter"), the quiz opens at material_flow,
 # then the 4 questions in order, each touched until right. Layout "025"
 # (#80, decision 024): some trainees press "Zurück" (step_index - 1) to
@@ -999,6 +1062,8 @@ hint_take <- function(s, obj, item, container, reason, after_s, next_hint = NULL
 # before the trainee leaves the scene. A hint function may set
 # s$on_next_step: it runs right after the next tour_step line, for a tag the
 # step change clears (TOO_MANY when the demo cartons leave with "cartons").
+# Layout "032" (#92): the 6 storage cartons are the only packages; a step
+# shown after material_flow resets them (concept_left_flow, section 5b4).
 run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
   unlocked <- FALSE
   s$tour_step <- NULL
@@ -1006,6 +1071,7 @@ run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
   run_hint <- function(key) if (!is.null(hints[[key]])) hints[[key]](s)
   show_step <- function(i) {
     emit(s, "tour_step", json_obj(step_id = tour_steps[i], step_index = i))
+    concept_left_flow(s)
     s$tour_step <- tour_steps[i]
     if (!is.null(s$on_next_step)) {
       f <- s$on_next_step
@@ -1057,11 +1123,13 @@ run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
     for (i in 1:3) {
       advance(s, runif(1, 2, 6))
       emit(s, "tour_step", json_obj(step_id = tour_steps[i], step_index = i))
+      concept_left_flow(s)
     }
   }
   maybe_unity_error(s)
   # #29: a few packages picked up at the label board (no container here).
-  if (s$interaction) {
+  # Layout "032" has no desk packages any more (decision 032).
+  if (s$interaction && !layout_at_least(s$layout, 32)) {
     for (k in seq_len(floor(side_runif(1, 5)))) {
       if (side_chance(0.5)) {
         pick_and_drop(s, sprintf("Interactables/VPE_OpenedPackage/Rings/ring (%d)", k), "ring_d")
@@ -1070,11 +1138,12 @@ run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
       }
     }
   }
-  for (qid in names(concept_questions)) {
+  questions <- concept_questions_for(s$layout)
+  for (qid in names(questions)) {
     # >= 5 s also covers the 1.5 s "Richtig!" hold after a right answer (#78):
     # no touch is generated while the toggles are not interactable.
     advance(s, runif(1, 5, 15))  # read the question and the three answers
-    ask_question(s, person, "concept", qid, concept_questions[[qid]])
+    ask_question(s, person, "concept", qid, questions[[qid]])
   }
   complete_task(s)
   advance(s, runif(1, 3, 10))  # read the feedback, then press the menu
@@ -1604,6 +1673,51 @@ go_to_scene(s, "MixedPickingScene"); run_picking(s, p813, forced = p813_mixed)
 go_to_scene(s, "ComplexScene"); run_picking(s, p813, end_on_correct = TRUE)
 end_session(s, "completed")
 
+# P814: English pilot on the "032" build (decision 032, #92): Concept picks
+# from the storage container. A fixed set of carton moves, so selftest.R knows
+# the numbers (cartons "Interactables/STECKER C Karton n"):
+#   step material: carton 1 out of the storage container and back in (reads
+#     the label): storage exit (5), storage enter (6)
+#   step cartons: cartons 1-4 into the order container (order 1..4, storage
+#     5..2); the 4th brings Ist above Soll: order / TOO_MANY, removed by the
+#     trainee (carton 4 back into the storage container: order 3, storage 3)
+#   step material_flow: the demo rides (nothing logged), the trainee presses
+#     "Zurück" (step 10: every carton back in the storage container, unlogged),
+#     puts carton 6 into the order container (order 1, storage 5: counts
+#     start again at 6 / 0), then "Weiter" to material_flow again.
+# Totals: storage 6 exits / 2 enters, order 5 enters / 1 exit, order at most
+# 4 cartons, Soll (3 cartons) reached once by the trainee, 1 TOO_MANY tag.
+p814_hints <- list(
+  material = function(s) {
+    advance(s, 2)
+    concept_move(s, concept_cartons[1], "storage", "storage", carry_s = 3)
+  },
+  cartons = function(s) {
+    for (k in 1:3) {
+      advance(s, 1.5)
+      concept_move(s, concept_cartons[k], "storage", "order")
+    }
+    advance(s, 1.5)
+    concept_move(s, concept_cartons[4], "storage", "order", reason = "TOO_MANY")
+    advance(s, 3)
+    concept_move(s, concept_cartons[4], "order", "storage", clears = "TOO_MANY")
+  },
+  material_flow = function(s) {
+    advance(s, 18)  # 4 s delay, the demo rides (~14 s), not logged
+    emit(s, "tour_step", json_obj(step_id = tour_steps[10], step_index = 10))  # "Zurück"
+    concept_left_flow(s)
+    s$tour_step <- tour_steps[10]
+    advance(s, 3)
+    concept_move(s, concept_cartons[6], "storage", "order")
+    advance(s, 4)
+    emit(s, "tour_step", json_obj(step_id = tour_steps[11], step_index = 11))  # "Weiter"
+    s$tour_step <- tour_steps[11]
+  })
+
+p814 <- new_person("P814")
+run_full_course(p814, "aaa1111", "2026-11-06T18:00:00Z", language = "EN", layout = "032",
+                special = list(ConceptScene = list(hints = p814_hints)))
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1656,7 +1770,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P813  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P814  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -1719,7 +1833,8 @@ paper_rows <- list(
   paper_row("P803"),
   paper_row("P811"),
   paper_row("P812"),
-  paper_row("P813"))
+  paper_row("P813"),
+  paper_row("P814"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

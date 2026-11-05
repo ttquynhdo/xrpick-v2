@@ -12,6 +12,9 @@ using UnityEngine;
 /// Packages are kinematic and keep where they are let go, so the containers are read with Physics.OverlapBox over
 /// their inside (zone colliders stay disabled) instead of trigger events; a package switched off or riding with its
 /// colliders off is simply no longer found.
+/// #92, decision 032: the sample cartons are grabbable and start in the storage container. What lies in each container
+/// is logged as container_enter / container_exit (container order or storage), except while LogSuspended is set (the
+/// lane demo moves cartons by itself); when it is cleared the current contents become the new baseline, unlogged.
 /// </summary>
 public class ConceptBoxHints : MonoBehaviour
 {
@@ -50,9 +53,34 @@ public class ConceptBoxHints : MonoBehaviour
     private readonly List<LyingPackage> lying = new();
     private readonly HashSet<Package> found = new();
 
+    private readonly Dictionary<ConceptBox, HashSet<int>> logged = new()
+    {
+        [ConceptBox.Order] = new HashSet<int>(),
+        [ConceptBox.Storage] = new HashSet<int>()
+    };
+
     private ConceptBoxHintRule rule;
     private ConceptHint? shown;
     private TMP_Text tagText;
+    private bool logSuspended;
+    private bool hasBaseline;
+
+    /// <summary>
+    /// While true nothing goes into container_* (the lane demo moves the cartons, not the trainee); setting it back to
+    /// false takes the next contents as the baseline without logging.
+    /// </summary>
+    public bool LogSuspended
+    {
+        get => logSuspended;
+        set
+        {
+            logSuspended = value;
+            if (!value)
+            {
+                hasBaseline = false;
+            }
+        }
+    }
 
     /// <summary>No package of another material lies in either container, so the lane demo may run.</summary>
     public bool NoWrongMaterial => rule == null || rule.NoWrongMaterial;
@@ -60,23 +88,19 @@ public class ConceptBoxHints : MonoBehaviour
     /// <summary>No hint is shown and none is waiting to settle.</summary>
     public bool IsClear => NoWrongMaterial && (rule == null || !rule.Current.HasValue);
 
-    /// <summary>
-    /// The sample-material packages lying in the storage container (they ride with it), each with the pose it had
-    /// when the scene started.
-    /// </summary>
-    public List<(Transform root, Vector3 startPosition, Quaternion startRotation)> SampleInStorage()
+    /// <summary>The settled sample-material packages in a container, in the order they were laid down.</summary>
+    public List<Transform> SampleIn(ConceptBox box)
     {
-        var riders = new List<(Transform, Vector3, Quaternion)>();
+        var roots = new List<Transform>();
         if (rule == null)
-            return riders;
+            return roots;
 
-        foreach (int id in rule.SettledSampleIn(ConceptBox.Storage))
+        foreach (int id in rule.SettledSampleIn(box))
         {
-            Package package = packages[id];
-            riders.Add((package.Root, package.StartPosition, package.StartRotation));
+            roots.Add(packages[id].Root);
         }
 
-        return riders;
+        return roots;
     }
 
     private void Awake()
@@ -151,6 +175,8 @@ public class ConceptBoxHints : MonoBehaviour
         if (rule == null)
             return;
 
+        // Cartons moved by code (lane demo, reset) must be seen where they are now, not at the last physics step.
+        Physics.SyncTransforms();
         lying.Clear();
         Collect(orderZone, ConceptBox.Order);
         Collect(storageZone, ConceptBox.Storage);
@@ -158,6 +184,56 @@ public class ConceptBoxHints : MonoBehaviour
         rule.Update(Time.timeAsDouble, lying, order.ShownPieces);
         order.SetPlacedPieces(rule.PlacedPieces);
         ShowHint(rule.Current);
+        LogContents();
+    }
+
+    // container_enter / container_exit per container when its set of lying packages changes (decision 032).
+    private void LogContents()
+    {
+        var now = new Dictionary<ConceptBox, HashSet<int>>
+        {
+            [ConceptBox.Order] = new HashSet<int>(),
+            [ConceptBox.Storage] = new HashSet<int>()
+        };
+        foreach (LyingPackage package in lying)
+        {
+            now[package.Box].Add(package.Id);
+        }
+
+        bool log = hasBaseline && !logSuspended;
+        foreach (ConceptBox box in new[] { ConceptBox.Order, ConceptBox.Storage })
+        {
+            HashSet<int> before = logged[box];
+            if (log)
+            {
+                string container = box == ConceptBox.Order ? InteractionEvents.ContainerOrder
+                    : InteractionEvents.ContainerStorage;
+                foreach (int id in before)
+                {
+                    if (!now[box].Contains(id))
+                    {
+                        LogChange(false, container, id, now[box].Count);
+                    }
+                }
+                foreach (int id in now[box])
+                {
+                    if (!before.Contains(id))
+                    {
+                        LogChange(true, container, id, now[box].Count);
+                    }
+                }
+            }
+
+            logged[box] = now[box];
+        }
+
+        hasBaseline = !logSuspended;
+    }
+
+    private void LogChange(bool entered, string container, int id, int countAfter)
+    {
+        PackageData data = packages[id].Data;
+        ResearchLogger.LogContainerChange(entered, ResearchObjectId.Of(data), data.MaterialKey, countAfter, container);
     }
 
     private void LateUpdate()
@@ -226,6 +302,18 @@ public class ConceptBoxHints : MonoBehaviour
             lying.Add(new LyingPackage(package.Id, box, data.MaterialKey, OrderContents.Form(data.packageType),
                 data.Vpe));
         }
+    }
+
+    /// <summary>True while a hand holds this package (its own grabbable or an enclosing one).</summary>
+    public bool IsHeld(Transform root)
+    {
+        foreach (Package package in packages)
+        {
+            if (package.Root == root)
+                return IsHeld(package);
+        }
+
+        return false;
     }
 
     private bool IsHeld(Package package)
@@ -310,8 +398,6 @@ public class ConceptBoxHints : MonoBehaviour
             Id = id;
             Data = data;
             Root = own.transform;
-            StartPosition = Root.position;
-            StartRotation = Root.rotation;
             Holders = data.GetComponentsInParent<Grabbable>(true);
             Parent = data.transform.parent != null ? data.transform.parent.GetComponentInParent<PackageData>(true) : null;
 
@@ -333,10 +419,6 @@ public class ConceptBoxHints : MonoBehaviour
 
         // The grabbable object that moves; rides with the storage container.
         public Transform Root { get; }
-
-        public Vector3 StartPosition { get; }
-
-        public Quaternion StartRotation { get; }
 
         // This package's grabbable and those of the packages around it (holding the carton holds its rings).
         public Grabbable[] Holders { get; }

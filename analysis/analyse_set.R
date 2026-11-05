@@ -131,10 +131,14 @@ position_skill_default <- "picking"
 red_button_scenes <- c("BasicPickingScene", "MixedPickingScene", "ComplexScene")
 
 # #29 interaction events. grab_start/_end exist only for packages with
-# PackageData: ConceptScene (label board) and the picking scenes. The
+# PackageData: ConceptScene (desk packages up to "029", the 6 storage
+# cartons from "032") and the picking scenes. The
 # WelcomeScene practice box has none, so its grabs are NA (not measured),
-# never 0. container_enter/_exit exist only where there is an order
-# container: the picking scenes (the red-button scenes).
+# never 0. The per-visit container_enters / _exits (and summary.csv) count
+# the order container of the picking scenes (the red-button scenes). From
+# layout "032" (#92, decision 032) ConceptScene also writes container_* for
+# its order and storage containers; those are read in section 13e
+# (concept_containers_by_visit.csv), never in these per-visit columns.
 grab_scenes <- c("ConceptScene", red_button_scenes)
 container_scenes <- red_button_scenes
 
@@ -1091,15 +1095,42 @@ if (nrow(bad_hold) > 0) {
        ": logged ", bad_hold$logged_duration_s[1], ", active ", bad_hold$hold_s[1], "); hold_s uses the active time")
 }
 
-# Order container: count_after must equal the running count of enters minus
-# exits in the visit (the container is empty at scene start). It counts every
-# package in the container, finished positions included.
-container_rows <- ix_events %>% filter(event %in% c("container_enter", "container_exit")) %>%
-  transmute(participant_id, session_id, scene, scene_visit, t, line, event,
+# Concept container_* exist from layout "032" on (#92, decision 032).
+concept_containers_logged <- function(layout_version) {
+  coalesce(suppressWarnings(as.integer(layout_version)) >= 32L, FALSE)
+}
+all_container_rows <- ix_events %>% filter(event %in% c("container_enter", "container_exit")) %>%
+  transmute(participant_id, session_id, scene = as.character(scene), scene_visit, t, line, event,
             container = map_chr(data, ~ as_chr(.x$container)),
             object_id = map_chr(data, ~ as_chr(.x$object_id)),
             material_key = map_chr(data, ~ as_chr(.x$material_key)),
             count_after = map_int(data, ~ as_int(.x$count_after))) %>%
+  left_join(sessions %>% select(session_id, layout_version), by = "session_id")
+# Contract: picking scenes write only container "order"; ConceptScene writes
+# "order" or "storage" and only from layout "032". Other lines are not read.
+bad_container <- all_container_rows %>%
+  filter(!((scene %in% red_button_scenes & container %in% "order") |
+             (scene == "ConceptScene" & container %in% c("order", "storage") &
+                concept_containers_logged(layout_version))))
+bad_container_sum <- bad_container %>%
+  group_by(participant_id, scene) %>%
+  summarise(n = n(), containers = paste(sort(unique(coalesce(container, "null"))), collapse = "/"),
+            layout = coalesce(first(layout_version), "none"), .groups = "drop")
+for (i in seq_len(nrow(bad_container_sum))) {
+  r <- bad_container_sum[i, ]
+  warn(r$n, " container_* line(s) in ", r$scene, " with container ", r$containers, " in a log of layout ",
+       r$layout, " (", r$participant_id, ", not read): picking scenes write only \"order\", ",
+       "ConceptScene \"order\" / \"storage\" from layout \"032\" on")
+}
+all_container_rows <- all_container_rows %>% anti_join(bad_container, by = c("session_id", "line"))
+# Concept container lines: section 13e (their counts restart at every demo reset).
+concept_container_rows <- all_container_rows %>% filter(scene == "ConceptScene")
+
+# Order container of the picking scenes: count_after must equal the running
+# count of enters minus exits in the visit (the container is empty at scene
+# start). It counts every package in the container, finished positions included.
+container_rows <- all_container_rows %>% filter(scene != "ConceptScene") %>%
+  select(-layout_version) %>%
   arrange(session_id, scene, scene_visit, t, line) %>%
   group_by(session_id, scene, scene_visit) %>%
   mutate(running = cumsum(if_else(event == "container_enter", 1L, -1L))) %>%
@@ -1111,8 +1142,6 @@ for (i in seq_len(nrow(bad_count))) {
   warn("container count_after disagrees with enters - exits: ", r$participant_id, " ", r$scene,
        " visit ", r$scene_visit, " at t = ", r$t, " (logged ", r$count_after, ", events ", r$running, ")")
 }
-other_container <- container_rows %>% filter(!container %in% "order")
-if (nrow(other_container) > 0) warn(nrow(other_container), " container event(s) with container other than \"order\"")
 
 # Menu touches (menu_select, written in the visit being left) and the
 # facilitator end control (#44).
@@ -2040,7 +2069,7 @@ proc_positions <- bind_rows(
          window_end_t = coalesce(done_t, visit_end_t),
          completed = !is.na(done_t))
 grab_t <- grabs %>% select(session_id, scene, scene_visit, g_t = start_t)
-change_t <- container_rows %>% select(session_id, scene, scene_visit, c_t = t)
+change_t <- container_rows %>% select(session_id, scene, scene_visit, c_t = t)  # order container, picking scenes
 press_t <- presses %>% filter(event == "confirm_pressed") %>%
   select(session_id, scene, scene_visit, position, p_t = t)
 first_press_empf_kz <- presses %>% filter(event == "confirm_pressed", !is.na(position)) %>%
@@ -2348,9 +2377,21 @@ tour_wide <- tour_first %>%
 # when the tag moves to another package, the old cleared and the new shown
 # share a frame. A shown without cleared = the scene was left (or the app
 # crashed) while the tag was shown. Hints are NOT attempts: nothing here
-# feeds confirm_count, items.csv or an error rate. Putting packages into the
-# Concept containers is voluntary and Concept writes no container_*, so
-# there is no denominator: hint counts are counts, never a rate.
+# feeds confirm_count, items.csv or an error rate. Hint counts are counts,
+# never a rate: on "029" putting packages into the Concept containers is
+# voluntary and unlogged (no container_*); from "032" (#92, decision 032)
+# Concept writes container_* (section 13e), so order_over_soll_enters there
+# is the count of chances for a TOO_MANY tag, but it is still not a rated
+# attempt.
+# What a tag can mean depends on the layout (never pool them):
+#   "029": the desk packages (KABELVERBINDER A, SCHRAUBE B, RING D) can give
+#     WRONG_MATERIAL; TOO_MANY can also come without the trainee (the
+#     counting demo's third carton shows next to a STECKER C carton put in
+#     before step cartons, and the tag goes when the demo cartons hide).
+#   "032": only the 6 STECKER C cartons are grabbable and the counting demo
+#     no longer places cartons, so WRONG_MATERIAL cannot happen and TOO_MANY
+#     only comes from the trainee laying a 4th carton into the order
+#     container (the lane demo only fills up to Soll).
 # Before layout "029" the tags did not exist: hint columns are NA (not
 # measured), never 0.
 # material_flow wait: at tour step material_flow the lane demo starts
@@ -2581,6 +2622,128 @@ if (any(concept_hints_by_visit$hints_logged)) {
   message("Concept hint tags (layout 029 on): ", sum(concept_hints_by_visit$hints_shown, na.rm = TRUE),
           " shown in ", sum(concept_hints_by_visit$hints_logged), " visit(s); longest material_flow wait ",
           suppressWarnings(max(concept_hints_by_visit$material_flow_wait_max_s, na.rm = TRUE)), " s")
+}
+
+# ---- 13e. ConceptScene containers (#92, decision 032, layout "032" on) --------
+
+# From layout "032" the trainee picks the sample order: 6 STECKER C cartons
+# start in the storage container (no event for them at scene start), Ist on
+# the sample WMS = cartons in the order container x VPE. ConceptBoxHints
+# counts a carton as "in" a container while it lies in its zone and is not
+# held, so container_exit comes when a carton lying in a container is
+# grabbed (same or next frame as its grab_start) and container_enter when it
+# is let go inside one (same or next frame as its grab_end); container =
+# order or storage, count_after = cartons in that container after the change.
+# The lane demo at material_flow moves cartons by itself (it tops the order
+# container up to Soll and rides both containers away) and logs nothing. Any
+# tour step shown after a material_flow showing ("Zurueck", "Von vorn") puts
+# all 6 cartons back into the storage container, unlogged. So the counts are
+# checked per segment: storage 6 / order 0 at scene enter and again after
+# every such reset; a line without a grab of the same carton within
+# concept_grab_link_s is flagged (moved by something other than the trainee).
+# Not an attempt: nothing here feeds confirm_count, items.csv or an error
+# rate. One row per Concept visit of a session with the interaction group;
+# every column NA (not measured, not 0) before layout "032". Concept
+# container_* never enter the per-visit container_enters / _exits columns or
+# summary.csv (empty there for ConceptScene).
+concept_start_counts <- c(order = 0L, storage = 6L)
+# Soll in cartons of the sample order (SampleWmsOrder: 120 pieces, VPE 40).
+concept_soll_cartons <- 3L
+concept_grab_link_s <- 0.1
+
+# Demo resets: tour_step lines whose previous tour_step of the visit (file
+# line order) was material_flow.
+concept_flow_resets <- tour_rows %>%
+  arrange(session_id, scene_visit, line) %>%
+  group_by(session_id, scene_visit) %>%
+  filter(lag(step_id) %in% "material_flow") %>%
+  ungroup() %>%
+  select(session_id, scene_visit, reset_line = line)
+reset_count_before <- function(sid, visit, ln) {
+  map_int(seq_along(sid), function(i) sum(concept_flow_resets$session_id == sid[i] &
+                                            concept_flow_resets$scene_visit == visit[i] &
+                                            concept_flow_resets$reset_line < ln[i]))
+}
+
+cc_rows <- concept_container_rows %>%
+  arrange(session_id, scene_visit, line) %>%
+  mutate(segment = reset_count_before(session_id, scene_visit, line),
+         step = if_else(event == "container_enter", 1L, -1L)) %>%
+  group_by(session_id, scene_visit, segment, container) %>%
+  mutate(running = unname(concept_start_counts[container]) + cumsum(step)) %>%
+  ungroup()
+cc_bad_count <- cc_rows %>% filter(is.na(count_after) | count_after != running) %>%
+  distinct(participant_id, session_id, scene_visit, container, .keep_all = TRUE)
+for (i in seq_len(nrow(cc_bad_count))) {
+  r <- cc_bad_count[i, ]
+  warn("ConceptScene ", r$container, " container count_after disagrees with the cartons expected after the ",
+       "last reset: ", r$participant_id, " visit ", r$scene_visit, " at t = ", r$t, " (logged ",
+       r$count_after, ", expected ", r$running, ")")
+}
+# Each line should sit next to a grab line of the same carton: exit with its
+# grab_start, enter with its grab_end.
+cc_grab_lines <- grab_rows %>% filter(as.character(scene) == "ConceptScene") %>%
+  transmute(session_id, scene_visit, object_id, g_event = event, g_t = t)
+cc_rows <- cc_rows %>%
+  mutate(row_id = row_number(),
+         link_event = if_else(event == "container_exit", "grab_start", "grab_end")) %>%
+  left_join(cc_grab_lines, by = c("session_id", "scene_visit", "object_id"), relationship = "many-to-many") %>%
+  group_by(row_id) %>%
+  summarise(across(-c(g_event, g_t), first),
+            grab_linked = any(!is.na(g_t) & abs(g_t - t) <= concept_grab_link_s & g_event == link_event),
+            .groups = "drop") %>%
+  select(-row_id, -link_event)
+cc_unlinked <- cc_rows %>% filter(!grab_linked)
+if (nrow(cc_unlinked) > 0) {
+  warn(nrow(cc_unlinked), " ConceptScene container_* line(s) without a grab of the same carton within ",
+       concept_grab_link_s, " s (moved without the trainee? counted, flagged in concept_containers_by_visit.csv): ",
+       paste(unique(cc_unlinked$participant_id), collapse = ", "))
+}
+
+# Per visit: carton moves per container, how far the order container was
+# filled, when Soll was first reached by the trainee (active seconds from
+# scene enter; the demo's own top-up is not logged and never counts).
+cc_visit_counts <- cc_rows %>%
+  group_by(session_id, scene_visit) %>%
+  summarise(storage_exits = sum(container == "storage" & event == "container_exit"),
+            storage_enters = sum(container == "storage" & event == "container_enter"),
+            order_enters = sum(container == "order" & event == "container_enter"),
+            order_exits = sum(container == "order" & event == "container_exit"),
+            order_max_cartons = max(c(0L, running[container == "order"])),
+            order_over_soll_enters = sum(container == "order" & event == "container_enter" &
+                                           running > concept_soll_cartons),
+            soll_t = first_or_na(t[container == "order" & event == "container_enter" &
+                                     running == concept_soll_cartons]),
+            container_count_breaks = n_distinct(paste(container, segment)[is.na(count_after) |
+                                                                           count_after != running]),
+            container_unlinked_lines = sum(!grab_linked), .groups = "drop")
+cc_visit_resets <- concept_flow_resets %>% count(session_id, scene_visit, name = "demo_resets")
+cc_count_cols <- c("storage_exits", "storage_enters", "order_enters", "order_exits", "order_max_cartons",
+                   "order_over_soll_enters", "container_count_breaks", "container_unlinked_lines", "demo_resets")
+concept_containers_by_visit <- visits %>%
+  filter(scene == "ConceptScene", interaction_logged %in% TRUE) %>%
+  select(participant_id, layout_version, session_id, scene_visit, visit_no, repeat_visit) %>%
+  mutate(containers_logged = concept_containers_logged(layout_version)) %>%
+  left_join(enters %>% filter(as.character(scene) == "ConceptScene") %>% select(session_id, scene_visit, enter_t),
+            by = c("session_id", "scene_visit")) %>%
+  left_join(cc_visit_counts, by = c("session_id", "scene_visit")) %>%
+  left_join(cc_visit_resets, by = c("session_id", "scene_visit")) %>%
+  mutate(across(all_of(cc_count_cols), ~ if_else(containers_logged, coalesce(as.integer(.x), 0L), NA_integer_)),
+         soll_reached = if_else(containers_logged, !is.na(soll_t), NA),
+         over_soll = if_else(containers_logged, order_max_cartons > concept_soll_cartons, NA),
+         # Active seconds from scene enter to the carton that first made Soll (NA = never).
+         time_to_soll_s = if_else(containers_logged & !is.na(soll_t),
+                                  round(soll_t - enter_t - paused_between(session_id, enter_t, soll_t), 3),
+                                  NA_real_)) %>%
+  select(participant_id, layout_version, session_id, scene_visit, visit_no, repeat_visit, containers_logged,
+         storage_exits, storage_enters, order_enters, order_exits, order_max_cartons, soll_reached,
+         time_to_soll_s, over_soll, order_over_soll_enters, demo_resets, container_count_breaks,
+         container_unlinked_lines) %>%
+  arrange(participant_id, visit_no)
+write_csv(concept_containers_by_visit, file.path(output_dir, "concept_containers_by_visit.csv"), na = "")
+if (any(concept_containers_by_visit$containers_logged)) {
+  message("Concept containers (layout 032 on): ", sum(concept_containers_by_visit$soll_reached, na.rm = TRUE),
+          " of ", sum(concept_containers_by_visit$containers_logged), " visit(s) reached Soll by hand")
 }
 
 # ---- 14. Wide file: one row per participant (for SPSS and paper forms) ---------
@@ -3022,7 +3185,8 @@ validity_limits <- c(
   "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).",
   "- Mixed position_1 (#94, decision 028): builds before #94 had Empf Kz 000 there (placement never rated), from #94 (line.empf_kz logged, layout \"029\") Empf Kz 003 (3 snap places, EKZ_PLACEMENT possible); an earlier \"029\" build without the field counts as 000. In a set with both, position_1 is split ([Empf Kz 000] / [Empf Kz 003]) in first_attempt_by_item.png and time_by_phase.png; the per-scene Mixed numbers (error_rate_MixedPickingScene, time_to_correct, error codes) still pool both and an Empf Kz 003 visit can have more presses (EKZ retries). The ekz_placement rate counts only presses with the right quantity at an Empf Kz 003 position (EKZ opportunities): its n is small and a wrong-quantity press is no EKZ attempt.",
   "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card). In a set with both levels position_1 is split in first_attempt_by_item.png and time_by_phase.png; the per-scene Complex numbers (time_to_correct_by_scene.png, error_codes_by_scene.png) still pool both levels.",
-  "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): putting packages into the Concept containers is voluntary and not logged otherwise (no container_* in Concept), so hint counts have no denominator and are never an error rate or an attempt. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts lane_demo_delay_s (4 s) after the step; older layouts have NA, not 0.")
+  "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts lane_demo_delay_s (4 s) after the step; older layouts have NA, not 0.",
+  "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).")
 # The pilot set (decision 023) is a try-out of the course and of this
 # analysis, not study data: say so on every pilot report.
 if (is_pilot_set) {

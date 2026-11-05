@@ -229,8 +229,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
-    m_Localized: Get to know the label and the warehouse management system (WMS).
-      Then answer the questions.
+    m_Localized: Read the label and the details in the WMS. Work out the number of
+      cartons. Put them from the storage container into the order container. Then
+      answer the questions.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627374
@@ -238,7 +239,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627375
-    m_Localized: Pick up each package and read its label.
+    m_Localized: Take a carton out of the storage container and read its label.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627376
@@ -377,10 +378,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627411
     m_Localized: 'Soll 100, VPE 25: how many cartons do you take?'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627415
-    m_Localized: Which material has Mat.-Nr 738190?
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627417
@@ -605,11 +602,8 @@ MonoBehaviour:
   - m_Id: 7615942627464
     m_Localized: 'Position {done} is done.
 
-      The opened carton with the broken-case
-      quantity stays in the module in the storage container.
-
-      Read the details
-      of position {next} in the WMS.'
+      Read the details of position {next}
+      in the WMS.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465
@@ -647,26 +641,6 @@ MonoBehaviour:
   - m_Id: 33687669182467
     m_Localized: '25 is the VPE: the number of pieces in one carton. Divide Soll
       by VPE.'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182468
-    m_Localized: KABELVERBINDER A
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182469
-    m_Localized: SCHRAUBE B
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182470
-    m_Localized: RING D
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182471
-    m_Localized: Compare the Mat.-Nr on the labels with 738190.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 33687669182472
-    m_Localized: Compare the Mat.-Nr on the labels with 738190.
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473
@@ -864,7 +838,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810627
-    m_Localized: Look into the order container on the right.
+    m_Localized: Put the cartons from the storage container into the order container.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810628
@@ -929,6 +903,39 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 773084278558720
     m_Localized: Now choose the next lesson in the menu.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336074862592
+    m_Localized: The WMS shows Mat.-Nr 738190. Which label matches?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360064
+    m_Localized: 'Mat.-Nr: 738910'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360065
+    m_Localized: 'Mat.-Nr: 738190'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360066
+    m_Localized: 'Mat.-Nr: 783190'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360067
+    m_Localized: Compare digit by digit with 738190.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360068
+    m_Localized: Compare digit by digit with 738190.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336150360069
+    m_Localized: "Example \u2013 not for picking up."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 970336154554368
+    m_Localized: The opened carton stays in the module in the storage container.
+      Take out only the loose pieces.
     m_Metadata:
       m_Items: []
   references:

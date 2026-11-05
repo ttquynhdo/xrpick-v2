@@ -32,8 +32,12 @@ public sealed partial class ResearchLogger
             i => InteractionEvents.GrabEnd(objectId, materialKey, i.GrabEnded(objectId, instance.SceneActiveSeconds())));
     }
 
-    /// <summary>The order container's set of packages actually changed; countAfter = packages in it now.</summary>
-    public static void LogContainerChange(bool entered, string objectId, string materialKey, int countAfter)
+    /// <summary>
+    /// A container's set of packages actually changed; countAfter = packages in it now. container: order, or in
+    /// ConceptScene also storage (#92).
+    /// </summary>
+    public static void LogContainerChange(bool entered, string objectId, string materialKey, int countAfter,
+        string container = InteractionEvents.ContainerOrder)
     {
         LogInteraction(entered ? "container_enter" : "container_exit", i =>
         {
@@ -46,7 +50,7 @@ public sealed partial class ResearchLogger
                 i.ContainerExited();
             }
 
-            return InteractionEvents.Container(InteractionEvents.ContainerOrder, objectId, materialKey, countAfter);
+            return InteractionEvents.Container(container, objectId, materialKey, countAfter);
         });
     }
 

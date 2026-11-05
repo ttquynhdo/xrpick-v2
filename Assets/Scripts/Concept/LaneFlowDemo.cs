@@ -8,17 +8,21 @@ using UnityEngine;
 /// onto the middle lane and away behind the monitor while the next storage container comes out of the hood into the
 /// work spot; once it has stopped, the order container rides away over the middle lane too. Containers are switched off
 /// only at the end of their ride, out of sight. Leaving the step, "Von vorn" or disabling puts everything back. Same
-/// paths as PositionStockSwitcher/OrderBoxConveyor (LaneRide), but no station_move events and no grabbable riders.
+/// paths as PositionStockSwitcher/OrderBoxConveyor (LaneRide), but no station_move events.
 /// #89: the tour bar stands between the trainee's eyes and the start of the middle lane, so the objects in
 /// hideWhileRiding are hidden from the first ride until the order container has left, then shown again.
-/// #91, decision 030: the order container leaves with the counted cartons in it (CartonCountDemo shows them at this
-/// step). Riders only get their position back on reset; whether they are shown is up to the script that owns them.
 /// #100, decision 030 item 5: the containers only ride once no hint is shown (ConceptBoxHints); until then the bar stays.
-/// A sample-material carton the trainee put into the storage container rides with it (colliders and interactables
-/// off, as in PositionStockSwitcher) and is back on the desk, grabbable, after a reset.
+/// #92, decision 032: the sample cartons are grabbable and start in the storage container. If the order container
+/// holds fewer cartons than the order needs, the missing ones are moved over one by one before anything rides, so Ist
+/// reaches Soll. The cartons lying in each container ride with it (colliders and interactables off, Ist frozen on the
+/// sample WMS); any reset puts all of them back to their scene-start pose, grabbable. While the demo moves cartons,
+/// ConceptBoxHints logs no container_* events.
 /// </summary>
 public class LaneFlowDemo : MonoBehaviour
 {
+    // About half a carton's width: a slot closer than this to a carton in the order container is taken.
+    private const float SlotTakenDistance = 0.07f;
+
     [SerializeField] private WmsFieldTour tour;
 
     [Tooltip("Tour step id that runs the demo.")]
@@ -27,21 +31,33 @@ public class LaneFlowDemo : MonoBehaviour
     [Header("Containers")]
     [SerializeField] private Transform storageBox;
 
-    [Tooltip("Static cartons riding in the storage container (its children ride).")]
-    [SerializeField] private Transform storageStock;
-
     [Tooltip("Next storage container, inactive at its place in the work spot until the demo runs.")]
     [SerializeField] private Transform nextStorageBox;
 
+    [Tooltip("Optional: static riders in the next storage container. #92: empty in ConceptScene, so nothing there looks grabbable without being so.")]
     [SerializeField] private Transform nextStorageStock;
 
     [SerializeField] private Transform orderBox;
 
-    [Tooltip("Static cartons riding in the order container (its children ride; CartonCountDemo shows them).")]
-    [SerializeField] private Transform orderStock;
-
-    [Tooltip("Hints on wrong or extra packages; the demo waits until none is shown.")]
+    [Tooltip("Hints on wrong or extra packages; the demo waits until none is shown. Also tells which cartons lie where.")]
     [SerializeField] private ConceptBoxHints boxHints;
+
+    [Header("Sample cartons (#92)")]
+    [Tooltip("The grabbable sample cartons; all go back to their scene-start pose on reset.")]
+    [SerializeField] private Transform[] sampleCartons;
+
+    [Tooltip("Sample WMS order: how many cartons the order needs; Ist is frozen while the cartons ride.")]
+    [SerializeField] private SampleWmsOrder order;
+
+    [Tooltip("Places for cartons moved into the order container, as offsets from its position (same grid as the storage container).")]
+    [SerializeField] private Vector3[] orderSlots =
+    {
+        new(-0.091f, 0.012f, -0.125f), new(-0.091f, 0.012f, 0f), new(-0.091f, 0.012f, 0.125f),
+        new(0.091f, 0.012f, -0.125f), new(0.091f, 0.012f, 0f), new(0.091f, 0.012f, 0.125f)
+    };
+
+    [Tooltip("Seconds between two cartons moved over.")]
+    [SerializeField] private float transferInterval = 0.6f;
 
     [Header("Paths (world offsets, same as Basic/Mixed/Complex)")]
     [Tooltip("Offsets of the next storage container from its work spot; the first is the start in the hood, the last must be zero.")]
@@ -64,8 +80,9 @@ public class LaneFlowDemo : MonoBehaviour
     [SerializeField] private float cornerPause = 0.3f;
 
     private readonly List<(Transform transform, Vector3 position, bool active, bool keepActive)> start = new();
+    private readonly List<(Transform carton, Vector3 position, Quaternion rotation)> cartonStart = new();
     private readonly List<GameObject> hidden = new();
-    private readonly List<PlacedRider> placedRiders = new();
+    private readonly List<CartonRider> riders = new();
     private bool changed;
 
     private void Awake()
@@ -73,20 +90,22 @@ public class LaneFlowDemo : MonoBehaviour
         Remember(storageBox);
         Remember(nextStorageBox);
         Remember(orderBox);
-        foreach (Transform rider in Riders(storageStock))
-        {
-            Remember(rider, keepActive: true);
-        }
         foreach (Transform rider in Riders(nextStorageStock))
         {
             Remember(rider, keepActive: true);
         }
-        foreach (Transform rider in Riders(orderStock))
-        {
-            Remember(rider, keepActive: true);
-        }
-        Remember(storageStock);
         Remember(nextStorageStock);
+
+        if (sampleCartons == null)
+            return;
+
+        foreach (Transform carton in sampleCartons)
+        {
+            if (carton != null)
+            {
+                cartonStart.Add((carton, carton.position, carton.rotation));
+            }
+        }
     }
 
     private void OnEnable()
@@ -112,11 +131,17 @@ public class LaneFlowDemo : MonoBehaviour
         bool missing = RequiredReference.IsMissing(tour, nameof(tour), this)
                        | RequiredReference.IsMissing(storageBox, nameof(storageBox), this)
                        | RequiredReference.IsMissing(nextStorageBox, nameof(nextStorageBox), this)
-                       | RequiredReference.IsMissing(orderBox, nameof(orderBox), this);
+                       | RequiredReference.IsMissing(orderBox, nameof(orderBox), this)
+                       | RequiredReference.IsMissing(boxHints, nameof(boxHints), this)
+                       | RequiredReference.IsMissing(order, nameof(order), this);
 
         if (!missing && (arrivalPath.Length == 0 || arrivalPath[^1] != Vector3.zero))
         {
             Debug.LogError("LaneFlowDemo: arrivalPath must end at (0, 0, 0).", this);
+        }
+        if (sampleCartons == null || sampleCartons.Length == 0)
+        {
+            Debug.LogError("LaneFlowDemo: sampleCartons is empty.", this);
         }
     }
 
@@ -140,16 +165,15 @@ public class LaneFlowDemo : MonoBehaviour
             yield return null;
         }
 
-        HideViewBlockers();
-        List<Transform> storageRiders = Riders(storageStock);
         if (boxHints != null)
         {
-            foreach ((Transform placed, Vector3 startPosition, Quaternion startRotation) in boxHints.SampleInStorage())
-            {
-                placedRiders.Add(new PlacedRider(placed, startPosition, startRotation));
-                storageRiders.Add(placed);
-            }
+            boxHints.LogSuspended = true;
         }
+        HideViewBlockers();
+
+        yield return FillOrder();
+
+        List<Transform> storageRiders = TakeRiders(ConceptBox.Storage);
 
         // The next storage container starts in the hood.
         List<Transform> nextRiders = Riders(nextStorageStock);
@@ -172,9 +196,107 @@ public class LaneFlowDemo : MonoBehaviour
             yield return null;
         }
 
-        yield return RideAway(orderBox, Riders(orderStock), orderPath, orderSpeed);
+        // Ist stays at what the order container holds while its cartons ride with their colliders off.
+        List<Transform> orderRiders = TakeRiders(ConceptBox.Order);
+        if (order != null)
+        {
+            order.SetShownPieces(orderRiders.Count * order.CurrentLine.vpe);
+        }
+        yield return RideAway(orderBox, orderRiders, orderPath, orderSpeed);
 
         ShowViewBlockers();
+    }
+
+    // The cartons the order still needs come over from the storage container (or wherever they lie) one by one.
+    private IEnumerator FillOrder()
+    {
+        if (boxHints == null || order == null || sampleCartons == null)
+            yield break;
+
+        int vpe = Mathf.Max(order.CurrentLine.vpe, 1);
+        List<Transform> inOrder = boxHints.SampleIn(ConceptBox.Order);
+        int missing = order.CurrentLine.soll / vpe - inOrder.Count;
+        if (missing <= 0)
+            yield break;
+
+        var candidates = new List<Transform>(boxHints.SampleIn(ConceptBox.Storage));
+        foreach (Transform carton in sampleCartons)
+        {
+            if (carton != null && !candidates.Contains(carton) && !inOrder.Contains(carton) && !boxHints.IsHeld(carton))
+            {
+                candidates.Add(carton);
+            }
+        }
+
+        var taken = new List<Vector3>();
+        foreach (Transform carton in inOrder)
+        {
+            taken.Add(carton.position);
+        }
+
+        for (int i = 0; i < missing && i < candidates.Count; i++)
+        {
+            if (!FreeSlot(taken, out Vector3 slot))
+                break;
+
+            if (i > 0)
+            {
+                yield return new WaitForSeconds(transferInterval);
+            }
+
+            Transform carton = candidates[i];
+            int index = cartonStart.FindIndex(c => c.carton == carton);
+            Quaternion rotation = index >= 0 ? cartonStart[index].rotation : carton.rotation;
+            carton.gameObject.SetActive(true);
+            carton.SetPositionAndRotation(slot, rotation);
+            taken.Add(slot);
+        }
+
+        // Let ConceptBoxHints settle the cartons, so Ist reaches Soll before anything rides.
+        yield return new WaitForSeconds((float)ConceptBoxHintRule.SettleSeconds + 0.3f);
+    }
+
+    private bool FreeSlot(List<Vector3> taken, out Vector3 slot)
+    {
+        foreach (Vector3 offset in orderSlots)
+        {
+            Vector3 candidate = orderBox.position + offset;
+            bool free = true;
+            foreach (Vector3 position in taken)
+            {
+                var distance = new Vector2(position.x - candidate.x, position.z - candidate.z);
+                if (distance.magnitude < SlotTakenDistance)
+                {
+                    free = false;
+                    break;
+                }
+            }
+
+            if (free)
+            {
+                slot = candidate;
+                return true;
+            }
+        }
+
+        slot = default;
+        return false;
+    }
+
+    // The cartons lying in a container ride with it: not grabbable, not seen by the containers.
+    private List<Transform> TakeRiders(ConceptBox box)
+    {
+        var list = new List<Transform>();
+        if (boxHints == null)
+            return list;
+
+        foreach (Transform carton in boxHints.SampleIn(box))
+        {
+            riders.Add(new CartonRider(carton));
+            list.Add(carton);
+        }
+
+        return list;
     }
 
     private void HideViewBlockers()
@@ -205,34 +327,36 @@ public class LaneFlowDemo : MonoBehaviour
         hidden.Clear();
     }
 
-    private IEnumerator RideAway(Transform box, List<Transform> riders, IReadOnlyList<Vector3> path, float speed)
+    private IEnumerator RideAway(Transform box, List<Transform> boxRiders, IReadOnlyList<Vector3> path, float speed)
     {
-        yield return LaneRide.Path(box, riders, path, speed, cornerPause);
+        yield return LaneRide.Path(box, boxRiders, path, speed, cornerPause);
 
         // Out of sight behind the monitor: switch off. The riders, not their parent, which may hold a script.
         SetActive(box, false);
-        foreach (Transform rider in riders)
+        foreach (Transform rider in boxRiders)
         {
             SetActive(rider, false);
         }
     }
 
-    private IEnumerator RideThen(Transform box, List<Transform> riders, IReadOnlyList<Vector3> path, float speed, System.Action done)
+    private IEnumerator RideThen(Transform box, List<Transform> boxRiders, IReadOnlyList<Vector3> path, float speed,
+        System.Action done)
     {
-        yield return LaneRide.Path(box, riders, path, speed, cornerPause);
+        yield return LaneRide.Path(box, boxRiders, path, speed, cornerPause);
         done();
     }
 
-    // Everything back to where it was in the scene; the next storage container hidden again.
+    // Everything back to where it was in the scene: the next storage container hidden again, every sample carton in
+    // the storage container and grabbable, Ist 0.
     private void ResetStation()
     {
         StopAllCoroutines();
         ShowViewBlockers();
-        foreach (PlacedRider rider in placedRiders)
+        foreach (CartonRider rider in riders)
         {
             rider.Restore();
         }
-        placedRiders.Clear();
+        riders.Clear();
 
         if (!changed)
             return;
@@ -249,6 +373,25 @@ public class LaneFlowDemo : MonoBehaviour
                 target.gameObject.SetActive(active);
             }
         }
+
+        // A carton in the trainee's hand stays there; it is put back wherever it is let go.
+        foreach ((Transform carton, Vector3 position, Quaternion rotation) in cartonStart)
+        {
+            if (carton != null && (boxHints == null || !boxHints.IsHeld(carton)))
+            {
+                carton.gameObject.SetActive(true);
+                carton.SetPositionAndRotation(position, rotation);
+            }
+        }
+
+        if (order != null)
+        {
+            order.SetShownPieces(0);
+        }
+        if (boxHints != null)
+        {
+            boxHints.LogSuspended = false;
+        }
     }
 
     // keepActive: only the position comes back on reset (riders whose visibility another script owns).
@@ -262,33 +405,28 @@ public class LaneFlowDemo : MonoBehaviour
 
     private static List<Transform> Riders(Transform stock)
     {
-        var riders = new List<Transform>();
+        var list = new List<Transform>();
         if (stock == null)
-            return riders;
+            return list;
 
         foreach (Transform child in stock)
         {
-            riders.Add(child);
+            list.Add(child);
         }
 
-        return riders;
+        return list;
     }
 
-    // A grabbable package the trainee put into the storage container: it rides like the static cartons and comes back
-    // to where it lay when the scene started (on the desk), grabbable again.
-    private sealed class PlacedRider
+    // A grabbable carton riding with a container: colliders and interactables off until the reset.
+    private sealed class CartonRider
     {
         private readonly Transform transform;
-        private readonly Vector3 position;
-        private readonly Quaternion rotation;
         private readonly List<Collider> colliders = new();
         private readonly List<Behaviour> interactables = new();
 
-        public PlacedRider(Transform transform, Vector3 position, Quaternion rotation)
+        public CartonRider(Transform transform)
         {
             this.transform = transform;
-            this.position = position;
-            this.rotation = rotation;
 
             foreach (Collider collider in transform.GetComponentsInChildren<Collider>())
             {
@@ -314,7 +452,6 @@ public class LaneFlowDemo : MonoBehaviour
                 return;
 
             transform.gameObject.SetActive(true);
-            transform.SetPositionAndRotation(position, rotation);
             foreach (Collider collider in colliders)
             {
                 collider.enabled = true;

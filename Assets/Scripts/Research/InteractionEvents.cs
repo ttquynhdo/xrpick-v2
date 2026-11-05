@@ -12,8 +12,8 @@ public static class InteractionEvents
     public const string ViaResume = "resume";
     // No facilitator_end: Beenden ends the session before WelcomeScene loads, so no scene_enter follows.
 
-    // container_enter / container_exit .container: the order container is the only counted one.
-    // concept_hint_* .container (#100): order or storage.
+    // container_enter / container_exit .container: order in Basic/Mixed/Complex; ConceptScene also storage (#92,
+    // layout "032"). concept_hint_* .container (#100): order or storage.
     public const string ContainerOrder = "order";
     public const string ContainerStorage = "storage";
 

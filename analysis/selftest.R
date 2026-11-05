@@ -28,7 +28,7 @@ local({
   source("analysis/analyse.R", local = TRUE)
 
   # 2. One row per study participant: P101-P115; the test ID P950 is dropped,
-  #    the pilot IDs P801-P803, P811-P813 are in their own set (8q).
+  #    the pilot IDs P801-P803, P811-P814 are in their own set (8q).
   stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
@@ -460,7 +460,7 @@ local({
   missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
   if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
   stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
-  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813")
+  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814")
   stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
             identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
   is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
@@ -574,7 +574,7 @@ local({
   stopifnot(any(grepl("concept_hint_cleared without a preceding", p_warn) & grepl("P813", p_warn)),
             sum(grepl("concept_hint_", p_warn, fixed = TRUE)) == 1, !any(grepl("concept_hint_", warn_lines, fixed = TRUE)))
   # Older layouts: no tags existed, so every hint column is NA (not 0).
-  old_v <- pilot_set$concept_hints_by_visit %>% filter(participant_id != "P813")
+  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814"))
   stopifnot(nrow(old_v) > 0, !any(old_v$hints_logged), all(is.na(old_v$hints_shown)),
             all(is.na(old_v$hint_shown_s)), all(is.na(old_v$material_flow_wait_max_s)))
   stopifnot(nrow(concept_hints_by_visit) > 0, !any(concept_hints_by_visit$hints_logged),
@@ -588,6 +588,49 @@ local({
             "ConceptScene [029]" %in% as.character(pilot_set$item_shares$chart_scene),
             identical(pilot_set$tour_has_zurueck("029"), TRUE),
             all(ts$zurueck_available[ts$participant_id == "P813"]))
+
+  # 8u. ConceptScene containers (#92, decision 032). P814 ran a "032" build
+  #     with fixed carton moves (make_fake_data.R p814_hints): carton 1 out of
+  #     the storage container and back, cartons 1-4 into the order container
+  #     (the 4th gives TOO_MANY, taken back by the trainee), the demo reset at
+  #     "Zurueck" after material_flow, then carton 6 into the order container
+  #     (counts restart at storage 6 / order 0, so its count_after is 1).
+  stopifnot(file.exists(file.path(pilot_dir, "concept_containers_by_visit.csv")),
+            file.exists(file.path(output_dir, "concept_containers_by_visit.csv")))
+  c814 <- pilot_set$concept_containers_by_visit %>% filter(participant_id == "P814")
+  stopifnot(nrow(c814) == 1, isTRUE(c814$containers_logged), c814$layout_version == "032",
+            c814$storage_exits == 6, c814$storage_enters == 2, c814$order_enters == 5, c814$order_exits == 1,
+            c814$order_max_cartons == 4, isTRUE(c814$soll_reached), isTRUE(c814$over_soll),
+            c814$order_over_soll_enters == 1, c814$demo_resets >= 1,
+            c814$container_count_breaks == 0, c814$container_unlinked_lines == 0)
+  # time_to_soll_s = active seconds from scene enter to the 3rd carton's enter.
+  cr814 <- pilot_set$cc_rows %>% filter(participant_id == "P814")
+  soll_line <- cr814 %>% filter(container == "order", event == "container_enter", running == 3) %>% slice_min(t, n = 1)
+  e814 <- pilot_set$enters %>% filter(session_id == soll_line$session_id, scene == "ConceptScene")
+  stopifnot(nrow(soll_line) == 1, soll_line$object_id == "Interactables/STECKER C Karton 3",
+            abs(c814$time_to_soll_s - (soll_line$t - e814$enter_t -
+                                         pilot_set$paused_between(soll_line$session_id, e814$enter_t, soll_line$t))) < 0.002)
+  # Carton 6 after the reset: count_after 1 (not 4), with storage back at 5.
+  k6 <- cr814 %>% filter(object_id == "Interactables/STECKER C Karton 6")
+  stopifnot(identical(k6$container, c("storage", "order")), identical(k6$count_after, c(5L, 1L)),
+            all(k6$segment >= 1))
+  # The one hint: TOO_MANY on carton 4, removed by the trainee.
+  h814 <- pilot_set$concept_hints %>% filter(participant_id == "P814")
+  stopifnot(nrow(h814) == 1, h814$reason == "TOO_MANY", h814$container == "order",
+            h814$object_id == "Interactables/STECKER C Karton 4", isTRUE(h814$removed_by_grab))
+  # Concept container_* stay out of the per-visit columns and summary.csv.
+  stopifnot(is.na(pilot_set$visits$container_enters[pilot_set$visits$participant_id == "P814" &
+                                                      pilot_set$visits$scene == "ConceptScene"]))
+  # Older layouts: NA, not 0; no container warnings on the fake data.
+  stopifnot(all(is.na(pilot_set$concept_containers_by_visit$order_enters[
+              pilot_set$concept_containers_by_visit$participant_id != "P814"])),
+            !any(concept_containers_by_visit$containers_logged),
+            !any(grepl("container_\\* line|ConceptScene (order|storage) container", c(p_warn, warn_lines))))
+  # label_by_matnr replaces material_by_matnr from "032", same skill.
+  q814 <- p_items %>% filter(participant_id == "P814", scene == "ConceptScene")
+  stopifnot("label_by_matnr" %in% q814$item, !"material_by_matnr" %in% q814$item,
+            all(q814$skill[q814$item == "label_by_matnr"] == "check_material"),
+            "material_by_matnr" %in% p_items$item[p_items$participant_id == "P813"])
   # Complex position_1 scaffold (#93): "019"/"025" = quiz_visible, "029" =
   # result_on_card. The pilot set holds both, so position_1 is split in the
   # item chart and the phase chart; position 2 and the study set are not.

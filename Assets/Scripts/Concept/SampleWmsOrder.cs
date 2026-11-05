@@ -7,6 +7,8 @@ using UnityEngine;
 /// #91, docs/decisions/030: Ist follows what lies in the order container (set by <see cref="CartonCountDemo"/>);
 /// Rest is the system's stock after the full order and stays fixed (decision 001).
 /// #100: Ist = the cartons the demo shows plus the sample-material pieces the trainee has put in (ConceptBoxHints).
+/// #92, decision 032: the trainee puts every carton in; "shown" pieces are only set by LaneFlowDemo, which freezes
+/// Ist while the order container rides away with its cartons (their colliders off).
 /// </summary>
 public class SampleWmsOrder : MonoBehaviour, IWmsOrderSource
 {

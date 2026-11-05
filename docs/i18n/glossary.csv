@@ -97,3 +97,4 @@ sichern,,to secure,"Fixing the remaining stock in the storage container, e.g. wi
 wiegen,,to weigh,Determining the quantity with a scale instead of counting.,no,requirements: Kommissionierung.pptx,proposed,
 Übung,die,exercise,The training in the app (In der Übung / Nicht in der Übung).,no,app,proposed,
 Ablauf,der,process,The sequence of steps at the picking station (board Ablauf am Kommissionierplatz).,no,app (#73),proposed,
+greifen,,to grab / pick up (in VR),"Verb for taking hold of an object with the hand in the app (Karton greifen, nicht zum Greifen). Not for taking goods out of a container (nehmen / herausnehmen).",no,german-reviewer (#92),proposed,

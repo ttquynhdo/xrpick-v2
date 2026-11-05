@@ -1,6 +1,7 @@
 scene,item,skill,scaffolded
 ConceptScene,cartons_from_soll,calculate_quantity,
 ConceptScene,material_by_matnr,check_material,
+ConceptScene,label_by_matnr,check_material,
 ConceptScene,ekz_003,ekz_placement,
 ConceptScene,ekz_000,ekz_placement,
 ComplexScene,cartons,calculate_quantity,
