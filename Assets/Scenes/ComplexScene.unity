@@ -19614,7 +19614,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1088422319721420110, guid: c2cc151dd301a0d45b8c3588843d61b1, type: 3}
   m_PrefabInstance: {fileID: 1354830945}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1354830948}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 591c1aa51857c0440bebc6e6eb8841b2, type: 3}
@@ -19623,6 +19623,11 @@ MonoBehaviour:
 --- !u!224 &1354830947 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2807112219663439310, guid: c2cc151dd301a0d45b8c3588843d61b1, type: 3}
+  m_PrefabInstance: {fileID: 1354830945}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1354830948 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9178016748712761096, guid: c2cc151dd301a0d45b8c3588843d61b1, type: 3}
   m_PrefabInstance: {fileID: 1354830945}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1360915858
@@ -30101,6 +30106,7 @@ MonoBehaviour:
   orderBoxConveyor: {fileID: 1019723393}
   congratulationsDelay: 2
   congratulationsFallback: 15
+  wmsDialog: {fileID: 1354830948}
 --- !u!4 &1933170181
 Transform:
   m_ObjectHideFlags: 0

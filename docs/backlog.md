@@ -47,7 +47,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   6. `german-reviewer` duyệt mọi chữ mới một lần → #36 đóng (thay bằng #88) → #13 export → một build → một buổi test kính; các mục ở trạng thái `verified-mcp` tới buổi đó. Đo lại thời lượng khoá (quy tắc 25 phút).
 - **Mới 2026-11-05 (test kính P802, 19 góp ý → #103–#114; build `727eee1` có mọi mục #86–#101 đang `verified-mcp`):**
   0. **Trước tiên (người dùng):** ghi kết quả test tay của buổi P802 vào các test report của #86–#101, #28, #29, #99 (theo checklist ở commit 727eee1) và cho G4/G5/B3/M3 của `docs/test-reports/grab-snap-fix.md`; mục nào đạt hết thì đóng `done`.
-  1. **Không cần decision, làm ngay:** #103 (vùng cầm, đo trước, 4 scene; làm trước #108) → #112 (đĩa facilitator, 5 scene, S). #113 sau khi người dùng chọn hướng (Complex, S).
+  1. **Không cần decision, làm ngay:** #103 (vùng cầm, đo trước, 4 scene; làm trước #108) (#112 bỏ: đĩa ở chỗ thấy được là cố ý). #113 verified-mcp (tắt LVS khi bảng hiện).
   2. **Hai `solution-decision`, chạy song song vì độc lập:** (a) **ConceptScene tour v3** cho #104–#107 (+ thời gian khoá của #110): thay phần liên quan của decision 010, 024, 026 mục 2, 028/031; (b) **trạm thực hành** cho #108 + #109 (mức scaffold khi xếp EKZ 003, vật lý thả carton, chỗ đặt phản hồi, giữ/bỏ mũi tên làn giữa; thay một phần decision 003/033).
   3. **Sau decision:** Concept tuần tự trên một nhánh: #104 + #106 (cùng thanh tour) → #105 → #107 → #110 (phần Concept). Song song được (khác scene): #108 (Basic, Mixed) → #109 (Basic, Mixed, Complex; sau #108 vì cùng scene) → #110 (phần Complex) → #111 (4 scene, cuối cùng vì đụng mọi thùng).
   4. **Data/R:** #102 → #114.
@@ -1698,19 +1698,20 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Công:** S
 - **Test trên kính:** nhanh (người điều phối với tới; người học không thấy)
 - **Depends on:** —
-- **Status:** todo
+- **Status:** dropped (người dùng 2026-11-05: đĩa đặt ở chỗ người học thấy là cố ý)
 
 ### #113 [Feature] Complex: bảng kết thúc không đè lên màn LVS đầy chữ
 - **Type:** feature
 - **Scene(s):** ComplexScene
 - **Files:** ComplexScene `Congratulations` (0, 1.16, 0.95), Assets/Scripts/PiecesOrderValidator.cs (`congratulationsDelay`), Assets/Scripts/ParticipantEntry/ParticipantCodeLabel.cs, docs/i18n/strings-todo.csv (`complex.end.summary`)
 - **Problem:** (P802 R19) Bảng nhỏ hơn màn hình và nằm ngay trước nó, nên nhãn, số và phím F của LVS lộ ra ở bốn phía, kéo mắt đi đúng lúc kết thúc.
-- **Done when:** Cuối Complex, ảnh từ chỗ đứng nhìn bảng: quanh bảng không thấy chữ hay số của LVS (LVS trống/tắt, hoặc bảng ở chỗ có nền là kho, theo lựa chọn). Bảng có mã người tham gia và câu tháo kính. Bảng không che làn giữa khi thùng đơn chạy (như #99). (code) `ParticipantCodeLabel` vẫn đọc mã trước `EndSession`; chữ mới (nếu rút gọn) qua `localize-strings`.
+- **Done when:** Cuối Complex, ảnh từ chỗ đứng nhìn bảng: quanh bảng không thấy chữ hay số của LVS: dialog LVS tắt đúng lúc bảng hiện, màn hình còn lại tối; trước đó (4 s chờ, lúc thùng đơn chạy) LVS vẫn hiện. Bảng có mã người tham gia và câu tháo kính. Bảng không che làn giữa khi thùng đơn chạy (như #99). (code) `ParticipantCodeLabel` vẫn đọc mã trước `EndSession`; chữ mới (nếu rút gọn) qua `localize-strings`.
 - **Inspector work expected:** yes
 - **Công:** S
 - **Test trên kính:** nhanh
-- **Depends on:** người dùng chọn một trong ba hướng của R19 (tắt LVS / dời bảng / rút gọn), không cần `solution-decision` đầy đủ
-- **Status:** todo
+- **Depends on:** — (người dùng chọn 2026-11-05: khi kết thúc thì tắt LVS, chỉ hiện bảng)
+- **Test report:** docs/test-reports/bl113.md
+- **Status:** verified-mcp (6/6 MCP/code ✅, chờ test tay H1 trên kính; nhánh `feat/113-congrats-wms-off`)
 
 ## Feature – Log dữ liệu nghiên cứu
 

@@ -60,6 +60,10 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     [Tooltip("Show Congratulations after this many seconds even if the order container never starts.")]
     [SerializeField] private float congratulationsFallback = 15f;
 
+    // #113: the panel is smaller than the monitor behind it; the WMS fields around it pulled the eye away.
+    [Tooltip("Optional. The WMS dialog on the monitor; switched off when Congratulations becomes visible.")]
+    [SerializeField] private GameObject wmsDialog;
+
     private string initialInstruction;
     private CanvasGroup congratulationsGroup;
     private readonly List<MonoBehaviour> hiddenInteractables = new();
@@ -203,7 +207,10 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     private void HideCongratulationsUntilDeparture()
     {
         if (orderBoxConveyor == null)
+        {
+            SwitchOffWmsDialog();
             return;
+        }
 
         if (!congratulationsPanel.TryGetComponent(out congratulationsGroup))
         {
@@ -264,6 +271,16 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
             }
         }
         hiddenInteractables.Clear();
+        SwitchOffWmsDialog();
+    }
+
+    // The order is complete, so the dialog never comes back in this scene.
+    private void SwitchOffWmsDialog()
+    {
+        if (wmsDialog != null)
+        {
+            wmsDialog.SetActive(false);
+        }
     }
 
     private void ShowCard()

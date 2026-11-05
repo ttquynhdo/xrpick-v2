@@ -2,7 +2,7 @@
 
 Người dùng ghi góp ý từng điểm ở đây. Khi đủ, phân tích chung một lần (`review-to-backlog`, rồi `solution-decision` cho mục có đánh đổi). Ảnh lưu ở `TestEvidence/review-P802/` (không commit). Kết quả log và video: `docs/pilot-P802-summary.md`.
 
-**Đã chuyển vào backlog (2026-11-05):** R18 → #103 · R1, R9, R11, R15 → #104 (phần ẩn thanh của R15 → #106) · R4, R10, R13 → #105 · R3 → #106 · R14 → #107 · R2, R8 → #108 · R5, R16 → #109 · R6 → #110 · R12, R17 → #111 · R7 → #112 · R19 → #113 · log cầm giả do ô snap (R) → #114. Hai điểm nhỏ: xem lại ở buổi test sau.
+**Đã chuyển vào backlog (2026-11-05):** R18 → #103 · R1, R9, R11, R15 → #104 (phần ẩn thanh của R15 → #106) · R4, R10, R13 → #105 · R3 → #106 · R14 → #107 · R2, R8 → #108 · R5, R16 → #109 · R6 → #110 · R12, R17 → #111 · R7 → #112 (dropped: người dùng cố ý để đĩa ở chỗ thấy được) · R19 → #113 · log cầm giả do ô snap (R) → #114. Hai điểm nhỏ: xem lại ở buổi test sau.
 
 Mỗi mục: **góp ý** (lời người dùng), **hiện trạng** (đọc từ code/CSV, chưa sửa), **ghi chú phân tích**.
 
