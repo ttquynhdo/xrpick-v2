@@ -8,7 +8,8 @@ using UnityEngine.SceneManagement;
 /// #29, decision 021: logs grab_start / grab_end for every Grabbable with a PackageData. Created at runtime
 /// once per loaded scene (no component in any scene or prefab); subscribes like InstructionStepHighlighter,
 /// inactive packages included. A grab starts with the first selecting pointer and ends when the last one
-/// releases (Unselect or Cancel), so two hands on one package give one grab.
+/// releases (Unselect or Cancel), so two hands on one package give one grab. Events of a SnapInteractor
+/// (package held by a snap place) are ignored: before that, every snap logged a grab that never ended (pilot P802).
 /// </summary>
 public class PackageGrabLogger : MonoBehaviour
 {
@@ -74,6 +75,13 @@ public class PackageGrabLogger : MonoBehaviour
 
     private void HandlePointerEvent(PointerEvent evt, Grabbable grabbable, PackageData package)
     {
+        // A SnapInteractor on the package selects its Grabbable while it sits in a snap place (Basic, Mixed EKZ 003);
+        // that is no hand grab. Its event Data is the interactor itself (its _data field is empty in every scene).
+        if (evt.Data is SnapInteractor)
+        {
+            return;
+        }
+
         if (!selecting.TryGetValue(grabbable, out HashSet<int> pointers))
         {
             pointers = new HashSet<int>();
