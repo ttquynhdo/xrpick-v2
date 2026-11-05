@@ -1441,7 +1441,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** #101 (thẻ mẫu EKZ); thay #96 (bỏ). Câu hỏi D39, D40, D12, A13 không chặn
 - **Decision:** docs/decisions/032-concept-one-picking-flow-grab-rule.md (thay mục 5 của docs/decisions/026-concept-study-desk.md)
 - **Test report:** docs/test-reports/bl92.md
-- **Status:** verified-mcp (17/18 MCP/code ✅; `selftest.R` chưa chạy được vì Windows chặn `tidyr`/`readr`; chờ test tay H1–H2 trên kính; nhánh `feat/92-concept-one-picking-flow`; layout "032")
+- **Status:** verified-mcp (17/18 MCP/code ✅; `selftest.R` chưa chạy được vì Windows chặn `tidyr`/`readr`; chờ test tay H1–H2 trên kính; nhánh `feat/92-concept-one-picking-flow`, commit 55c4ee2; layout "032")
 
 ### #93 [Feature] Cụm câu hỏi xong việc thì thu lại (Concept + Complex)
 - **Type:** feature
