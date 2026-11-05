@@ -1476,7 +1476,8 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Công:** S–M
 - **Test trên kính:** không (ảnh Editor đủ)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl95.md
+- **Status:** verified-mcp (11/11 MCP/code ✅; không cần test kính, xem lại băng ở buổi test chung; nhánh `fix/95-conveyor-rails`)
 
 ### #96 [P2] ComplexScene: vòng rời xuyên qua carton và nảy ra khỏi thùng đơn
 - **Type:** bug
