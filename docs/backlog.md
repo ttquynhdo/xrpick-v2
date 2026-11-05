@@ -48,8 +48,8 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **Mới 2026-11-05 (test kính P802, 19 góp ý → #103–#114; build `727eee1` có mọi mục #86–#101 đang `verified-mcp`):**
   0. **Trước tiên (người dùng):** ghi kết quả test tay của buổi P802 vào các test report của #86–#101, #28, #29, #99 (theo checklist ở commit 727eee1) và cho G4/G5/B3/M3 của `docs/test-reports/grab-snap-fix.md`; mục nào đạt hết thì đóng `done`.
   1. **Không cần decision, làm ngay:** #103 (vùng cầm, đo trước, 4 scene; làm trước #108) (#112 bỏ: đĩa ở chỗ thấy được là cố ý). #113 verified-mcp (tắt LVS khi bảng hiện).
-  2. **Hai `solution-decision`, chạy song song vì độc lập:** (a) **ConceptScene tour v3** cho #104–#107 (+ thời gian khoá của #110): thay phần liên quan của decision 010, 024, 026 mục 2, 028/031; (b) **trạm thực hành** cho #108 + #109 (mức scaffold khi xếp EKZ 003, vật lý thả carton, chỗ đặt phản hồi, giữ/bỏ mũi tên làn giữa; thay một phần decision 003/033).
-  3. **Sau decision:** Concept tuần tự trên một nhánh: #104 + #106 (cùng thanh tour) → #105 → #107 → #110 (phần Concept). Song song được (khác scene): #108 (Basic, Mixed) → #109 (Basic, Mixed, Complex; sau #108 vì cùng scene) → #110 (phần Complex) → #111 (4 scene, cuối cùng vì đụng mọi thùng).
+  2. **Hai `solution-decision`: xong 2026-11-05** (decision 036 cho #104, #105, #107, #110, #106 bỏ; decision 037 cho #108, #109). Phần cũ: (a) **ConceptScene tour v3** cho #104–#107 (+ thời gian khoá của #110): thay phần liên quan của decision 010, 024, 026 mục 2, 028/031; (b) **trạm thực hành** cho #108 + #109 (mức scaffold khi xếp EKZ 003, vật lý thả carton, chỗ đặt phản hồi, giữ/bỏ mũi tên làn giữa; thay một phần decision 003/033).
+  3. **Sau decision:** Concept tuần tự trên một nhánh: #104 → #105 → #107 → #110 (phần Concept). Song song được (khác scene): #108 (Basic, Mixed) → #109 (Basic, Mixed, Complex; sau #108 vì cùng scene) → #110 (phần Complex) → #111 (4 scene, cuối cùng vì đụng mọi thùng).
   4. **Data/R:** #102 → #114.
   5. **Cuối đợt:** đổi `layout_version` một lần ("033" → "034", vì #110 đổi cách chấm quiz và #108 có thể đổi chấm EKZ), `data-analyst` sửa spec + R một lần; `german-reviewer` duyệt mọi chữ mới một lần → #13 export → một build → một buổi test kính (P803).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
@@ -1597,11 +1597,12 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Scene(s):** ConceptScene
 - **Files:** Assets/Scripts/Concept/HeldLabelTags.cs, Assets/Scripts/Concept/WmsFieldTour.cs (`heldPackages`, `steps[].heldMaterialKey`, `ShowAction`), Assets/Scripts/Orders/HeldPackageTracker.cs, docs/i18n/strings-todo.csv (`concept.label.tag.*`, `concept.tour.*.action`, `.action_held`, `concept.tour.material_flow.body`), Assets/Scripts/Concept/LaneFlowDemo.cs (`startDelay`)
 - **Problem:** (P802 R1, R9, R11, R15) Thẻ Mat.-Nr/VPE cạnh kiện đang cầm nháy qua lại (đổi bên khi tay ở giữa tầm nhìn) và chỉ lặp lại chữ trên nhãn. Dòng hành động ở `intro`, `ist`, `rest`, `not_used` chỉ là „Press "Next"“, không khác nút Next. Ở `material`/`verp_einh` câu „Pick up the STECKER C carton“ không nói cầm để làm gì; mục đích chỉ hiện khi đang cầm (`action_held`). Bước 11 có ~45 từ nhưng chỉ 4 s trước khi thanh bị ẩn; log P802: người học bấm Back rồi Next để đọc lại.
-- **Done when:** Ở ConceptScene, cầm và xoay carton STECKER C trước mắt: không có thẻ chữ nào hiện cạnh carton. Ở `material`, dòng hành động nói cả việc cầm và việc so nhãn với Mat.-Nr/Bez. trước khi người học cầm gì; cầm rồi thả carton: dòng không đổi. Ở `verp_einh`, tương tự với VPE ↔ Verp.-Einh. Ở `intro`, `ist`, `rest`, `not_used`: dòng hành động nói một việc để nhìn trên LVS, hoặc không có dòng hành động (theo decision). Ở bước 11, chữ trên thanh đọc xong được trong thời gian thanh còn hiện (EN và DE), và câu mà demo không cho thấy (thùng được di chuyển bằng tay ở trạm thật) vẫn còn. (code) Không còn key `concept.label.tag.*` trong CSV và bảng; mọi chữ mới qua `localize-strings` + `german-reviewer`. (code) Tour vẫn 11 `step_id` cùng index; `tour_step` không đổi; decision 026 mục 2 ghi là đã bị thay.
+- **Done when:** Ở ConceptScene, cầm và xoay carton STECKER C trước mắt: không có thẻ chữ nào hiện cạnh carton. Ở `material`, trước khi cầm gì: dòng hành động trên thanh nói cầm carton STECKER C và so Etikett với Mat.-Nr/Bez.; cầm rồi thả carton: dòng không đổi. Ở `verp_einh`: dòng nói so VPE trên Etikett với Verp.-Einh., khác dòng của `material`. Ở `intro`, `ist`, `rest`, `not_used`: dòng hành động nói một việc nhìn trên LVS; ở cả 11 bước không dòng nào chỉ nói bấm „Weiter“. Ở `rest`: không câu nào nói hay ngụ ý Rest đổi khi người học di chuyển carton. Ở bước 11, trước khi thùng đơn đi: chỉ tiêu đề, một câu ngắn và lời „xem“. Ở bước 11, khi thùng đơn đã đi và thanh quay lại: câu „In der Praxis bewegen Sie die Behälter von Hand.“ (EN tương ứng) và nút „Zu den Fragen“ hiện. Ở EN và DE: chữ của mỗi bước vừa thanh, không tràn (ảnh). (code) Không còn key `concept.label.tag.*` và `.action_held`; `WmsFieldTour` không còn `heldPackages`/`heldMaterialKey`; Console không báo reference rỗng; EditMode tests xanh. (code) Tour vẫn 11 `step_id` cùng index; `tour_step` không đổi; chữ mới qua `localize-strings` + `german-reviewer`.
 - **Inspector work expected:** yes (tắt/bỏ `Held Label Tags`, trường `heldPackages` của tour)
 - **Công:** M
 - **Test trên kính:** nhanh (đọc dòng hành động, bước 11 kịp đọc)
 - **Depends on:** decision chung ConceptScene (#104–#107)
+- **Decision:** docs/decisions/036-concept-tour-v3.md
 - **Status:** todo
 
 ### #105 [Feature] ConceptScene: chỉ ô LVS rõ ràng: mũi tên trên màn hình tới đúng ô, chú thích thẳng hàng, marker không che nhãn
@@ -1609,11 +1610,12 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Scene(s):** ConceptScene
 - **Files:** ConceptScene `WMS_Monitor/Head/Screen/Tour Markers` (mũi tên, `Caption <id>`), `STECKER C Marker`, Assets/Scripts/Concept/WmsFieldTour.cs (`steps[].markers`), prefab `WMS_Kommissionierung` (chỉ đọc: child theo vùng, decision 008)
 - **Problem:** (P802 R13, R10, R4) Mũi tên hàng chỉ từ cạnh khung, nên mũi tên của Ist (và Verp.-Einh.) chạm Soll (Empf Kz) trước và bị hiểu là chú thích của ô đó. Thẻ chú thích cao cố định 330, chữ ở nửa trên, mũi tên lơ lửng không chạm thẻ hay ô, thẻ khác độ sâu với màn hình nên lệch theo tầm mắt. Mũi tên cam của bước `material` nằm đè lên nhãn carton cần đọc. **Người dùng cho phép vẽ mũi tên lên LVS** (2026-11-05), thay quy tắc của decision 010 / 024 mục 2.
-- **Done when:** Ở `ist`, mũi tên nằm trên màn hình và chạm ô Ist, không chạm ô Soll. Ở `verp_einh`, mũi tên chạm ô Verp.-Einh., không chạm Empf Kz. Ở `material`, `soll`, `rest`, `empf_kz_003`, `empf_kz_000`, `cartons`: mỗi mũi tên chạm đúng ô của bước. Ảnh `wms` ở ba tầm mắt (1,45 / 1,60 / 1,75 m): thẻ chú thích và mũi tên vẫn chỉ đúng ô. Thẻ chú thích cao vừa chữ và nối liền với mũi tên. Ở `material`, nhìn từ chỗ đứng, chữ trên nhãn carton STECKER C không bị mũi tên cam che. Chữ và số của dialog không đổi; ở Basic, Mixed, Complex không có gì vẽ lên LVS. (code) Lớp mũi tên nằm ngoài prefab `WMS_Kommissionierung`, không raycast. (code) Decision mới ghi là thay phần „không vẽ lên dialog“ của 010 và 024 mục 2.
+- **Done when:** Ở `ist`: khung cam nằm trên màn hình, bao ô Ist, không chạm ô Soll. Ở `verp_einh`: khung bao Verp.-Einh., không chạm Empf Kz. Ở `material`, `soll`, `cartons`, `rest`, `empf_kz_003`, `empf_kz_000`: mỗi khung bao đúng ô của bước. Ở `not_used`: khung các vùng không dùng nằm trên màn hình. Không khung hay đường nào đè lên chữ hoặc số của dialog. Thẻ chú thích cao vừa chữ, cùng mặt phẳng với màn hình, nối liền với khung. Ảnh `wms` ở 1,45 / 1,60 / 1,75 m: thẻ và khung vẫn chỉ đúng ô. Ở `material`, nhìn từ chỗ đứng: chữ trên nhãn STECKER C không bị mũi tên cam che; cầm carton thì mũi tên tắt. Basic, Mixed, Complex: không có gì vẽ lên LVS. (code) Lớp vẽ nằm ngoài prefab `WMS_Kommissionierung` (prefab không đổi), không raycast.
 - **Inspector work expected:** yes (mũi tên, thẻ chú thích trong `Tour Markers`)
 - **Công:** M
 - **Test trên kính:** nhanh (mũi tên chỉ đúng ô từ chỗ đứng, ở chiều cao người thật)
 - **Depends on:** decision chung ConceptScene (#104–#107)
+- **Decision:** docs/decisions/036-concept-tour-v3.md
 - **Status:** todo
 
 ### #106 [Feature] ConceptScene: thanh tour không che thùng đơn khi phải thao tác
@@ -1626,18 +1628,20 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Công:** S–M
 - **Test trên kính:** bắt buộc (tầm với, nhìn thùng khi thao tác)
 - **Depends on:** decision chung ConceptScene; làm cùng nhánh với #104 (cùng thanh)
-- **Status:** todo
+- **Decision:** docs/decisions/036-concept-tour-v3.md
+- **Status:** dropped (người dùng 2026-11-05: thanh tour hiện tại không có vấn đề; giữ chỗ của #89. Mở lại nếu buổi test sau thấy thanh che thùng ở bước 2/5)
 
 ### #107 [Feature] ConceptScene: hai mẫu Empf Kz 000 và 003 cho thấy khác biệt „xếp ↔ đổ“
 - **Type:** feature
 - **Scene(s):** ConceptScene
 - **Files:** ConceptScene `Layout Slots/EKZ Sample 003|000` (vật, thẻ), docs/i18n/strings-todo.csv (thẻ mẫu, nếu thêm chữ hành động)
 - **Problem:** (P802 R14) Hai mẫu khác nhau cùng lúc ở loại hàng (carton ↔ túi), vật tư và cách xếp; 2 túi trông gọn, 3 carton một hàng trông như đặt bình thường. Người học không thấy được „003 = từng chiếc, có thứ tự; 000 = đổ vào“. Quiz `ekz_003`/`ekz_000` hỏi đúng khác biệt này (P802: `ekz_003` sai lần đầu).
-- **Done when:** Ở bước 8–9, nhìn từ chỗ đứng: hai mẫu dùng cùng một loại hàng (hoặc theo decision), chỉ khác cách xếp. Mẫu 003: các chiếc thẳng hàng, cùng hướng. Mẫu 000: ít nhất 5 chiếc nằm lộn xộn, nghiêng, chồng lên nhau. Thẻ mẫu nói luôn hành động („từng chiếc, có thứ tự“ / „đổ vào được“) hoặc có hoạt cảnh ngắn đặt ↔ đổ (theo decision). Không vật nào xuyên thành thùng mẫu. (code) Mẫu không có `PackageData`, `Grabbable`, collider, không nằm trong `Hint Zone`; `ekz_003`/`ekz_000` không đổi đáp án; decision 028/031 ghi là đã bị sửa phần mẫu.
+- **Done when:** Ở bước 8–9, nhìn từ chỗ đứng: cả hai mẫu là carton KABELVERBINDER A cùng cỡ. Mẫu 003: 3 carton thẳng một hàng, cùng hướng, đọc được nắp. Mẫu 000: ít nhất 5 carton nằm nghiêng theo các hướng khác nhau, chồng lên nhau. Không carton nào xuyên thành thùng mẫu. Thẻ mẫu giữ pictogram, „Empf Kz 00x = EKZ x“ và ký hiệu bàn tay, không thêm chữ hành động. Chữ `empf_kz_000` và câu hỏi `ekz_000` nói về carton, không nói túi; không chuỗi nào nói carton được „einfüllen/schütten“; có EN + DE qua `german-reviewer`. Ở bước 1–7, 10, 11: không thấy mẫu nào. (code) Key và đáp án đúng của `ekz_003`/`ekz_000` không đổi; mẫu không có `PackageData`/`Grabbable`/collider, nằm ngoài `Hint Zone`; `PackageStandardizer.Check()` không báo mẫu.
 - **Inspector work expected:** yes (vật mẫu, thẻ)
 - **Công:** S (đổi vật mẫu) – M (hoạt cảnh)
 - **Test trên kính:** nhanh (thấy khác biệt từ chỗ đứng)
 - **Depends on:** decision chung ConceptScene; liên quan ý tưởng vật EKZ 0 của P801 R19 (vít, phụ kiện ống)
+- **Decision:** docs/decisions/036-concept-tour-v3.md
 - **Status:** todo
 
 ### #108 [Feature] Basic, Mixed: người học thấy được chỗ đặt carton theo Empf Kz 003; carton không nằm nghiêng lơ lửng
@@ -1645,11 +1649,12 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Scene(s):** BasicPickingScene, MixedPickingScene
 - **Files:** `BoxSnapper*` (renderer `Marker*` đang tắt, #41/#56), Assets/Scripts/EkzPlacementCheck.cs, Assets/Scripts/OrderFeedback.cs (`EKZ_PLACEMENT`), docs/i18n/strings-todo.csv, Rigidbody của carton (kinematic)
 - **Problem:** (P802 R2, R8) Ở cả Basic và Mixed vị trí 1, người học chồng/đặt nghiêng carton lên carton khác → `EKZ_PLACEMENT`, rồi lấy carton ra và bấm nút khi đang thiếu → `TOO_FEW`. Ô snap vô hình; thông báo không nói đặt ở đâu; carton thả ra nằm nghiêng trên carton khác, không rơi, che biển thùng; Ist đã bằng Soll dù xếp sai.
-- **Done when:** Basic: cầm một carton đưa tới thùng đơn → thấy được các ô còn trống (theo decision: luôn hiện, hoặc chỉ khi đang cầm). Basic: thả carton lên trên carton khác → carton không nằm nghiêng lơ lửng (về ô trống gần nhất hoặc về chỗ thả hợp lệ, theo decision). Basic: 6 carton, 1 carton không vào ô → bấm nút → thẻ lỗi nói rõ carton nào/chỗ nào cần sửa. Mixed vị trí 1: tương tự với 3 ô; vị trí 2 (Empf Kz 000): không có ô nào hiện. Complex: không đổi. (code) Mức hỗ trợ có giảm dần qua bài hay không ghi trong decision; nếu đổi cách đếm/chấm thì `layout_version` và spec đổi cùng lúc.
+- **Done when:** Basic: vào bài, ảnh `container` → thấy 6 ô trống trên đáy thùng đơn, nhận ra được bằng viền, không chỉ bằng màu. Basic: thả một carton gần một ô trống → carton khớp ô, thẳng, có âm thanh; ô đó không còn thấy là trống. Basic: thả carton thứ hai vào ô đã có carton → carton thứ hai không khớp vào ô đó. Basic: thả một carton lên trên một carton đã khớp ô → carton nằm phẳng trên carton bên dưới, không nghiêng, không lơ lửng; Ist vẫn tính nó. Basic: 6 carton, 1 carton nằm chồng, bấm nút đỏ → thẻ „Nicht richtig“ nêu quy tắc Empf Kz 003 và bảo đặt carton có dấu vào một ô trống; carton đó có biểu tượng `warning` vàng (không phải mũi tên cam); không có số nào. Basic: lấy carton có dấu ra → dấu và thẻ kết quả tắt cùng lúc. Basic: thiếu số lượng và có carton lỏng, bấm → lý do là số lượng, không có dấu ở carton. Mixed vị trí 1: vào bài và cầm carton tới thùng đơn → không thấy ô nào. Mixed vị trí 1: đủ 3 carton, 1 carton lỏng, bấm → thẻ lỗi + dấu ở carton đó, và từ lúc đó 3 ô hiện tới hết vị trí 1. Mixed vị trí 1: thả carton ở nửa phải thùng → carton nằm phẳng tại chỗ đó. Mixed vị trí 2: khi thùng kho mới đã dừng, không ô nào hiện; túi thả như trước. Complex: không đổi. (code) Không carton nào bị dời khi đang được cầm, khi `IsMoving` hoặc `IsShipped`. (code) Một lần thả trong thùng → tối đa một `container_enter`, không có cặp `container_exit`/`enter` do việc dời; `grab_start` không đến từ `SnapInteractor`. (code) `layout_version` mới (chung với #104–#110); `item_skills.csv` đánh dấu Basic `position_1` × `ekz_placement` là có hỗ trợ; R lọc theo press × skill; spec + `make_fake_data.R` + `analyse_set.R` sửa cùng lúc, `selftest.R` xanh, `data-analyst` duyệt. (code) Chữ mới qua `localize-strings` + `german-reviewer`.
 - **Inspector work expected:** yes (hiện ô, vật lý carton)
 - **Công:** M
 - **Test trên kính:** bắt buộc (thả carton bằng tay thật vào ô)
-- **Depends on:** #103 (vùng cầm); cần `solution-decision` (mức scaffold, vật lý thả)
+- **Depends on:** #103 (vùng cầm, verified-mcp)
+- **Decision:** docs/decisions/037-picking-station-places-feedback.md
 - **Status:** todo
 
 ### #109 [Feature] Basic, Mixed, Complex: phản hồi sau khi bấm nút đỏ ở chỗ người học đang nhìn; một ký hiệu một nghĩa
@@ -1657,11 +1662,12 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
 - **Files:** `Instruction Table/Correct|Incorrect|Result` (0.50, 0.84, 0.38), Assets/Scripts/ResultCardStyle.cs, Assets/Scripts/StationRideCue.cs (`Middle Lane Arrow`, chỉ Basic), Assets/Scripts/WS Scripts/OrderConfirm.cs, Assets/Scripts/MixPickingValidator.cs, Assets/Scripts/PiecesOrderValidator.cs
 - **Problem:** (P802 R5, R16) Khi người học nhìn vào thùng đơn, thẻ kết quả chỉ lộ một góc ở mép phải dưới; log cho thấy bấm lại sau vài giây, sửa kiểu thử. Ở Basic, mũi tên cam trên làn giữa (#99) là cùng ký hiệu với marker „cầm cái này“ của Concept, từ chỗ đứng trông như chỉ vào thùng đơn và đè lên biển „Order container“, đứng yên 4 s trước khi thùng chạy; người học không biết có phải làm gì không.
-- **Done when:** Basic, Mixed, Complex: nhìn vào thùng đơn từ chỗ đứng, bấm nút đỏ với đơn sai → lý do lỗi đọc được mà không phải quay đầu khỏi thùng. Đơn đúng → câu „Richtig“ và câu báo thùng sắp chạy đọc được ở cùng chỗ. Basic: sau khi đúng, không có mũi tên cam chỉ xuống nào; nếu còn ký hiệu hướng đi thì nó khác hình/màu với marker của Concept, nằm trên mặt làn giữa và chỉ hiện khi thùng đã chạy (theo decision). Phản hồi không che LVS và không che làn giữa khi thùng chạy. (code) `confirm_*` không đổi; decision 033 ghi phần mũi tên là đã bị thay.
+- **Done when:** Basic, Mixed, Complex: đứng ở (0, 1,6, 0) nhìn vào thùng đơn, bấm nút đỏ với đơn sai → toàn bộ thẻ kết quả nằm trong khung nhìn đó, không phải quay đầu. Đơn hoặc vị trí đúng → „Richtig!“ và câu báo thùng chạy ở cùng thẻ, cùng chỗ; bản DE đọc xong trong 4 s chờ. Thẻ ở cùng toạ độ trong 3 scene, ở thành trước thùng đơn, không chạy theo thùng. Basic và Mixed cuối: thẻ ẩn khoảng 2 s sau khi thùng đơn bắt đầu chạy, và mục Menu bài kế tiếp có highlight xanh; thẻ không còn câu „Wählen Sie … im Menü“. Ảnh `wms` ở 1,45 / 1,60 / 1,75 m: thẻ không che LVS. Ảnh khi thùng chạy: thẻ không che làn giữa. Tay ấn nút đỏ và tay đặt carton không bị thẻ chắn; thẻ không che miệng thùng đơn từ chỗ đứng. Basic: sau khi đúng, không có mũi tên cam nào hiện. (code) `confirm_*` không đổi; màu chỉ ở `ResultCardStyle`; `scene-ref-auditor` chạy trước khi bỏ `StationRideCue`.
 - **Inspector work expected:** yes (vị trí thẻ kết quả, mũi tên)
 - **Công:** M
 - **Test trên kính:** nhanh (đọc phản hồi khi nhìn thùng)
-- **Depends on:** cần `solution-decision` (vị trí phản hồi; giữ hay bỏ mũi tên); #111 (biển thùng) nếu phản hồi đặt trên thành thùng
+- **Depends on:** — (decision 037: thẻ ở thành trước thùng, không chờ #111); làm sau #108 (cùng scene)
+- **Decision:** docs/decisions/037-picking-station-places-feedback.md
 - **Status:** todo
 
 ### #110 [Feature] Concept, Complex: câu trả lời sai khoá nút một lúc để người học đọc lời giải thích
@@ -1669,11 +1675,12 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Scene(s):** ConceptScene, ComplexScene
 - **Files:** Assets/Scripts/PackageQuizController.cs (`CorrectHoldSeconds`), Assets/Scripts/Complex/RemainderQuizController.cs, Assets/Scripts/Research/ResearchEventData.cs (`LayoutVersion`), docs/research-logging-spec.md, analysis/
 - **Problem:** (P802 R6) Câu được chấm ngay khi chạm và sau câu sai các nút bấm được ngay, nên người học quét A → C → B trong 2–6 s, không đọc dòng giải thích màu đỏ. Concept chỉ 1/4 câu đúng lần đầu; câu „cái lẻ“ ở Complex cũng vậy. R đã chỉ tính lần chạm đầu, nên số liệu không sai, nhưng việc học kém đi.
-- **Done when:** Concept: chạm một đáp án sai → dòng giải thích hiện, các nút A/B/C không bấm được trong khoảng thời gian của decision (đề xuất 1,5–2 s), trông mờ đi; hết thời gian → bấm được lại. Chạm đúng → như bây giờ (giữ „Richtig!“ 1,5 s). Complex quiz phần dư: tương tự. Chạm trong lúc khoá → không có `quiz_answer`. (code) `layout_version` đổi một lần trong đợt (cùng các mục khác); spec, `make_fake_data.R`, `analyse_set.R` ghi rõ khoá sau câu sai, `selftest.R` xanh, `data-analyst` duyệt.
+- **Done when:** Concept: chạm một đáp án sai → dòng giải thích hiện dưới A/B/C, cả ba nút mờ đi và không bấm được trong 2 s, sau đó bấm được lại; dòng giải thích ở lại tới lần chạm tiếp theo. Chạm trong lúc khoá → không có gì đổi, không có `quiz_answer`. Chạm đúng → như hiện nay (giữ „Richtig!“ 1,5 s). Complex quiz phần dư: cùng 2 s, cùng cách hiển thị. (code) Một hằng số dùng chung, không lặp số ở hai script. (code) `layout_version` đổi một lần chung với #108/#109; spec ghi khoá 2 s; `make_fake_data.R` thêm khoảng nghỉ đó; `analyse_set.R` có hằng số khoá và độ trễ demo theo layout và tách `complex_remainder` theo layout; `selftest.R` xanh; `data-analyst` duyệt.
 - **Inspector work expected:** no (trường serialized mới, giá trị mặc định)
 - **Công:** S
 - **Test trên kính:** nhanh
 - **Depends on:** — (thời gian khoá: chọn trong decision chung Concept)
+- **Decision:** docs/decisions/036-concept-tour-v3.md
 - **Status:** todo
 
 ### #111 [Feature] Biển thùng và chú thích carton đã mở: một mẫu, dán sát vật, không lơ lửng
