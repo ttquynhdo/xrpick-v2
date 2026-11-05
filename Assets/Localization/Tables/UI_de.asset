@@ -163,7 +163,7 @@ MonoBehaviour:
   - m_Id: 7615942627358
     m_Localized: "Der Auftrag ist richtig.\nDer Auftragsbeh\xE4lter wechselt auf
       die mittlere Bahn und f\xE4hrt weg. Sehen Sie den Beh\xE4ltern auf der Rollenbahn
-      zu.\nW\xE4hlen Sie danach im Men\xFC \u201E4.\_Mehrere Positionen\u201C."
+      zu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
@@ -224,8 +224,7 @@ MonoBehaviour:
   - m_Id: 7615942627371
     m_Localized: "Alle Materialien und Mengen stimmen mit dem Auftrag \xFCberein.\nDer
       Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg. Sehen
-      Sie den Beh\xE4ltern auf der Rollenbahn zu.\nW\xE4hlen Sie danach im Men\xFC
-      \u201E{next_lesson}\u201C."
+      Sie den Beh\xE4ltern auf der Rollenbahn zu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372

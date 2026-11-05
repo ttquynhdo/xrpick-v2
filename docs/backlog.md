@@ -51,7 +51,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   2. **Hai `solution-decision`: xong 2026-11-05** (decision 036 cho #104, #105, #107, #110, #106 bỏ; decision 037 cho #108, #109). Phần cũ: (a) **ConceptScene tour v3** cho #104–#107 (+ thời gian khoá của #110): thay phần liên quan của decision 010, 024, 026 mục 2, 028/031; (b) **trạm thực hành** cho #108 + #109 (mức scaffold khi xếp EKZ 003, vật lý thả carton, chỗ đặt phản hồi, giữ/bỏ mũi tên làn giữa; thay một phần decision 003/033).
   3. **Sau decision:** Concept tuần tự trên một nhánh: #104 → #105 → #107 (verified-mcp, merged vào `main` 42c805d, đã push 2026-11-05); #110 bỏ (người dùng 2026-11-05). Song song được (khác scene): #108 (Basic, Mixed) → #109 (Basic, Mixed, Complex; sau #108 vì cùng scene) → #111 (4 scene, cuối cùng vì đụng mọi thùng).
   4. **Data/R:** #102 → #114.
-  5. **Cuối đợt:** đổi `layout_version` một lần ("033" → "034", vì #108 có thể đổi chấm EKZ; #110 đã bỏ nên cách chấm quiz không đổi), `data-analyst` sửa spec + R một lần (gồm phần R của #108: `item_skills.csv` Basic `position_1` × `ekz_placement` có hỗ trợ, lọc press × skill; cần #102 để `selftest.R` chạy); `german-reviewer` duyệt mọi chữ mới một lần → #13 export → một build → một buổi test kính (P803).
+  5. **Cuối đợt:** đổi `layout_version` một lần ("033" → "034", vì #108 có thể đổi chấm EKZ, và #109 bỏ câu gọi Menu nên khoảng `task_completed` → `menu_select` ở Basic/Mixed không so được với dữ liệu cũ (data-analyst 2026-11-06); không chạy pilot/study bằng build giữa đợt; #110 đã bỏ nên cách chấm quiz không đổi), `data-analyst` sửa spec + R một lần (gồm phần R của #108: `item_skills.csv` Basic `position_1` × `ekz_placement` có hỗ trợ, lọc press × skill; cần #102 để `selftest.R` chạy); `german-reviewer` duyệt mọi chữ mới một lần → #13 export → một build → một buổi test kính (P803).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
@@ -1672,7 +1672,8 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Test trên kính:** nhanh (đọc phản hồi khi nhìn thùng)
 - **Depends on:** — (decision 037: thẻ ở thành trước thùng, không chờ #111); làm sau #108 (cùng scene)
 - **Decision:** docs/decisions/037-picking-station-places-feedback.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl109.md
+- **Status:** verified-mcp (17/17 ✅ MCP/code, chờ test tay F2-đọc, F7-tay, H1 trên kính; nhánh `feat/109-result-card-at-box`; thẻ đặt sát miệng thùng (mép trên y 0.962) thay vì y 0.80–0.85 để xa tay ấn nút)
 
 ### #110 [Feature] Concept, Complex: câu trả lời sai khoá nút một lúc để người học đọc lời giải thích
 - **Type:** feature

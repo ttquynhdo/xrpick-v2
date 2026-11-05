@@ -162,9 +162,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627358
-    m_Localized: "The order is correct.\nThe order container moves onto the middle
-      lane and leaves. Watch the containers on the roller conveyor.\nThen choose
-      \u201C4.\_Several positions\u201D in the menu."
+    m_Localized: 'The order is correct.
+
+      The order container moves onto the
+      middle lane and leaves. Watch the containers on the roller conveyor.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
@@ -220,9 +221,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627371
-    m_Localized: "All materials and quantities match the order.\nThe order container
-      moves onto the middle lane and leaves. Watch the containers on the roller conveyor.\nNext,
-      choose \u201C{next_lesson}\u201D in the menu."
+    m_Localized: 'All materials and quantities match the order.
+
+      The order
+      container moves onto the middle lane and leaves. Watch the containers on the
+      roller conveyor.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372

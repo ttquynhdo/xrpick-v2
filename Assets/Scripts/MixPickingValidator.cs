@@ -9,13 +9,11 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
 
     public event Action OrderCompleted;
 
-    // Loc table UI (#54). {next_lesson} = menu label of the next lesson.
+    // Loc table UI (#54). #109: no Menu sentence; ResultCardDeparture highlights the next lesson in the Menu.
     private const string CorrectKey = "mixed.feedback.correct";
 
     // #21, decision 012: {position} = finished position, {next_position} = next position.
     private const string PositionDoneKey = "mixed.feedback.position_done";
-
-    private const string NextScene = "ComplexScene";
 
     [SerializeField] private MixedPickingContainer container;
     [SerializeField] private TMP_Text feedbackText;
@@ -200,11 +198,7 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
 
         if (result.Correct)
         {
-            if (!LessonNames.TryGetDisplayName(NextScene, out string nextLesson))
-            {
-                Debug.LogError($"MixedPickingValidator: no lesson name for {NextScene}.", this);
-            }
-            ShowResult(OrderFeedback.CorrectTitle(), ResultCardStyle.Correct, Loc.Get(CorrectKey, ("next_lesson", nextLesson)));
+            ShowResult(OrderFeedback.CorrectTitle(), ResultCardStyle.Correct, Loc.Get(CorrectKey));
             IsCompleted = true;
             ResearchLogger.LogTaskCompleted();
             OrderCompleted?.Invoke();
