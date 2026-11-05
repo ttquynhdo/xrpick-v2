@@ -213,3 +213,4 @@ concept.quiz.label_by_matnr.738910.wrong,Vergleichen Sie Ziffer für Ziffer mit 
 concept.quiz.label_by_matnr.783190.wrong,Vergleichen Sie Ziffer für Ziffer mit 738190.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 concept.ekz.sample.not_grabbable,Beispiel – nicht zum Greifen.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 complex.storage.opened_carton,Der angebrochene Karton bleibt im Modul im Lagerbehälter. Nehmen Sie nur die losen Teile heraus.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
+common.position.label,Position {position},proposed,claude,2026-11-05,"#97: WMS word Position, identical to EN; glossary term"

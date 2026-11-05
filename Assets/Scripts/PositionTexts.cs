@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -5,6 +6,7 @@ using UnityEngine.Serialization;
 /// <summary>
 /// #19, docs/decisions/016: an instruction card that shows only the text of the current position.
 /// #55: each position names a Loc key (table UI, docs/i18n/strings-todo.csv), not the text itself.
+/// #97, decision 035: with station stock the next position's text shows only once the storage containers stopped.
 /// </summary>
 public class PositionTexts : MonoBehaviour
 {
@@ -17,18 +19,23 @@ public class PositionTexts : MonoBehaviour
     [FormerlySerializedAs("textPerPosition")]
     [SerializeField] private string[] keyPerPosition;
 
+    [Tooltip("Optional. Storage containers on the station lanes (IStationStock); the text changes when they stop.")]
+    [SerializeField] private MonoBehaviour stationStock;
+
     private IPositionedOrder order;
+    private IStationStock stock;
 
     private void Awake()
     {
         order = container as IPositionedOrder;
+        stock = stationStock as IStationStock;
     }
 
     private void OnEnable()
     {
         if (order != null)
         {
-            order.LineAdvanced += Show;
+            order.LineAdvanced += HandleLineAdvanced;
         }
     }
 
@@ -36,7 +43,7 @@ public class PositionTexts : MonoBehaviour
     {
         if (order != null)
         {
-            order.LineAdvanced -= Show;
+            order.LineAdvanced -= HandleLineAdvanced;
         }
     }
 
@@ -55,6 +62,24 @@ public class PositionTexts : MonoBehaviour
         {
             Debug.LogError($"PositionTexts: {count} keys but {order.OrderLines.Count} order lines.", this);
         }
+
+        Show(order.CurrentPosition);
+    }
+
+    private void HandleLineAdvanced(int position)
+    {
+        if (stock == null)
+        {
+            Show(position);
+            return;
+        }
+
+        StartCoroutine(ShowWhenStockSettled());
+    }
+
+    private IEnumerator ShowWhenStockSettled()
+    {
+        yield return StationStockWait.UntilSettled(stock);
 
         Show(order.CurrentPosition);
     }

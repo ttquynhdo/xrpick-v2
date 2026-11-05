@@ -960,6 +960,10 @@ MonoBehaviour:
       pieces you need"
     m_Metadata:
       m_Items: []
+  - m_Id: 1029442483654656
+    m_Localized: Position {position}
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

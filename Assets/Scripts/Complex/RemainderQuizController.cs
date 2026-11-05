@@ -81,6 +81,9 @@ public class RemainderQuizController : MonoBehaviour
     // Question id ("cartons" / "loose"), answer key, correct. #28 will log it.
     public event Action<string, string, bool> AnswerChosen;
 
+    // #97, decision 035: both answers are right (raised once).
+    public event Action Answered;
+
     private void Awake()
     {
         toggles = new[] { optionAToggle, optionBToggle, optionCToggle };
@@ -225,6 +228,7 @@ public class RemainderQuizController : MonoBehaviour
         }
 
         IsAnswered = true;
+        Answered?.Invoke();
         feedbackText.text = Loc.Get(DoneKey);
         RefreshLabels();
         foreach (Toggle toggle in toggles)

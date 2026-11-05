@@ -19454,6 +19454,8 @@ MonoBehaviour:
   orderBox: {fileID: 786606220}
   validator: {fileID: 786606224}
   stationStock: {fileID: 0}
+  remainderQuiz: {fileID: 0}
+  doneCheckPrefab: {fileID: 1813272060346504523, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
   frameColor: {r: 0.012, g: 0.569, b: 0.867, a: 1}
   hintAlpha: 0.6
   currentFrameThinness: 1

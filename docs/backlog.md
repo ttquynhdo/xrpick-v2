@@ -1501,14 +1501,16 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 ### #97 [Feature] Dấu ✓ trên thẻ việc ở Basic, Mixed và Complex như Welcome/Concept
 - **Type:** feature
 - **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
-- **Files:** Assets/Scripts/InstructionStepHighlighter.cs, Assets/Scripts/Orders/InstructionStepTracker.cs, Assets/Scripts/Concept/ConceptCardProgress.cs (mẫu), `InstructionShelf` ở 3 scene, `Done Check` (copy từ WelcomeScene)
+- **Files:** Assets/Scripts/InstructionStepHighlighter.cs, Assets/Scripts/Orders/InstructionStepTracker.cs, Assets/Scripts/PositionTexts.cs, Assets/Scripts/Complex/RemainderQuizController.cs, Assets/Scripts/Concept/ConceptCardProgress.cs (mẫu), `InstructionShelf` ở 3 scene, `Done Check` (copy từ WelcomeScene)
 - **Problem:** (test kính P801, bl79 H1) Ở Welcome (#39) và Concept (#79) thẻ việc có ✓ khi xong; ở Basic, Mixed và Complex chỉ có khung xanh bước hiện tại (#40), không có ✓. Người học không thấy cùng một tín hiệu „xong việc“ qua các bài.
-- **Done when:** Basic: cầm kiện đầu tiên → thẻ 1 có ✓; đủ kiện trong thùng → thẻ 2 có ✓; đơn đúng → thẻ 3 có ✓. Mixed/Complex: các ✓ của vị trí 1 xuất hiện như trên. Đúng vị trí 1, khi thẻ đổi sang chữ của vị trí 2 → mọi ✓ tắt, rồi bật lại theo việc của vị trí 2. Đúng vị trí cuối → cả 3 thẻ có ✓. ✓ nằm ở góc thẻ, không che chữ ở DE và EN (ảnh `instructions`). Khung xanh của #40 vẫn chạy như trước. (code) Logic ✓ quyết bởi `InstructionStepTracker` thuần C#, có EditMode test. (code) Không ghi log mới.
+- **Done when:** (decision 035) Basic: mở bài → không thẻ nào có ✓. Cầm carton đầu tiên → thẻ 1 có ✓, khung xanh sang thẻ 2. Bỏ carton vào thùng nhưng chưa bấm nút → thẻ 2 và 3 chưa có ✓ (kể cả khi đã đủ số). Bấm nút đỏ khi đơn sai → không ✓ nào đổi. Bấm nút đỏ khi đơn đúng → cả 3 thẻ có ✓, không thẻ nào có khung. Mixed: position 1 đúng → cả 3 thẻ có ✓ trong lúc chờ và lúc thùng chạy, chữ thẻ vẫn là của position 1. Khi thùng kho mới đã dừng → ✓ tắt hết, chữ thẻ đổi sang position 2, khung ở thẻ 1, cùng một lúc. Position 2 đúng → cả 3 thẻ có ✓. Complex position 1: trả lời đúng cả hai câu → thẻ 1 có ✓, khung sang thẻ 2; phần còn lại như Mixed. Mixed và Complex: giữa thẻ „Darum geht es“ và thẻ 1 có dòng „Position 1 · Position 2“, position hiện tại màu xanh và gạch chân; sau khi sang position 2 thì „Position 1“ có ✓. Basic không có dòng này. ✓ và dòng position không che chữ, không chồng thẻ khác ở DE và EN (ảnh `instructions`, cả hai position); Complex: thẻ 3 vẫn nằm trên thùng kho position 2. Khung xanh và khung „sẵn sàng“ của #40 vẫn chạy như trước. (code) Logic ✓ do `InstructionStepTracker` thuần C# quyết định, có EditMode test. (code) Không ghi log mới.
 - **Inspector work expected:** yes (badge trên 3 thẻ × 3 scene)
 - **Công:** M
 - **Test trên kính:** nhanh (thấy ✓ khi xong từng việc)
 - **Depends on:** #87 (decision 027: ✓ không bao giờ ở thẻ „Aufgabe“, giữ chỗ ở thẻ mới). Người dùng chốt 2026-11-04: sang vị trí 2 thì ✓ của vị trí 1 tắt (khác Welcome/Concept, nơi ✓ không bao giờ tắt, vì ở đây thẻ đổi sang việc mới)
-- **Status:** todo
+- **Decision:** docs/decisions/035-done-checks-picking-position-strip.md
+- **Test report:** docs/test-reports/bl97.md
+- **Status:** verified-mcp (16/18 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/97-done-checks-picking`)
 
 ### #98 [Feature] Rút gọn dần chữ trên thẻ qua các bài (fading)
 - **Type:** feature

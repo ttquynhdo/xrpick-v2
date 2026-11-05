@@ -90,5 +90,100 @@ namespace XRPick.Orders.Tests
             Assert.IsFalse(tracker.OrderCompleted());
             Assert.AreEqual(InstructionStep.Done, tracker.Step);
         }
+
+        // #97, decision 035: done marks.
+        [Test]
+        public void Start_NoCardDone()
+        {
+            var tracker = new InstructionStepTracker();
+
+            Assert.IsFalse(tracker.ReadDone);
+            Assert.IsFalse(tracker.PickDone);
+            Assert.IsFalse(tracker.ConfirmDone);
+        }
+
+        [Test]
+        public void FirstGrab_MarksOnlyReadDone()
+        {
+            var tracker = new InstructionStepTracker();
+            tracker.PackageGrabbed();
+
+            Assert.IsTrue(tracker.ReadDone);
+            Assert.IsFalse(tracker.PickDone);
+            Assert.IsFalse(tracker.ConfirmDone);
+        }
+
+        [Test]
+        public void ReadFinishedWithoutGrab_MovesToPick_AndMarksRead()
+        {
+            var tracker = new InstructionStepTracker();
+
+            Assert.IsTrue(tracker.ReadFinished());
+            Assert.AreEqual(InstructionStep.Pick, tracker.Step);
+            Assert.IsTrue(tracker.ReadDone);
+            Assert.IsFalse(tracker.ReadFinished());
+            Assert.IsFalse(tracker.PackageGrabbed());
+        }
+
+        [Test]
+        public void FullContainer_WithoutConfirm_DoesNotMarkPickOrConfirm()
+        {
+            var tracker = new InstructionStepTracker();
+            tracker.PackageGrabbed();
+            tracker.PackagesInBoxChanged(3);
+
+            Assert.IsFalse(tracker.PickDone);
+            Assert.IsFalse(tracker.ConfirmDone);
+            Assert.IsTrue(tracker.ConfirmReady);
+        }
+
+        [Test]
+        public void CorrectPosition_MarksAllThree_NoHint_ContentsIgnored()
+        {
+            var tracker = new InstructionStepTracker();
+            tracker.PackageGrabbed();
+            tracker.PackagesInBoxChanged(3);
+
+            Assert.IsTrue(tracker.PositionConfirmed());
+            Assert.AreEqual(InstructionStep.Confirmed, tracker.Step);
+            Assert.IsTrue(tracker.ReadDone);
+            Assert.IsTrue(tracker.PickDone);
+            Assert.IsTrue(tracker.ConfirmDone);
+            Assert.IsFalse(tracker.ConfirmReady);
+
+            // While the storage containers change nothing moves the marks.
+            Assert.IsFalse(tracker.PackagesInBoxChanged(0));
+            Assert.IsFalse(tracker.PackageGrabbed());
+            Assert.IsFalse(tracker.PositionConfirmed());
+            Assert.IsTrue(tracker.PickDone);
+        }
+
+        [Test]
+        public void NextPosition_ClearsAllMarks()
+        {
+            var tracker = new InstructionStepTracker();
+            tracker.PackageGrabbed();
+            tracker.PositionConfirmed();
+
+            Assert.IsTrue(tracker.PositionStarted());
+            Assert.AreEqual(InstructionStep.Read, tracker.Step);
+            Assert.IsFalse(tracker.ReadDone);
+            Assert.IsFalse(tracker.PickDone);
+            Assert.IsFalse(tracker.ConfirmDone);
+        }
+
+        [Test]
+        public void OrderCompleted_MarksAllThree()
+        {
+            var tracker = new InstructionStepTracker();
+            tracker.PackageGrabbed();
+
+            tracker.OrderCompleted();
+
+            Assert.IsTrue(tracker.ReadDone);
+            Assert.IsTrue(tracker.PickDone);
+            Assert.IsTrue(tracker.ConfirmDone);
+            Assert.IsFalse(tracker.PositionConfirmed());
+        }
     }
 }

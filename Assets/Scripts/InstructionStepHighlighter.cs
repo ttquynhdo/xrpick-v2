@@ -10,6 +10,9 @@ using UnityEngine;
 /// frame as a "ready" hint while the order container holds packages of the current position. Steps follow
 /// actions only (InstructionStepTracker), never the order result. The „Aufgabe“ card is never touched.
 /// Frames are built at runtime from each card's own sprite, without raycast targets.
+/// #97, decision 035: each step card also gets the Welcome/Concept done mark (DoneCheck prefab, top right): card 1
+/// when the read step is over, cards 2 and 3 when the red button confirmed the position as correct. All three stay
+/// while the storage containers change and turn off when the next position starts.
 /// </summary>
 public class InstructionStepHighlighter : MonoBehaviour
 {
@@ -33,6 +36,13 @@ public class InstructionStepHighlighter : MonoBehaviour
     // #71, decision 019 (assumption D27): card 1 lights up when the next storage container has stopped.
     [Tooltip("Optional. Storage containers on the station lanes (IStationStock); a new position starts when they stop.")]
     [SerializeField] private MonoBehaviour stationStock;
+
+    // #97, decision 035: in Complex the read step of position 1 is the remainder quiz.
+    [Tooltip("Optional (ComplexScene). Both quiz answers right ends the read step of position 1.")]
+    [SerializeField] private RemainderQuizController remainderQuiz;
+
+    [Tooltip("Done mark cloned onto each step card (Assets/Prefabs/DoneCheck.prefab).")]
+    [SerializeField] private GameObject doneCheckPrefab;
 
     [Header("Look")]
     [Tooltip("Frame colour; same blue as the Menu's Next Lesson Highlight (#39).")]
@@ -66,6 +76,10 @@ public class InstructionStepHighlighter : MonoBehaviour
     private InstructionCardLook read;
     private InstructionCardLook pick;
     private InstructionCardLook confirm;
+
+    private GameObject readCheck;
+    private GameObject pickCheck;
+    private GameObject confirmCheck;
 
     private void Awake()
     {
@@ -108,6 +122,10 @@ public class InstructionStepHighlighter : MonoBehaviour
         {
             stock.Settled += HandleStockSettled;
         }
+        if (remainderQuiz != null)
+        {
+            remainderQuiz.Answered += HandleQuizAnswered;
+        }
     }
 
     private void OnDisable()
@@ -135,6 +153,10 @@ public class InstructionStepHighlighter : MonoBehaviour
         {
             stock.Settled -= HandleStockSettled;
         }
+        if (remainderQuiz != null)
+        {
+            remainderQuiz.Answered -= HandleQuizAnswered;
+        }
         positionStartPending = false;
     }
 
@@ -142,7 +164,8 @@ public class InstructionStepHighlighter : MonoBehaviour
     {
         bool missing = RequiredReference.IsMissing(readCard, nameof(readCard), this)
                        | RequiredReference.IsMissing(pickCard, nameof(pickCard), this)
-                       | RequiredReference.IsMissing(confirmCard, nameof(confirmCard), this);
+                       | RequiredReference.IsMissing(confirmCard, nameof(confirmCard), this)
+                       | RequiredReference.IsMissing(doneCheckPrefab, nameof(doneCheckPrefab), this);
 
         if (contents == null)
         {
@@ -158,6 +181,16 @@ public class InstructionStepHighlighter : MonoBehaviour
         read = new InstructionCardLook(readCard, frameOutset);
         pick = new InstructionCardLook(pickCard, frameOutset);
         confirm = new InstructionCardLook(confirmCard, frameOutset);
+
+        // After the looks: the frames are the cards' last children, the marks must draw on top of them.
+        readCheck = AddDoneCheck(readCard);
+        pickCheck = AddDoneCheck(pickCard);
+        confirmCheck = AddDoneCheck(confirmCard);
+
+        if (remainderQuiz != null && remainderQuiz.IsAnswered)
+        {
+            tracker.ReadFinished();
+        }
 
         if (contents != null)
         {
@@ -183,6 +216,14 @@ public class InstructionStepHighlighter : MonoBehaviour
         }
     }
 
+    private void HandleQuizAnswered()
+    {
+        if (tracker.ReadFinished())
+        {
+            Apply();
+        }
+    }
+
     private void HandleContentsChanged()
     {
         if (tracker.PackagesInBoxChanged(contents.PackageCount))
@@ -193,6 +234,12 @@ public class InstructionStepHighlighter : MonoBehaviour
 
     private void HandleLineAdvanced(int position)
     {
+        // LineAdvanced is raised by a correct confirm: all three cards are done until the next position starts.
+        if (tracker.PositionConfirmed())
+        {
+            Apply();
+        }
+
         if (stock != null)
         {
             // The storage containers may hear LineAdvanced after this script: look one frame later.
@@ -246,7 +293,7 @@ public class InstructionStepHighlighter : MonoBehaviour
             return;
 
         InstructionStep step = tracker.Step;
-        bool done = step == InstructionStep.Done;
+        bool done = step == InstructionStep.Done || step == InstructionStep.Confirmed;
         bool readCurrent = step == InstructionStep.Read;
         bool pickCurrent = step == InstructionStep.Pick;
 
@@ -256,5 +303,27 @@ public class InstructionStepHighlighter : MonoBehaviour
         Color hint = frameColor;
         hint.a *= hintAlpha;
         confirm.Show(tracker.ConfirmReady ? hint : Color.clear, hintFrameThinness, dimmed: !done, dimFactor);
+
+        readCheck.SetActive(tracker.ReadDone);
+        pickCheck.SetActive(tracker.PickDone);
+        confirmCheck.SetActive(tracker.ConfirmDone);
+    }
+
+    // Same place as the Concept/Welcome marks: top right, at the title row, half outside the card.
+    private GameObject AddDoneCheck(RectTransform card)
+    {
+        GameObject check = Instantiate(doneCheckPrefab, card, false);
+        check.name = "Done Check";
+        check.layer = card.gameObject.layer;
+
+        var rect = (RectTransform)check.transform;
+        rect.anchorMin = Vector2.one;
+        rect.anchorMax = Vector2.one;
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.anchoredPosition3D = new Vector3(0f, -6f, 0f);
+        rect.SetAsLastSibling();
+
+        check.SetActive(false);
+        return check;
     }
 }
