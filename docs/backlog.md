@@ -1617,7 +1617,8 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Test trên kính:** nhanh (mũi tên chỉ đúng ô từ chỗ đứng, ở chiều cao người thật)
 - **Depends on:** decision chung ConceptScene (#104–#107)
 - **Decision:** docs/decisions/036-concept-tour-v3.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl105.md
+- **Status:** verified-mcp (13/14 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`)
 
 ### #106 [Feature] ConceptScene: thanh tour không che thùng đơn khi phải thao tác
 - **Type:** feature
