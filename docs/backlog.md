@@ -40,7 +40,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   1. **#88** trước (cỡ carton quyết ô EKZ Mixed, carton đếm Concept, thùng mẫu EKZ, vòng trên carton Complex; có thể dựng lại lưới 6 ô Basic). **#95** xen vào lúc nào cũng được (chỉ prefab và mesh).
   2. Concept: **#89** (mở đầu bằng bước đo bố cục bàn học cho mọi vật mới, như #84) → **#90** → **#91** (+ số LVS khớp với thùng, bổ sung 2026-11-05) → **#100** (báo kiện sai/thừa trong thùng, cần `solution-decision`) → **#94 phần Concept** (verified-mcp 2026-11-05, cùng phần Mixed) → **#92** (cần thùng mẫu mới) → **#93 phần Concept**.
   3. **#94 phần Mixed** → **#93 phần Complex** → **#96** → **#92 phần Complex** (carton đã mở, người dùng chốt 2026-11-04: quy tắc vật chỉ để xem cho mọi scene).
-  3b'. **Rà lại 2026-11-05:** #96 bỏ (không phải lỗi, vòng kinematic). Mới **#101** (decision 031: mẫu 003 3 carton, thẻ mẫu mang hình của bảng EKZ). Thứ tự còn lại: **#101 → #92 (Concept + Complex cùng lúc) → #99 → #87 → #86 → #97**, rồi bước 5–6 dưới đây.
+  3b'. **Rà lại 2026-11-05:** #96 bỏ (không phải lỗi, vòng kinematic). Mới **#101** (decision 031: mẫu 003 3 carton, thẻ mẫu mang hình của bảng EKZ). Thứ tự còn lại: **#101 → #92 (Concept + Complex cùng lúc) → #99 → #87 → #86 → #97**, rồi bước 5–6 dưới đây. **Cập nhật 2026-11-05:** #101, #92 verified-mcp. Sau #97 làm **#102** (data/R: mở khoá tidyr/readr, chạy `selftest.R` cho layout "032", người dùng học R dần), rồi bước 5–6.
   3c. **#99** (chờ 12 s trước khi thùng chạy, Basic/Mixed/Complex): sau chuỗi Mixed/Complex ở bước 3, trước #87.
   4. **#87** (sau mọi mục đổi chữ thẻ, chạy công cụ slot một lần) → **#86** → **#97**.
   5. Hợp đồng log: các mục trên **không** tự đổi `layout_version`; cuối đợt đổi một lần "025" → "029" (build có 026–029), `data-analyst` sửa spec + `make_fake_data.R` + `analyse_set.R` một lần (tách Concept, Complex `position_1`, Mixed theo layout), `selftest.R` xanh.
@@ -1790,3 +1790,27 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Giả định (2026-11-04, người dùng chọn):** chỉ bài kế tiếp mở, và chỉ sau khi xong bài đang học (Welcome: cầm thùng + bấm nút đỏ; Concept: đúng cả 4 câu; Basic/Mixed: `OrderCompleted`); bài đang học và các bài trước luôn khoá; ở Complex mọi mục khoá (kết thúc qua `FacilitatorEndSession`). Không có nút vượt cho người điều phối. Phần `menu_select … blocked` chuyển sang #29.
 - **Test report:** docs/test-reports/bl42.md
 - **Status:** verified-mcp (14/14 ✅, chờ test tay H1, H2 và phần crash thật của K4)
+
+### #102 [P2] Data/R sau #92: mở khoá tidyr/readr, chạy selftest cho layout "032", học R từng bước
+- **Type:** refactor (kiểm tra phần R + học)
+- **Scene(s):** — (chỉ `analysis/`; bước 4 dùng một log thật của ConceptScene)
+- **Files:** `analysis/selftest.R` (mục 8u mới), `analysis/analyse_set.R` (7b, 13d, 13e mới → `concept_containers_by_visit.csv`), `analysis/make_fake_data.R` (người giả P814, layout "032"), `docs/research-logging-spec.md`; thư viện R ở `%LOCALAPPDATA%\R\win-library\4.6\tidyr` và `\readr`
+- **Problem:** (#92, 2026-11-05) Windows Smart App Control chặn `tidyr.dll` và `readr.dll` („An Application Control policy has blocked this file“), nên `selftest.R` không chạy được. Phần R mà `data-analyst` viết cho #92 mới chỉ được kiểm từng khối, chưa chạy trọn. #92 T16 vẫn ⏳. Người dùng muốn tự sửa phần này và học R dần qua chính việc sửa.
+- **Done when:**
+  - Sau khi mở khoá (thử lần lượt: `Unblock-File` trên hai thư mục; nếu không được thì cài Rtools46 và `install.packages(c("tidyr", "readr"), type = "source")`; cách cuối là tắt Smart App Control, nếu là máy công ty/trường thì hỏi IT trước), `Rscript -e "library(tidyr); library(readr)"` chạy mà không báo lỗi Application Control.
+  - `"C:\Program Files\R\R-4.6.2\bin\Rscript.exe" analysis/selftest.R` chạy hết và mọi kiểm tra đều xanh, kể cả mục 8u (P814).
+  - `analysis/output/pilot/concept_containers_by_visit.csv` có dòng P814 với: storage_exits 6, storage_enters 2, order_enters 5, order_exits 1, order_max_cartons 4, soll_reached TRUE, order_over_soll_enters 1, demo_resets 2.
+  - Chép log thật của một lượt ConceptScene "032" (mã thử P9xx: cầm carton, đặt 3 vào thùng đơn, tới bước 11, „Von vorn“) vào `analysis/data/`, chạy `analyse.R`: không có cảnh báo `container_count_breaks` hay `container_unlinked_lines`, và dòng `container_exit` storage đầu tiên có `count_after` 5.
+  - (học) Bạn tự chạy được ba lệnh `make_fake_data.R` → `analyse.R` → `selftest.R`, nói được mỗi lệnh đọc gì và ghi ra gì. Bạn đọc khối 13e cùng `data-analyst` và tự thêm hoặc sửa một chỉ số nhỏ theo hướng dẫn, sao cho `selftest.R` vẫn xanh. Ghi chú bằng lời của bạn vào `analysis/LEARNING.md` (file mới).
+  - (code) Khi xong thì #92 T16 thành ✅ trong `docs/test-reports/bl92.md`.
+- **Kế hoạch học R (gợi ý, mỗi bước khoảng 30–60 phút, nhờ `data-analyst` giảng):**
+  1. Chạy ba lệnh trên. Xem `analysis/data/` (đầu vào giả) và `analysis/output/` (bảng, hình) có gì.
+  2. Mở một file `*_events.jsonl` và `summary.csv` bằng editor, so từng trường với `docs/research-logging-spec.md`.
+  3. Trong R console: `readr::read_csv()` một bảng output, rồi `dplyr::filter()`, `count()`, `summarise()` để tự trả lời một câu, ví dụ „P814 đặt dư mấy lần?“.
+  4. Đọc khối 13e với `data-analyst` (event → bảng theo visit), rồi tự thêm một cột.
+  5. Đọc `selftest.R` mục 8u: hiểu vì sao test bằng dữ liệu giả bắt được lỗi trong `analyse_set.R`.
+- **Inspector work expected:** no
+- **Công:** S (mở khoá + chạy selftest); phần học: thêm 3–5 buổi ngắn
+- **Test trên kính:** không
+- **Depends on:** #92 (commit 55c4ee2). Người dùng chọn 2026-11-05: làm sau các mục feature còn lại (#99 → #87 → #86 → #97), trước bước „hợp đồng log / build cuối“
+- **Status:** todo
