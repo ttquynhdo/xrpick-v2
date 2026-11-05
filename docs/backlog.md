@@ -1638,13 +1638,14 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Scene(s):** ConceptScene
 - **Files:** ConceptScene `Layout Slots/EKZ Sample 003|000` (vật, thẻ), docs/i18n/strings-todo.csv (thẻ mẫu, nếu thêm chữ hành động)
 - **Problem:** (P802 R14) Hai mẫu khác nhau cùng lúc ở loại hàng (carton ↔ túi), vật tư và cách xếp; 2 túi trông gọn, 3 carton một hàng trông như đặt bình thường. Người học không thấy được „003 = từng chiếc, có thứ tự; 000 = đổ vào“. Quiz `ekz_003`/`ekz_000` hỏi đúng khác biệt này (P802: `ekz_003` sai lần đầu).
-- **Done when:** Ở bước 8–9, nhìn từ chỗ đứng: cả hai mẫu là carton KABELVERBINDER A cùng cỡ. Mẫu 003: 3 carton thẳng một hàng, cùng hướng, đọc được nắp. Mẫu 000: ít nhất 5 carton nằm nghiêng theo các hướng khác nhau, chồng lên nhau. Không carton nào xuyên thành thùng mẫu. Thẻ mẫu giữ pictogram, „Empf Kz 00x = EKZ x“ và ký hiệu bàn tay, không thêm chữ hành động. Chữ `empf_kz_000` và câu hỏi `ekz_000` nói về carton, không nói túi; không chuỗi nào nói carton được „einfüllen/schütten“; có EN + DE qua `german-reviewer`. Ở bước 1–7, 10, 11: không thấy mẫu nào. (code) Key và đáp án đúng của `ekz_003`/`ekz_000` không đổi; mẫu không có `PackageData`/`Grabbable`/collider, nằm ngoài `Hint Zone`; `PackageStandardizer.Check()` không báo mẫu.
+- **Done when:** Ở bước 8–9, nhìn từ chỗ đứng: cả hai mẫu là carton KABELVERBINDER A cùng cỡ, bằng nửa carton chuẩn (người dùng 2026-11-05). Mẫu 003: carton cùng hướng, nắp lên, xếp lưới thẳng hàng ít nhất 3 × 2, chồng 2 lớp. Mẫu 000: nhiều carton hơn mẫu 003 một lớp, nằm nghiêng theo các hướng khác nhau, chồng lên nhau. Không carton nào xuyên thành thùng mẫu. Thẻ mẫu giữ pictogram, „Empf Kz 00x = EKZ x“ và ký hiệu bàn tay, không thêm chữ hành động. Chữ `empf_kz_000` và câu hỏi `ekz_000` nói về carton, không nói túi; không chuỗi nào nói carton được „einfüllen/schütten“; có EN + DE qua `german-reviewer`. Ở bước 1–7, 10, 11: không thấy mẫu nào. (code) Key và đáp án đúng của `ekz_003`/`ekz_000` không đổi; mẫu không có `PackageData`/`Grabbable`/collider, nằm ngoài `Hint Zone`; `PackageStandardizer.Check()` không báo mẫu (hai mẫu không thuộc chuẩn carton 029).
 - **Inspector work expected:** yes (vật mẫu, thẻ)
 - **Công:** S (đổi vật mẫu) – M (hoạt cảnh)
 - **Test trên kính:** nhanh (thấy khác biệt từ chỗ đứng)
 - **Depends on:** decision chung ConceptScene; liên quan ý tưởng vật EKZ 0 của P801 R19 (vít, phụ kiện ống)
 - **Decision:** docs/decisions/036-concept-tour-v3.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl107.md
+- **Status:** verified-mcp (12/13 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`; carton nửa cỡ theo yêu cầu người dùng 2026-11-05)
 
 ### #108 [Feature] Basic, Mixed: người học thấy được chỗ đặt carton theo Empf Kz 003; carton không nằm nghiêng lơ lửng
 - **Type:** feature

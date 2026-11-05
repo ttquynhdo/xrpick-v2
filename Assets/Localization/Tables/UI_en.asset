@@ -358,8 +358,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: 'Other orders can show 000 here, that is EKZ 0: the parts may lie
-      unordered, like the bags in the example.'
+    m_Localized: 'Other orders can show 000 here, that is EKZ 0: the cartons may
+      lie unordered, like in the example.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -396,11 +396,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627419
-    m_Localized: Pour in unordered
+    m_Localized: Put in unordered
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627420
-    m_Localized: 'Empf Kz 000: how may you put the bags into the order container?'
+    m_Localized: 'Empf Kz 000: how may you put the cartons into the order container?'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627421
@@ -408,7 +408,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627422
-    m_Localized: Pouring in is allowed
+    m_Localized: Putting them in unordered is allowed
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627423
@@ -658,7 +658,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182474
-    m_Localized: With 000 the bags may lie unordered.
+    m_Localized: With 000 the cartons may lie unordered.
     m_Metadata:
       m_Items: []
   - m_Id: 287914819719168
@@ -670,7 +670,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 287914874245121
-    m_Localized: Pouring in unordered is allowed.
+    m_Localized: Putting in unordered is allowed.
     m_Metadata:
       m_Items: []
   - m_Id: 287914874245122

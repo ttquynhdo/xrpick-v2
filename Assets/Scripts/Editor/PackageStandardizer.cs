@@ -44,6 +44,10 @@ public static class PackageStandardizer
     private const float StickerHeightShare = 0.8f;
 
     // The longest lines that must fit: carton names on the lid, the Mat.-Nr line on a bag label.
+    // #107 (user, 2026-11-05): the two view-only ConceptScene EKZ samples hold half-size cartons (003 in an ordered
+    // grid, 000 loose and tilted); they are not packages and keep their own size and pose.
+    private static readonly string[] ViewOnlySampleRoots = { "EKZ Sample 003", "EKZ Sample 000" };
+
     private const string LongestCartonLine = "SCHLAUCHSCHELLE B";
     private const string LongestBagLine = "Mat.-Nr: 738190";
 
@@ -180,7 +184,7 @@ public static class PackageStandardizer
     {
         return scene.GetRootGameObjects()
             .SelectMany(root => root.GetComponentsInChildren<MeshFilter>(true))
-            .Where(f => f.sharedMesh != null);
+            .Where(f => f.sharedMesh != null && !IsViewOnlySample(f.transform));
     }
 
     private static Mesh CartonMesh()
@@ -526,6 +530,17 @@ public static class PackageStandardizer
     }
 
     private static string PathOf(Transform t) => t.parent == null ? t.name : PathOf(t.parent) + "/" + t.name;
+
+    private static bool IsViewOnlySample(Transform t)
+    {
+        for (Transform p = t; p != null; p = p.parent)
+        {
+            if (ViewOnlySampleRoots.Contains(p.name))
+                return true;
+        }
+
+        return false;
+    }
 
     private static Vector3 Abs(Vector3 v) => new(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
 

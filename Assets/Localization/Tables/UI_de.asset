@@ -362,7 +362,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627403
     m_Localized: "Bei anderen Auftr\xE4gen kann hier 000 stehen, das ist EKZ 0: Die
-      Teile d\xFCrfen ungeordnet liegen wie die T\xFCten im Beispiel."
+      Kartons d\xFCrfen ungeordnet liegen wie im Beispiel."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -399,11 +399,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627419
-    m_Localized: "Ungeordnet einf\xFCllen"
+    m_Localized: Ungeordnet einlegen
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627420
-    m_Localized: "Empf Kz 000: Wie d\xFCrfen Sie die T\xFCten in den Auftragsbeh\xE4lter
+    m_Localized: "Empf Kz 000: Wie d\xFCrfen Sie die Kartons in den Auftragsbeh\xE4lter
       geben?"
     m_Metadata:
       m_Items: []
@@ -412,7 +412,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627422
-    m_Localized: "Einf\xFCllen ist erlaubt"
+    m_Localized: Ungeordnet einlegen ist erlaubt
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627423
@@ -654,7 +654,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182474
-    m_Localized: "Bei 000 d\xFCrfen die T\xFCten ungeordnet liegen."
+    m_Localized: "Bei 000 d\xFCrfen die Kartons ungeordnet liegen."
     m_Metadata:
       m_Items: []
   - m_Id: 287914819719168
@@ -666,7 +666,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 287914874245121
-    m_Localized: "Ungeordnet einf\xFCllen ist erlaubt."
+    m_Localized: Ungeordnet einlegen ist erlaubt.
     m_Metadata:
       m_Items: []
   - m_Id: 287914874245122

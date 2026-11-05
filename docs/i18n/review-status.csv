@@ -136,15 +136,15 @@ concept.quiz.cartons_from_soll.25,25 Kartons,proposed,german-reviewer (agent),20
 concept.quiz.cartons_from_soll.25.wrong,25 ist die VPE: die Stückzahl in einem Karton. Teilen Sie Soll durch VPE.,proposed,german-reviewer (agent),2026-11-03,"Agent: OK; optional 'durch die VPE', left to #13"
 concept.quiz.ekz_003.q,Empf Kz 003: Wie geben Sie die Kartons in den Auftragsbehälter?,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.quiz.ekz_003.ordered,Einzeln und geordnet einlegen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.ekz_003.poured,Ungeordnet einfüllen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
+concept.quiz.ekz_003.poured,Ungeordnet einlegen,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#107, decision 036)"
 concept.quiz.ekz_003.poured.wrong,Bei 003 müssen die Kartons einzeln und geordnet liegen.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
-concept.quiz.ekz_000.q,Empf Kz 000: Wie dürfen Sie die Tüten in den Auftragsbehälter geben?,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
+concept.quiz.ekz_000.q,Empf Kz 000: Wie dürfen Sie die Kartons in den Auftragsbehälter geben?,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#107, decision 036)"
 concept.quiz.ekz_000.ordered,Nur einzeln und geordnet einlegen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.ekz_000.ordered.wrong,Bei 000 dürfen die Tüten ungeordnet liegen.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
-concept.quiz.ekz_000.poured,Einfüllen ist erlaubt,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
+concept.quiz.ekz_000.ordered.wrong,Bei 000 dürfen die Kartons ungeordnet liegen.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#107, decision 036)"
+concept.quiz.ekz_000.poured,Ungeordnet einlegen ist erlaubt,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#107, decision 036)"
 concept.ekz.title,EKZ-Übersicht,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.in_training,In der Übung,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
-concept.ekz.0,Ungeordnet einfüllen ist erlaubt.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
+concept.ekz.0,Ungeordnet einlegen ist erlaubt.,proposed,german-reviewer (agent),2026-11-05,"Agent proposal (#107), user accepted"
 concept.ekz.2,"Von Hand einlegen, auch mehrere auf einmal.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.3,Einzeln und geordnet einlegen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.4,"Wie EKZ 3, Teile in einer Ebene mit Zwischenlage trennen.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
@@ -156,7 +156,7 @@ complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen unter dem B
 concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.cartons.body,= 3 Kartons,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#91, result line of the caption next to Soll/Verp.-Einh.)"
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, das ist EKZ 0: Die Teile dürfen ungeordnet liegen wie die Tüten im Beispiel.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
+concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, das ist EKZ 0: Die Kartons dürfen ungeordnet liegen wie im Beispiel.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#107, decision 036)"
 concept.tour.material_flow.body,"Der Lagerbehälter fährt über die mittlere Bahn weg, danach der fertige Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.card.step3_body,"Drücken Sie nach der Erklärung zum LVS „Zu den Fragen“. Drücken Sie dann A, B oder C.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 concept.quiz.locked,Die Fragen kommen nach der Erklärung zum LVS.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
