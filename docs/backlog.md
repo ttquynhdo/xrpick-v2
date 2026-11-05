@@ -1532,7 +1532,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** — ; D41 (người hướng dẫn, không chặn). Mỗi lần đổi thùng thêm ~3,4 s, cả khoá thêm ~17 s
 - **Decision:** docs/decisions/033-confirm-pause-container-change-cue.md
 - **Test report:** docs/test-reports/bl99.md
-- **Status:** verified-mcp (13/14 MCP/code ✅, T9b chưa chạy; `selftest.R` không chạy được vì #102; chờ test tay H1–H3, T9b; nhánh `feat/99-read-before-ride`)
+- **Status:** verified-mcp (13/14 MCP/code ✅, T9b chưa chạy; `selftest.R` không chạy được vì #102; chờ test tay H1–H3, T9b; nhánh `feat/99-read-before-ride`, commit a45f4e7)
 
 ### #100 [Feature] ConceptScene: báo ngay khi người học bỏ kiện sai hoặc thừa vào thùng kho / thùng đơn
 - **Type:** feature
