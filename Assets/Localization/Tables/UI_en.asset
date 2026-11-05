@@ -254,8 +254,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627379
-    m_Localized: The questions come after the WMS explanation. Then press A, B or
-      C.
+    m_Localized: After the WMS explanation, press "To the questions". Then press
+      A, B or C.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627381
@@ -369,11 +369,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627408
     m_Localized: Now answer the next question.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627409
-    m_Localized: "You answered all questions correctly. Now choose \u201C{lesson}\u201D
-      in the menu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627410
@@ -893,8 +888,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156763004928
-    m_Localized: Watch the containers on the roller conveyor. Then answer the questions
-      below the screen.
+    m_Localized: Watch the containers on the roller conveyor. Then press "To the
+      questions".
     m_Metadata:
       m_Items: []
   - m_Id: 735937718784000
@@ -917,6 +912,22 @@ MonoBehaviour:
   - m_Id: 762340292038656
     m_Localized: This storage container holds material with a different material
       number. Take it out.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 770818364542976
+    m_Localized: To the questions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 770818612006912
+    m_Localized: '<b>{cartons} cartons + {pieces} pieces</b>
+
+      Put the full
+      cartons into the order container first, then the loose pieces from the opened
+      carton.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 773084278558720
+    m_Localized: Now choose the next lesson in the menu.
     m_Metadata:
       m_Items: []
   references:

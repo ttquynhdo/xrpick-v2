@@ -1239,6 +1239,41 @@ chart_scene <- function(scene, session_id) {
   factor(sc, levels = chart_scene_levels)
 }
 
+# Complex position 1 (#93, decision 026 items 6-7): up to layout "025" the
+# remainder quiz and the Worked Example board stay below the screen during
+# the whole of position 1 ("quiz_visible"); from "029" they hide once both
+# answers are right and shelf card 2 shows the trainee's own result
+# ("result_on_card"). Same items, less scaffold, so position_1 results of the
+# two levels are never pooled. Position 2 and the other scenes did not change.
+# Split by scaffold level, not by every layout: "019" and "025" share it.
+complex_p1_scaffold <- function(layout_version) {
+  if_else(coalesce(suppressWarnings(as.integer(layout_version)) >= 29L, FALSE),
+          "result_on_card", "quiz_visible")
+}
+p1_levels <- complex_p1_scaffold(session_layout$layout_version)
+mixed_p1_scaffold <- n_distinct(p1_levels) > 1
+# Chart label per level = the layouts of the set with that level, e.g. "019/025".
+p1_level_label <- map_chr(set_names(c("quiz_visible", "result_on_card")), function(l)
+  paste(sort(unique(layout_label(session_layout$layout_version[p1_levels == l]))), collapse = "/"))
+if (mixed_p1_scaffold) {
+  warn("set mixes Complex position_1 scaffold (layout ", p1_level_label[["quiz_visible"]], " = quiz_visible, ",
+       p1_level_label[["result_on_card"]], " = result_on_card, #93): ComplexScene position_1 in ",
+       "first_attempt_by_item.png and time_by_phase.png is split, never pooled; items.csv and ",
+       "process_by_position.csv carry scaffold_level")
+}
+# scaffold_level column: set for Complex position_1 only, NA elsewhere.
+p1_scaffold_level <- function(scene, item, session_id) {
+  if_else(as.character(scene) == "ComplexScene" & item == "position_1",
+          complex_p1_scaffold(sessions$layout_version[match(session_id, sessions$session_id)]),
+          NA_character_)
+}
+# Item name for charts: "position_1 [019/025]" / "position_1 [029]" for
+# Complex in a set that mixes the two levels, else the item itself.
+chart_item <- function(scene, item, session_id) {
+  lev <- p1_scaffold_level(scene, item, session_id)
+  if_else(mixed_p1_scaffold & !is.na(lev), paste0(item, " [", p1_level_label[lev], "]"), item)
+}
+
 # ---- 9. Compare the rebuilt visits with summary.csv ---------------------------
 
 summary_files <- list.files(data_dir, pattern = "_summary\\.csv$", recursive = TRUE, full.names = TRUE)
@@ -1549,6 +1584,9 @@ items <- item_attempts %>%
     # Header layout of the item's session (section 8b): ConceptScene items of
     # different layouts are never pooled.
     layout_version = sessions$layout_version[match(session_id, sessions$session_id)],
+    # Complex position_1 scaffold level (#93); split in the chart when mixed.
+    scaffold_level = p1_scaffold_level(scene, item, session_id),
+    chart_item = chart_item(scene, item, session_id),
     chart_scene = chart_scene(scene, session_id),
     scene = factor(scene, levels = levels(visits$scene))) %>%
   arrange(participant_id, scene, item)
@@ -1557,7 +1595,7 @@ for (i in seq_len(nrow(unmapped_items))) {
   warn("quiz item ", unmapped_items$item[i], " in ", unmapped_items$scene[i],
        " is not in item_skills.csv: left out of first_attempt_by_item.png")
 }
-write_csv(items %>% select(participant_id, scene, layout_version, item, kind, quiz, skill, scaffolded,
+write_csv(items %>% select(participant_id, scene, layout_version, item, kind, quiz, skill, scaffolded, scaffold_level,
                            first_attempt_correct, attempts, reached_correct, first_attempt_codes,
                            session_id, scene_visit, repeat_visit),
           file.path(output_dir, "items.csv"), na = "")
@@ -1587,7 +1625,7 @@ skill_colours <- setNames(okabe_ito[seq_along(skill_levels)], skill_levels)
 
 title_items <- "Is the first attempt per item right more often later in the course?"
 item_shares <- items %>% filter(!is.na(skill)) %>%
-  group_by(skill, scene, chart_scene, item, kind, scaffolded) %>%
+  group_by(skill, scene, chart_scene, item, chart_item, kind, scaffolded) %>%
   summarise(k = sum(first_attempt_correct %in% TRUE), n = n(), .groups = "drop")
 if (nrow(item_shares) == 0) {
   p_items <- empty_chart(title_items)
@@ -1602,11 +1640,13 @@ if (nrow(item_shares) == 0) {
            pos_no = suppressWarnings(as.integer(str_remove(item, "^position_"))),
            item_rank = coalesce(csv_order, 1000L + coalesce(pos_no, 0L)),
            # chart_scene: "ConceptScene [019]" etc. in a mixed-layout set (8b).
-           x_label = paste0(str_remove(as.character(chart_scene), "(Picking)?Scene"), "\n", item),
+           # chart_item: "position_1 [019/025]" etc. for Complex when mixed (#93).
+           x_label = paste0(str_remove(as.character(chart_scene), "(Picking)?Scene"), "\n",
+                            str_replace(chart_item, " \\[", "\n[")),
            skill = factor(skill, levels = skill_levels),
            # Hollow = scaffolded (the app handed the trainee the numbers).
            fill_colour = if_else(scaffolded, "white", skill_colours[as.character(skill)])) %>%
-    arrange(as.integer(chart_scene), item_rank) %>%
+    arrange(as.integer(chart_scene), item_rank, chart_item) %>%
     mutate(x_label = factor(x_label, levels = unique(x_label)))
   p_items <- ggplot(item_shares, aes(x_label, 100 * share, colour = skill)) +
     geom_linerange(aes(ymin = 100 * lo, ymax = 100 * hi), linewidth = 0.7, alpha = 0.6) +
@@ -1893,20 +1933,27 @@ process <- proc_positions %>%
     item = paste0("position_", position)) %>%
   left_join(item_skills %>% select(scene, item, scaffolded), by = c("scene", "item")) %>%
   mutate(scaffolded = coalesce(scaffolded, FALSE),
+         # Complex position_1 scaffold level (#93, section 8b): split when mixed.
+         layout_version = sessions$layout_version[match(session_id, sessions$session_id)],
+         scaffold_level = p1_scaffold_level(scene, item, session_id),
+         chart_item = chart_item(scene, item, session_id),
          scene = factor(scene, levels = levels(visits$scene))) %>%
   arrange(participant_id, scene, scene_visit, position)
 write_csv(process %>% select(participant_id, session_id, scene, scene_visit, counting, repeat_visit,
-                             position, scaffolded, completed, presses, read_s, pick_s, check_s, position_s),
+                             layout_version, position, scaffolded, scaffold_level, completed, presses,
+                             read_s, pick_s, check_s, position_s),
           file.path(output_dir, "process_by_position.csv"), na = "")
 
 proc_long <- process %>% filter(counting, completed) %>%
-  select(participant_id, scene, position, read_s, pick_s, check_s) %>%
+  select(participant_id, scene, position, chart_item, read_s, pick_s, check_s) %>%
   pivot_longer(c(read_s, pick_s, check_s), names_to = "phase", values_to = "seconds") %>%
   filter(!is.na(seconds)) %>%
   mutate(phase = factor(phase, levels = c("read_s", "pick_s", "check_s"),
                         labels = c("read (start -> first grab)", "pick (first grab -> last box change)",
                                    "check (last box change -> correct press)")),
-         slot = paste0(str_remove(as.character(scene), "PickingScene|Scene"), "\nposition ", position))
+         # chart_item keeps Complex position 1 split by scaffold level (#93).
+         slot = paste0(str_remove(as.character(scene), "PickingScene|Scene"), "\n",
+                       str_replace(str_replace(chart_item, "^position_", "position "), " \\[", "\n[")))
 if (nrow(proc_long) == 0) {
   p_q3 <- empty_chart(title_q3)
   warn("no completed positions with interaction events: time_by_phase.png is empty")
@@ -2836,6 +2883,7 @@ validity_limits <- c(
   "- Q5 (paper NASA-TLX, once at the end, raw = unweighted mean): who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.",
   "- ConceptScene tour (tour_steps.csv): Back presses are derived from step_index (-1 = Zurück) and exist only for layout_version \"025\" on; \"019\" logs and headers without layout_version have NA, not 0. A Zurück < 2 s after Weiter is read as a likely mis-press, not proven. Step time ends at the next step or the first quiz answer: time spent looking elsewhere (label board, packages) is in it.",
   "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).",
+  "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card). In a set with both levels position_1 is split in first_attempt_by_item.png and time_by_phase.png; the per-scene Complex numbers (time_to_correct_by_scene.png, error_codes_by_scene.png) still pool both levels.",
   "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): putting packages into the Concept containers is voluntary and not logged otherwise (no container_* in Concept), so hint counts have no denominator and are never an error rate or an attempt. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts lane_demo_delay_s (4 s) after the step; older layouts have NA, not 0.")
 # The pilot set (decision 023) is a try-out of the course and of this
 # analysis, not study data: say so on every pilot report.

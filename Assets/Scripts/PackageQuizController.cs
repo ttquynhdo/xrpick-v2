@@ -10,8 +10,11 @@ using UnityEngine.UI;
 /// #45 + #20 + #52 + #73, docs/decisions/007 (5), 010, 015 and 020: ConceptScene quiz. One question at a time above up
 /// to three answer toggles (A–C) that show the answer text. A toggle switched on is rated at once, as in ComplexScene's
 /// RemainderQuizController: a wrong answer names its reason, a correct one moves on to the next question. Feedback is a
-/// line inside the cluster. The cluster stays locked until the WMS tour reaches its last step and stays open after that.
-/// Logs quiz_unlocked, quiz_answer and task_completed (#28, decision 021).
+/// line inside the cluster. The questions stay locked until the WMS tour reaches its last step.
+/// #93, decision 026 (4): the cluster then takes the bar's place only after „Zu den Fragen“ on the tour bar, and its
+/// own „Zurück“ brings the bar back at the same step; bar and cluster are never shown together. After the last correct
+/// answer „Richtig!“ stays CorrectHoldSeconds, then the bar comes back with „Von vorn“ and the cluster stays hidden.
+/// Logs quiz_unlocked, quiz_answer and task_completed (#28, decision 021); switching bar ↔ cluster logs nothing.
 /// </summary>
 public class PackageQuizController : MonoBehaviour, ILessonCompletion
 {
@@ -21,9 +24,8 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     private const string HowToKey = "concept.quiz.how_to";
     private const string CorrectKey = "concept.quiz.correct";
     private const string NextQuestionKey = "concept.quiz.next_question";
-    private const string AllDoneKey = "concept.quiz.all_done";        // {lesson} = menu label of the next lesson
     private const string WrongKey = "concept.quiz.wrong";
-    private const string NextScene = "BasicPickingScene";
+    private const string BackKey = "concept.tour.back";
     // #55: question concept.quiz.<id>.q, answer concept.quiz.<id>.<key>, reason concept.quiz.<id>.<key>.wrong.
     private const string QuestionKeyPrefix = "concept.quiz.";
     private const string SelectedMark = "» ";
@@ -83,8 +85,17 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     [Tooltip("Hidden while locked: the row with the answer toggles.")]
     [SerializeField] private GameObject answerArea;
 
-    [Tooltip("#78, decision 024: the whole cluster, hidden until the tour first reaches unlockStepId.")]
+    [Tooltip("#78, decision 024: the whole cluster; #93: shown only after „Zu den Fragen“ on the tour bar.")]
     [SerializeField] private GameObject clusterRoot;
+
+    [Header("Back to the tour (#93)")]
+    [Tooltip("Push button in the cluster that brings the tour bar back at its last step.")]
+    [SerializeField] private Toggle backToggle;
+
+    [SerializeField] private TMP_Text backLabel;
+
+    [Tooltip("Inactive highlight behind the next lesson's Menu item, shown when all questions are right (as in WelcomeScene).")]
+    [SerializeField] private GameObject nextLessonHighlight;
 
     private Toggle[] toggles;
     private TMP_Text[] labels;
@@ -134,6 +145,12 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         if (tour != null)
         {
             tour.StepShown += OnTourStepShown;
+            tour.QuestionsRequested += ShowQuestions;
+        }
+
+        if (backToggle != null)
+        {
+            backToggle.onValueChanged.AddListener(OnBackToggled);
         }
     }
 
@@ -150,6 +167,12 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         if (tour != null)
         {
             tour.StepShown -= OnTourStepShown;
+            tour.QuestionsRequested -= ShowQuestions;
+        }
+
+        if (backToggle != null)
+        {
+            backToggle.onValueChanged.RemoveListener(OnBackToggled);
         }
 
         // A disabled object stops its coroutines: never stay locked between two questions.
@@ -165,6 +188,11 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         isSetUp = !HasMissingReferences();
         if (!isSetUp)
             return;
+
+        if (backLabel != null)
+        {
+            backLabel.text = Loc.Get(BackKey);
+        }
 
         ShowQuestion(0);
 
@@ -186,7 +214,10 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
             | RequiredReference.IsMissing(questionText, nameof(questionText), this)
             | RequiredReference.IsMissing(feedbackText, nameof(feedbackText), this)
             | RequiredReference.IsMissing(tour, nameof(tour), this)
-            | RequiredReference.IsMissing(answerArea, nameof(answerArea), this);
+            | RequiredReference.IsMissing(answerArea, nameof(answerArea), this)
+            | RequiredReference.IsMissing(clusterRoot, nameof(clusterRoot), this)
+            | RequiredReference.IsMissing(backToggle, nameof(backToggle), this)
+            | RequiredReference.IsMissing(nextLessonHighlight, nameof(nextLessonHighlight), this);
 
         if (questions == null || questions.Length == 0)
         {
@@ -229,14 +260,10 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         }
     }
 
-    // Decision 020: before the tour's last step only one line says when the questions come; nothing can be pressed.
-    // #78, decision 024: with clusterRoot set, the whole cluster is hidden instead (card 3 says when it comes).
+    // #78, decision 024: before the tour's last step the whole cluster is hidden (card 3 says when it comes).
     private void ShowLocked()
     {
-        if (clusterRoot != null)
-        {
-            clusterRoot.SetActive(false);
-        }
+        clusterRoot.SetActive(false);
         answerArea.SetActive(false);
         if (progressText != null)
         {
@@ -246,13 +273,10 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         feedbackText.text = string.Empty;
     }
 
+    // #93: the questions are ready but stay hidden until „Zu den Fragen“ on the tour bar.
     private void Unlock()
     {
         IsUnlocked = true;
-        if (clusterRoot != null)
-        {
-            clusterRoot.SetActive(true);
-        }
         answerArea.SetActive(true);
         if (progressText != null)
         {
@@ -260,8 +284,34 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         }
         ShowQuestion(current);
         feedbackText.text = Loc.Get(HowToKey);
+        tour.OffersQuestions = true;
         ResearchLogger.LogQuizUnlocked();
         Unlocked?.Invoke();
+    }
+
+    private void ShowQuestions()
+    {
+        if (!isSetUp || !IsUnlocked || IsAnswered)
+            return;
+
+        tour.SetBarVisible(false);
+        clusterRoot.SetActive(true);
+    }
+
+    private void ShowTour()
+    {
+        clusterRoot.SetActive(false);
+        tour.SetBarVisible(true);
+    }
+
+    private void OnBackToggled(bool isOn)
+    {
+        if (!isOn)
+            return;
+
+        // Push button: release at once so the next poke counts again.
+        backToggle.SetIsOnWithoutNotify(false);
+        ShowTour();
     }
 
     private void ShowQuestion(int index)
@@ -331,21 +381,23 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
             return;
         }
 
-        if (!LessonNames.TryGetDisplayName(NextScene, out string nextLesson))
-        {
-            Debug.LogError($"PackageQuizController: no lesson name for {NextScene}.", this);
-        }
-
         IsAnswered = true;
-        feedbackText.text = Loc.Get(CorrectKey) + "\n" + Loc.Get(AllDoneKey, ("lesson", nextLesson));
+        feedbackText.text = Loc.Get(CorrectKey);
         RefreshLabels();
-        foreach (Toggle toggle in toggles)
-        {
-            toggle.interactable = false;
-        }
+        SetTogglesInteractable(false);
+        tour.FinishQuestions();
+        nextLessonHighlight.SetActive(true);
 
         ResearchLogger.LogTaskCompleted();
         LessonCompleted?.Invoke();
+        StartCoroutine(ShowTourAfterHold());
+    }
+
+    // #93: „Richtig!“ stays under the last question, then the cluster folds away for good.
+    private IEnumerator ShowTourAfterHold()
+    {
+        yield return new WaitForSeconds(CorrectHoldSeconds);
+        ShowTour();
     }
 
     // We are inside the pressed toggle's onValueChanged(true). The SDK's AnimatorOverrideLayerWeight listens after us,

@@ -258,8 +258,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627379
-    m_Localized: "Die Fragen kommen nach der Erkl\xE4rung zum LVS. Dr\xFCcken Sie
-      dann A, B oder C."
+    m_Localized: "Dr\xFCcken Sie nach der Erkl\xE4rung zum LVS \u201EZu den Fragen\u201C.
+      Dr\xFCcken Sie dann A, B oder C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627381
@@ -374,11 +374,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627408
     m_Localized: "Beantworten Sie jetzt die n\xE4chste Frage."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627409
-    m_Localized: "Sie haben alle Fragen richtig beantwortet. W\xE4hlen Sie jetzt
-      im Men\xFC \u201E{lesson}\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627410
@@ -895,8 +890,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156763004928
-    m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu. Beantworten Sie
-      dann die Fragen unter dem Bildschirm."
+    m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu. Dr\xFCcken Sie
+      dann \u201EZu den Fragen\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 735937718784000
@@ -919,6 +914,20 @@ MonoBehaviour:
   - m_Id: 762340292038656
     m_Localized: "In diesem Lagerbeh\xE4lter liegt Material mit einer anderen Materialnummer.
       Nehmen Sie es heraus."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 770818364542976
+    m_Localized: Zu den Fragen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 770818612006912
+    m_Localized: "<b>{cartons} Kartons + {pieces} St\xFCck</b>\nLegen Sie zuerst
+      die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den
+      Auftragsbeh\xE4lter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 773084278558720
+    m_Localized: "W\xE4hlen Sie jetzt im Men\xFC die n\xE4chste Lektion."
     m_Metadata:
       m_Items: []
   references:

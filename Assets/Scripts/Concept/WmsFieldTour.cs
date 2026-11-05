@@ -13,6 +13,9 @@ using UnityEngine.UI;
 /// push buttons, #80). The bar is hidden at the start and opens through <see cref="Open"/> (card 1 done) or after
 /// <see cref="autoOpenSeconds"/>; step 1 is shown and logged only then. #90: a step with a held material shows a
 /// second action line while that material is held (pick up → compare).
+/// #93, decision 026 (4): while <see cref="OffersQuestions"/> is set, the right button of the last step reads
+/// „Zu den Fragen“ and raises <see cref="QuestionsRequested"/> instead of starting over; the quiz then hides the bar
+/// through <see cref="SetBarVisible"/> and shows it again at the same step (no step change, no tour_step).
 /// </summary>
 public class WmsFieldTour : MonoBehaviour
 {
@@ -21,6 +24,7 @@ public class WmsFieldTour : MonoBehaviour
     private const string NextKey = "concept.tour.next";
     private const string RestartKey = "concept.tour.restart";
     private const string BackKey = "concept.tour.back";
+    private const string ToQuestionsKey = "concept.tour.to_questions";
     private const float DimmedAlpha = 0.5f;
     private const string StepKeyPrefix = "concept.tour.";
 
@@ -78,11 +82,32 @@ public class WmsFieldTour : MonoBehaviour
 
     private int current;
     private bool ready;
+    private bool offersQuestions;
+    private bool questionsDone;
 
     // Step id of the step just shown, raised on every step change incl. the first (#73: the quiz unlocks at a step).
     public event Action<string> StepShown;
 
+    // #93: the right button was pressed at the last step while OffersQuestions is set.
+    public event Action QuestionsRequested;
+
     public bool IsOpen { get; private set; }
+
+    // #93: set by the quiz while it is open and not yet answered; the last step's right button leads to it.
+    public bool OffersQuestions
+    {
+        get => offersQuestions;
+        set
+        {
+            offersQuestions = value;
+            if (IsOpen && ready)
+            {
+                ShowNextLabel();
+            }
+        }
+    }
+
+    private bool IsLastStep => current == steps.Length - 1;
 
     // Null until the bar is open (#89).
     public string CurrentStepId => IsOpen ? steps[current].id : null;
@@ -185,7 +210,30 @@ public class WmsFieldTour : MonoBehaviour
         if (!IsOpen)
             return;
 
+        if (offersQuestions && IsLastStep)
+        {
+            QuestionsRequested?.Invoke();
+            return;
+        }
+
         ShowStep((current + 1) % steps.Length);
+    }
+
+    // #93: all questions are right; the last step goes back to „Von vorn“ and its action line points to the Menu.
+    public void FinishQuestions()
+    {
+        questionsDone = true;
+        OffersQuestions = false;
+        ShowAction();
+    }
+
+    // #93: the quiz takes the bar's place while it is shown. Does nothing before the bar is open.
+    public void SetBarVisible(bool visible)
+    {
+        if (IsOpen && ready)
+        {
+            barRoot.SetActive(visible);
+        }
     }
 
     // Decision 024: back one step; does nothing at step 1 (no step change, no log).
@@ -255,10 +303,7 @@ public class WmsFieldTour : MonoBehaviour
             progressText.text = Loc.Get(ProgressKey, ("n", index + 1), ("total", steps.Length));
         }
 
-        if (nextLabel != null)
-        {
-            nextLabel.text = Loc.Get(index == steps.Length - 1 ? RestartKey : NextKey);
-        }
+        ShowNextLabel();
 
         bool canGoBack = index > 0;
         backToggle.interactable = canGoBack;
@@ -271,6 +316,15 @@ public class WmsFieldTour : MonoBehaviour
         StepShown?.Invoke(step.id);
     }
 
+    private void ShowNextLabel()
+    {
+        if (nextLabel == null)
+            return;
+
+        string key = !IsLastStep ? NextKey : offersQuestions ? ToQuestionsKey : RestartKey;
+        nextLabel.text = Loc.Get(key);
+    }
+
     // The "what to do" line of the current step; also called when a package is grabbed or released (#90).
     private void ShowAction()
     {
@@ -278,6 +332,12 @@ public class WmsFieldTour : MonoBehaviour
             return;
 
         Step step = steps[current];
+        if (questionsDone && IsLastStep)
+        {
+            actionText.text = Loc.Get(StepKeyPrefix + step.id + ".action_done");
+            return;
+        }
+
         bool held = heldPackages != null && !string.IsNullOrEmpty(step.heldMaterialKey)
                     && heldPackages.IsMaterialHeld(step.heldMaterialKey);
         actionText.text = Loc.Get(StepKeyPrefix + step.id + (held ? ".action_held" : ".action"));

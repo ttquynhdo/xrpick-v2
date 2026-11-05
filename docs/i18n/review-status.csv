@@ -83,7 +83,6 @@ concept.label.default_body,"Nehmen Sie eine Verpackung in die Hand. Hier sehen S
 concept.label.default_title,1. Etikett lesen,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.label.matnr,Mat.-Nr: {matnr} – die Materialnummer. Dieselbe Nummer steht im LVS.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.label.vpe,VPE: {vpe} ST – so viele Stück sind in dieser Verpackung.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-concept.quiz.all_done,Sie haben alle Fragen richtig beantwortet. Wählen Sie jetzt im Menü „{lesson}“.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.quiz.correct,<color=#27AE60><b>Richtig!</b></color>,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.quiz.next_question,Beantworten Sie jetzt die nächste Frage.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.quiz.progress,Frage {n} von {total},proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
@@ -164,7 +163,7 @@ concept.tour.cartons.body,= 3 Kartons,proposed,german-reviewer (agent),2026-11-0
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.empf_kz_000.body,"Bei anderen Aufträgen kann hier 000 stehen, also EKZ 0: Die Teile dürfen ungeordnet liegen oder eingefüllt werden.",proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.material_flow.body,"Der Lagerbehälter kommt von links und fährt über die mittlere Bahn weg; der Auftragsbehälter fährt erst weg, wenn der Auftrag erledigt ist. In der Praxis bewegen Sie die Behälter von Hand.",proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.card.step3_body,"Die Fragen kommen nach der Erklärung zum LVS. Drücken Sie dann A, B oder C.",proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
+concept.card.step3_body,"Drücken Sie nach der Erklärung zum LVS „Zu den Fragen“. Drücken Sie dann A, B oder C.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 concept.quiz.locked,Die Fragen kommen nach der Erklärung zum LVS.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.title,Ablauf am Kommissionierplatz,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
@@ -202,9 +201,12 @@ concept.tour.rest.action,Drücken Sie „Weiter“.,proposed,german-reviewer (ag
 concept.tour.empf_kz_003.action,Sehen Sie sich das Beispiel „Empf Kz 003“ zwischen den Behältern an.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.empf_kz_000.action,Vergleichen Sie die beiden Beispiele zwischen den Behältern.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.not_used.action,Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
-concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu. Beantworten Sie dann die Fragen unter dem Bildschirm.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu. Drücken Sie dann „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 concept.label.tag.matnr,Mat.-Nr: {matnr} – Materialnummer,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
 concept.label.tag.vpe,VPE: {vpe} ST – Stück pro Karton oder Tüte,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
 concept.tour.material.action_held,Vergleichen Sie Mat.-Nr und Bez. im LVS mit dem Etikett.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
 concept.tour.verp_einh.action_held,Lesen Sie die VPE auf dem Etikett ab und vergleichen Sie sie mit Verp.-Einh. im LVS.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#90)"
 concept.hint.storage_wrong_material,In diesem Lagerbehälter liegt Material mit einer anderen Materialnummer. Nehmen Sie es heraus.,proposed,,2026-11-05,#100 new
+concept.tour.to_questions,Zu den Fragen,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
+complex.card.step2_body_answered,"<b>{cartons} Kartons + {pieces} Stück</b>\nLegen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#93); add a singular key if the order ever needs 1 carton"
+concept.tour.material_flow.action_done,Wählen Sie jetzt im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)

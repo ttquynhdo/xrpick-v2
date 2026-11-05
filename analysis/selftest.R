@@ -551,6 +551,29 @@ local({
             "ConceptScene [029]" %in% as.character(pilot_set$item_shares$chart_scene),
             identical(pilot_set$tour_has_zurueck("029"), TRUE),
             all(ts$zurueck_available[ts$participant_id == "P813"]))
+  # Complex position_1 scaffold (#93): "019"/"025" = quiz_visible, "029" =
+  # result_on_card. The pilot set holds both, so position_1 is split in the
+  # item chart and the phase chart; position 2 and the study set are not.
+  stopifnot(identical(pilot_set$complex_p1_scaffold(c("019", "025", "029", NA)),
+                      c("quiz_visible", "quiz_visible", "result_on_card", "quiz_visible")))
+  cp1 <- p_items %>% filter(scene == "ComplexScene", item == "position_1")
+  stopifnot(all(cp1$scaffold_level[cp1$participant_id == "P813"] == "result_on_card"),
+            all(cp1$scaffold_level[cp1$participant_id %in% c("P811", "P812")] == "quiz_visible"),
+            all(is.na(p_items$scaffold_level[!(p_items$scene == "ComplexScene" & p_items$item == "position_1")])))
+  cx <- as.character(pilot_set$item_shares$x_label[pilot_set$item_shares$scene == "ComplexScene"])
+  stopifnot(all(c("Complex\nposition_1\n[019/025]", "Complex\nposition_1\n[029]", "Complex\nposition_2") %in% cx),
+            !"Complex\nposition_1" %in% cx,
+            any(grepl("set mixes Complex position_1 scaffold", p_warn)),
+            !any(grepl("set mixes Complex position_1 scaffold", warn_lines)),
+            !any(grepl("\\[", as.character(item_shares$x_label))))
+  slots <- levels(pilot_set$proc_long$slot)
+  stopifnot(all(c("Complex\nposition 1\n[019/025]", "Complex\nposition 1\n[029]", "Complex\nposition 2") %in% slots))
+  pp <- read_csv(file.path(pilot_dir, "process_by_position.csv"), show_col_types = FALSE,
+                 col_types = cols(layout_version = col_character()))
+  stopifnot(all(c("layout_version", "scaffold_level") %in% names(pp)),
+            identical(sort(unique(na.omit(pp$scaffold_level[pp$scene == "ComplexScene" & pp$position == 1]))),
+                      c("quiz_visible", "result_on_card")),
+            all(is.na(pp$scaffold_level[!(pp$scene == "ComplexScene" & pp$position == 1)])))
   # The hint event names are in the catalogue (no "not in the v2 catalogue" note for them).
   stopifnot(all(c("concept_hint_shown", "concept_hint_cleared") %in% pilot_set$known_events))
 

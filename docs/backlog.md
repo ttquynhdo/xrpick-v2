@@ -1453,7 +1453,8 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** nhanh (xem cụm thu lại, lùi tour, nhặt hàng vị trí 1 không bị che)
 - **Depends on:** decision 026; phần Complex làm được riêng
 - **Decision:** docs/decisions/026-concept-study-desk.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl93.md
+- **Status:** verified-mcp (19/21 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/93-quiz-folds-away`; layout "029")
 
 ### #94 [Feature] Kế hoạch EKZ cho cả khoá và vật mẫu thực tế (EKZ 0 / EKZ 3)
 - **Type:** feature

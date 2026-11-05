@@ -27711,6 +27711,7 @@ MonoBehaviour:
   hideWhenPositionDone:
   - {fileID: 405932598}
   - {fileID: 294300516}
+  resultCardText: {fileID: 2002543170}
 --- !u!1 &1957760153
 GameObject:
   m_ObjectHideFlags: 0

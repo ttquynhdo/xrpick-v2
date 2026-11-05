@@ -16,6 +16,8 @@ using UnityEngine.UI;
 /// ConceptScene: after the right first answer „Richtig!“ stays under question 1 for
 /// PackageQuizController.CorrectHoldSeconds with the toggles not interactable, then question 2 comes with the
 /// neutral how-to line.
+/// #93, decision 026 (6): once both answers are right, shelf card 2 shows the result („2 Kartons + 5 Stück“) and,
+/// after the same hold and once the storage box stands at the work spot, the cluster and the worked example hide.
 /// </summary>
 public class RemainderQuizController : MonoBehaviour
 {
@@ -32,6 +34,7 @@ public class RemainderQuizController : MonoBehaviour
     private const string DoneKey = "complex.quiz.done";
     private const string HowToKey = "complex.quiz.how_to";
     private const string ProgressKey = "concept.quiz.progress";
+    private const string ResultCardKey = "complex.card.step2_body_answered";   // {cartons}, {pieces}
     private const string SelectedMark = "» ";
 
     private const string CartonsId = "cartons";
@@ -56,8 +59,11 @@ public class RemainderQuizController : MonoBehaviour
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private TMP_Text feedbackText;
 
-    [Tooltip("Hidden when position 1 is done: the question cluster and the worked-example board.")]
+    [Tooltip("Hidden once both answers are right and the storage box has arrived (#93): the question cluster and the worked-example board.")]
     [SerializeField] private GameObject[] hideWhenPositionDone;
+
+    [Tooltip("Body of shelf card 2; shows the trainee's result after both answers (#93). PositionTexts writes it again at position 2.")]
+    [SerializeField] private TMP_Text resultCardText;
 
     private Toggle[] toggles;
     private TMP_Text[] labels;
@@ -148,7 +154,8 @@ public class RemainderQuizController : MonoBehaviour
             | RequiredReference.IsMissing(optionBLabel, nameof(optionBLabel), this)
             | RequiredReference.IsMissing(optionCLabel, nameof(optionCLabel), this)
             | RequiredReference.IsMissing(questionText, nameof(questionText), this)
-            | RequiredReference.IsMissing(feedbackText, nameof(feedbackText), this);
+            | RequiredReference.IsMissing(feedbackText, nameof(feedbackText), this)
+            | RequiredReference.IsMissing(resultCardText, nameof(resultCardText), this);
     }
 
     private void ShowQuestion(int index)
@@ -224,7 +231,22 @@ public class RemainderQuizController : MonoBehaviour
         {
             toggle.interactable = false;
         }
+        resultCardText.text = Loc.Get(ResultCardKey,
+            ("cartons", RemainderQuiz.FullCartons(line)), ("pieces", RemainderQuiz.LoosePieces(line)));
         stock.RevealFirstSet();
+        StartCoroutine(HideAfterHold());
+    }
+
+    // #93: „Richtig!“ stays readable, and nothing changes in front of the trainee while the storage box rides in.
+    private IEnumerator HideAfterHold()
+    {
+        yield return new WaitForSeconds(PackageQuizController.CorrectHoldSeconds);
+        while (stock.IsMoving)
+        {
+            yield return null;
+        }
+
+        HideCluster();
     }
 
     // We are inside the pressed toggle's onValueChanged(true). The SDK's AnimatorOverrideLayerWeight listens after us,
@@ -270,7 +292,13 @@ public class RemainderQuizController : MonoBehaviour
         return value == 1 ? Loc.Get(PieceOneKey) : Loc.Get(PiecesKey, ("count", value));
     }
 
+    // Also at the next position, in case the hold was cut short (object disabled).
     private void OnLineAdvanced(int position)
+    {
+        HideCluster();
+    }
+
+    private void HideCluster()
     {
         if (hideWhenPositionDone == null)
             return;

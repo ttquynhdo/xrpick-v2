@@ -347,10 +347,6 @@ MonoBehaviour:
     m_Key: concept.quiz.next_question
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627409
-    m_Key: concept.quiz.all_done
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627410
     m_Key: concept.quiz.wrong
     m_Metadata:
@@ -841,6 +837,18 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 762340292038656
     m_Key: concept.hint.storage_wrong_material
+    m_Metadata:
+      m_Items: []
+  - m_Id: 770818364542976
+    m_Key: concept.tour.to_questions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 770818612006912
+    m_Key: complex.card.step2_body_answered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 773084278558720
+    m_Key: concept.tour.material_flow.action_done
     m_Metadata:
       m_Items: []
   m_Metadata:
