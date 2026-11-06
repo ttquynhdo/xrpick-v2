@@ -19,6 +19,20 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
+**ĐỢT CUỐI (người dùng chốt 2026-11-06: gộp mọi việc còn lại vào một đợt; 2026-11-07 chốt build cuối để demo).** Khối này thay mọi thứ tự cũ bên dưới (các khối cũ chỉ còn là lịch sử). Không thêm feature mới trước demo.
+- **A. Trước build (đổi app, Claude làm, không cần kính):**
+  1. `german-reviewer` duyệt một lần mọi chữ mới/đổi từ #86 tới #113 (`docs/i18n/strings-todo.csv`), sửa CSV, `LocalizationBinder.ImportCsv()`; nếu chữ thẻ đổi thì chạy lại `InstructionShelfLayout` ở scene đó.
+  2. Hợp đồng log: `ResearchEventData.LayoutVersion` "033" → "034" (#108 chấm EKZ, #109 bỏ câu gọi Menu); `data-analyst` sửa `docs/research-logging-spec.md` + `make_fake_data.R` + `analyse_set.R` một lần (gồm phần R của #108: `item_skills.csv` Basic `position_1` × `ekz_placement` có hỗ trợ). `selftest.R` chạy được chỉ sau #102 (bước C), nên ở bước này chỉ kiểm từng khối.
+  3. Chạy hồi quy nhanh qua MCP ở cả 5 scene (EditMode tests `XRPick.Orders.Tests` + `XRPick.Research.Tests`, mỗi scene vào Play một lượt, console không lỗi).
+  4. Commit, push `main`, ra **một build** (APK) đặt tên theo commit.
+  - **Cập nhật 2026-11-06 tối:** A1 xong (1 câu sửa: `mixed.card.step2_body`, thẻ Mixed xếp lại; glossary EKZ = das). A2 xong (`LayoutVersion` "034", spec + R; `selftest.R` chạy được lại và xanh). A3 xong (215/215 EditMode, cả 5 scene vào Play không lỗi script). #13 export xong (bước C). Đã commit và push; **chỉ còn build (bạn, 2026-11-07)**. Còn chờ bạn quyết: ở Basic 034, 6 ô viền bằng đúng 6 carton của đơn, nên lỗi số lượng ở Basic có thể bị ước thấp (xem `analysis/skill_scaffolds.csv`).
+- **B. Bạn, với build đó (ngày demo / buổi P803):**
+  1. Ghi kết quả test tay của buổi P802 vào test report #86–#101, #28, #29, #99 và G4/G5/B3/M3 của `grab-snap-fix.md` (nếu chưa ghi).
+  2. Một buổi test kính P803 (mã pilot, cả khoá) gom mọi case tay còn chờ: #103 T5–T8, #104/#105/#107 H1, #108 H1, #109 F2-đọc/F7-tay/H1, #111 H1–H3, #113 H1, và các case cũ còn ⏳ (#11 L9/L10, #19, #36 H1–H3, #39, #40, #42, #51–#53, #56, #57, #59, #62, #64, #67, #69, #71, #72, #75 P1, #28 T1–T2, #29 H1–H2, #31 M1–M2). Đo lại thời lượng khoá (quy tắc 25 phút).
+  3. Báo kết quả trong chat → Claude đóng `done` các mục đạt hết; mục trượt thành mục sửa nhỏ sau demo. #36 đóng (thay bằng #88).
+- **C. Không đổi app, làm song song hoặc sau demo (không chặn build):** #102 (mở khoá tidyr/readr, `selftest.R` xanh, học R) → #114 (R bỏ cầm giả do snap) → chạy `selftest.R` cho "034"; #13 export EN–DE cho người bản ngữ (luôn cuối, sau bước A1).
+- **Ngoài đợt:** #98 (chỉ làm nếu dữ liệu pilot cho thấy cần). Đã bỏ: #22, #30, #43, #48, #74, #96, #106, #110, #112.
+
 **Thứ tự đề xuất (rà lại 2026-11-01, sau khi merge #18 → #17 → #6 → #14 → #8 vào `main`, commit `b64b40f`).** Hai nhánh không được cùng sửa một file `.unity` một lúc. Không còn mục nào bị chặn bởi câu hỏi (nhóm trả lời hết; người hướng dẫn xác nhận sau, các mục làm theo giả định ghi rõ ở Status). #22 và #48 đã bỏ, #5 gộp vào #18, #32 gộp vào #45. **Người dùng chọn 2026-11-01:** các mục log nghiên cứu còn mở (#28–#31, #42, #43) để đợt cuối (Đợt 6).
 - **Đã `done`:** Đợt 1 (#1, #2, #3, #4, #7, #9, #15, #16, #24, #26, #34, #38), đợt #27/#44, chuỗi validator #18 → #6 → #14 → #8, và #10, #20, #45 (người dùng báo test tay ✅ cho cả buổi test kính, 2026-11-01).
 - **Sau #40 (2026-11-02):** #40 verified-mcp (decision 017), chờ test kính H1–H3 cùng buổi với #19, #21, #36, #39, #50–#52, #53. #53 verified-mcp (thẻ 1 nhắc quiz, giả định D20). #11 verified-mcp (2026-11-02, nền tảng DE/EN, chờ build ConceptScene trên Quest L9 + chạm nút L10). Tiếp theo: #12 done (20e0075) → #54 done (10d9db5) → #55 done (57068e7) → #13, rồi đợt 6. #12 được chia ba ngày 2026-11-02.
@@ -50,7 +64,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   1. **Không cần decision, làm ngay:** #103 (vùng cầm, đo trước, 4 scene; làm trước #108) (#112 bỏ: đĩa ở chỗ thấy được là cố ý). #113 verified-mcp (tắt LVS khi bảng hiện).
   2. **Hai `solution-decision`: xong 2026-11-05** (decision 036 cho #104, #105, #107, #110, #106 bỏ; decision 037 cho #108, #109). Phần cũ: (a) **ConceptScene tour v3** cho #104–#107 (+ thời gian khoá của #110): thay phần liên quan của decision 010, 024, 026 mục 2, 028/031; (b) **trạm thực hành** cho #108 + #109 (mức scaffold khi xếp EKZ 003, vật lý thả carton, chỗ đặt phản hồi, giữ/bỏ mũi tên làn giữa; thay một phần decision 003/033).
   3. **Sau decision:** Concept tuần tự trên một nhánh: #104 → #105 → #107 (verified-mcp, merged vào `main` 42c805d, đã push 2026-11-05); #110 bỏ (người dùng 2026-11-05). Song song được (khác scene): #108 (Basic, Mixed) → #109 (Basic, Mixed, Complex; sau #108 vì cùng scene) → #111 (4 scene, cuối cùng vì đụng mọi thùng).
-  4. **Data/R:** #102 → #114.
+  4. **Data/R:** #102 → #114. **Cập nhật 2026-11-06:** #108, #109, #111 verified-mcp (bước 3 xong, `main` 9e2a28f, chưa push); việc kế tiếp là #102.
   5. **Cuối đợt:** đổi `layout_version` một lần ("033" → "034", vì #108 có thể đổi chấm EKZ, và #109 bỏ câu gọi Menu nên khoảng `task_completed` → `menu_select` ở Basic/Mixed không so được với dữ liệu cũ (data-analyst 2026-11-06); không chạy pilot/study bằng build giữa đợt; #110 đã bỏ nên cách chấm quiz không đổi), `data-analyst` sửa spec + R một lần (gồm phần R của #108: `item_skills.csv` Basic `position_1` × `ekz_placement` có hỗ trợ, lọc press × skill; cần #102 để `selftest.R` chạy); `german-reviewer` duyệt mọi chữ mới một lần → #13 export → một build → một buổi test kính (P803).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
@@ -652,7 +666,8 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** không (người duyệt mở file trong Excel)
 - **Depends on:** #12, #54, #55
 - **Decision:** docs/decisions/002-localization-mechanism.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl13.md
+- **Status:** verified-mcp (6/7 ✅ code, chờ bạn E1: mở file trong Excel; công cụ `docs/i18n/review_tool.py`, export đầu tiên `docs/i18n/review/review-2026-11-06.csv`)
 
 ### #10 [Feature] Dựng panel WMS giống dialog Kommissionierung thật
 - **Type:** feature
@@ -1979,7 +1994,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** S (mở khoá + chạy selftest); phần học: thêm 3–5 buổi ngắn
 - **Test trên kính:** không
 - **Depends on:** #92 (commit 55c4ee2). Người dùng chọn 2026-11-05: làm sau các mục feature còn lại (#99 → #87 → #86 → #97), trước bước „hợp đồng log / build cuối“
-- **Status:** todo
+- **Status:** todo (2026-11-06: tidyr/readr nạp được lại, `selftest.R` chạy hết và báo OK với layout "034" (P816), nên bước mở khoá đã xong; phần học R và log thật Concept vẫn còn)
 
 ### #114 [P2] R: bỏ các lần cầm giả do ô snap trong log cũ, đếm vào `data_quality.snap_grab_artifacts`
 - **Type:** refactor (analysis)
