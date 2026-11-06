@@ -20,7 +20,6 @@ welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,ge
 mixed.card.task_body,"<b>Sie lernen, mehrere Positionen nacheinander zu kommissionieren.</b>\nSo stimmen bei jeder Position Material und Menge, auch wenn Verpackung und EKZ wechseln.",proposed,german-reviewer (agent),2026-11-05,#87
 mixed.card.step1_body,"Lesen Sie für die aktuelle Position ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,german-reviewer (agent),2026-11-05,#87
 common.card.step2_pick_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
-mixed.card.step2_body,"Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie sie nach dem <nobr>Empf Kz</nobr> in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,#87
 mixed.card.step3_body,"Prüfen Sie, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,german-reviewer (agent),2026-11-05,#87
 complex.card.task_body,"<b>Sie lernen auszurechnen, wie viele volle Kartons und lose Teile Sie brauchen.</b>\nSo stimmt die Menge auch dann, wenn sie nicht in volle Kartons passt.",proposed,german-reviewer (agent),2026-11-05,#87
 complex.card.step1_body,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,german-reviewer (agent),2026-11-05,#87
@@ -212,3 +211,4 @@ complex.storage.opened_carton,"Nehmen Sie nur die losen Teile heraus, der Karton
 common.position.label,Position {position},proposed,claude,2026-11-05,"#97: WMS word Position, identical to EN; glossary term"
 concept.tour.material_flow.body_after,In der Praxis bewegen Sie die Behälter von Hand.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
 concept.tour.material_flow.action_after,Prüfen Sie Ihr Wissen: Drücken Sie „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
+mixed.card.step2_body,"Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie sie so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,german-reviewer (agent),2026-11-06,"Final-wave pass: same rule sentence as basic.step2.text; „nach dem Empf Kz legen“ could read as „after“"

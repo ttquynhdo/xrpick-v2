@@ -485,7 +485,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627439
     m_Localized: "Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie
-      sie nach dem <nobr>Empf Kz</nobr> in den Auftragsbeh\xE4lter."
+      sie so in den Auftragsbeh\xE4lter, wie es das <nobr>Empf Kz</nobr> verlangt."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627440
