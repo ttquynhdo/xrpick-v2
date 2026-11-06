@@ -1177,6 +1177,8 @@ ix_events <- visit_events %>% filter(session_id %in% interaction_sessions)
 # latest start; grab_no 0 = an end without a start in this visit (logged
 # duration_s null). A start without an end is an open grab (crash, scene
 # change or session end while holding): censored, no duration.
+snap_place_scenes <- c("BasicPickingScene", "MixedPickingScene")
+snap_restart_max_s <- 0.1
 grab_rows <- ix_events %>% filter(event %in% c("grab_start", "grab_end")) %>%
   transmute(participant_id, session_id, scene, scene_visit, t, line, event,
             object_id = map_chr(data, ~ as_chr(.x$object_id)),
@@ -1184,8 +1186,60 @@ grab_rows <- ix_events %>% filter(event %in% c("grab_start", "grab_end")) %>%
             logged_duration_s = map_dbl(data, ~ as_num(.x$duration_s))) %>%
   arrange(session_id, scene, scene_visit, t, line) %>%
   group_by(session_id, scene, scene_visit, object_id) %>%
-  mutate(grab_no = cumsum(event == "grab_start")) %>%
+  mutate(grab_no = cumsum(event == "grab_start"),
+         # Snap restart (#114): up to build 727eee1 the logger also counted the
+         # SnapInteractor of a Basic/Mixed snap place as a grabber, so a
+         # carton let go into a place got a grab_end and, 0.01-0.02 s later,
+         # a new grab_start (Basic: never ended; Mixed: ended when the order
+         # box rode). No hand regrabs that fast (P802's fastest real one:
+         # 0.25 s), so a start < 0.1 s after the same object's end is that
+         # artefact. The fixed logger (e3f6cf9) never writes it, so the rule
+         # has no build check; a hit in a "034"-or-newer log is warned below.
+         snap_restart = event == "grab_start" & !is.na(object_id) &
+           as.character(scene) %in% snap_place_scenes &
+           lag(event, default = "") == "grab_end" & (t - lag(t)) < snap_restart_max_s) %>%
+  # The artefact start and the end paired with it (same grab_no) are dropped.
+  group_by(session_id, scene, scene_visit, object_id, grab_no) %>%
+  mutate(snap_artifact = grab_no > 0 & any(snap_restart)) %>%
   ungroup()
+snap_artifacts <- grab_rows %>% filter(snap_restart) %>%
+  select(participant_id, session_id, scene, scene_visit, object_id, grab_no, t)
+# Where each artefact ends (its paired grab_end; Inf = never ended in the visit).
+snap_artifact_spans <- grab_rows %>% filter(snap_artifact) %>%
+  group_by(participant_id, session_id, scene, scene_visit, object_id, grab_no) %>%
+  summarise(art_start_t = first(t), art_end_t = if (any(event == "grab_end")) max(t[event == "grab_end"]) else Inf,
+            .groups = "drop")
+grab_rows <- grab_rows %>% filter(!snap_artifact) %>% select(-snap_restart, -snap_artifact)
+# Builds from layout "034" on all have the fixed logger: a restart there is a
+# real hand regrab under 0.1 s (e.g. a pinch released and caught again), not
+# an artefact, but it is still dropped. Name it so a reader can check it.
+snap_new_builds <- snap_artifacts %>%
+  left_join(sessions %>% select(session_id, layout_version), by = "session_id") %>%
+  filter(coalesce(suppressWarnings(as.integer(layout_version)) >= 34L, FALSE))
+if (nrow(snap_new_builds) > 0) {
+  warn(nrow(snap_new_builds), " grab restart(s) < ", snap_restart_max_s, " s in a layout \"034\"-or-newer log (",
+       paste(unique(snap_new_builds$participant_id), collapse = ", "), "): that logger writes no snap artefacts, ",
+       "so these are probably fast real regrabs; they were dropped from grabs (#114)")
+}
+# Spec limit (#114): in old logs a hand that took a snapped carton out of its
+# place wrote no grab_start (the restart was still open), so that real grab
+# is lost inside the artefact. A container_exit of the object while its
+# artefact is open shows it happened.
+lost_in_snap <- snap_artifact_spans %>%
+  inner_join(ix_events %>% filter(event == "container_exit") %>%
+               transmute(session_id, scene, scene_visit, exit_t = t,
+                         object_id = map_chr(data, ~ as_chr(.x$object_id))),
+             by = c("session_id", "scene", "scene_visit", "object_id"), relationship = "many-to-many") %>%
+  filter(exit_t > art_start_t, exit_t < art_end_t)
+if (nrow(lost_in_snap) > 0) {
+  warn(nrow(lost_in_snap), " container_exit(s) of a carton while its snap-place grab restart was open (",
+       paste(unique(lost_in_snap$participant_id), collapse = ", "), "): a real grab out of the snap place ",
+       "is missing from grabs (old logger limit, #114)")
+}
+if (nrow(snap_artifacts) > 0) {
+  message("Note: ", nrow(snap_artifacts), " snap-place grab restart(s) (logger before e3f6cf9) dropped from grabs ",
+          "(data_quality.csv snap_grab_artifacts)")
+}
 no_object <- grab_rows %>% filter(is.na(object_id))
 if (nrow(no_object) > 0) warn(nrow(no_object), " grab event(s) without object_id (cannot be paired)")
 grabs <- grab_rows %>% filter(grab_no > 0, !is.na(object_id)) %>%
@@ -1281,6 +1335,8 @@ interaction_visit <- enters %>% select(session_id, scene, scene_visit, enter_t) 
                         ev_hold_s = round(sum(hold_s, na.rm = TRUE), 3),
                         first_grab_t = min(start_t), .groups = "drop"),
             by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(snap_artifacts %>% count(session_id, scene, scene_visit, name = "ev_snap_grab_artifacts"),
+            by = c("session_id", "scene", "scene_visit")) %>%
   left_join(container_rows %>% group_by(session_id, scene, scene_visit) %>%
               summarise(ev_container_enters = sum(event == "container_enter"),
                         ev_container_exits = sum(event == "container_exit"), .groups = "drop"),
@@ -1292,7 +1348,7 @@ interaction_visit <- enters %>% select(session_id, scene, scene_visit, enter_t) 
               summarise(ev_end_control_opened = sum(event == "end_control_opened"),
                         last_opened_t = last_or_na(t[event == "end_control_opened"]), .groups = "drop"),
             by = c("session_id", "scene", "scene_visit")) %>%
-  mutate(across(c(ev_grabs, ev_regrabs, ev_open_grabs, ev_container_enters, ev_container_exits,
+  mutate(across(c(ev_grabs, ev_regrabs, ev_open_grabs, ev_snap_grab_artifacts, ev_container_enters, ev_container_exits,
                   ev_menu_blocked, ev_end_control_opened), ~ coalesce(as.integer(.x), 0L)),
          ev_hold_s = coalesce(ev_hold_s, 0),
          # Active seconds from scene enter to the first grab (NA = no grab).
@@ -1446,6 +1502,8 @@ visits <- visits_base %>%
     grabs = if_else(grab_logged, ev_grabs, NA_integer_),
     regrabs = if_else(grab_logged, ev_regrabs, NA_integer_),
     open_grabs = if_else(grab_logged, ev_open_grabs, NA_integer_),
+    # #114: snap restarts dropped from grabs/regrabs/open_grabs/hold_s (old logs only).
+    snap_grab_artifacts = if_else(grab_logged, ev_snap_grab_artifacts, NA_integer_),
     hold_s = if_else(grab_logged, ev_hold_s, NA_real_),
     time_to_first_grab_s = if_else(grab_logged, ev_time_to_first_grab_s, NA_real_),
     container_enters = if_else(container_logged, ev_container_enters, NA_integer_),
@@ -1727,7 +1785,8 @@ summary_mismatches <- tibble(participant_id = character(), session_id = characte
                              events_value = character(), summary_value = character())
 if (nrow(summary_rows) > 0) {
   both <- visits %>%
-    mutate(scene = as.character(scene)) %>%
+    # The app's summary grabs (old logs) count the snap restarts R drops (#114).
+    mutate(scene = as.character(scene), grabs = grabs + coalesce(snap_grab_artifacts, 0L)) %>%
     select(participant_id, session_id, scene, scene_visit, closed, all_of(compare_cols)) %>%
     full_join(summary_rows %>% mutate(scene_visit = as.integer(scene_visit)) %>%
                 select(participant_id, session_id, scene, scene_visit, all_of(compare_cols)),
@@ -1848,6 +1907,8 @@ data_quality <- sessions %>%
                         end_control_opens = if (any(interaction_logged)) sum(end_control_opened, na.rm = TRUE) else NA_integer_,
                         menu_blocked = if (any(interaction_logged)) sum(menu_blocked, na.rm = TRUE) else NA_integer_,
                         open_grabs = if (any(grab_logged)) sum(open_grabs, na.rm = TRUE) else NA_integer_,
+                        # #114: > 0 = a log from before the snap fix (e3f6cf9); the restarts are not in grabs.
+                        snap_grab_artifacts = if (any(grab_logged)) sum(snap_grab_artifacts, na.rm = TRUE) else NA_integer_,
                         facilitator_tail_s = if (any(!is.na(facilitator_tail_s))) sum(facilitator_tail_s, na.rm = TRUE) else NA_real_,
                         .groups = "drop"),
             by = "participant_id") %>%
@@ -1866,7 +1927,7 @@ data_quality <- sessions %>%
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, interaction_logged,
-         end_control_opens, menu_blocked, open_grabs, facilitator_tail_s, invariant_breaks,
+         end_control_opens, menu_blocked, open_grabs, snap_grab_artifacts, facilitator_tail_s, invariant_breaks,
          unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
          first_start_utc) %>%
   arrange(participant_id)
@@ -1899,6 +1960,8 @@ dq_long <- data_quality %>%
             # Empty = not measured (build before #29).
             interaction = as.character(interaction_logged),
             end_ctrl_opens = coalesce(as.character(end_control_opens), ""),
+            # #114: orange = a log from before the snap fix (restarts dropped from grabs).
+            snap_restarts = coalesce(as.character(snap_grab_artifacts), ""),
             invariant = as.character(invariant_breaks),
             unknown_code = as.character(unknown_codes),
             summary_diff = as.character(summary_mismatches),
@@ -3191,7 +3254,7 @@ participant_cols <- c("participant_id", "end_status", "course_finished", "multi_
                       "resume_offered", "resume_declined", "ended_session_override",
                       "duration_censored", "active_s", "paused_s", "pauses",
                       "hmd_removed_count", "unity_errors", "total_confirms", "interaction_logged",
-                      "end_control_opens", "menu_blocked", "open_grabs", "facilitator_tail_s")
+                      "end_control_opens", "menu_blocked", "open_grabs", "snap_grab_artifacts", "facilitator_tail_s")
 wide <- data_quality %>%
   select(all_of(participant_cols)) %>%
   left_join(wide_scene, by = "participant_id") %>%

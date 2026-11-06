@@ -2006,4 +2006,5 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #102 (mở khoá tidyr/readr, `selftest.R` chạy được); hợp với kế hoạch học R của #102 (bước 4–5)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl114.md
+- **Status:** verified-mcp (10/10 ✅ code, không có case tay; chờ commit để thành done)

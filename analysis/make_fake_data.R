@@ -14,6 +14,9 @@
 # section 5b4) and the quiz question label_by_matnr; P815 ran layout "033"
 # (4 s station start delay) and P816 layout "034" (#108/#109: EKZ place
 # outlines, Menu highlight; fixed Basic/Mixed presses, no format change).
+# P817 ran a "033" build with the old snap-place grab logger (#114): a carton
+# let go into a Basic/Mixed snap place gets a grab_end and, 0.013 s later, a
+# new grab_start (like the real P802, build 727eee1).
 # Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
@@ -28,7 +31,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P816, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P817, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -401,6 +404,8 @@ start_session <- function(person, build, start_utc, start_mode = "manual",
   s$interaction <- schema == 2 && interaction
   s$language <- language
   s$layout <- layout
+  # #114: the logger before e3f6cf9 (snap places restart a grab); set by run_full_course.
+  s$snap_restart <- FALSE
   # Pilot IDs log to research/pilot/; everything else here to research/ (P950,
   # a test ID, sits in research/ on purpose, see section 7).
   s$folder <- if (grepl("^P8[0-9]{2}$", s$pid)) fake_pilot else fake_research
@@ -483,6 +488,8 @@ enter_scene <- function(s, scene, from, via) {
               # (one row per package: object_id, material, position, form) and
               # how many packages of each kind were taken so far (for new ids).
               grabs = 0, c_enter = 0, c_exit = 0, grab_open = list(),
+              # #114: open snap-place grab restarts (object_id -> material).
+              snap_open = list(),
               box = data.frame(obj = character(0), item = character(0), pos = integer(0),
                                form = character(0), stringsAsFactors = FALSE),
               taken = list())
@@ -831,6 +838,25 @@ put_in <- function(s, item, pos, form) {
   container_change(s, TRUE, obj, item, pos, form)
   advance(s, round(side_runif(0.2, 0.8), 3))
   grab_end(s, obj, item)
+  snap_restart(s, obj, item, pos, form)
+}
+
+# #114: the logger up to build 727eee1 also counted the SnapInteractor of a
+# snap place (Basic, Mixed Empf Kz 003 position) as a grabber: 0.013 s after
+# the hand's grab_end the carton gets a new grab_start (the app's summary
+# grabs count it too). Basic never ends it; Mixed ends it when the order box
+# rides (ride_order_end). snap_artifact_log = the truth selftest.R checks.
+snap_artifact_log <- data.frame(pid = character(0), scene = character(0), obj = character(0),
+                                stringsAsFactors = FALSE)
+snap_restart <- function(s, obj, item, pos, form) {
+  if (!isTRUE(s$snap_restart) || form != "full" ||
+      position_empf_kz(s$scene, pos, s$layout) != "003" ||
+      !s$scene %in% c("BasicPickingScene", "MixedPickingScene")) return(invisible())
+  advance(s, 0.013)
+  grab_start(s, obj, item)
+  s$v$snap_open[[obj]] <- item
+  snap_artifact_log <<- rbind(snap_artifact_log, data.frame(pid = s$pid, scene = s$scene, obj = obj,
+                                                          stringsAsFactors = FALSE))
 }
 
 # Take the last package of this kind out of the order container again.
@@ -954,6 +980,14 @@ ride_order_end <- function(s, last_pos) {
   emit(s, "station_move_start", json_obj(what = "storage_out", position = last_pos))
   advance(s, 1.2)
   emit(s, "station_move_start", json_obj(what = "order_box", position = last_pos))
+  # #114 (old logger): the riding order box ends Mixed's snap-place grabs.
+  if (s$scene == "MixedPickingScene") {
+    for (obj in names(s$v$snap_open)) {
+      advance(s, 0.001)
+      grab_end(s, obj, s$v$snap_open[[obj]])
+    }
+    s$v$snap_open <- list()
+  }
   advance(s, runif(1, 1.6, 2.1))
   emit(s, "station_move_arrived", json_obj(what = "storage_out", position = last_pos))
   advance(s, 1.2)
@@ -1285,9 +1319,10 @@ run_visit <- function(s, person, ...) {
 # ComplexScene order is complete (#28 calls EndSession("completed") there).
 run_full_course <- function(person, build, start_utc, special = list(), start_mode = "manual",
                             resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
-                            language = "DE", layout = "025") {
+                            language = "DE", layout = "025", snap_restart = FALSE) {
   s <- start_session(person, build, start_utc, start_mode, resume_scene, resume_accepted, ended_warning,
                      language, layout = layout)
+  s$snap_restart <- snap_restart
   run_welcome(s)
   for (scene in scene_order[-1]) {
     go_to_scene(s, scene)
@@ -1779,6 +1814,25 @@ run_full_course(p816, "ccc3333", "2026-11-06T22:00:00Z", language = "EN", layout
                                             fixed_press(3, list())),
                                  "2" = list(fixed_press(3, list()))))))
 
+# P817 (#114): a "033" build with the old snap-place grab logger, like the
+# real P802 (build 727eee1). Fixed, correct presses in Basic and Mixed, so no
+# carton is taken out of a snap place again (that would hide a real grab in
+# the artefact, a limit of the old logs the spec names). Basic: 6 restarts,
+# never ended (open in the log); Mixed position 1: 3 restarts, ended when the
+# order box rides. R must drop all 9 and count them as snap_grab_artifacts.
+# Own random stream, restored afterwards, so the paper forms of section 9
+# keep their numbers.
+rng_before_p817 <- .Random.seed
+set.seed(817)
+p817 <- new_person("P817")
+run_full_course(p817, "bbb2222", "2026-11-07T08:00:00Z", language = "EN", layout = "033",
+                snap_restart = TRUE,
+                special = list(ConceptScene = list(hints = p814_hints),
+                               BasicPickingScene = list(forced = list("1" = list(fixed_press(6, list())))),
+                               MixedPickingScene = list(forced = list("1" = list(fixed_press(3, list())),
+                                                                      "2" = list(fixed_press(3, list()))))))
+assign(".Random.seed", rng_before_p817, envir = globalenv())
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1831,7 +1885,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P816  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P817  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -1897,7 +1951,8 @@ paper_rows <- list(
   paper_row("P813"),
   paper_row("P814"),
   paper_row("P815"),
-  paper_row("P816"))
+  paper_row("P816"),
+  paper_row("P817"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

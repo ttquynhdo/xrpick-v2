@@ -28,7 +28,7 @@ local({
   source("analysis/analyse.R", local = TRUE)
 
   # 2. One row per study participant: P101-P115; the test ID P950 is dropped,
-  #    the pilot IDs P801-P803, P811-P816 are in their own set (8q).
+  #    the pilot IDs P801-P803, P811-P817 are in their own set (8q).
   stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
@@ -460,7 +460,7 @@ local({
   missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
   if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
   stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
-  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815", "P816")
+  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815", "P816", "P817")
   stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
             identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
   is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
@@ -574,7 +574,7 @@ local({
   stopifnot(any(grepl("concept_hint_cleared without a preceding", p_warn) & grepl("P813", p_warn)),
             sum(grepl("concept_hint_", p_warn, fixed = TRUE)) == 1, !any(grepl("concept_hint_", warn_lines, fixed = TRUE)))
   # Older layouts: no tags existed, so every hint column is NA (not 0).
-  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815", "P816"))
+  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815", "P816", "P817"))
   stopifnot(nrow(old_v) > 0, !any(old_v$hints_logged), all(is.na(old_v$hints_shown)),
             all(is.na(old_v$hint_shown_s)), all(is.na(old_v$material_flow_wait_max_s)))
   stopifnot(nrow(concept_hints_by_visit) > 0, !any(concept_hints_by_visit$hints_logged),
@@ -623,7 +623,7 @@ local({
                                                       pilot_set$visits$scene == "ConceptScene"]))
   # Older layouts: NA, not 0; no container warnings on the fake data.
   stopifnot(all(is.na(pilot_set$concept_containers_by_visit$order_enters[
-              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815", "P816")])),
+              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815", "P816", "P817")])),
             !any(concept_containers_by_visit$containers_logged),
             !any(grepl("container_\\* line|ConceptScene (order|storage) container", c(p_warn, warn_lines))))
   # label_by_matnr replaces material_by_matnr from "032", same skill.
@@ -869,6 +869,42 @@ local({
                   (r816$menu_t - r816$tc_t - pilot_set$paused_between(r816$session_id, r816$tc_t, r816$menu_t))) < 0.002)
   # Station waits of "034" are grouped with "033" (4 s).
   stopifnot(all(pilot_set$station_waits$station_wait_group[pilot_set$station_waits$participant_id == "P816"] == "033_on"))
+
+  # 8y. Snap-place grab restarts (#114). P817 ran a "033" build with the old
+  #     grab logger: every carton let go into a Basic / Mixed position-1 snap
+  #     place got a second grab_start 0.013 s after its grab_end (truth:
+  #     make_fake_data.R snap_artifact_log). R drops each restart with the end
+  #     paired to it and counts it; nobody else has any.
+  sa <- snap_artifact_log %>% filter(pid == "P817")
+  stopifnot(nrow(snap_artifact_log) == nrow(sa), nrow(sa) == 9,
+            sum(sa$scene == "BasicPickingScene") == 6, sum(sa$scene == "MixedPickingScene") == 3)
+  stopifnot(pq("snap_grab_artifacts", "P817") == 9,
+            # Basic's 6 restarts were never ended in the log: not open grabs.
+            pq("open_grabs", "P817") == 0,
+            all(pilot_set$data_quality$snap_grab_artifacts[pilot_set$data_quality$participant_id != "P817"] == 0),
+            all(data_quality$snap_grab_artifacts[data_quality$interaction_logged] == 0),
+            is.na(dq("snap_grab_artifacts", "P104")))
+  for (sc in c("BasicPickingScene", "MixedPickingScene")) {
+    v <- pilot_set$visits %>% filter(participant_id == "P817", scene == sc)
+    sum_row <- pilot_set$summary_rows %>% filter(participant_id == "P817", scene == sc)
+    n_art <- sum(sa$scene == sc)
+    objs <- pilot_set$grabs %>% filter(participant_id == "P817", scene == sc)
+    stopifnot(nrow(v) == 1, nrow(sum_row) == 1, n_art > 0,
+              # The app's summary grabs count the restarts, R's grabs do not
+              # (and the summary seam stays clean, 8q: no "differs" warning).
+              v$grabs == sum_row$grabs - n_art,
+              v$snap_grab_artifacts == n_art, v$open_grabs == 0,
+              # regrabs as with the fixed logger: the restarts add none.
+              v$regrabs == sum_row$grabs - n_art - n_distinct(objs$object_id),
+              !any(objs$open))
+  }
+  # The hand grabs of the restarted cartons stay (one per carton in the box).
+  stopifnot(all(sa$obj %in% pilot_set$grabs$object_id[pilot_set$grabs$participant_id == "P817"]))
+  # P817 is a "033" log and never took a snapped carton out again: neither
+  # the "034"-or-newer warning nor the lost-grab warning fires; the column is in wide.csv.
+  stopifnot(!any(grepl("grab restart(s) <", c(p_warn, warn_lines), fixed = TRUE)),
+            !any(grepl("snap-place grab restart was open", c(p_warn, warn_lines), fixed = TRUE)),
+            pw8("snap_grab_artifacts", "P817") == 9)
 
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.
