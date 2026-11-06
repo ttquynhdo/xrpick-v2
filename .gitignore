@@ -86,6 +86,8 @@ crashlytics-build.properties
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/[Aa]ndroid/
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/[Aa]ndroid.meta
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/[Ss]tandalone*
+# link.xml (+ .meta) copied in by every player build, deleted again on the next script reload
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/link.xml*
 
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
