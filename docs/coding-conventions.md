@@ -1,10 +1,10 @@
 # Coding conventions
 
-**Status: draft (2026-11-01).** Applies to project code in `Assets/Scripts/`. SDK samples and imported art under `Assets/` are not ours. Don't edit them.
+**Status: draft (2026-11-01, facts updated 2026-11-06).** Applies to project code in `Assets/Scripts/`. SDK samples and imported art under `Assets/` are not ours. Don't edit them.
 
 **How to apply:** follow these rules in **new code** and in **the lines you change** for a backlog item. Don't rewrite whole old files just for style. That makes diffs hard to review and risks breaking Inspector references. When an item already touches an old script, bring the touched parts up to these rules.
 
-The reference for "good" is `Assets/Scripts/PiecesContainerCounter.cs`, apart from its hard-coded numbers and English text (§5, §6), its commented-out code and its unused `IsAcceptedType` (§8).
+The reference for "good" is `Assets/Scripts/PiecesContainerCounter.cs`.
 
 Rules marked **(pending decision)** wait for an architecture decision in `docs/decisions/`. Until then, follow the interim rule given.
 
@@ -37,8 +37,8 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
 - Unsubscribe events and stop coroutines in `OnDisable` / `OnDestroy`.
 
 ## 5. Order data and validation
-- **Single source for order quantities (decided, `docs/decisions/005-order-single-source.md`):** each scene declares its order once, in WMS units: order lines of {`PackageType`, Soll in pieces, VPE in pieces per package} as serialized fields on the scene's counter. Full packages (Soll ÷ VPE) and loose pieces (remainder) are derived, never declared. Validators, feedback and the WMS panel text read the counter. BasicPickingScene keeps `CalcForWMS.necessarySize` (pieces). Never repeat a quantity as a literal: no `== 2`, `"/ 2"`, `"2 GG"` in code or text.
-- Keep the rule itself separate from Unity, so it can be tested. Pass in plain values, e.g. `static bool IsOrderCorrect(int gga, int ggb, int loose, OrderRequirement req)`, and get a plain result back. The MonoBehaviour only collects counts and shows the result. See §10.
+- **Single source for order quantities (decided, `docs/decisions/005-order-single-source.md`):** each scene declares its order once, in WMS units: `orderLines` (`OrderLine` {materialKey, materialName, soll in pieces, vpe in pieces per package}) as serialized fields on the scene's counter. Full packages (Soll ÷ VPE) and loose pieces (remainder) are derived, never declared. Validators, feedback and the WMS panel text read the counter. BasicPickingScene keeps `CalcForWMS.necessarySize` (pieces). Never repeat a quantity as a literal: no `== 2`, `"/ 2"`, `"2 GG"` in code or text.
+- Keep the rule itself separate from Unity, so it can be tested: `OrderRule.Check(lines, OrderContents)` in `Assets/Scripts/Orders/` takes plain values and returns a plain `OrderResult`. The MonoBehaviour only collects the contents and shows the result. See §10.
 - A validator decides **right/wrong and why** (e.g. too few, too many, wrong type). It doesn't decide **wording**. Feedback text is built from that reason (§6).
 - **Validator result format (decided, `docs/decisions/006-validator-result-format.md`):** the order rule lives in the pure C# asmdef `XRPick.Orders` (EditMode-tested) and returns an ordered list of `{Code, Item}` errors plus per-order-line counts; `Correct` means the list is empty. `Item` is a stable, language-independent material key, never an enum name or display text. The screen shows only the first error (reason + what to do) and a generic "more errors" line; the log records the whole list. The result holds no text and no target numbers.
 
@@ -48,10 +48,10 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
   - Scene texts use `LocalizeStringEvent`.
   - Code gets strings only through `Loc.Get(key, args)`; don't put `LocalizedString` fields in each script.
   - The language is chosen once on WelcomeScene and saved in `PlayerPrefs`. Changing it reloads the scene.
-- **Until #11 is done:** no **new** hard-coded English or *du* text shown to the trainee. Every new or changed string goes through the `localize-strings` skill: key + EN + DE, with a row in `docs/i18n/strings-todo.csv` (the skill creates it if missing). Put the strings in one place per script (a `const` block or serialized fields), not scattered through the logic, so they move easily to `Loc.Get`.
+- No hard-coded text shown to the trainee. Every new or changed string gets a key with EN + DE in `docs/i18n/strings-todo.csv` (the `localize-strings` skill), is imported with **XRPick → Localization → Import strings CSV into UI table**, and is read in code with `Loc.Get`. Inspector data holds keys, not texts.
 - Don't build sentences by concatenating word pieces (`"Sie haben " + n + " Pakete"`). German word order differs. Use whole sentences with named placeholders (`{count}`).
 - No Smart String plural forms. Write counters as labels instead: `Pakete: {placed} / {required}`. Put rich text (`<color>`, `<b>`) around a whole sentence, never around single words.
-- Colours for feedback: green = correct, red = wrong. Use the same colour values in every scene.
+- Colours for feedback: green = correct, red = wrong, defined only in `ResultCardStyle.cs`. Don't set feedback colours anywhere else.
 - Debug and log messages (`Debug.Log*`) are in English. They are for developers.
 
 ## 7. Errors and logging
@@ -77,7 +77,7 @@ Rules marked **(pending decision)** wait for an architecture decision in `docs/d
 
 ## 10. Testability
 - Logic that doesn't need Unity goes in plain C# classes or static methods: order rules, quantity maths, feedback reason. These can get EditMode tests (`com.unity.test-framework` is installed).
-- When tests are added, put them in `Assets/Tests/EditMode/` with their own asmdef that references the code under test. A test asmdef can't reference `Assembly-CSharp`, so this first needs an asmdef for `Assets/Scripts/`. That is a separate decision. The new asmdef must reference TMPro and every Meta/XR assembly the scripts use. Code elsewhere in `Assets/` that uses project classes would then stop compiling.
+- A test asmdef can't reference `Assembly-CSharp`, so testable logic goes into the pure asmdef `XRPick.Orders` (`Assets/Scripts/Orders/`, `noEngineReferences`) or `XRPick.Research` (`Assets/Scripts/Research/`). Their tests are in `Assets/Tests/EditMode/Orders/` (`XRPick.Orders.Tests`) and `Assets/Tests/EditMode/Research/` (`XRPick.Research.Tests`). Scripts in `Assembly-CSharp` stay untested by EditMode tests.
 - Whatever can only be checked in Play mode is covered by the `unity-safe-change` test plan (UnityMCP plus manual cases).
 
 ## 11. Comments

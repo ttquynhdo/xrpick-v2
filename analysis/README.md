@@ -225,8 +225,8 @@ without a skill there tests every skill its scene lists in `scene_skills.csv`.
 The denominator of a skill in a visit = the counted attempts that tested it;
 the numerator = those of them with an error code of that skill; the "first
 attempt" = the first of them. Example: ConceptScene `check_material` counts
-only the touches on question `material_by_matnr`, and its first attempt is the
-first touch on that question (the quiz always starts with `cartons_from_soll`,
+only the touches on question `label_by_matnr` (`material_by_matnr` before
+layout "032"), and its first attempt is the first touch on that question (the quiz always starts with `cartons_from_soll`,
 so "the visit's first touch" would make the other skills 0 % by
 construction). In Basic, Mixed and Complex every counted press tests every
 skill of the scene, except `ekz_placement` (#94, decision 028): a press tests

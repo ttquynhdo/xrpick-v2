@@ -25,4 +25,4 @@ Mỗi dòng trong `glossary.csv` là một thuật ngữ:
 - Định nghĩa viết bằng lời của đội, **không trích nguyên văn tài liệu bảo mật**. Cột `source` chỉ ghi tên tài liệu và slide.
 
 ## Review bởi người bản ngữ
-Người hướng dẫn hoặc một người Đức bản ngữ sẽ duyệt **file export EN–DE**. Quy trình nằm trong skill `localize-strings` (phần "Review export"). Chuỗi chưa được duyệt vẫn dùng được trong prototype, nhưng không được coi là bản cuối.
+Người hướng dẫn hoặc một người Đức bản ngữ sẽ duyệt **file export EN–DE**. Quy trình nằm trong skill `localize-strings` (phần "Review export"): `python -I docs/i18n/review_tool.py export` tạo file `docs/i18n/review/review-<ngày>.csv` + hướng dẫn tiếng Đức; `python -I docs/i18n/review_tool.py import <file> --reviewer <tên>` đưa sửa đổi vào `strings-todo.csv`. Chuỗi chưa được duyệt vẫn dùng được trong prototype, nhưng không được coi là bản cuối.
