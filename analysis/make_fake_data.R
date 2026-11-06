@@ -11,7 +11,10 @@
 # pilot P813, the ConceptScene hint tags of #100 (concept_hint_shown / _cleared,
 # section 5b3) and, for the layout "032" pilot P814 (#92, decision 032), the
 # ConceptScene container_enter / _exit of both containers (order, storage;
-# section 5b4) and the quiz question label_by_matnr. Header event_groups =
+# section 5b4) and the quiz question label_by_matnr; P815 ran layout "033"
+# (4 s station start delay) and P816 layout "034" (#108/#109: EKZ place
+# outlines, Menu highlight; fixed Basic/Mixed presses, no format change).
+# Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
 # perf, floor-drop or tracking events: decision 022 dropped #30 and #74, the
@@ -25,7 +28,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P815, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P816, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -1751,6 +1754,31 @@ p815 <- new_person("P815")
 run_full_course(p815, "bbb2222", "2026-11-06T20:00:00Z", language = "EN", layout = "033",
                 special = list(ConceptScene = list(hints = p814_hints)))
 
+# P816: a layout "034" build (decision 037, #108/#109/#111). No event or
+# field changes; what changes is what the trainee sees: Basic position 1
+# outlines its 6 EKZ places from the start, Mixed position 1 its 3 places
+# after the first EKZ_PLACEMENT; the Basic/Mixed result card no longer names
+# the Menu, the next Menu item lights up once the order box departs. Fixed
+# presses so selftest.R can check the press x skill scaffold:
+#   Basic position 1: EKZ_PLACEMENT (outlines on: not an ekz_placement test),
+#     TOO_FEW (5 cartons), correct. calculate_quantity tested by all 3.
+#   Mixed position 1: EKZ_PLACEMENT (first EKZ opportunity, outlines still
+#     off: an ekz_placement test, wrong), EKZ_PLACEMENT again and correct
+#     (outlines on: not tested); position 2 correct.
+# Station start delay 4 s as in "033".
+p816 <- new_person("P816")
+run_full_course(p816, "ccc3333", "2026-11-06T22:00:00Z", language = "EN", layout = "034",
+                special = list(ConceptScene = list(hints = p814_hints),
+                               BasicPickingScene = list(forced = list("1" = list(
+                                 fixed_press(6, list(err("EKZ_PLACEMENT"))),
+                                 fixed_press(5, list(err("TOO_FEW", "training_b"))),
+                                 fixed_press(6, list())))),
+                               MixedPickingScene = list(forced = list(
+                                 "1" = list(fixed_press(3, list(err("EKZ_PLACEMENT"))),
+                                            fixed_press(3, list(err("EKZ_PLACEMENT"))),
+                                            fixed_press(3, list())),
+                                 "2" = list(fixed_press(3, list()))))))
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1803,7 +1831,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P815  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P816  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -1868,7 +1896,8 @@ paper_rows <- list(
   paper_row("P812"),
   paper_row("P813"),
   paper_row("P814"),
-  paper_row("P815"))
+  paper_row("P815"),
+  paper_row("P816"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

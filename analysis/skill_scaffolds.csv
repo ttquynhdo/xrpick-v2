@@ -1,0 +1,3 @@
+scene,item,skill,from_layout,shown,source
+BasicPickingScene,position_1,ekz_placement,034,always,#108 decision 037
+MixedPickingScene,position_1,ekz_placement,034,after_error,#108 decision 037

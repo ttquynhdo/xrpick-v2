@@ -121,6 +121,30 @@ item_skills <- read_csv(file.path(analysis_folder, "item_skills.csv"), show_col_
   mutate(skill = na_if(trimws(skill), ""),
          scaffolded = coalesce(tolower(trimws(scaffolded)) == "true", FALSE))
 
+# Skill scaffolds (#108, decision 037): help the app gives for ONE skill at an
+# item, while the item's other skills stay measured. One row per scene x item
+# x skill. from_layout = first layout_version with the help; shown = when it
+# is visible: "always" (Basic position 1: the 6 EKZ places are outlined from
+# the start) or "after_error" (Mixed position 1: the 3 places appear after the
+# first press of the visit at that item with an error of that skill, i.e.
+# EKZ_PLACEMENT, and stay until the position ends). A press x skill pair with
+# the help visible is left out of that skill's rate and of its objective
+# (numerator AND denominator); the press still counts for the other skills.
+# item_skills.csv can't hold this: it has one row per item, and "scaffolded"
+# there takes the whole press out.
+skill_scaffolds <- read_csv(file.path(analysis_folder, "skill_scaffolds.csv"), show_col_types = FALSE,
+                            col_types = cols(.default = col_character())) %>%
+  transmute(scene = trimws(scene), item = trimws(item), skill = trimws(skill),
+            from_layout = suppressWarnings(as.integer(from_layout)), shown = trimws(shown))
+bad_scaffolds <- skill_scaffolds %>%
+  filter(is.na(from_layout) | !shown %in% c("always", "after_error") |
+           !paste(scene, skill) %in% paste(scene_skills$scene, scene_skills$skill))
+if (nrow(bad_scaffolds) > 0) {
+  stop("skill_scaffolds.csv: from_layout must be a number, shown 'always' or 'after_error', and the skill ",
+       "listed for the scene in scene_skills.csv; check row(s): ",
+       paste(bad_scaffolds$scene, bad_scaffolds$item, bad_scaffolds$skill, collapse = "; "))
+}
+
 # A position item without a skill in item_skills.csv (all of them until the
 # study lead decides D28) is shown as "picking": the whole position right at
 # the first press, any error code.
@@ -734,6 +758,39 @@ presses <- v2_events %>% filter(event %in% c("confirm_pressed", "quiz_answer")) 
   left_join(item_skills %>% select(scene, item, scaffolded), by = c("scene", "item")) %>%
   mutate(scaffolded = coalesce(scaffolded, FALSE))
 
+# Skill scaffolds per press (skill_scaffolds.csv, #108): one row per red-button
+# press and skill whose help was visible when the press happened. "always":
+# every press of a build from from_layout on. "after_error": a press after an
+# earlier press of the same visit and item that carried an error of that
+# skill (the app shows the help on that error; a new scene visit starts
+# without it). R derives this from the presses alone, no extra log field.
+press_skill_scaffolded <- presses %>%
+  filter(event == "confirm_pressed", !is.na(item)) %>%
+  mutate(scene = as.character(scene), lay = suppressWarnings(as.integer(layout_version))) %>%
+  inner_join(skill_scaffolds, by = c("scene", "item"), relationship = "many-to-many") %>%
+  filter(coalesce(lay >= from_layout, FALSE)) %>%
+  mutate(has_skill_error = map2_lgl(codes, skill, ~ any(skill_map$skill[match(.x, skill_map$error_code)] %in% .y))) %>%
+  arrange(session_id, scene, scene_visit, item, skill, t, line) %>%
+  group_by(session_id, scene, scene_visit, item, skill) %>%
+  mutate(error_before = lag(cumsum(has_skill_error), default = 0L) > 0) %>%
+  ungroup() %>%
+  filter(shown == "always" | (shown == "after_error" & error_before)) %>%
+  distinct(press_id, skill)
+
+# EKZ place help of a position (#108): NA where the position is not Empf Kz
+# "003" (or a quiz item); "hidden" = no outlines in this build; else the
+# "shown" value of skill_scaffolds.csv for ekz_placement ("always" /
+# "after_error"). A build property of the position, not of one press (Mixed
+# "after_error": the first press is still made without the outlines).
+ekz_places_level <- function(scene, item, empf_kz, layout_version) {
+  key <- skill_scaffolds %>% filter(skill == "ekz_placement")
+  i <- match(paste(as.character(scene), item), paste(key$scene, key$item))
+  lay <- suppressWarnings(as.integer(layout_version))
+  case_when(!empf_kz %in% "003" ~ NA_character_,
+            !is.na(i) & coalesce(lay >= key$from_layout[i], FALSE) ~ key$shown[i],
+            TRUE ~ "hidden")
+}
+
 # Invariant (spec section 6): correct == (no error codes). Report every break.
 invariant_breaks <- presses %>% filter(is.na(correct) | correct != (n_codes == 0))
 for (i in seq_len(nrow(invariant_breaks))) {
@@ -1276,6 +1333,67 @@ if (nrow(menu_entries) > 0) {
   warn(nrow(menu_entries), " scene_enter with via 'menu' without a menu_select for that scene just before it")
 }
 
+# Menu choice after the order is done (#109, decision 037 item 4). Up to
+# layout "033" the Basic and Mixed result card said „Wählen Sie … im Menü“
+# from the correct confirm on (menu_cue "text"). From "034" that sentence is
+# gone: the card hides 2 s after the order box departs and the next Menu item
+# gets a blue highlight (menu_cue "highlight"), i.e. the cue comes later and
+# in another form. The time from task_completed to the trainee's Menu choice
+# therefore measures different things in the two groups: never pooled.
+# One row per Basic/Mixed visit with task_completed in a session that logged
+# interaction:
+#   departed_t  = station_move_start what "order_box" (OrderBoxConveyor.Departed)
+#   menu_t      = first menu_select with blocked false after task_completed
+#   time_to_menu_after_done_s     = active seconds task_completed -> menu_t
+#   time_to_menu_after_departed_s = active seconds departed_t -> menu_t
+#                                   (negative = chosen before the box left)
+#   menu_blocked_after_done = touches on locked items in between
+# NA = no Menu choice in the visit (session ended, crash) or no departure.
+menu_cue_scenes <- c("BasicPickingScene", "MixedPickingScene")
+menu_cue <- function(scene, layout_version) {
+  lay <- suppressWarnings(as.integer(layout_version))
+  case_when(!as.character(scene) %in% menu_cue_scenes | is.na(lay) ~ NA_character_,
+            lay >= 34L ~ "highlight", TRUE ~ "text")
+}
+# Active seconds from a to b (pauses removed; negative when b is before a).
+active_span <- function(sid, a, b) {
+  if_else(is.na(a) | is.na(b), NA_real_,
+          round(b - a - sign(b - a) * paused_between(sid, pmin(a, b), pmax(a, b)), 3))
+}
+order_box_start <- ride_rows %>% filter(what == "order_box") %>%
+  group_by(session_id, scene, scene_visit) %>%
+  summarise(departed_t = min(start_t), .groups = "drop")
+menu_after_done <- task_completed %>%
+  filter(scene %in% menu_cue_scenes, session_id %in% interaction_sessions) %>%
+  select(session_id, scene, scene_visit, tc_t) %>%
+  left_join(order_box_start, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(menu_rows %>% select(session_id, scene, scene_visit, m_t = t, m_target = target_scene, m_blocked = blocked),
+            by = c("session_id", "scene", "scene_visit"), relationship = "many-to-many") %>%
+  group_by(session_id, scene, scene_visit, tc_t, departed_t) %>%
+  summarise(sel_i = { i <- which(m_blocked %in% FALSE & coalesce(m_t >= tc_t, FALSE)); if (length(i)) i[which.min(m_t[i])] else NA_integer_ },
+            menu_t = if (is.na(sel_i)) NA_real_ else m_t[sel_i],
+            menu_target = if (is.na(sel_i)) NA_character_ else m_target[sel_i],
+            menu_blocked_after_done = sum(m_blocked %in% TRUE & coalesce(m_t >= tc_t, FALSE) &
+                                            (is.na(menu_t) | coalesce(m_t <= menu_t, FALSE))),
+            .groups = "drop") %>%
+  select(-sel_i) %>%
+  left_join(sessions %>% select(session_id, participant_id, layout_version), by = "session_id") %>%
+  mutate(menu_cue = menu_cue(scene, layout_version),
+         time_to_menu_after_done_s = active_span(session_id, tc_t, menu_t),
+         time_to_menu_after_departed_s = active_span(session_id, departed_t, menu_t)) %>%
+  select(participant_id, session_id, scene, scene_visit, layout_version, menu_cue, tc_t, departed_t, menu_t,
+         menu_target, time_to_menu_after_done_s, time_to_menu_after_departed_s, menu_blocked_after_done) %>%
+  arrange(participant_id, session_id, scene_visit)
+mixed_menu_cue_set <- n_distinct(na.omit(menu_after_done$menu_cue)) > 1
+if (mixed_menu_cue_set) {
+  warn("set mixes the Menu cue after a done order in Basic/Mixed (text: ",
+       paste(sort(unique(menu_after_done$participant_id[menu_after_done$menu_cue %in% "text"])), collapse = ", "),
+       "; highlight: ",
+       paste(sort(unique(menu_after_done$participant_id[menu_after_done$menu_cue %in% "highlight"])), collapse = ", "),
+       "; #109, layout \"034\"): menu_after_done.csv is split by menu_cue, never pooled")
+}
+write_csv(menu_after_done, file.path(output_dir, "menu_after_done.csv"), na = "")
+
 # ---- 8. Merge sessions per participant and number visits across them ----------
 
 visits <- visits_base %>%
@@ -1464,6 +1582,44 @@ if (mixed_m1_ekz) {
        "; #94): MixedPickingScene position_1 in first_attempt_by_item.png and time_by_phase.png ",
        "is split, never pooled; items.csv and process_by_position.csv carry empf_kz")
 }
+# EKZ place help (#108, decision 037, layout "034"): Basic position 1 shows
+# its 6 places from the start, Mixed position 1 its 3 places after the first
+# EKZ_PLACEMENT; each place takes one carton and a released carton lies flat.
+# Placement is easier than in "033"-or-older builds ("hidden"), and in Basic
+# the 6 outlines also show how many cartons go in. So position_1 of these
+# scenes is never pooled across levels: first_attempt_by_item.png and
+# time_by_phase.png split it, items.csv and process_by_position.csv carry
+# ekz_places, and the ekz_placement rate is split in the skill charts.
+# Level of a session = that of its first press at the item.
+ekz_place_items <- skill_scaffolds %>% filter(skill == "ekz_placement") %>% distinct(scene, item)
+ekz_places_session <- presses %>%
+  filter(event == "confirm_pressed") %>%
+  mutate(scene = as.character(scene)) %>%
+  semi_join(ekz_place_items, by = c("scene", "item")) %>%
+  arrange(session_id, t, line) %>%
+  distinct(session_id, scene, item, .keep_all = TRUE) %>%
+  mutate(ekz_places = ekz_places_level(scene, item, empf_kz, layout_version)) %>%
+  filter(!is.na(ekz_places)) %>%
+  select(session_id, participant_id, scene, item, layout_version, ekz_places)
+ekz_places_text <- c(hidden = "places hidden", always = "places shown", after_error = "places after error")
+ekz_places_split <- ekz_places_session %>% group_by(scene) %>%
+  summarise(split = n_distinct(ekz_places) > 1, .groups = "drop") %>%
+  { setNames(.$split, .$scene) }
+mixed_ekz_places_set <- any(ekz_places_split)
+for (sc in names(ekz_places_split)[ekz_places_split]) {
+  lv <- ekz_places_session %>% filter(scene == sc)
+  warn("set mixes EKZ place help in ", sc, " position_1 (",
+       paste(map_chr(sort(unique(lv$ekz_places)), function(l) paste0(l, ": ", paste(sort(unique(
+         lv$participant_id[lv$ekz_places == l])), collapse = ", "))), collapse = "; "),
+       "; #108, layout \"034\"): position_1 is split in first_attempt_by_item.png, time_by_phase.png and ",
+       "the ekz_placement skill charts, never pooled; items.csv and process_by_position.csv carry ekz_places")
+}
+# ekz_places of one position_1 of a session (NA for other items / no press there).
+session_ekz_places <- function(scene, item, session_id) {
+  ekz_places_session$ekz_places[match(paste(session_id, as.character(scene), item),
+                                       paste(ekz_places_session$session_id, ekz_places_session$scene,
+                                             ekz_places_session$item))]
+}
 # empf_kz column of process_by_position.csv for a position without a press:
 # expected_empf_kz with what the session's presses tell about the build.
 item_empf_kz <- function(scene, item, session_id) {
@@ -1488,8 +1644,14 @@ chart_item <- function(scene, item, session_id) {
   m1 <- if_else(as.character(scene) == "MixedPickingScene" & item == "position_1",
                 mixed_p1_session$empf_kz[match(session_id, mixed_p1_session$session_id)],
                 NA_character_)
+  # EKZ place help (#108): split only in a scene whose position_1 mixes levels.
+  ep <- session_ekz_places(scene, item, session_id)
+  ep_split <- unname(coalesce(ekz_places_split[as.character(scene)], FALSE)) & !is.na(ep)
+  ep_text <- if_else(ep_split, unname(ekz_places_text[coalesce(ep, "hidden")]), NA_character_)
   case_when(mixed_p1_scaffold & !is.na(lev) ~ paste0(item, " [", p1_level_label[lev], "]"),
-            mixed_m1_ekz & !is.na(m1) ~ paste0(item, " [Empf Kz ", m1, "]"),
+            (mixed_m1_ekz | ep_split) & !is.na(m1) ~
+              paste0(item, " [Empf Kz ", m1, if_else(ep_split, paste0(", ", ep_text), ""), "]"),
+            ep_split ~ paste0(item, " [", ep_text, "]"),
             TRUE ~ item)
 }
 
@@ -1644,6 +1806,12 @@ data_quality <- sessions %>%
     # TRUE on every row when the set holds builds with the 0.6 s and the 4 s
     # station start delay (decision 033): wait_s is split, never pooled.
     mixed_station_wait = mixed_station_wait_set,
+    # TRUE on every row when Basic or Mixed position_1 of the set mixes EKZ
+    # place help (#108, layout "034"): position_1 and ekz_placement are split.
+    mixed_ekz_places = mixed_ekz_places_set,
+    # TRUE on every row when the set mixes the Menu cue after a done order
+    # (#109, layout "034"): menu_after_done.csv is split by menu_cue.
+    mixed_menu_cue = mixed_menu_cue_set,
     n_crashes = sum(end_status == "crash"),
     # end_status of the participant = how their last session ended.
     end_status = last(end_status),
@@ -1693,7 +1861,8 @@ data_quality <- sessions %>%
                   duplicate_files), ~ coalesce(.x, 0L)),
          error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
-         mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, mixed_layout, mixed_station_wait, gap_h, n_crashes, resume_offered, resume_declined,
+         mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, mixed_layout, mixed_station_wait,
+         mixed_ekz_places, mixed_menu_cue, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, interaction_logged,
@@ -1809,6 +1978,8 @@ items <- item_attempts %>%
     layout_version = sessions$layout_version[match(session_id, sessions$session_id)],
     # Complex position_1 scaffold level (#93); split in the chart when mixed.
     scaffold_level = p1_scaffold_level(scene, item, session_id),
+    # EKZ place help of an Empf Kz 003 position (#108): hidden / always / after_error.
+    ekz_places = ekz_places_level(scene, item, empf_kz, layout_version),
     chart_item = chart_item(scene, item, session_id),
     chart_scene = chart_scene(scene, session_id),
     scene = factor(scene, levels = levels(visits$scene))) %>%
@@ -1819,6 +1990,7 @@ for (i in seq_len(nrow(unmapped_items))) {
        " is not in item_skills.csv: left out of first_attempt_by_item.png")
 }
 write_csv(items %>% select(participant_id, scene, layout_version, item, kind, quiz, skill, scaffolded, scaffold_level, empf_kz,
+                           ekz_places,
                            first_attempt_correct, attempts, reached_correct, first_attempt_codes,
                            session_id, scene_visit, repeat_visit),
           file.path(output_dir, "items.csv"), na = "")
@@ -1921,7 +2093,12 @@ press_skill_tests <- presses %>%
   filter(if_else(is.na(item_skill), event == "confirm_pressed", scene_skill == item_skill),
          is.na(item_skill) & scene_skill == "ekz_placement" & ekz_opportunity |
            !(is.na(item_skill) & scene_skill == "ekz_placement")) %>%
-  transmute(participant_id, session_id, scene, scene_visit, t, line, press_id, skill = scene_skill)
+  transmute(participant_id, session_id, scene, scene_visit, t, line, press_id, skill = scene_skill) %>%
+  # Skill scaffolds (skill_scaffolds.csv, #108): a press x skill pair whose
+  # help was visible is no test of that skill (Basic position 1 from "034":
+  # ekz_placement never; Mixed position 1 from "034": ekz_placement only up to
+  # the first EKZ_PLACEMENT of the visit). The press still tests its other skills.
+  anti_join(press_skill_scaffolded, by = c("press_id", "skill"))
 
 # Per visit and skill: skill_presses = attempts that tested the skill (the
 # denominator); first_skill_press_id = the first of them (the first attempt
@@ -1952,14 +2129,28 @@ skill_rates <- counting_visits %>%
          first_attempt_skill_error = map2_lgl(skill_error_press_ids, first_skill_press_id,
                                               ~ !is.null(.x) && .y %in% .x),
          error_rate = presses_with_skill_error / skill_presses,
-         # One x position per layout for ConceptScene in a mixed set (8b).
-         chart_scene = chart_scene(scene, session_id),
+         # EKZ place help of the visit's position_1 (#108), ekz_placement rows only.
+         ekz_places = if_else(skill == "ekz_placement",
+                              session_ekz_places(scene, "position_1", session_id), NA_character_),
+         # One x position per layout for ConceptScene in a mixed set (8b), and
+         # per EKZ place help for ekz_placement in a scene that mixes it (#108).
+         chart_scene = as.character(chart_scene(scene, session_id)),
+         chart_scene = if_else(!is.na(ekz_places) & coalesce(unname(ekz_places_split[scene]), FALSE),
+                               paste0(chart_scene, " [", unname(ekz_places_text[coalesce(ekz_places, "hidden")]), "]"),
+                               chart_scene),
          scene = factor(scene, levels = levels(visits$scene))) %>%
   select(-skill_error_press_ids, -first_skill_press_id)
 
 # Scenes with skills, in build order, so every layer uses the same x order
-# (ConceptScene split by layout in a mixed set).
+# (ConceptScene split by layout in a mixed set; Basic/Mixed followed by one
+# level per EKZ place help when the set mixes it, #108).
 skill_scene_limits <- chart_scene_levels[str_remove(chart_scene_levels, " \\[.*\\]$") %in% skill_pairs$scene]
+skill_scene_limits <- unlist(map(skill_scene_limits, function(l) {
+  if (!coalesce(unname(ekz_places_split[l]), FALSE)) return(l)
+  present <- intersect(names(ekz_places_text), ekz_places_session$ekz_places[ekz_places_session$scene == l])
+  c(l, paste0(l, " [", unname(ekz_places_text[present]), "]"))
+}))
+skill_rates <- skill_rates %>% mutate(chart_scene = factor(chart_scene, levels = skill_scene_limits))
 
 title_q1 <- "Secondary: does the error rate per press fall across the course, per skill?"
 if (nrow(skill_rates) == 0) {
@@ -1986,7 +2177,7 @@ if (nrow(skill_rates) == 0) {
 ",
                            "picking: every press, a position tests all skills of its scene;\n",
                            "ekz_placement only presses with the right quantity at an Empf Kz 003 position). ",
-                           "Scaffolded Complex position 1 left out. ",
+                           "Scaffolded Complex position 1 and presses with EKZ place outlines (#108) left out. ",
                            "Indication only: fixed scene order, no control group."),
          x = "Scene (build order)", y = "Attempts at this skill with its error (%)") +
     theme_minimal(base_size = 11) +
@@ -2178,11 +2369,13 @@ process <- proc_positions %>%
          empf_kz = coalesce(first_press_empf_kz$empf_kz[match(paste(session_id, scene, scene_visit, position),
                                                               first_press_empf_kz$key)],
                             item_empf_kz(scene, item, session_id)),
+         # EKZ place help of an Empf Kz 003 position (#108).
+         ekz_places = ekz_places_level(scene, item, empf_kz, layout_version),
          chart_item = chart_item(scene, item, session_id),
          scene = factor(scene, levels = levels(visits$scene))) %>%
   arrange(participant_id, scene, scene_visit, position)
 write_csv(process %>% select(participant_id, session_id, scene, scene_visit, counting, repeat_visit,
-                             layout_version, position, scaffolded, scaffold_level, empf_kz, completed, presses,
+                             layout_version, position, scaffolded, scaffold_level, empf_kz, ekz_places, completed, presses,
                              read_s, pick_s, check_s, position_s),
           file.path(output_dir, "process_by_position.csv"), na = "")
 
@@ -2870,6 +3063,12 @@ obj_item_tests <- item_attempts %>%
   summarise(correct = first(correct), .groups = "drop")
 # Objectives rated by EKZ_PLACEMENT: tested only at an EKZ opportunity.
 ekz_objectives <- unique(code_objectives$objective_id[code_objectives$code == "EKZ_PLACEMENT"])
+# press x objective pairs whose skill was scaffolded at the press (skill_scaffolds.csv).
+scaffolded_press_objectives <- press_skill_scaffolded %>%
+  inner_join(skill_map %>% filter(!is.na(objective_id), !is.na(skill)) %>%
+               distinct(skill = as.character(skill), objective_id = as.character(objective_id)),
+             by = "skill", relationship = "many-to-many") %>%
+  transmute(key = paste(press_id, objective_id)) %>% pull(key)
 # (b) First press at a position that tested an objective through its codes.
 obj_code_tests <- item_attempts %>%
   mutate(scene = as.character(scene)) %>%
@@ -2877,6 +3076,9 @@ obj_code_tests <- item_attempts %>%
   inner_join(code_objectives %>% distinct(scene, objective_id), by = "scene",
              relationship = "many-to-many") %>%
   filter(ekz_opportunity | !objective_id %in% ekz_objectives) %>%
+  # Skill scaffolds (#108): a press whose help for the objective's skill was
+  # visible is no test of it (Basic position 1 from "034" never tests P2).
+  filter(!paste(press_id, objective_id) %in% scaffolded_press_objectives) %>%
   arrange(participant_id, scene, item, objective_id, t, line) %>%
   group_by(participant_id, scene, item, objective_id) %>%
   slice(1) %>% ungroup() %>%
@@ -3363,6 +3565,8 @@ validity_limits <- c(
   "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card). In a set with both levels position_1 is split in first_attempt_by_item.png and time_by_phase.png; the per-scene Complex numbers (time_to_correct_by_scene.png, error_codes_by_scene.png) still pool both levels.",
   "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts lane_demo_delay_s (4 s) after the step; older layouts have NA, not 0.",
   "- Station start delay (decision 033, station_waits.csv): from layout \"033\" the boxes wait 4 s after a correct confirm before they ride (Complex box 1 after the remainder quiz: 0.6 s), before \"033\" 0.6 s. wait_s, wait_after_done_s and the per-scene active_s include this wait, so they are never pooled across station_wait_group; time_to_correct_by_scene.png uses time_to_correct_s minus wait_s for the picking scenes (wide.csv keeps the logged time_to_correct_s). wait_after_done_s starts at the first ride, not at task_completed, so it leaves out the start delay after the last confirm.",
+  "- EKZ place help (#108, decision 037, layout \"034\", skill_scaffolds.csv): Basic position 1 outlines its 6 snap places from the start, Mixed position 1 its 3 places after the first EKZ_PLACEMENT of the visit; from \"034\" each place takes one carton, a carton released in the box lies flat, and a placement error marks the loose cartons. A press x skill pair with the outlines visible is left out of the ekz_placement rate and of P2 (numerator and denominator), so from \"034\" Basic gives no ekz_placement measure and Mixed only up to its first EKZ_PLACEMENT (P2 = the first EKZ opportunity of Mixed position 1, always made without outlines). Basic calculate_quantity stays measured although the 6 outlines equal the 6 cartons the order needs: read Basic TOO_FEW/TOO_MANY of \"034\" as a lower bound of calculation errors. position_1 of Basic and Mixed is never pooled across ekz_places levels (hidden / always / after_error; items.csv, process_by_position.csv; split charts when a set mixes them), and P802's (\"033\") placement data are not pooled with \"034\".",
+  "- Menu after a done order (#109, menu_after_done.csv): up to layout \"033\" the Basic/Mixed result card told the trainee to choose the next lesson in the Menu from the correct confirm on (menu_cue text); from \"034\" the next Menu item is highlighted once the order box departs (menu_cue highlight). time_to_menu_after_done_s includes the 4 s start delay and the storage-box exit in both groups, but the cue itself comes later in \"034\"; compare within one menu_cue only. #111 (layout \"034\": box signs on the inner back wall, one note on Complex's opened carton, Basic/Complex storage cartons rearranged with the same counts and names) changes no logged field; Basic/Complex grab order and time to first grab may shift slightly, so read picking-scene grab and phase times within one layout.",
   "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).")
 # The pilot set (decision 023) is a try-out of the course and of this
 # analysis, not study data: say so on every pilot report.
