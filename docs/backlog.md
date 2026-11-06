@@ -2008,3 +2008,16 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** #102 (mở khoá tidyr/readr, `selftest.R` chạy được); hợp với kế hoạch học R của #102 (bước 4–5)
 - **Test report:** docs/test-reports/bl114.md
 - **Status:** done (commit 8654c31, test 10/10 ✅)
+
+### #115 [P1] Mixed: collider của túi SCHRAUBE B nhỏ hơn túi, cầm cổ túi có thể không nhấc được
+- **Type:** bug
+- **Scene(s):** MixedPickingScene
+- **Files:** `Assets/Scripts/Editor/PackageStandardizer.cs` (`Check`, `StandardizeOpenScene`), `Assets/Scenes/MixedPickingScene.unity` (`Interactables/PlasticBag_GG_1`–`4`, override trên instance của `Storage_Solutions/Prefabs/PlasticBag02`)
+- **Problem:** (rà soát 2026-11-06) BoxCollider gốc của túi chỉ 10,2 × 10,1 × 10,3 cm ở phần đáy, trong khi túi rộng 15,5 cm, sâu 15,4 cm, cao 18,6 cm. Phần vai và cổ túi (10–18,6 cm) không có collider chính. Meta Interaction SDK đo khoảng cách cầm tới collider của rigidbody (`Collisions.ClosestPointToColliders`), nên nắm cổ túi, chỗ người ta hay cầm, có thể không nhấc được. Lỗi có từ prefab gốc; #88 phóng to túi 25 % cùng collider. `PackageStandardizer.Check()` không kiểm collider của túi.
+- **Done when:** Ở cả 4 túi, collider bao toàn bộ hình túi: hộp bao của collider khớp hộp bao của mesh trong 2 mm. Một điểm cách đỉnh cổ túi 1 cm nằm cách collider ≤ 1 cm. Position 2: 3 túi trong thùng đơn → Ist 60, xác nhận đúng; lấy một túi ra → Ist 40. Thùng đơn chạy đi mang theo 3 túi. Cầm túi bằng tay thật ở cổ và ở thân đều nhấc được, thả vào thùng đơn rồi lấy ra được. (code) `Check()` báo lỗi một túi cầm được mà không có MeshCollider convex của mesh túi, và `StandardizeOpenScene` sửa lại thành như vậy.
+- **Inspector work expected:** no (công cụ ghi override trên instance)
+- **Công:** S
+- **Test trên kính:** nhanh (cầm cổ và thân túi bằng tay thật)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl115.md
+- **Status:** verified-mcp (10/10 ✅ MCP/code, chờ test tay H1 trên kính)

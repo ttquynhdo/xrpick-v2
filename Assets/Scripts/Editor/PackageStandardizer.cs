@@ -11,7 +11,8 @@ using UnityEngine.SceneManagement;
 /// #88, decision 029: one size per package kind in every scene and one fixed-size label on each carton lid.
 /// Cartons: mesh SM_box_1 at the Basic carton size (Complex's CardboardBox06 cartons get the same mesh),
 /// one label on the lid, the front sticker hidden (its collider stays: it is the carton's solid collider).
-/// Bags: the Mixed bag 25 % larger, one label inside the bag outline facing the standing spot.
+/// Bags: the Mixed bag 25 % larger, one label inside the bag outline facing the standing spot, and (#115) a grabbable
+/// bag's collider = one convex MeshCollider of the bag mesh.
 /// Every label uses the same font size with no auto-size. Opened cartons and loose pieces are not touched.
 /// Check reports every deviation; StandardizeOpenScene fixes them in place (dry run only reports).
 /// Running it again changes nothing new. Re-run after a label text or package size changes.
@@ -107,6 +108,7 @@ public static class PackageStandardizer
                 continue;
 
             FitSize(filter, BagSize(filter.sharedMesh));
+            FitBagCollider(filter);
             PlaceBagLabel(filter, fontSize);
         }
 
@@ -153,6 +155,9 @@ public static class PackageStandardizer
             bags++;
             string path = PathOf(filter.transform);
             CheckSize(errors, path, filter, BagSize(filter.sharedMesh));
+            if (!HasBagCollider(filter))
+                errors.Add($"{path}: grabbable bag without one convex MeshCollider of {BagMeshName} (#115)");
+
             List<TMP_Text> visible = VisibleLabels(filter.transform);
             if (visible.Count != 1)
                 errors.Add($"{path}: {visible.Count} visible labels, expected 1");
@@ -178,6 +183,45 @@ public static class PackageStandardizer
     private static IEnumerable<MeshFilter> Bags(Scene scene)
     {
         return AllFilters(scene).Where(f => f.sharedMesh.name == BagMeshName);
+    }
+
+    // #115: the Meta SDK measures the grab distance to the rigidbody's colliders, so a grabbable bag's own collider
+    // must follow the whole bag, neck included. The imported prefab had a 10 cm box over the bottom of the bag only.
+    // A bag without a Rigidbody is not grabbable and keeps what it has. The label child keeps its own collider.
+    private static bool HasBagCollider(MeshFilter filter)
+    {
+        if (filter.GetComponent<Rigidbody>() == null)
+            return true;
+
+        Collider[] own = filter.GetComponents<Collider>();
+        return own.Length == 1
+            && own[0] is MeshCollider mesh
+            && mesh.sharedMesh == filter.sharedMesh
+            && mesh.convex && !mesh.isTrigger && mesh.enabled;
+    }
+
+    private static void FitBagCollider(MeshFilter filter)
+    {
+        GameObject bag = filter.gameObject;
+        if (bag.GetComponent<Rigidbody>() == null || HasBagCollider(filter))
+            return;
+
+        foreach (Collider other in bag.GetComponents<Collider>())
+        {
+            if (!(other is MeshCollider))
+                Undo.DestroyObjectImmediate(other);
+        }
+
+        MeshCollider mesh = bag.GetComponent<MeshCollider>();
+        if (mesh == null)
+            mesh = Undo.AddComponent<MeshCollider>(bag);
+
+        Undo.RecordObject(mesh, "Bag collider");
+        mesh.sharedMesh = filter.sharedMesh;
+        mesh.convex = true;
+        mesh.isTrigger = false;
+        mesh.enabled = true;
+        Record(mesh);
     }
 
     private static IEnumerable<MeshFilter> AllFilters(Scene scene)

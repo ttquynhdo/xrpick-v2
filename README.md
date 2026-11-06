@@ -21,7 +21,7 @@ Five scenes, played in this build order (`ProjectSettings/EditorBuildSettings.as
 | 1 | `WelcomeScene` | The facilitator enters the participant code on a keypad (and, for pilots and tests, picks Deutsch/English). The trainee then practises the two basic actions: grab the box and press the red button. |
 | 2 | `ConceptScene` | A guided tour of the WMS fields (Mat.-Nr, Bez., Verp.-Einh., Soll, Ist, Rest, Empf Kz) with a nav bar (`Zurück` / `Weiter`) and on-screen markers. The trainee moves STECKER C cartons from the storage container into the order container, sees Soll : Verp.-Einh. = number of cartons, the Empf Kz 003 vs 000 samples, and the three-lane container flow. Ends with a 4-question A/B/C quiz. |
 | 3 | `BasicPickingScene` | One order line: 6 full cartons, each placed in its own snap place (Empf Kz 003). |
-| 4 | `MixedPickingScene` | Two positions, one after the other: cartons placed in snap places (Empf Kz 003), then bags put in loosely (000). |
+| 4 | `MixedPickingScene` | Two order lines, one after the other. Line 1: 3 cartons, each placed in its own marked spot (Empf Kz 003 = place neatly). Line 2: 3 bags, dropped in anywhere in the free half (Empf Kz 000 = no placement rule). |
 | 5 | `ComplexScene` | Two positions with remainders, for example 55 pieces = 2 full cartons + 5 loose pieces taken from an opened carton. A short quiz on full cartons and loose pieces comes before position 1. Ends with a summary panel that shows the participant code. |
 
 In research sessions the Menu opens only the next lesson, and only after the current one is done.

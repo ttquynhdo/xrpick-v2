@@ -87,7 +87,7 @@ Menu mở hết, nên đi thẳng tới scene cần thử. Ở mỗi scene, chú
 - [ ] Bấm nút đỏ một lần → sau buổi, log có đúng một `confirm_pressed` cho lần đó (#28 T2)
 - [ ] Position 1 đúng: ✓ ở 3 thẻ (#97 H1). Đọc thẻ kết quả và dialog. Trong 4 s chờ: carton trong thùng kho không cầm được, carton trên bàn cầm được (#99 H3). Thùng kho đổi: không giật, không vật nào chạy về phía mặt, mái che che được thùng mới (#71 H1, H3)
 - [ ] Đang cầm một kiện lúc thùng kho đổi → kiện ở lại trên tay (#71 T5, H2)
-- [ ] Position 2: đổ 3 túi vào nửa phải thùng đơn bằng tay (#94 H1). Cầm túi `PlasticBag_GG_4`, bỏ vào thùng đơn rồi lấy ra (#67 H1, #88 H1). Đọc thẻ kết quả, dialog, thẻ trên giá, dòng position có ✓ ở Position 1 (#71 H1, #62 T10, #97 H2)
+- [ ] Position 2: đổ 3 túi vào nửa phải thùng đơn bằng tay (#94 H1). Cầm túi ở **cổ túi** và ở thân, cả hai đều nhấc được (#115 H1). Cầm túi `PlasticBag_GG_4`, bỏ vào thùng đơn rồi lấy ra (#67 H1, #88 H1). Đọc thẻ kết quả, dialog, thẻ trên giá, dòng position có ✓ ở Position 1 (#71 H1, #62 T10, #97 H2)
 - [ ] Xong đơn: xem cả chuyến thùng đơn chạy đi. Đang cầm một kiện lúc thùng chạy → kiện ở lại trên tay (#71 H1, H2)
 - [ ] Chọn bài 5 trong Menu (#71 H4 bắt đầu ở đây)
 
