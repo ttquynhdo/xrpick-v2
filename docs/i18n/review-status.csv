@@ -39,8 +39,8 @@ complex.quiz.option_carton_one,1 Karton,proposed,,2026-11-02,#19
 complex.quiz.option_cartons,{count} Kartons,proposed,,2026-11-02,#19
 complex.quiz.option_piece_one,1 Teil,proposed,,2026-11-02,#19
 complex.quiz.option_pieces,{count} Teile,proposed,,2026-11-02,#19
-complex.quiz.wrong_cartons,Nicht richtig. Teilen Sie Soll durch VPE. Es zählen nur volle Kartons.,proposed,german-reviewer (agent),2026-11-02,#19
-complex.quiz.wrong_loose,Nicht richtig. Lose Teile = Soll minus (volle Kartons × VPE).,proposed,,2026-11-02,#19
+complex.quiz.wrong_cartons,Nicht richtig. Teilen Sie Soll durch Verp.-Einh. Es zählen nur volle Kartons.,proposed,german-reviewer (agent),2026-11-16,#119
+complex.quiz.wrong_loose,Nicht richtig. Lose Teile = Soll - (volle Kartons × Verp.-Einh.).,proposed,german-reviewer (agent),2026-11-16,#119
 complex.quiz.next,Richtig! Beantworten Sie jetzt die zweite Frage.,proposed,,2026-11-02,#19
 complex.quiz.done,Richtig! Nehmen Sie jetzt die vollen Kartons und die losen Teile aus dem Lagerbehälter.,proposed,,2026-11-02,#19
 complex.example.title,Beispiel,proposed,german-reviewer (agent),2026-11-02,#19
@@ -132,7 +132,7 @@ concept.quiz.cartons_from_soll.2,2 Kartons,proposed,german-reviewer (agent),2026
 concept.quiz.cartons_from_soll.2.wrong,2 Kartons sind nur 50 Stück.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.4,4 Kartons,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.25,25 Kartons,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.cartons_from_soll.25.wrong,25 ist die VPE: die Stückzahl in einem Karton. Teilen Sie Soll durch VPE.,proposed,german-reviewer (agent),2026-11-03,"Agent: OK; optional 'durch die VPE', left to #13"
+concept.quiz.cartons_from_soll.25.wrong,25 ist die VPE (im LVS: Verp.-Einh.): die Stückzahl in einem Karton. Teilen Sie Soll durch Verp.-Einh.,proposed,german-reviewer (agent),2026-11-16,#119: Agent OK
 concept.quiz.ekz_003.q,Empf Kz 003: Wie geben Sie die Kartons in den Auftragsbehälter?,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.quiz.ekz_003.ordered,Einzeln und geordnet einlegen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.ekz_003.poured,Ungeordnet einlegen,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#107, decision 036)"

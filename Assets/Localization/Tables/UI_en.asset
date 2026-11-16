@@ -583,13 +583,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627458
-    m_Localized: <color=#EB5757><b>Not correct.</b></color> Divide Soll by VPE. Only
-      full cartons count.
+    m_Localized: <color=#EB5757><b>Not correct.</b></color> Divide Soll by Verp.-Einh.
+      Only full cartons count.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627459
     m_Localized: "<color=#EB5757><b>Not correct.</b></color> Loose pieces = Soll
-      minus (full cartons \xD7 VPE)."
+      - (full cartons \xD7 Verp.-Einh.)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627460
@@ -652,8 +652,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182467
-    m_Localized: '25 is the VPE: the number of pieces in one carton. Divide Soll
-      by VPE.'
+    m_Localized: '25 is the VPE (in the WMS: Verp.-Einh.): the number of pieces in
+      one carton. Divide Soll by Verp.-Einh.'
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473

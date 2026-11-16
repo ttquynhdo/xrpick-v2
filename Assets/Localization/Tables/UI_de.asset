@@ -579,12 +579,12 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627458
     m_Localized: "<color=#EB5757><b>Nicht richtig.</b></color> Teilen Sie Soll durch
-      VPE. Es z\xE4hlen nur volle Kartons."
+      Verp.-Einh. Es z\xE4hlen nur volle Kartons."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627459
     m_Localized: "<color=#EB5757><b>Nicht richtig.</b></color> Lose Teile = Soll
-      minus (volle Kartons \xD7 VPE)."
+      - (volle Kartons \xD7 Verp.-Einh.)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627460
@@ -644,8 +644,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182467
-    m_Localized: "25 ist die VPE: die St\xFCckzahl in einem Karton. Teilen Sie Soll
-      durch VPE."
+    m_Localized: "25 ist die VPE (im LVS: Verp.-Einh.): die St\xFCckzahl in einem
+      Karton. Teilen Sie Soll durch Verp.-Einh."
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473
