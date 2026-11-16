@@ -2054,7 +2054,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S
 - **Test trên kính:** nhanh (đọc câu cuối Concept)
 - **Depends on:** #116 (cùng WelcomeScene / CSV, làm sau)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl117.md
+- **Status:** verified-mcp (8/9 ✅ MCP/code, chờ test tay H1: đọc dòng cuối Concept trên kính; commit bc050b1)
 
 ### #118 [P1] Concept tour: bước 1 giới thiệu màn hình WMS và „customer order“, bước 5–6 bỏ tới khi Ist = Soll, bước 9 không lẫn trái/phải, bước 11 thùng chạy chậm hơn
 - **Type:** logic
