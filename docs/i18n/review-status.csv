@@ -98,7 +98,7 @@ entry.warning.finished,Für {participant_id} gibt es bereits eine abgeschlossene
 lesson.basic,3. Kommissionieren nach EKZ 3,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 lesson.complex,5. Volle Kartons und loses Material,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 lesson.concept,2. Grundlagen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-lesson.mixed,4. Mehrere Positionen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
+lesson.mixed,4. Mehrere Auftragspositionen,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#128); changed from 4. Mehrere Positionen
 lesson.welcome,1. Einführung,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 menu.title,MENÜ,proposed,german-reviewer (agent),2026-11-03,Agent: OK; new in #54 (was English MENU)
 mixed.feedback.correct,Alle Materialien und Mengen stimmen mit dem Auftrag überein.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,claude,2026-11-06,"#109 (decision 037): Menu sentence removed, the Menu item is highlighted instead; rest unchanged from #99 review"
