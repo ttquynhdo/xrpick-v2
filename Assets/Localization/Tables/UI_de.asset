@@ -302,7 +302,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627389
-    m_Localized: Hier sehen Sie einen Auftrag im Lagerverwaltungssystem (LVS).
+    m_Localized: Der Bildschirm vor Ihnen ist das Lagerverwaltungssystem (LVS). Darauf
+      sehen Sie einen Kundenauftrag.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627390
@@ -848,12 +849,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810627
-    m_Localized: "Legen Sie die Kartons aus dem Lagerbeh\xE4lter in den Auftragsbeh\xE4lter."
+    m_Localized: "Legen Sie Kartons aus dem Lagerbeh\xE4lter in den Auftragsbeh\xE4lter,
+      bis Ist und Soll gleich sind."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810628
-    m_Localized: "Schauen Sie auf Ist: So viele St\xFCck haben Sie in den Auftragsbeh\xE4lter
-      gelegt."
+    m_Localized: 'Schauen Sie auf Ist: Liegt der Wert unter Soll, legen Sie Kartons
+      nach, bis Ist und Soll gleich sind.'
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810629
@@ -867,7 +869,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810631
-    m_Localized: Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.
+    m_Localized: "Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.
+      Sehen Sie danach rechts die EKZ-\xDCbersicht an."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632

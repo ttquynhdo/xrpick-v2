@@ -2067,7 +2067,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S
 - **Test trên kính:** nhanh (bước 9 nhìn đúng phía, bước 11 đủ thời gian xem)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl118.md
+- **Status:** verified-mcp (11/11 MCP/code ✅, chờ test tay I4b, I5b; layout_version "035")
 
 ### #119 [P1] Phép chia nói „Soll : Verp.-Einh.“ theo tên ô LVS, không „VPE“
 - **Type:** logic

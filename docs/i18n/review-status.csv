@@ -112,7 +112,7 @@ order.feedback.too_many,Zu viel Material {name}. Rechnen Sie nach: Sollmenge get
 order.feedback.wrong_material,Im Auftragsbehälter liegt falsches Material. Nehmen Sie es heraus. Prüfen Sie die Materialnummer im LVS.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 order.feedback.wrong_title,Nicht richtig,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.tour.intro.title,Das LVS,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.tour.intro.body,Hier sehen Sie einen Auftrag im Lagerverwaltungssystem (LVS).,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
+concept.tour.intro.body,Der Bildschirm vor Ihnen ist das Lagerverwaltungssystem (LVS). Darauf sehen Sie einen Kundenauftrag.,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#118, team review C7/C8/C11/C12)"
 concept.tour.material.title,Mat.-Nr und Bez.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.material.body,Materialnummer und Bezeichnung.,proposed,german-reviewer (agent),2026-11-04,"Agent: OK after its fixes (#89, tour bar)"
 concept.tour.verp_einh.title,Verp.-Einh.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
@@ -189,11 +189,11 @@ concept.tour.intro.action,"Sehen Sie sich den Auftrag im LVS an: Dort steht, was
 concept.tour.material.action,"Nehmen Sie den Karton STECKER C in die Hand und prüfen Sie, ob das Etikett zu Mat.-Nr und Bez. passt.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.verp_einh.action,"Vergleichen Sie die VPE auf dem Etikett mit Verp.-Einh.: So wissen Sie, wie viele Stück in einem Karton sind.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.soll.action,Merken Sie sich die Zahl im Feld Soll: Im nächsten Schritt rechnen Sie damit die Anzahl Kartons aus.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
-concept.tour.cartons.action,Legen Sie die Kartons aus dem Lagerbehälter in den Auftragsbehälter.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
-concept.tour.ist.action,Schauen Sie auf Ist: So viele Stück haben Sie in den Auftragsbehälter gelegt.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
+concept.tour.cartons.action,"Legen Sie Kartons aus dem Lagerbehälter in den Auftragsbehälter, bis Ist und Soll gleich sind.",proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#118, team review C7/C8/C11/C12)"
+concept.tour.ist.action,"Schauen Sie auf Ist: Liegt der Wert unter Soll, legen Sie Kartons nach, bis Ist und Soll gleich sind.",proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#118, team review C7/C8/C11/C12)"
 concept.tour.rest.action,"Lesen Sie Rest ab: Daran sehen Sie, wie viele Stück nach dem Auftrag im Lagerbehälter bleiben.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.empf_kz_003.action,Sehen Sie sich links neben dem Bildschirm das Beispiel „Empf Kz 003“ an.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
-concept.tour.empf_kz_000.action,Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
+concept.tour.empf_kz_000.action,Vergleichen Sie die beiden Beispiele links neben dem Bildschirm. Sehen Sie danach rechts die EKZ-Übersicht an.,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#118, team review C7/C8/C11/C12)"
 concept.tour.not_used.action,Sehen Sie sich die markierten Bereiche an: Die brauchen Sie in der Übung nicht.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.hint.storage_wrong_material,In diesem Lagerbehälter liegt Material mit einer anderen Materialnummer. Nehmen Sie es heraus.,proposed,,2026-11-05,#100 new

@@ -303,7 +303,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627389
-    m_Localized: Here you see an order in the warehouse management system (WMS).
+    m_Localized: The screen in front of you is the warehouse management system (WMS).
+      It shows a customer order.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627390
@@ -853,12 +854,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810627
-    m_Localized: Put the cartons from the storage container into the order container.
+    m_Localized: Put cartons from the storage container into the order container
+      until Ist equals Soll.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810628
-    m_Localized: 'Look at Ist: it shows how many pieces you have put into the order
-      container.'
+    m_Localized: 'Look at Ist: if it is lower than Soll, put in more cartons until
+      Ist equals Soll.'
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810629
@@ -872,7 +874,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810631
-    m_Localized: Compare the two examples to the left of the screen.
+    m_Localized: Compare the two examples to the left of the screen. Then look at
+      the EKZ overview on the right.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632

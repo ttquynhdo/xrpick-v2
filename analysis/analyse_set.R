@@ -2728,13 +2728,20 @@ tour_wide <- tour_first %>%
 # Before layout "029" the tags did not exist: hint columns are NA (not
 # measured), never 0.
 # material_flow wait: at tour step material_flow the lane demo starts
-# lane_demo_delay_s after the step is shown, but only once no tag is shown
+# lane_demo_delay_for(layout) after the step is shown, but only once no tag is shown
 # (LaneFlowDemo waits for ConceptBoxHints.IsClear). Wait per showing =
 # active seconds from that start until the chain of tags (a tag moving on in
 # the same frame continues the chain) ends, cut at the next tour_step or the
 # visit end.
 
-if (!exists("lane_demo_delay_s")) lane_demo_delay_s <- 4
+# LaneFlowDemo.startDelay per build: 4 s up to layout "034", 8 s from "035"
+# (#118: slower lane demo). Setting lane_demo_delay_s before sourcing forces
+# one value for every layout (for tests).
+lane_demo_delay_for <- function(layout_version) {
+  if (exists("lane_demo_delay_s")) return(rep(lane_demo_delay_s, length(layout_version)))
+  lay <- suppressWarnings(as.integer(layout_version))
+  if_else(coalesce(lay >= 35L, FALSE), 8, 4)
+}
 hint_chain_gap_s <- 0.05
 hints_logged <- function(layout_version) {
   coalesce(suppressWarnings(as.integer(layout_version)) >= 29L, FALSE)
@@ -2889,7 +2896,7 @@ hint_chains <- concept_hints %>%
             chain_open = any(ended_by == "crash"), .groups = "drop")
 flow_shows <- tour_shows %>%
   filter(step_id %in% "material_flow", hints_logged(layout_version)) %>%
-  transmute(session_id, scene_visit, demo_t = t + lane_demo_delay_s,
+  transmute(session_id, scene_visit, demo_t = t + lane_demo_delay_for(layout_version),
             step_end_t = coalesce(next_t, end_t), step_crashed = is.na(next_t) & !closed) %>%
   filter(step_end_t > demo_t) %>%
   mutate(show_id = row_number())
@@ -3626,7 +3633,7 @@ validity_limits <- c(
   "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).",
   "- Mixed position_1 (#94, decision 028): builds before #94 had Empf Kz 000 there (placement never rated), from #94 (line.empf_kz logged, layout \"029\") Empf Kz 003 (3 snap places, EKZ_PLACEMENT possible); an earlier \"029\" build without the field counts as 000. In a set with both, position_1 is split ([Empf Kz 000] / [Empf Kz 003]) in first_attempt_by_item.png and time_by_phase.png; the per-scene Mixed numbers (error_rate_MixedPickingScene, time_to_correct, error codes) still pool both and an Empf Kz 003 visit can have more presses (EKZ retries). The ekz_placement rate counts only presses with the right quantity at an Empf Kz 003 position (EKZ opportunities): its n is small and a wrong-quantity press is no EKZ attempt.",
   "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card). In a set with both levels position_1 is split in first_attempt_by_item.png and time_by_phase.png; the per-scene Complex numbers (time_to_correct_by_scene.png, error_codes_by_scene.png) still pool both levels.",
-  "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts lane_demo_delay_s (4 s) after the step; older layouts have NA, not 0.",
+  "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts 4 s (layout up to \"034\") or 8 s (\"035\" on, #118) after the step; older layouts have NA, not 0.",
   "- Station start delay (decision 033, station_waits.csv): from layout \"033\" the boxes wait 4 s after a correct confirm before they ride (Complex box 1 after the remainder quiz: 0.6 s), before \"033\" 0.6 s. wait_s, wait_after_done_s and the per-scene active_s include this wait, so they are never pooled across station_wait_group; time_to_correct_by_scene.png uses time_to_correct_s minus wait_s for the picking scenes (wide.csv keeps the logged time_to_correct_s). wait_after_done_s starts at the first ride, not at task_completed, so it leaves out the start delay after the last confirm.",
   "- EKZ place help (#108, decision 037, layout \"034\", skill_scaffolds.csv): Basic position 1 outlines its 6 snap places from the start, Mixed position 1 its 3 places after the first EKZ_PLACEMENT of the visit; from \"034\" each place takes one carton, a carton released in the box lies flat, and a placement error marks the loose cartons. A press x skill pair with the outlines visible is left out of the ekz_placement rate and of P2 (numerator and denominator), so from \"034\" Basic gives no ekz_placement measure and Mixed only up to its first EKZ_PLACEMENT (P2 = the first EKZ opportunity of Mixed position 1, always made without outlines). Basic calculate_quantity stays measured although the 6 outlines equal the 6 cartons the order needs: read Basic TOO_FEW/TOO_MANY of \"034\" as a lower bound of calculation errors. position_1 of Basic and Mixed is never pooled across ekz_places levels (hidden / always / after_error; items.csv, process_by_position.csv; split charts when a set mixes them), and P802's (\"033\") placement data are not pooled with \"034\".",
   "- Menu after a done order (#109, menu_after_done.csv): up to layout \"033\" the Basic/Mixed result card told the trainee to choose the next lesson in the Menu from the correct confirm on (menu_cue text); from \"034\" the next Menu item is highlighted once the order box departs (menu_cue highlight). time_to_menu_after_done_s includes the 4 s start delay and the storage-box exit in both groups, but the cue itself comes later in \"034\"; compare within one menu_cue only. #111 (layout \"034\": box signs on the inner back wall, one note on Complex's opened carton, Basic/Complex storage cartons rearranged with the same counts and names) changes no logged field; Basic/Complex grab order and time to first grab may shift slightly, so read picking-scene grab and phase times within one layout.",
