@@ -2198,4 +2198,4 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** không
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl128.md
-- **Status:** done (nhánh `feat/128-lesson-4-name`, test 7/7 ✅; chỉ đổi chữ, không cần kính)
+- **Status:** done (commit 74dda18, test 7/7 ✅; chỉ đổi chữ, không cần kính)
