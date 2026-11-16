@@ -42,7 +42,19 @@ public class ParticipantEntryController : MonoBehaviour
     [SerializeField] private GameObject[] testModeBadges;
 
     [Header("Course")]
+    // #121 (decision 038): step 1 of the course, shown once a session runs (title, objectives, „Zu den Aufgaben“).
+    [Tooltip("Shown once a session runs: the Welcome title, the objectives panel and the „Zu den Aufgaben“ button.")]
     [SerializeField] private GameObject[] courseRoots;
+
+    [Tooltip("Part of courseRoots hidden again when „Zu den Aufgaben“ is pressed (objectives panel, the button itself).")]
+    [SerializeField] private GameObject[] objectiveRoots;
+
+    [Tooltip("Step 2, shown only after „Zu den Aufgaben“: cards, box, red button, Menu.")]
+    [SerializeField] private GameObject[] taskRoots;
+
+    [Tooltip("Poke toggle „Zu den Aufgaben“, used as a push button.")]
+    [SerializeField] private Toggle tasksToggle;
+
     [SerializeField] private SceneMenuController sceneMenu;
 
     private const float DisabledLabelAlpha = 0.3f;
@@ -53,6 +65,23 @@ public class ParticipantEntryController : MonoBehaviour
     private string resumeScene;
     private bool started;
     private bool broken;
+    private bool tasksOpened;
+
+    private void OnEnable()
+    {
+        if (tasksToggle != null)
+        {
+            tasksToggle.onValueChanged.AddListener(OnTasksToggled);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (tasksToggle != null)
+        {
+            tasksToggle.onValueChanged.RemoveListener(OnTasksToggled);
+        }
+    }
 
     private void Start()
     {
@@ -73,7 +102,10 @@ public class ParticipantEntryController : MonoBehaviour
             | RequiredReference.IsMissing(okButton, nameof(okButton), this)
             | RequiredReference.IsMissing(entrySurface, nameof(entrySurface), this)
             | RequiredReference.IsMissing(sceneMenu, nameof(sceneMenu), this)
-            | !HasCourseRoots())
+            | RequiredReference.IsMissing(tasksToggle, nameof(tasksToggle), this)
+            | !HasRoots(courseRoots, nameof(courseRoots))
+            | !HasRoots(objectiveRoots, nameof(objectiveRoots))
+            | !HasRoots(taskRoots, nameof(taskRoots)))
         {
             broken = true;
             return;
@@ -94,21 +126,21 @@ public class ParticipantEntryController : MonoBehaviour
         ShowKeypad();
     }
 
-    private bool HasCourseRoots()
+    private bool HasRoots(GameObject[] roots, string fieldName)
     {
-        if (courseRoots == null || courseRoots.Length == 0)
+        if (roots == null || roots.Length == 0)
         {
-            Debug.LogError($"{nameof(ParticipantEntryController)} on '{gameObject.name}': {nameof(courseRoots)} is empty, nothing would be gated.", this);
+            Debug.LogError($"{nameof(ParticipantEntryController)} on '{gameObject.name}': {fieldName} is empty, nothing would be gated.", this);
             return false;
         }
 
         bool valid = true;
-        for (int i = 0; i < courseRoots.Length; i++)
+        for (int i = 0; i < roots.Length; i++)
         {
-            if (courseRoots[i] != null)
+            if (roots[i] != null)
                 continue;
 
-            Debug.LogError($"{nameof(ParticipantEntryController)} on '{gameObject.name}': {nameof(courseRoots)}[{i}] is not assigned.", this);
+            Debug.LogError($"{nameof(ParticipantEntryController)} on '{gameObject.name}': {fieldName}[{i}] is not assigned.", this);
             valid = false;
         }
 
@@ -319,12 +351,42 @@ public class ParticipantEntryController : MonoBehaviour
         }
     }
 
+    // #121 (decision 038): a running session shows step 1 (objectives) first; step 2 (tasks) waits for the button,
+    // never for a timer. Hidden: both steps.
     private void SetCourseVisible(bool visible)
     {
-        if (courseRoots == null)
+        SetActive(taskRoots, false);
+        SetActive(courseRoots, visible);
+    }
+
+    private void OnTasksToggled(bool isOn)
+    {
+        if (tasksToggle != null)
+        {
+            tasksToggle.SetIsOnWithoutNotify(false);
+        }
+
+        OpenTasks();
+    }
+
+    /// <summary>„Zu den Aufgaben“: hides the objectives (with their poke surfaces) and shows the task objects.</summary>
+    public void OpenTasks()
+    {
+        if (broken || !started || tasksOpened)
             return;
 
-        foreach (GameObject root in courseRoots)
+        tasksOpened = true;
+        SetActive(objectiveRoots, false);
+        SetActive(taskRoots, true);
+        ResearchLogger.LogWelcomeTasksOpened();
+    }
+
+    private static void SetActive(GameObject[] roots, bool visible)
+    {
+        if (roots == null)
+            return;
+
+        foreach (GameObject root in roots)
         {
             if (root != null)
                 root.SetActive(visible);

@@ -310,7 +310,7 @@ known_events <- c("header", "session_start", "session_end", "scene_enter", "scen
                   "crash_recovered", "confirm_pressed", "confirm_ignored", "position_completed",
                   "task_completed", "quiz_answer", "quiz_unlocked", "tour_step",
                   "station_move_start", "station_move_arrived", "welcome_practice_done",
-                  "grab_start", "grab_end", "container_enter", "container_exit",
+                  "welcome_tasks_opened", "grab_start", "grab_end", "container_enter", "container_exit",
                   "concept_hint_shown", "concept_hint_cleared")
 # Decision 022 dropped #30 (pose, perf) and #74 (floor drops, input mode,
 # tracking): the app must never write these. If one turns up, the build is not
@@ -911,6 +911,62 @@ task_completed <- v2_events %>% filter(event == "task_completed") %>%
             tc_time_to_correct_s = map_dbl(data, ~ as_num(.x$time_to_correct_s))) %>%
   distinct(session_id, scene, scene_visit, .keep_all = TRUE)
 
+# WelcomeScene learning objectives (#121/#124, decision 038, layout "036" on):
+# „Zu den Aufgaben" writes welcome_tasks_opened once per visit with the
+# active seconds since scene_enter (= reading time of the objectives, pauses
+# removed by the app). Only after it the practice box, red button and Menu
+# appear, so both welcome_practice_done must come later. objectives_read_s is
+# NA (not measured) for older layouts, for other scenes and for a "036"
+# Welcome visit without the press (resumed session, crash, facilitator end).
+objectives_layout <- function(layout_version) {
+  coalesce(suppressWarnings(as.integer(layout_version)) >= 36L, FALSE)
+}
+tasks_opened_rows <- v2_events %>% filter(event == "welcome_tasks_opened") %>%
+  transmute(session_id, scene, scene_visit, to_t = t,
+            to_s = map_dbl(data, ~ as_num(.x$time_since_scene_enter_s))) %>%
+  left_join(sessions %>% select(session_id, participant_id, layout_version), by = "session_id")
+# Checks: right scene and layout, once per visit, logged time = rebuilt time.
+odd_to <- tasks_opened_rows %>%
+  filter(scene != "WelcomeScene" | !objectives_layout(layout_version)) %>%
+  distinct(participant_id, scene, layout_version)
+for (i in seq_len(nrow(odd_to))) {
+  warn("welcome_tasks_opened in ", odd_to$scene[i], " of a layout ", coalesce(odd_to$layout_version[i], "none"),
+       " log (", odd_to$participant_id[i], "): only WelcomeScene from layout \"036\" writes it (not read)")
+}
+tasks_opened_rows <- tasks_opened_rows %>% filter(scene == "WelcomeScene", objectives_layout(layout_version))
+twice_to <- tasks_opened_rows %>% count(participant_id, session_id, scene_visit) %>% filter(n > 1)
+for (i in seq_len(nrow(twice_to))) {
+  warn("welcome_tasks_opened ", twice_to$n[i], " times in WelcomeScene visit ", twice_to$scene_visit[i], " (",
+       twice_to$participant_id[i], "): the first one counts")
+}
+tasks_opened <- tasks_opened_rows %>% arrange(session_id, scene_visit, to_t) %>%
+  distinct(session_id, scene, scene_visit, .keep_all = TRUE) %>%
+  left_join(enters %>% select(session_id, scene, scene_visit, enter_t),
+            by = c("session_id", "scene", "scene_visit")) %>%
+  mutate(rebuilt_s = round(to_t - enter_t - paused_between(session_id, enter_t, to_t), 3))
+bad_to <- tasks_opened %>% filter(is.na(to_s) | abs(to_s - rebuilt_s) > 0.005)
+for (i in seq_len(nrow(bad_to))) {
+  warn("welcome_tasks_opened time_since_scene_enter_s ", coalesce(as.character(bad_to$to_s[i]), "missing"),
+       " but events say ", bad_to$rebuilt_s[i], " s (", bad_to$participant_id[i], ", visit ",
+       bad_to$scene_visit[i], ")")
+}
+# A practice action before the press (or without any press) in a "036" visit
+# means the hook is missing or the scene flow broke: the reading time is not
+# what it claims.
+practice_rows <- v2_events %>% filter(event == "welcome_practice_done", scene == "WelcomeScene") %>%
+  group_by(session_id, scene, scene_visit) %>% summarise(first_practice_t = min(t), .groups = "drop") %>%
+  left_join(sessions %>% select(session_id, participant_id, layout_version), by = "session_id") %>%
+  filter(objectives_layout(layout_version)) %>%
+  left_join(tasks_opened %>% select(session_id, scene, scene_visit, to_t), by = c("session_id", "scene", "scene_visit")) %>%
+  filter(is.na(to_t) | first_practice_t < to_t)
+for (i in seq_len(nrow(practice_rows))) {
+  warn("welcome_practice_done ", if (is.na(practice_rows$to_t[i])) "without" else "before",
+       " welcome_tasks_opened in WelcomeScene visit ", practice_rows$scene_visit[i], " (",
+       practice_rows$participant_id[i], ", layout ", practice_rows$layout_version[i],
+       "): objectives_read_s of that visit is not trustworthy")
+}
+tasks_opened <- tasks_opened %>% transmute(session_id, scene, scene_visit, ev_objectives_read_s = to_s)
+
 # Active time at an attempt, for logs whose attempts carry no time field: wall
 # time since scene enter minus the paused time between enter and the attempt.
 press_active <- presses %>%
@@ -1462,7 +1518,11 @@ visits <- visits_base %>%
   left_join(ignored_counts, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(wait_stats, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(interaction_visit, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(tasks_opened, by = c("session_id", "scene", "scene_visit")) %>%
   mutate(
+    # Reading time of the Welcome learning objectives (layout "036" on, see
+    # tasks_opened above); NA when not measured, never 0.
+    objectives_read_s = ev_objectives_read_s,
     # Outcome numbers exist only for scenes with a confirm or quiz in sessions
     # that measured outcomes; everywhere else they stay NA (not measured).
     # Inside a measuring session a visit without a press is a real 0.
@@ -3208,7 +3268,8 @@ per_scene <- visits %>% filter(counting) %>%
             time_to_correct_s = time_to_correct_s, completed = completed,
             visit_censored = duration_censored,
             grabs = grabs, regrabs = regrabs, container_enters = container_enters,
-            container_exits = container_exits, time_to_first_grab_s = time_to_first_grab_s)
+            container_exits = container_exits, time_to_first_grab_s = time_to_first_grab_s,
+            objectives_read_s = objectives_read_s)
 visit_counts <- visits %>% mutate(scene = as.character(scene)) %>% count(participant_id, scene, name = "visits")
 per_scene <- full_join(visit_counts, per_scene, by = c("participant_id", "scene"))
 
@@ -3219,7 +3280,7 @@ wide_scene <- per_scene %>%
               values_from = c(visits, active_s, paused_s, confirms, confirm_ignored, wait_s, wait_after_done_s, errors,
                               error_rate, first_correct, attempts_to_correct, time_to_correct_s,
                               completed, visit_censored, grabs, regrabs, container_enters,
-                              container_exits, time_to_first_grab_s))
+                              container_exits, time_to_first_grab_s, objectives_read_s))
 # Scenes without a confirm or quiz (WelcomeScene) never have outcome values:
 # drop those always-empty columns.
 no_outcome_cols <- as.vector(outer(outcome_measures, setdiff(unique(per_scene$scene), outcome_scenes),
@@ -3233,7 +3294,10 @@ no_grab_cols <- as.vector(outer(c("grabs", "regrabs", "time_to_first_grab_s"),
                                 setdiff(unique(per_scene$scene), grab_scenes), paste, sep = "_"))
 no_container_cols <- as.vector(outer(c("container_enters", "container_exits"),
                                      setdiff(unique(per_scene$scene), container_scenes), paste, sep = "_"))
-wide_scene <- wide_scene %>% select(-any_of(c(no_outcome_cols, no_button_cols, no_grab_cols, no_container_cols)))
+# The objectives reading time exists only in WelcomeScene (layout "036" on).
+no_objectives_cols <- paste0("objectives_read_s_", setdiff(unique(per_scene$scene), "WelcomeScene"))
+wide_scene <- wide_scene %>% select(-any_of(c(no_outcome_cols, no_button_cols, no_grab_cols, no_container_cols,
+                                              no_objectives_cols)))
 
 # Q3 phases of the counting visit, one column per scene and position,
 # e.g. read_s_MixedPickingScene_p2.
@@ -3637,7 +3701,8 @@ validity_limits <- c(
   "- Station start delay (decision 033, station_waits.csv): from layout \"033\" the boxes wait 4 s after a correct confirm before they ride (Complex box 1 after the remainder quiz: 0.6 s), before \"033\" 0.6 s. wait_s, wait_after_done_s and the per-scene active_s include this wait, so they are never pooled across station_wait_group; time_to_correct_by_scene.png uses time_to_correct_s minus wait_s for the picking scenes (wide.csv keeps the logged time_to_correct_s). wait_after_done_s starts at the first ride, not at task_completed, so it leaves out the start delay after the last confirm.",
   "- EKZ place help (#108, decision 037, layout \"034\", skill_scaffolds.csv): Basic position 1 outlines its 6 snap places from the start, Mixed position 1 its 3 places after the first EKZ_PLACEMENT of the visit; from \"034\" each place takes one carton, a carton released in the box lies flat, and a placement error marks the loose cartons. A press x skill pair with the outlines visible is left out of the ekz_placement rate and of P2 (numerator and denominator), so from \"034\" Basic gives no ekz_placement measure and Mixed only up to its first EKZ_PLACEMENT (P2 = the first EKZ opportunity of Mixed position 1, always made without outlines). Basic calculate_quantity stays measured although the 6 outlines equal the 6 cartons the order needs: read Basic TOO_FEW/TOO_MANY of \"034\" as a lower bound of calculation errors. position_1 of Basic and Mixed is never pooled across ekz_places levels (hidden / always / after_error; items.csv, process_by_position.csv; split charts when a set mixes them), and P802's (\"033\") placement data are not pooled with \"034\".",
   "- Menu after a done order (#109, menu_after_done.csv): up to layout \"033\" the Basic/Mixed result card told the trainee to choose the next lesson in the Menu from the correct confirm on (menu_cue text); from \"034\" the next Menu item is highlighted once the order box departs (menu_cue highlight). time_to_menu_after_done_s includes the 4 s start delay and the storage-box exit in both groups, but the cue itself comes later in \"034\"; compare within one menu_cue only. #111 (layout \"034\": box signs on the inner back wall, one note on Complex's opened carton, Basic/Complex storage cartons rearranged with the same counts and names) changes no logged field; Basic/Complex grab order and time to first grab may shift slightly, so read picking-scene grab and phase times within one layout.",
-  "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).")
+  "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).",
+  "- WelcomeScene in two steps (#121/#124, decision 038, layout \"036\"): the learning objectives come first and the practice box, red button and Menu appear only after „Zu den Aufgaben\" (objectives_read_s = active seconds to that press; NA for older layouts, never 0). Welcome active_s and the times before the first welcome_practice_done of \"036\" are not comparable with \"035\"-or-older logs. objectives_read_s is time on the panel, not proof it was read.")
 # The pilot set (decision 023) is a try-out of the course and of this
 # analysis, not study data: say so on every pilot report.
 if (is_pilot_set) {

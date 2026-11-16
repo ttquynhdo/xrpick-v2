@@ -930,16 +930,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1017753042292736
-    m_Localized: "<b>You will know:</b>\n\u2022 the fields in the warehouse management
-      system (WMS)\n\u2022 storage containers and order containers\n\u2022 the difference
-      between Empf Kz 003 and 000"
+    m_Localized: <b>You will know:</b>
     m_Metadata:
       m_Items: []
   - m_Id: 1017753113595904
-    m_Localized: "<b>You will be able to:</b>\n\u2022 read the data in the WMS and
-      compare it with the label\n\u2022 place cartons according to the EKZ\n\u2022
-      pick several order lines one after another\n\u2022 work out how many full cartons
-      and loose pieces you need"
+    m_Localized: <b>You will be able to:</b>
     m_Metadata:
       m_Items: []
   - m_Id: 1029442483654656
@@ -992,6 +987,22 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5042288934653960
     m_Localized: At the real picking station you confirm with your foot.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272448
+    m_Localized: 3. Choose the lesson
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272449
+    m_Localized: Choose the highlighted lesson in the menu on the right.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272450
+    m_Localized: the fields in the warehouse management system (WMS)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272451
+    m_Localized: To the tasks
     m_Metadata:
       m_Items: []
   references:

@@ -924,16 +924,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1017753042292736
-    m_Localized: "<b>Nach dem Kurs kennen Sie:</b>\n\u2022 die Felder im Lagerverwaltungssystem
-      (LVS)\n\u2022 Lagerbeh\xE4lter und Auftragsbeh\xE4lter\n\u2022 den Unterschied
-      zwischen Empf Kz 003 und 000"
+    m_Localized: <b>Nach dem Kurs kennen Sie:</b>
     m_Metadata:
       m_Items: []
   - m_Id: 1017753113595904
-    m_Localized: "<b>Nach dem Kurs k\xF6nnen Sie:</b>\n\u2022 die Angaben im LVS
-      ablesen und mit dem Etikett vergleichen\n\u2022 Kartons nach EKZ einlegen\n\u2022
-      mehrere Auftragspositionen nacheinander kommissionieren\n\u2022 ausrechnen,
-      wie viele volle Kartons und lose Teile Sie brauchen"
+    m_Localized: "<b>Nach dem Kurs k\xF6nnen Sie:</b>"
     m_Metadata:
       m_Items: []
   - m_Id: 1029442483654656
@@ -986,6 +981,22 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5042288934653960
     m_Localized: "Am echten Kommissionierplatz best\xE4tigen Sie mit dem Fu\xDF."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272448
+    m_Localized: "3. Lektion w\xE4hlen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272449
+    m_Localized: "W\xE4hlen Sie im Men\xFC rechts die markierte Lektion."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272450
+    m_Localized: die Felder im Lagerverwaltungssystem (LVS)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272451
+    m_Localized: Zu den Aufgaben
     m_Metadata:
       m_Items: []
   references:

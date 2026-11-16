@@ -59,3 +59,6 @@ Người dùng gộp vào #87: nhìn lướt thẻ mục tiêu là hiểu bài n
 
 ## Câu hỏi còn mở
 - D33 (người hướng dẫn, không chặn): chỉ ghi „LVS“ trong các mục có đủ không khi tên đầy đủ đứng ở tiêu đề cụm 1. Giả định: đủ.
+
+## Sửa đổi 2026-11-16 (#121, decision 038)
+- Mục 7: khối hai dòng hướng dẫn thao tác (vàng) của bảng Welcome bỏ đi. Bảng chỉ hiện ở bước 1 (mục tiêu); bước 2 (giá thẻ, hộp, nút đỏ, Menu) mở bằng nút „Zu den Aufgaben“, thẻ hiện tại có khung xanh, thẻ 3 „Lektion wählen“ chỉ sang Menu. Mẫu thẻ (mục 1–6, thẻ mục tiêu) giữ nguyên.

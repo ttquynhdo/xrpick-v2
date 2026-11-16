@@ -895,6 +895,22 @@ MonoBehaviour:
     m_Key: complex.end.foot
     m_Metadata:
       m_Items: []
+  - m_Id: 5054402919272448
+    m_Key: welcome.card.step3_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272449
+    m_Key: welcome.card.step3_body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272450
+    m_Key: welcome.panel.know.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5054402919272451
+    m_Key: welcome.tasks.button
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

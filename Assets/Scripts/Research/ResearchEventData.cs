@@ -14,8 +14,9 @@ public static class ResearchEventData
     // after a correct confirm before the containers ride (decision 033, #99); "034" = Empf Kz 003 places shown with one
     // carton per place and loose-carton marks (decision 037, #108), result card at the order box, Menu highlight instead
     // of the Menu sentence (#109), box signs in one pose (#111); "035" = slower Concept lane demo (8 s wait, slower
-    // boxes) and reworded tour steps 1, 5, 6, 9 (#118). R tells logs apart by it.
-    public const string LayoutVersion = "035";
+    // boxes) and reworded tour steps 1, 5, 6, 9 (#118); "036" = WelcomeScene in two steps (decision 038, #121/#124:
+    // objectives first, „Zu den Aufgaben“ → welcome_tasks_opened, step frame, card 3 „Lektion wählen“). R tells logs apart by it.
+    public const string LayoutVersion = "036";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
     public static readonly string[] EventGroups = { "session", "outcome", "interaction" };

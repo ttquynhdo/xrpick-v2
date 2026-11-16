@@ -28,7 +28,7 @@ local({
   source("analysis/analyse.R", local = TRUE)
 
   # 2. One row per study participant: P101-P115; the test ID P950 is dropped,
-  #    the pilot IDs P801-P803, P811-P817 are in their own set (8q).
+  #    the pilot IDs P801-P803, P811-P818 are in their own set (8q).
   stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
@@ -460,7 +460,7 @@ local({
   missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
   if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
   stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
-  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815", "P816", "P817")
+  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815", "P816", "P817", "P818")
   stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
             identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
   is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
@@ -574,7 +574,7 @@ local({
   stopifnot(any(grepl("concept_hint_cleared without a preceding", p_warn) & grepl("P813", p_warn)),
             sum(grepl("concept_hint_", p_warn, fixed = TRUE)) == 1, !any(grepl("concept_hint_", warn_lines, fixed = TRUE)))
   # Older layouts: no tags existed, so every hint column is NA (not 0).
-  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815", "P816", "P817"))
+  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815", "P816", "P817", "P818"))
   stopifnot(nrow(old_v) > 0, !any(old_v$hints_logged), all(is.na(old_v$hints_shown)),
             all(is.na(old_v$hint_shown_s)), all(is.na(old_v$material_flow_wait_max_s)))
   stopifnot(nrow(concept_hints_by_visit) > 0, !any(concept_hints_by_visit$hints_logged),
@@ -623,7 +623,7 @@ local({
                                                       pilot_set$visits$scene == "ConceptScene"]))
   # Older layouts: NA, not 0; no container warnings on the fake data.
   stopifnot(all(is.na(pilot_set$concept_containers_by_visit$order_enters[
-              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815", "P816", "P817")])),
+              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815", "P816", "P817", "P818")])),
             !any(concept_containers_by_visit$containers_logged),
             !any(grepl("container_\\* line|ConceptScene (order|storage) container", c(p_warn, warn_lines))))
   # label_by_matnr replaces material_by_matnr from "032", same skill.
@@ -643,13 +643,13 @@ local({
   cx <- as.character(pilot_set$item_shares$x_label[pilot_set$item_shares$scene == "ComplexScene"])
   # The result_on_card label lists every layout of that level: P813 "029",
   # P814 "032", P815 "033", P816 "034".
-  stopifnot(all(c("Complex\nposition_1\n[019/025]", "Complex\nposition_1\n[029/032/033/034]", "Complex\nposition_2") %in% cx),
+  stopifnot(all(c("Complex\nposition_1\n[019/025]", "Complex\nposition_1\n[029/032/033/034/036]", "Complex\nposition_2") %in% cx),
             !"Complex\nposition_1" %in% cx,
             any(grepl("set mixes Complex position_1 scaffold", p_warn)),
             !any(grepl("set mixes Complex position_1 scaffold", warn_lines)),
             !any(grepl("\\[", as.character(item_shares$x_label))))
   slots <- levels(pilot_set$proc_long$slot)
-  stopifnot(all(c("Complex\nposition 1\n[019/025]", "Complex\nposition 1\n[029/032/033/034]", "Complex\nposition 2") %in% slots))
+  stopifnot(all(c("Complex\nposition 1\n[019/025]", "Complex\nposition 1\n[029/032/033/034/036]", "Complex\nposition 2") %in% slots))
   pp <- read_csv(file.path(pilot_dir, "process_by_position.csv"), show_col_types = FALSE,
                  col_types = cols(layout_version = col_character()))
   stopifnot(all(c("layout_version", "scaffold_level") %in% names(pp)),
@@ -810,8 +810,8 @@ local({
   stopifnot(all(scf$skill == "ekz_placement"),
             setequal(scf$press_id[scf$press_id %in% pr816$press_id],
                      c(b816$press_id, m816$press_id[2:3])),
-            # Older layouts never scaffold a skill.
-            !any(scf$press_id %in% pilot_set$presses$press_id[pilot_set$presses$participant_id != "P816"]))
+            # Older layouts never scaffold a skill ("036" = "034" outside Welcome: P818 may).
+            !any(scf$press_id %in% pilot_set$presses$press_id[!pilot_set$presses$participant_id %in% c("P816", "P818")]))
   sr816 <- pilot_set$skill_rates %>% filter(participant_id == "P816")
   # Basic: no ekz_placement test at all from "034"; quantity tested by all 3 presses, 1 error.
   stopifnot(!any(sr816$scene == "BasicPickingScene" & sr816$skill == "ekz_placement"),
@@ -856,7 +856,7 @@ local({
             file.exists(file.path(output_dir, "menu_after_done.csv")))
   mad <- pilot_set$menu_after_done
   stopifnot(identical(sort(unique(mad$menu_cue[mad$participant_id == "P816"])), "highlight"),
-            all(mad$menu_cue[mad$participant_id != "P816"] == "text"),
+            all(mad$menu_cue[!mad$participant_id %in% c("P816", "P818")] == "text"),
             all(menu_after_done$menu_cue == "text"),
             nrow(mad %>% filter(participant_id == "P816")) == 2,
             all(!is.na(mad$departed_t[mad$participant_id == "P816"])),
@@ -905,6 +905,35 @@ local({
   stopifnot(!any(grepl("grab restart(s) <", c(p_warn, warn_lines), fixed = TRUE)),
             !any(grepl("snap-place grab restart was open", c(p_warn, warn_lines), fixed = TRUE)),
             pw8("snap_grab_artifacts", "P817") == 9)
+
+  # 8z. WelcomeScene learning objectives (#121/#124, decision 038). P818 ran
+  #     the current layout "036": welcome_tasks_opened before both
+  #     welcome_practice_done, with a 25 s headset-off pause while reading.
+  #     objectives_read_s = the logged active time (wall time minus 25 s);
+  #     NA for every older layout and every other scene, never 0. No
+  #     warning, and "036" behaves like "035" outside WelcomeScene.
+  v818 <- pilot_set$visits %>% filter(participant_id == "P818", scene == "WelcomeScene")
+  stopifnot(nrow(v818) == 1, !is.na(v818$objectives_read_s), v818$objectives_read_s > 0,
+            v818$objectives_read_s < v818$duration_s, v818$paused_s >= 25)
+  ev818 <- pilot_set$events %>% filter(participant_id == "P818", scene == "WelcomeScene")
+  to_i <- which(ev818$event == "welcome_tasks_opened")
+  pd_i <- which(ev818$event == "welcome_practice_done")
+  stopifnot(length(to_i) == 1, length(pd_i) == 2, all(pd_i > to_i),
+            # wall time from scene_enter is 25 s (the pause) longer than the logged active time
+            abs((ev818$t[to_i] - ev818$t[ev818$event == "scene_enter"]) - 25 - v818$objectives_read_s) < 0.01)
+  stopifnot(all(is.na(pilot_set$visits$objectives_read_s[pilot_set$visits$participant_id != "P818" |
+                                                         pilot_set$visits$scene != "WelcomeScene"])),
+            all(is.na(visits$objectives_read_s)))
+  stopifnot("objectives_read_s_WelcomeScene" %in% names(pilot_set$wide),
+            !any(grepl("^objectives_read_s_(Concept|Basic|Mixed|Complex)", names(pilot_set$wide))),
+            identical(pw8("objectives_read_s_WelcomeScene", "P818"), v818$objectives_read_s),
+            is.na(pw8("objectives_read_s_WelcomeScene", "P817")))
+  stopifnot(!any(grepl("welcome_tasks_opened|welcome_practice_done (before|without)", c(p_warn, warn_lines))),
+            !any(grepl("not in the v2 catalogue", c(p_warn, warn_lines))))
+  # "036" = "035" outside WelcomeScene: 8 s lane demo, 4 s station wait, Menu highlight.
+  stopifnot(all(pilot_set$station_waits$station_wait_group[pilot_set$station_waits$participant_id == "P818"] == "033_on"),
+            all(pilot_set$menu_after_done$menu_cue[pilot_set$menu_after_done$participant_id == "P818"] == "highlight"),
+            pilot_set$lane_demo_delay_for("036") == 8)
 
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.

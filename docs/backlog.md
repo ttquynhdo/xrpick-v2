@@ -21,7 +21,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 
 **ĐỢT FESTO (thêm 2026-11-16, từ review nhóm 2026-11-09, `docs/review-notes-team-2026-11-09.md`; Festo review 18/11, design freeze 19/11).** Khối này đứng trước khối ĐỢT CUỐI; việc còn lại của ĐỢT CUỐI (build, buổi P803, gửi file duyệt, học R #102) vẫn giữ.
 - **A. „Sửa ngay“, trước 18/11 (chỉ chữ + chỉnh nhỏ, không cần decision):** #119 (chỉ CSV) → #116 (Welcome) → #117 (Welcome + Concept, sau #116) ∥ #118 (Concept; không chạy cùng lúc với #117 vì cùng ConceptScene) → #120 (Complex, sau #116). Cuối nhóm: `german-reviewer` duyệt mọi chữ mới một lần, `ImportCsv`, chạy lại `InstructionShelfLayout` ở scene có thẻ đổi chữ, hỏi `data-analyst` có cần đổi `layout_version` không (#118 đổi tour Concept, decision 024: dữ liệu Concept trước/sau không gộp), một build.
-- **B. Cần `solution-decision`, sau Festo review (18/11), trước hoặc sau freeze tuỳ phản hồi:** #121 (Welcome theo chuỗi), #122 (ví dụ Complex, sau #119), #123 (Empf Kz 000 ở Complex), #124 (Menu). Có thể chạy một `solution-decision` chung cho #121 + #124 (cùng câu hỏi „làm sao người học thấy bước/bài tiếp theo“).
+- **B. Cần `solution-decision`, sau Festo review (18/11), trước hoặc sau freeze tuỳ phản hồi:** #121 (Welcome theo chuỗi), #122 (ví dụ Complex, sau #119), #123 (Empf Kz 000 ở Complex), #124 (Menu). Có thể chạy một `solution-decision` chung cho #121 + #124 (cùng câu hỏi „làm sao người học thấy bước/bài tiếp theo“). **Cập nhật 2026-11-16:** decision 038 (#121 + #124, làm chung) và 039 (#123) đã accepted; #122 không cần decision (chỉ chữ, đi thẳng `localize-strings` + `unity-safe-change`); thêm #128 (tên bài 4).
 - **C. Chờ các bạn tả lại:** #125 (chữ nào gần/xa), #126 (nút nào không ăn). **Vòng sau:** #127 audio.
 
 **ĐỢT CUỐI (người dùng chốt 2026-11-06: gộp mọi việc còn lại vào một đợt; 2026-11-07 chốt build cuối để demo).** Khối này thay mọi thứ tự cũ bên dưới (các khối cũ chỉ còn là lịch sử). Không thêm feature mới trước demo.
@@ -2098,15 +2098,17 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 
 ### #121 [Feature] Welcome: mục tiêu ngắn có biểu tượng, hiện theo chuỗi (mục tiêu trước, việc sau), chỉ bước tiếp theo
 - **Type:** feature
-- **Scene(s):** WelcomeScene (thẻ mục tiêu các bài nếu đổi câu)
-- **Files:** `Assets/Scenes/WelcomeScene.unity` (`Info Panel`, `InstructionShelf`), `Assets/Scripts/Welcome/WelcomePracticeFeedback.cs`, CSV
+- **Scene(s):** WelcomeScene
+- **Files:** `Assets/Scenes/WelcomeScene.unity` (`Info Panel`, nút mới, `InstructionShelf` + thẻ 3), `Assets/Scripts/Welcome/WelcomePracticeFeedback.cs`, `Assets/Scripts/ParticipantEntry/ParticipantEntryController.cs` (`courseRoots` hai pha), `docs/i18n/strings-todo.csv`, `Assets/Scripts/Research/` (event mới, `LayoutVersion`), `docs/research-logging-spec.md`, `analysis/make_fake_data.R`, `analysis/analyse_set.R`
 - **Problem:** (C2, C3, C10) Welcome đưa cùng lúc mục tiêu, thời lượng, chỉ dẫn thẻ, Menu, hộp và nút: quá nhiều để đọc. Sau khi nhấc hộp không có gì chỉ sang bước 2.
-- **Done when:** (viết lại khi có decision) Người học nhập mã xong thấy mục tiêu trước, phần việc (thẻ, hộp, nút) hiện sau một hành động rõ ràng. Mỗi mục tiêu ngắn hơn hiện nay và có biểu tượng. Sau khi nhấc hộp, thẻ 2 được làm nổi.
+- **Decision:** docs/decisions/038-welcome-two-steps-step-frame-lesson-card.md (làm cùng #124 trong một thay đổi)
+- **Done when:** Nhập mã xong, người học chỉ thấy tiêu đề Welcome, bảng „Lernziele“ và nút „Zu den Aufgaben“; giá thẻ, hộp, nút đỏ và Menu đều ẩn. Bảng có 3 + 4 dòng ngắn cùng lời với `complex.end.know.*`/`can.*` (dòng 1 viết đầy đủ „Lagerverwaltungssystem (LVS)“), mỗi dòng nằm trên một dòng ở cả DE và EN, có một biểu tượng không trùng ✓, `warning` hay mũi tên cam; không còn dòng vàng; dòng thời lượng còn. Bấm „Zu den Aufgaben“ → bảng và nút biến mất (cả poke surface), giá thẻ, hộp, nút đỏ và Menu hiện, thẻ 1 có khung xanh. Không bấm nút thì bước 2 không bao giờ tự hiện. Nhấc hộp lần đầu → thẻ 1 có ✓, khung xanh sang thẻ 2. Bấm nút đỏ trước khi nhấc hộp → thẻ 2 có ✓, khung vẫn ở thẻ 1. (code) Bấm „Zu den Aufgaben“ ghi đúng một event với thời gian kể từ lúc vào scene (mã enum, không chữ); header `layout_version` "036"; spec, `make_fake_data.R`, `analyse_set.R` sửa cùng lúc, `selftest.R` xanh, `data-analyst` duyệt; `welcome_practice_done` `grab`/`button` vẫn mỗi loại một lần; mọi ID cùng một luồng. (code) Decision 034 và 027 mục 7 ghi phần được thay. Trên Quest: nút „Zu den Aufgaben“ không bị nhầm với nút đỏ, sau khi bấm người học nhìn sang thẻ 1 mà không phải hỏi. Nếu biểu tượng không kịp freeze 19/11: giao bảng chỉ có dòng ngắn, câu về biểu tượng chuyển thành item riêng.
 - **Inspector work expected:** yes
 - **Công:** M
 - **Test trên kính:** nhanh
-- **Depends on:** #116; cần `solution-decision` (thay một phần decision 027/034)
-- **Status:** todo
+- **Depends on:** #116
+- **Test report:** docs/test-reports/bl121.md
+- **Status:** verified-mcp (14/15 ✅ MCP/code, chờ test tay W12 trên Quest; layout_version "036")
 
 ### #122 [Feature] Complex: bảng ví dụ nêu công thức trước và nhắc dùng số trên WMS
 - **Type:** feature
@@ -2123,26 +2125,29 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 ### #123 [Feature] Complex: người học để ý Empf Kz 000
 - **Type:** feature
 - **Scene(s):** ComplexScene
-- **Files:** chưa rõ (thẻ, LVS hoặc thùng; theo decision)
+- **Files:** `Assets/Scripts/Complex/RemainderQuizController.cs`, `Assets/Scripts/Orders/RemainderQuiz.cs` (+ EditMode tests nếu cần), `Assets/Scenes/ComplexScene.unity` (`Remainder Quiz`, `BoundsClipper`), `docs/i18n/strings-todo.csv`, `Assets/Scripts/Research/` (`LayoutVersion`), `docs/research-logging-spec.md`, `analysis/item_skills.csv`, `analysis/make_fake_data.R`, `analysis/analyse_set.R`
 - **Problem:** (C18) Ở bài cuối Empf Kz là 000 ở cả hai position, người học không để ý. Từ #105 bài thực hành không vẽ gì lên LVS.
-- **Done when:** (viết lại khi có decision) Ở position 1 người học thấy Empf Kz 000 được làm nổi ở một chỗ, không trái quy tắc „một ký hiệu một nghĩa“.
+- **Decision:** docs/decisions/039-complex-ekz-question.md
+- **Done when:** Ở ComplexScene position 1, trả lời đúng hai câu tính → sau 1,5 s „Richtig!“ cụm hiện câu 3 „Frage 3 von 3“ hỏi cách đặt các phần vào thùng đơn; thân câu không ghi „000“ và không lộ đáp án; thùng kho chưa vào. Câu 3 chọn sai → „Nicht richtig.“ + một câu chỉ chỗ đọc Empf Kz trong LVS và lý do, không nói đáp án; câu hỏi còn, thùng kho chưa vào. Câu 3 chọn đúng → „Richtig!“, thùng kho đi vào; dòng đậm thẻ 2 ghi „2 Kartons + 5 Stück“ kèm câu trả lời EKZ; sau 1,5 s, khi thùng kho đứng yên, cụm câu hỏi và `Worked Example` ẩn. Position 1, F6 trước khi đúng cả 3 câu → chỉ nhắc vàng `complex.feedback.answer_quiz_first`, không chấm. Position 2 không có câu hỏi, thẻ và luồng như trước. Cả hai position: LVS vẫn Empf Kz 000 nền xám, không khung, mũi tên hay `warning` trên hoặc cạnh nó. Đặt hàng lộn xộn đúng số lượng → kết quả như trước (không lỗi EKZ). Cả 3 nút A/B/C của câu 3 chạm được (`BoundsClipper` phủ hết hàng) và chữ đáp án DE/EN vừa nút. Chữ mới qua `localize-strings` + `german-reviewer`; thẻ Complex xếp lại bằng `InstructionShelfLayout`. (code) Mỗi lần chạm câu 3 ghi một `quiz_answer` `complex_remainder` với `question_id` cố định mới, `selected` là khoá enum; `item_skills.csv` thêm dòng Complex cho câu này → `ekz_placement`, D3; `scene_skills.csv` Complex **không** thêm `ekz_placement`; `layout_version` "036"; spec, `make_fake_data.R`, `analyse_set.R` cùng thay đổi, `selftest.R` xanh, `data-analyst` duyệt; `XRPick.Orders.Tests` xanh. (code) Decision 028 ghi phần được thay.
 - **Inspector work expected:** yes
-- **Công:** S–M
+- **Công:** M
 - **Test trên kính:** nhanh
-- **Depends on:** cần `solution-decision` (đụng #105, decision 036/037)
+- **Depends on:** — (câu hỏi người hướng dẫn D45, D47 không chặn)
 - **Status:** todo
 
 ### #124 [Feature] Menu dễ nhận ra
 - **Type:** feature
-- **Scene(s):** cả 5 scene
-- **Files:** chưa rõ (theo decision)
+- **Scene(s):** WelcomeScene (Concept, Basic, Mixed không đổi)
+- **Files:** như #121 (thẻ 3 trên `InstructionShelf` của Welcome, `WelcomePracticeFeedback`)
 - **Problem:** (C20) Người học không nhận ra Menu bên phải bàn. Nhóm đề xuất mũi tên, nhưng mũi tên cam đang chỉ có nghĩa „nhìn/cầm cái này“ trong tour Concept (decision 037 mục 5).
-- **Done when:** (viết lại khi có decision) Lúc cần chuyển bài, người học tìm thấy Menu mà không phải hỏi.
+- **Decision:** docs/decisions/038-welcome-two-steps-step-frame-lesson-card.md (làm cùng #121 trong một thay đổi)
+- **Done when:** Làm xong cả hai thao tác ở Welcome → thẻ 3 „3. Lektion wählen“ có khung xanh, cùng lúc mục „2. Grundlagen“ có nền xanh. Với ID research chỉ mục „2. Grundlagen“ mở được. Complex không có bước Menu. Concept, Basic, Mixed: tín hiệu Menu như trước (highlight). Trên Quest, ở cuối Welcome, Concept, Basic và Mixed người học chọn mục có nền xanh mà không phải hỏi; ở Basic/Mixed nếu phải hỏi thì ghi vào `docs/review-notes-p8xx.md` để bật đường lùi của decision 038 (viền xanh quanh cả Menu).
 - **Inspector work expected:** yes
-- **Công:** S–M
+- **Công:** S (trong #121)
 - **Test trên kính:** nhanh
-- **Depends on:** #117; cần `solution-decision`
-- **Status:** todo
+- **Depends on:** #117, #121
+- **Test report:** docs/test-reports/bl124.md
+- **Status:** verified-mcp (5/6 ✅ MCP/code, chờ test tay M5 trên Quest)
 
 ### #125 [P2] Chữ nổi lúc gần lúc xa gây chóng mặt
 - **Type:** bug
@@ -2179,3 +2184,15 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** bắt buộc
 - **Depends on:** —
 - **Status:** todo (vòng sau, ngoài phạm vi trước design freeze 19/11 theo kế hoạch Notion)
+
+### #128 [P2] Tên bài 4 „4. Mehrere Auftragspositionen“ / „4. Several order lines“
+- **Type:** text
+- **Scene(s):** cả 5 scene (Menu), WelcomeScene (resume panel qua `LessonNames`)
+- **Files:** `docs/i18n/strings-todo.csv` (`lesson.mixed`), `docs/i18n/glossary.csv` (dòng tên bài)
+- **Problem:** Tên bài 4 „4. Mehrere Positionen“ và bản EN dùng chữ „positions“, nhóm review nói khó hiểu; glossary dùng „Auftragsposition“ (german-reviewer khi lấy ý kiến cho decision 038).
+- **Done when:** Menu ở cả 5 scene và resume panel ghi „4. Mehrere Auftragspositionen“ / „4. Several order lines“, vừa một dòng (canvas 400 px, font 18, cả dòng đậm có „» “). Glossary cập nhật. `german-reviewer` OK.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** —
+- **Status:** todo

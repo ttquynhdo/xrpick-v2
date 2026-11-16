@@ -16,7 +16,10 @@
 # outlines, Menu highlight; fixed Basic/Mixed presses, no format change).
 # P817 ran a "033" build with the old snap-place grab logger (#114): a carton
 # let go into a Basic/Mixed snap place gets a grab_end and, 0.013 s later, a
-# new grab_start (like the real P802, build 727eee1).
+# new grab_start (like the real P802, build 727eee1). P818 runs the current
+# layout "036" (#121, decision 038): WelcomeScene writes welcome_tasks_opened
+# („Zu den Aufgaben", reading time of the learning objectives) before the two
+# welcome_practice_done; older layouts never write it.
 # Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
@@ -31,7 +34,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P817, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P818, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -998,8 +1001,25 @@ ride_order_end <- function(s, last_pos) {
 
 # practice = FALSE: a resumed session (the keypad jumps straight to the
 # offered scene, so the Welcome practice is not done again).
-run_welcome <- function(s, practice = TRUE) {
-  advance(s, runif(1, 8, 20))
+# read_pause_s > 0 (layout "036" only): the headset comes off while the
+# trainee reads the learning objectives, so welcome_tasks_opened's active
+# time is shorter than the wall time (tests that R takes the logged value).
+run_welcome <- function(s, practice = TRUE, read_pause_s = 0) {
+  if (practice && s$schema == 2 && layout_at_least(s$layout, 36)) {
+    # Layout "036" (#121, decision 038): after the code only the learning
+    # objectives show; „Zu den Aufgaben" writes welcome_tasks_opened (active
+    # seconds since scene_enter = reading time) and only then the cards, box,
+    # red button and Menu appear, so both welcome_practice_done follow it.
+    advance(s, runif(1, 15, 60))
+    if (read_pause_s > 0) {
+      pause_app(s, "hmd_unmounted", read_pause_s)
+      advance(s, runif(1, 3, 10))
+    }
+    emit(s, "welcome_tasks_opened", json_obj(time_since_scene_enter_s = active_s(s)))
+    advance(s, runif(1, 3, 8))
+  } else {
+    advance(s, runif(1, 8, 20))
+  }
   if (practice && s$schema == 2) {
     # First grab of the box, then first red-button press (#39).
     emit(s, "welcome_practice_done", json_obj(action = "grab"))
@@ -1323,7 +1343,7 @@ run_full_course <- function(person, build, start_utc, special = list(), start_mo
   s <- start_session(person, build, start_utc, start_mode, resume_scene, resume_accepted, ended_warning,
                      language, layout = layout)
   s$snap_restart <- snap_restart
-  run_welcome(s)
+  do.call(run_welcome, c(list(s), special[["WelcomeScene"]]))
   for (scene in scene_order[-1]) {
     go_to_scene(s, scene)
     args <- c(list(s, person), special[[scene]])
@@ -1833,6 +1853,21 @@ run_full_course(p817, "bbb2222", "2026-11-07T08:00:00Z", language = "EN", layout
                                                                       "2" = list(fixed_press(3, list()))))))
 assign(".Random.seed", rng_before_p817, envir = globalenv())
 
+# P818 (#121/#124, decision 038): the current build, layout "036". Same as
+# "035" everywhere except WelcomeScene: the learning objectives come first and
+# „Zu den Aufgaben" writes welcome_tasks_opened before the two
+# welcome_practice_done. The headset comes off for 25 s while reading, so the
+# logged reading time (active) is 25 s shorter than the wall time; R must use
+# the logged value (objectives_read_s). Concept with the 8 s lane demo of
+# "035". Own random stream, restored, like P817.
+rng_before_p818 <- .Random.seed
+set.seed(818)
+p818 <- new_person("P818")
+run_full_course(p818, "ddd4444", "2026-11-16T09:00:00Z", language = "EN", layout = "036",
+                special = list(WelcomeScene = list(read_pause_s = 25),
+                               ConceptScene = list(hints = p814_hints)))
+assign(".Random.seed", rng_before_p818, envir = globalenv())
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1885,7 +1920,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P817  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P818  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -1952,7 +1987,8 @@ paper_rows <- list(
   paper_row("P814"),
   paper_row("P815"),
   paper_row("P816"),
-  paper_row("P817"))
+  paper_row("P817"),
+  paper_row("P818"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

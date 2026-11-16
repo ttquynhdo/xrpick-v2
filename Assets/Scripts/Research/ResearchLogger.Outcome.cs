@@ -69,6 +69,12 @@ public sealed partial class ResearchLogger
         Log("welcome_practice_done", OutcomeEvents.WelcomePracticeDone(action));
     }
 
+    /// <summary>WelcomeScene „Zu den Aufgaben“ pressed (#121, decision 038); once per visit.</summary>
+    public static void LogWelcomeTasksOpened()
+    {
+        LogOutcome("welcome_tasks_opened", o => OutcomeEvents.WelcomeTasksOpened(instance.SceneActiveSeconds()));
+    }
+
     private static void LogOutcome(string eventName, Func<VisitOutcome, JsonFields> build)
     {
         if (!IsSessionActive || !instance.visitOpen || instance.writeFailed)

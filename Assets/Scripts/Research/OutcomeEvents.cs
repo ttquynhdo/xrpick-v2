@@ -117,6 +117,13 @@ public static class OutcomeEvents
         return new JsonFields().Add("action", action);
     }
 
+    /// <summary>#121 (decision 038): WelcomeScene „Zu den Aufgaben“ pressed; the time is the reading time of the
+    /// learning objectives (active seconds since scene_enter, pauses subtracted).</summary>
+    public static JsonFields WelcomeTasksOpened(double timeSinceSceneEnterS)
+    {
+        return new JsonFields().Add("time_since_scene_enter_s", Round(timeSinceSceneEnterS));
+    }
+
     /// <summary>[{"code":"TOO_FEW","item":"connector_a"}, …]; item null for codes without a material.</summary>
     public static string ErrorCodesJson(IReadOnlyList<OrderError> errors)
     {
