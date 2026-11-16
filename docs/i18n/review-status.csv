@@ -39,14 +39,16 @@ complex.quiz.option_cartons,{count} Kartons,proposed,,2026-11-02,#19
 complex.quiz.option_piece_one,1 Teil,proposed,,2026-11-02,#19
 complex.quiz.option_pieces,{count} Teile,proposed,,2026-11-02,#19
 complex.quiz.wrong_cartons,Nicht richtig. Teilen Sie Soll durch Verp.-Einh. Es zählen nur volle Kartons.,proposed,german-reviewer (agent),2026-11-16,#119
-complex.quiz.wrong_loose,Nicht richtig. Lose Teile = Soll - (volle Kartons × Verp.-Einh.).,proposed,german-reviewer (agent),2026-11-16,#119
+complex.quiz.wrong_loose,Nicht richtig. Lose Teile = Soll – (Verp.-Einh. × volle Kartons).,proposed,german-reviewer (agent),2026-11-16,#119; #122: wording proposed by german-reviewer (same as complex.example.body line 2)
 complex.quiz.next,Richtig! Beantworten Sie jetzt die zweite Frage.,proposed,,2026-11-02,#19
 complex.quiz.done,Richtig! Nehmen Sie jetzt die vollen Kartons und die losen Teile aus dem Lagerbehälter.,proposed,,2026-11-02,#19
 complex.example.title,Beispiel,proposed,german-reviewer (agent),2026-11-02,#19
-complex.example.body,"Soll 64 ST, VPE 20 ST
-1. 64 : 20 = 3,2 – also 3 volle Kartons (60 ST)
-2. 64 - 60 = 4 lose Teile
-Kontrolle: 60 + 4 = 64 ST",proposed,german-reviewer (agent),2026-11-02,#19
+complex.example.body,"Volle Kartons = Soll : <nobr>Verp.-Einh.</nobr>
+<nobr>Lose Teile = Soll – (Verp.-Einh. × volle Kartons)</nobr>
+Soll 64, <nobr>Verp.-Einh.</nobr> 20:
+64 : 20 = 3,2, also 3 volle Kartons
+64 – (20 × 3) = 4 lose Teile
+Rechnen Sie für Ihren Auftrag mit den Zahlen aus dem LVS.",proposed,german-reviewer (agent),2026-11-16,Agent: OK with 2 suggestions applied (#122)
 complex.feedback.position_done,"Position {done} ist erledigt.
 Der Lagerbehälter fährt weg, der nächste kommt von links. Sehen Sie den Behältern auf der Rollenbahn zu.
 Lesen Sie dann im LVS die Angaben zu Position {next} ab.",proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"

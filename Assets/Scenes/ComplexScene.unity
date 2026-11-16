@@ -6837,7 +6837,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -23}
-  m_SizeDelta: {x: 260, y: 100}
+  m_SizeDelta: {x: 300, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &399125436
 MonoBehaviour:
@@ -6859,8 +6859,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Soll 64 ST, VPE 20 ST\n1. 64 : 20 = 3,2 \u2013 also 3 volle Kartons (60
-    ST)\n2. 64 - 60 = 4 lose Teile\nKontrolle: 60 + 4 = 64 ST"
+  m_text: "Volle Kartons = Soll : <nobr>Verp.-Einh.</nobr>\n<nobr>Lose Teile = Soll
+    \u2013 (Verp.-Einh. \xD7 volle Kartons)</nobr>\nSoll 64, <nobr>Verp.-Einh.</nobr>
+    20:\n64 : 20 = 3,2, also 3 volle Kartons\n64 \u2013 (20 \xD7 3) = 4 lose Teile\nRechnen
+    Sie f\xFCr Ihren Auftrag mit den Zahlen aus dem LVS."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -22171,8 +22173,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 49}
-  m_SizeDelta: {x: 260, y: 36}
+  m_AnchoredPosition: {x: 0, y: 69}
+  m_SizeDelta: {x: 300, y: 36}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1407148974
 MonoBehaviour:
@@ -32497,8 +32499,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.0932, y: 0.1855}
-  m_SizeDelta: {x: 290, y: 150}
+  m_AnchoredPosition: {x: -0.1232, y: 0.1255}
+  m_SizeDelta: {x: 330, y: 190}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1933170179
 GameObject:

@@ -577,7 +577,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627459
     m_Localized: "<color=#EB5757><b>Nicht richtig.</b></color> Lose Teile = Soll
-      - (volle Kartons \xD7 Verp.-Einh.)."
+      \u2013 (Verp.-Einh. \xD7 volle Kartons)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627460
@@ -595,8 +595,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627463
-    m_Localized: "Soll 64 ST, VPE 20 ST\n1. 64 : 20 = 3,2 \u2013 also 3 volle Kartons
-      (60 ST)\n2. 64 - 60 = 4 lose Teile\nKontrolle: 60 + 4 = 64 ST"
+    m_Localized: "Volle Kartons = Soll : <nobr>Verp.-Einh.</nobr>\n<nobr>Lose Teile
+      = Soll \u2013 (Verp.-Einh. \xD7 volle Kartons)</nobr>\nSoll 64, <nobr>Verp.-Einh.</nobr>
+      20:\n64 : 20 = 3,2, also 3 volle Kartons\n64 \u2013 (20 \xD7 3) = 4 lose Teile\nRechnen
+      Sie f\xFCr Ihren Auftrag mit den Zahlen aus dem LVS."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464

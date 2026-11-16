@@ -188,20 +188,24 @@ complex.quiz.option_cartons,Answer button label (after 'A: '); {count} = number 
 complex.quiz.option_piece_one,"Answer button label, value 1 (#19).",1 piece,1 Teil,14
 complex.quiz.option_pieces,Answer button label; {count} = number of loose pieces (#19).,{count} pieces,{count} Teile,14
 complex.quiz.wrong_cartons,"Feedback line in the question cluster after a wrong carton answer; no answer given, only the method. 'Nicht richtig.' red bold. Font 16, 600 x 60 px (#19). Rich text as shown in code (#54).",<color=#EB5757><b>Not correct.</b></color> Divide Soll by Verp.-Einh. Only full cartons count.,<color=#EB5757><b>Nicht richtig.</b></color> Teilen Sie Soll durch Verp.-Einh. Es zählen nur volle Kartons.,90
-complex.quiz.wrong_loose,Feedback line after a wrong loose-piece answer; method only (#19). Rich text as shown in code (#54).,<color=#EB5757><b>Not correct.</b></color> Loose pieces = Soll - (full cartons × Verp.-Einh.).,<color=#EB5757><b>Nicht richtig.</b></color> Lose Teile = Soll - (volle Kartons × Verp.-Einh.).,90
+complex.quiz.wrong_loose,"Feedback line after a wrong loose-piece answer; method only (#19). #122: same formula as complex.example.body line 2 (en dash minus; the font has no U+2212). Rich text as shown in code (#54).",<color=#EB5757><b>Not correct.</b></color> Loose pieces = Soll – (Verp.-Einh. × full cartons).,<color=#EB5757><b>Nicht richtig.</b></color> Lose Teile = Soll – (Verp.-Einh. × volle Kartons).,90
 complex.quiz.wrong_placement,"ComplexScene Remainder Quiz, question 3 of 3 at position 1 (#123, decision 039): asked after the two maths questions; tests that the trainee reads Empf Kz in the LVS. Feedback line after a wrong answer: says where to read (Empf Kz in the LVS) and why, never the answer or the value 000 (like complex.quiz.wrong_*). Rich text as shown in code (#54).",<color=#EB5757><b>Not correct.</b></color> Read Empf Kz in the WMS: it shows how you may put the goods in.,"<color=#EB5757><b>Nicht richtig.</b></color> Lesen Sie im LVS das Feld Empf Kz: Es zeigt, wie Sie die Ware einlegen dürfen.",120
 complex.quiz.next,Feedback line after the right carton answer; 'Richtig!' green bold (#19). Rich text as shown in code (#54).,<color=#27AE60><b>Correct!</b></color> Now answer the second question.,<color=#27AE60><b>Richtig!</b></color> Beantworten Sie jetzt die zweite Frage.,90
 complex.quiz.next_third,"Feedback line after the right loose-piece answer (#123, decision 039: a third question follows); 'Richtig!' green bold, like complex.quiz.next. Rich text as shown in code (#54).",<color=#27AE60><b>Correct!</b></color> Now answer the third question.,<color=#27AE60><b>Richtig!</b></color> Beantworten Sie jetzt die dritte Frage.,90
 complex.quiz.done,Feedback line after both answers are right; the storage container then appears (#19). Rich text as shown in code (#54).,<color=#27AE60><b>Correct!</b></color> Now take the full cartons and the loose pieces from the storage container.,<color=#27AE60><b>Richtig!</b></color> Nehmen Sie jetzt die vollen Kartons und die losen Teile aus dem Lagerbehälter.,100
 complex.quiz.how_to,"ComplexScene question cluster: neutral instruction line under the A/B/C buttons, at question 1 and after the 1.5 s „Richtig!“ hold before question 2 (#85, decision 024). Same text as concept.quiz.how_to (german-reviewer OK there).","Press A, B or C to answer.","Drücken Sie A, B oder C, um zu antworten.",60
 complex.example.title,"Worked-example board right of the WMS screen, header, font 20, 320 px; shown only at position 1 (#19).",Example,Beispiel,40
-complex.example.body,"Worked-example board body, 4 lines, font 20, 320 x 160 px. Numbers are fixed example values, different from the real order. Never use 'Rest' for the remainder (glossary) (#19).","Soll 64 ST, VPE 20 ST
-1. 64 : 20 = 3.2 – so 3 full cartons (60 ST)
-2. 64 - 60 = 4 loose pieces
-Check: 60 + 4 = 64 ST","Soll 64 ST, VPE 20 ST
-1. 64 : 20 = 3,2 – also 3 volle Kartons (60 ST)
-2. 64 - 60 = 4 lose Teile
-Kontrolle: 60 + 4 = 64 ST",160
+complex.example.body,"Worked-example board body below the question cluster, 6 lines, 260 x 100 px canvas units, auto-size. #122: the two formulas first, then the example numbers (64 / 20, fixed, different from the real order), then where to take the numbers for the own order. Each formula line is one <nobr> so it never breaks. Minus is the en dash – (U+2013): the font has no U+2212. Verp.-Einh. = WMS field label, never VPE (#119). Never use 'Rest' for the remainder (glossary) (#19).","Full cartons = Soll : <nobr>Verp.-Einh.</nobr>
+<nobr>Loose pieces = Soll – (Verp.-Einh. × full cartons)</nobr>
+Soll 64, <nobr>Verp.-Einh.</nobr> 20:
+64 : 20 = 3.2, so 3 full cartons
+64 – (20 × 3) = 4 loose pieces
+For your order, calculate with the numbers in the WMS.","Volle Kartons = Soll : <nobr>Verp.-Einh.</nobr>
+<nobr>Lose Teile = Soll – (Verp.-Einh. × volle Kartons)</nobr>
+Soll 64, <nobr>Verp.-Einh.</nobr> 20:
+64 : 20 = 3,2, also 3 volle Kartons
+64 – (20 × 3) = 4 lose Teile
+Rechnen Sie für Ihren Auftrag mit den Zahlen aus dem LVS.",230
 complex.feedback.position_done,"#99 (decision 033): middle line = mixed.feedback.position_done middle line (storage container leaves + watch sentence); the boxes wait 4 s. Result card right of the red button after a correct position 1 (green). {done} = finished position, {next} = next position. #59: „Richtig!“ is the card title (order.feedback.correct_title); body is light, uncoloured. #92 (decision 032): the Anbruchmenge line moved to the storage label (complex.storage.opened_carton), said once.","Position {done} is done.
 The storage container leaves; the next one comes from the left. Watch the containers on the roller conveyor.
 Then read the details of position {next} in the WMS.","Position {done} ist erledigt.

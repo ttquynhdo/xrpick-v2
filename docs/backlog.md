@@ -2121,7 +2121,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S
 - **Test trên kính:** nhanh (đọc bảng ví dụ)
 - **Depends on:** #119 (cùng cách gọi Verp.-Einh.)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl122.md
+- **Status:** verified-mcp (8/9 ✅ MCP/code, chờ test tay E6: đọc bảng ví dụ trên kính; dấu trừ là „–“ vì font không có „−“; thêm: `complex.quiz.wrong_loose` cùng công thức với bảng)
 
 ### #123 [Feature] Complex: người học để ý Empf Kz 000
 - **Type:** feature

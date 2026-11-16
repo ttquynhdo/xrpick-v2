@@ -581,7 +581,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627459
     m_Localized: "<color=#EB5757><b>Not correct.</b></color> Loose pieces = Soll
-      - (full cartons \xD7 Verp.-Einh.)."
+      \u2013 (Verp.-Einh. \xD7 full cartons)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627460
@@ -598,8 +598,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627463
-    m_Localized: "Soll 64 ST, VPE 20 ST\n1. 64 : 20 = 3.2 \u2013 so 3 full cartons
-      (60 ST)\n2. 64 - 60 = 4 loose pieces\nCheck: 60 + 4 = 64 ST"
+    m_Localized: "Full cartons = Soll : <nobr>Verp.-Einh.</nobr>\n<nobr>Loose pieces
+      = Soll \u2013 (Verp.-Einh. \xD7 full cartons)</nobr>\nSoll 64, <nobr>Verp.-Einh.</nobr>
+      20:\n64 : 20 = 3.2, so 3 full cartons\n64 \u2013 (20 \xD7 3) = 4 loose pieces\nFor
+      your order, calculate with the numbers in the WMS."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
