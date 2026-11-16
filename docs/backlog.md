@@ -2041,7 +2041,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S
 - **Test trên kính:** nhanh (đọc bảng Welcome)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl116.md
+- **Status:** verified-mcp (12/13 ✅ MCP/code, chờ test tay H1: đọc bảng Welcome và thẻ 1 trên kính; commit 5f0954a)
 
 ### #117 [P1] Chuyển bài: câu nói chọn bài được tô sáng trong Menu; Concept nói rõ „Start over“ chỉ để xem lại
 - **Type:** logic
