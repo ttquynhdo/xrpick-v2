@@ -2175,7 +2175,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** bắt buộc (bấm bằng tay thật, 10 lần mỗi nút)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl126.md
-- **Status:** verified-mcp (19/20 ✅, chờ test tay H1 trên Quest)
+- **Status:** verified-mcp (commit 7531028, merged vào `main` 091996d; 19/20 ✅, chờ test tay H1 trên Quest)
 
 ### #127 [Feature] Âm thanh đúng/sai và audio thay bớt chữ
 - **Type:** feature
