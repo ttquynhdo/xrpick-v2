@@ -471,10 +471,6 @@ MonoBehaviour:
     m_Key: complex.end.summary_title
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627447
-    m_Key: complex.end.summary
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627448
     m_Key: mixed.feedback.position_done
     m_Metadata:
@@ -857,6 +853,46 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1077645040029696
     m_Key: concept.tour.material_flow.action_after
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288884322304
+    m_Key: complex.end.know_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653952
+    m_Key: complex.end.know.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653953
+    m_Key: complex.end.know.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653954
+    m_Key: complex.end.know.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653955
+    m_Key: complex.end.can_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653956
+    m_Key: complex.end.can.1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653957
+    m_Key: complex.end.can.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653958
+    m_Key: complex.end.can.3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653959
+    m_Key: complex.end.can.4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653960
+    m_Key: complex.end.foot
     m_Metadata:
       m_Items: []
   m_Metadata:

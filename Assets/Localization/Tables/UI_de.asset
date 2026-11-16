@@ -526,16 +526,6 @@ MonoBehaviour:
     m_Localized: Das haben Sie gelernt
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627447
-    m_Localized: "<b>Sie kennen jetzt:</b>\n\u2022 die Felder im LVS\n\u2022 Lagerbeh\xE4lter
-      und Auftragsbeh\xE4lter\n\u2022 den Unterschied zwischen Empf Kz 003 und 000\n<b>Sie
-      k\xF6nnen jetzt:</b>\n\u2022 die Angaben im LVS ablesen und mit dem Etikett
-      vergleichen\n\u2022 Kartons nach EKZ einlegen\n\u2022 mehrere Auftragspositionen
-      nacheinander kommissionieren\n\u2022 ausrechnen, wie viele volle Kartons und
-      lose Teile Sie brauchen\n\nAm echten Kommissionierplatz best\xE4tigen Sie mit
-      dem Fu\xDF."
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627448
     m_Localized: "Position {position} ist erledigt.\nDer Lagerbeh\xE4lter f\xE4hrt
       weg, der n\xE4chste kommt von links. Sehen Sie den Beh\xE4ltern auf der Rollenbahn
@@ -957,6 +947,46 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1077645040029696
     m_Localized: "Pr\xFCfen Sie Ihr Wissen: Dr\xFCcken Sie \u201EZu den Fragen\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288884322304
+    m_Localized: 'Sie kennen jetzt:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653952
+    m_Localized: die Felder im LVS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653953
+    m_Localized: "Lager- und Auftragsbeh\xE4lter"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653954
+    m_Localized: den Unterschied zwischen Empf Kz 003 und 000
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653955
+    m_Localized: "Sie k\xF6nnen jetzt:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653956
+    m_Localized: das LVS mit dem Etikett vergleichen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653957
+    m_Localized: Kartons nach EKZ einlegen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653958
+    m_Localized: mehrere Auftragspositionen kommissionieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653959
+    m_Localized: volle Kartons und lose Teile ausrechnen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653960
+    m_Localized: "Am echten Kommissionierplatz best\xE4tigen Sie mit dem Fu\xDF."
     m_Metadata:
       m_Items: []
   references:

@@ -27,7 +27,6 @@ complex.card.step2_body,"Rechnen Sie aus, wie viele Sie brauchen. Legen Sie zuer
 complex.card.step3_body,"Zählen Sie Kartons und lose Teile nach und prüfen Sie, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,german-reviewer (agent),2026-11-05,#87
 complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
 complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
-complex.end.summary,"<b>Sie kennen jetzt:</b>\n• die Felder im LVS\n• Lagerbehälter und Auftragsbehälter\n• den Unterschied zwischen Empf Kz 003 und 000\n<b>Sie können jetzt:</b>\n• die Angaben im LVS ablesen und mit dem Etikett vergleichen\n• Kartons nach EKZ einlegen\n• mehrere Auftragspositionen nacheinander kommissionieren\n• ausrechnen, wie viele volle Kartons und lose Teile Sie brauchen\n\nAm echten Kommissionierplatz bestätigen Sie mit dem Fuß.",proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
 basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,,2026-11-03,#62
 mixed.feedback.position_done,"Position {position} ist erledigt.\nDer Lagerbehälter fährt weg, der nächste kommt von links. Sehen Sie den Behältern auf der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab.",proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie sie so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,german-reviewer (agent),2026-11-05,#87
@@ -212,3 +211,13 @@ common.position.label,Position {position},proposed,claude,2026-11-05,"#97: WMS w
 concept.tour.material_flow.body_after,In der Praxis bewegen Sie die Behälter von Hand.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
 concept.tour.material_flow.action_after,Prüfen Sie Ihr Wissen: Drücken Sie „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
 mixed.card.step2_body,"Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie sie so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,german-reviewer (agent),2026-11-06,"Final-wave pass: same rule sentence as basic.step2.text; „nach dem Empf Kz legen“ could read as „after“"
+complex.end.know_title,Sie kennen jetzt:,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.know.1,die Felder im LVS,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.know.2,Lager- und Auftragsbehälter,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.know.3,den Unterschied zwischen Empf Kz 003 und 000,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.can_title,Sie können jetzt:,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.can.1,das LVS mit dem Etikett vergleichen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.can.2,Kartons nach EKZ einlegen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.can.3,mehrere Auftragspositionen kommissionieren,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.can.4,volle Kartons und lose Teile ausrechnen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.foot,Am echten Kommissionierplatz bestätigen Sie mit dem Fuß.,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"

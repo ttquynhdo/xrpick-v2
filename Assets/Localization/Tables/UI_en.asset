@@ -526,16 +526,6 @@ MonoBehaviour:
     m_Localized: What you learned
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627447
-    m_Localized: "<b>You now know:</b>\n\u2022 the fields in the WMS\n\u2022 storage
-      containers and order containers\n\u2022 the difference between Empf Kz 003
-      and 000\n<b>You can now:</b>\n\u2022 read the data in the WMS and compare it
-      with the label\n\u2022 place cartons according to the EKZ\n\u2022 pick several
-      order lines (positions) one after another\n\u2022 work out how many full cartons
-      and loose pieces you need\n\nAt the real picking station you confirm with your
-      foot."
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627448
     m_Localized: 'Position {position} is done.
 
@@ -963,6 +953,46 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1077645040029696
     m_Localized: 'Check what you have learnt: press "To the questions".'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288884322304
+    m_Localized: 'You now know:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653952
+    m_Localized: the fields in the WMS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653953
+    m_Localized: storage and order containers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653954
+    m_Localized: the difference between Empf Kz 003 and 000
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653955
+    m_Localized: 'You can now:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653956
+    m_Localized: compare the WMS with the label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653957
+    m_Localized: place cartons by EKZ
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653958
+    m_Localized: pick several order lines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653959
+    m_Localized: work out full cartons and loose pieces
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5042288934653960
+    m_Localized: At the real picking station you confirm with your foot.
     m_Metadata:
       m_Items: []
   references:

@@ -2093,7 +2093,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S
 - **Test trên kính:** nhanh (đọc bảng cuối)
 - **Depends on:** #116 (dùng câu mục tiêu mới)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl120.md
+- **Status:** verified-mcp (8/8 MCP/code ✅, chờ test tay E8: đọc bảng cuối trên kính)
 
 ### #121 [Feature] Welcome: mục tiêu ngắn có biểu tượng, hiện theo chuỗi (mục tiêu trước, việc sau), chỉ bước tiếp theo
 - **Type:** feature

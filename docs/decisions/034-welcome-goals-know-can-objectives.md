@@ -79,3 +79,7 @@ Bị bác thêm: hai cột (mục Complex tràn dòng, lấn Menu/giá thẻ); m
 - D33 (sửa): tên đầy đủ LVS chỉ ở mục đầu tiên có đủ không. Giả định: đủ.
 - D42: thứ tự đọc các trường trong dialog có cố định không.
 - D39: xác nhận người lấy hàng so nhãn carton với Mat.-Nr (người dùng đã quyết: có).
+
+## Sửa đổi 2026-11-16 (#120, review nhóm C21)
+- Mục 4 (`complex.end.summary`) được thay: bảng chúc mừng ở Complex không còn chép lại nguyên câu của Welcome thành một khối chữ. Giữ hai nhóm với câu dẫn „Sie kennen jetzt:“ / „Sie können jetzt:“ (người dùng chọn), mỗi mục tiêu một dòng ngắn có dấu ✓ (`DoneCheck`) phía trước; nhóm 1 là cụm danh từ, nhóm 2 là cụm động từ; chữ thường đầu dòng. Mỗi dòng một key (`complex.end.know_title`, `complex.end.know.1`–`.3`, `complex.end.can_title`, `complex.end.can.1`–`.4`), câu bàn đạp chân thành key riêng `complex.end.foot`. Vẫn cùng 7 mục, cùng thứ tự như `welcome.panel.know` / `welcome.panel.can`.
+- Dòng Mixed bỏ „(positions)“ („pick several order lines“ / „mehrere Auftragspositionen kommissionieren“): nhóm review nói chữ „positions“ khó hiểu. Welcome vẫn còn „(positions)“ trong `welcome.panel.can` (#116); đổi chỗ đó là việc riêng nếu người dùng muốn.
