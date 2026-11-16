@@ -2077,7 +2077,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl119.md
+- **Status:** done (commit 0c2ca10, test 12/12 ✅, không có case test tay)
 
 ### #120 [P1] Complex: bảng chúc mừng ngắn, mỗi mục tiêu một dấu ✓
 - **Type:** logic
