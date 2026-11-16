@@ -430,7 +430,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627426
-    m_Localized: Greifen Sie mit einer Hand nach dem Karton und heben Sie ihn hoch.
+    m_Localized: Greifen Sie den Karton mit einer Hand, heben Sie ihn hoch und stellen
+      Sie ihn wieder ab.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627427
@@ -451,7 +452,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627431
-    m_Localized: Das lernen Sie
+    m_Localized: Lernziele
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627433
@@ -467,7 +468,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627436
-    m_Localized: '<b>Sie lernen, mehrere Positionen nacheinander zu kommissionieren.</b>
+    m_Localized: '<b>Sie lernen, mehrere Auftragspositionen nacheinander zu kommissionieren.</b>
 
       So
       stimmen bei jeder Position Material und Menge, auch wenn Verpackung und EKZ
@@ -528,9 +529,10 @@ MonoBehaviour:
     m_Localized: "<b>Sie kennen jetzt:</b>\n\u2022 die Felder im LVS\n\u2022 Lagerbeh\xE4lter
       und Auftragsbeh\xE4lter\n\u2022 den Unterschied zwischen Empf Kz 003 und 000\n<b>Sie
       k\xF6nnen jetzt:</b>\n\u2022 die Angaben im LVS ablesen und mit dem Etikett
-      vergleichen\n\u2022 Kartons nach EKZ einlegen\n\u2022 mehrere Positionen nacheinander
-      kommissionieren\n\u2022 ausrechnen, wie viele volle Kartons und lose Teile
-      Sie brauchen\n\nAm echten Kommissionierplatz best\xE4tigen Sie mit dem Fu\xDF."
+      vergleichen\n\u2022 Kartons nach EKZ einlegen\n\u2022 mehrere Auftragspositionen
+      nacheinander kommissionieren\n\u2022 ausrechnen, wie viele volle Kartons und
+      lose Teile Sie brauchen\n\nAm echten Kommissionierplatz best\xE4tigen Sie mit
+      dem Fu\xDF."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
@@ -929,16 +931,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1017753042292736
-    m_Localized: "<b>Sie kennen:</b>\n\u2022 die Felder im Lagerverwaltungssystem
+    m_Localized: "<b>Nach dem Kurs kennen Sie:</b>\n\u2022 die Felder im Lagerverwaltungssystem
       (LVS)\n\u2022 Lagerbeh\xE4lter und Auftragsbeh\xE4lter\n\u2022 den Unterschied
       zwischen Empf Kz 003 und 000"
     m_Metadata:
       m_Items: []
   - m_Id: 1017753113595904
-    m_Localized: "<b>Sie k\xF6nnen:</b>\n\u2022 die Angaben im LVS ablesen und mit
-      dem Etikett vergleichen\n\u2022 Kartons nach EKZ einlegen\n\u2022 mehrere Positionen
-      nacheinander kommissionieren\n\u2022 ausrechnen, wie viele volle Kartons und
-      lose Teile Sie brauchen"
+    m_Localized: "<b>Nach dem Kurs k\xF6nnen Sie:</b>\n\u2022 die Angaben im LVS
+      ablesen und mit dem Etikett vergleichen\n\u2022 Kartons nach EKZ einlegen\n\u2022
+      mehrere Auftragspositionen nacheinander kommissionieren\n\u2022 ausrechnen,
+      wie viele volle Kartons und lose Teile Sie brauchen"
     m_Metadata:
       m_Items: []
   - m_Id: 1029442483654656
