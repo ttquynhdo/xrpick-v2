@@ -2133,7 +2133,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** M
 - **Test trên kính:** nhanh
 - **Depends on:** — (câu hỏi người hướng dẫn D45, D47 không chặn)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl123.md
+- **Status:** verified-mcp (15/16 ✅ MCP/code, chờ test tay Q14 trên Quest; layout_version "036" cùng build với #121/#124)
 
 ### #124 [Feature] Menu dễ nhận ra
 - **Type:** feature

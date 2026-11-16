@@ -51,5 +51,26 @@ namespace XRPick.Orders.Tests
             CollectionAssert.Contains(options, answer);
             Assert.GreaterOrEqual(options[0], 0);
         }
+    
+        // #123, decision 039: the placement question follows the line's Empf Kz.
+        [Test]
+        public void PlacementAnswer_FollowsEmpfKz()
+        {
+            var line000 = new OrderLine("ring_d", "RING D", 55, 25) { empfKz = "000" };
+            var line003 = new OrderLine("ring_d", "RING D", 55, 25) { empfKz = "003" };
+
+            Assert.AreEqual(RemainderQuiz.PlacementPoured, RemainderQuiz.PlacementAnswer(line000));
+            Assert.AreEqual(RemainderQuiz.PlacementOrdered, RemainderQuiz.PlacementAnswer(line003));
+        }
+
+        [Test]
+        public void PlacementOptions_AreThreeDistinctAndHoldTheAnswer()
+        {
+            var line = new OrderLine("ring_d", "RING D", 55, 25) { empfKz = "000" };
+
+            Assert.AreEqual(3, RemainderQuiz.PlacementOptions.Count);
+            CollectionAssert.AllItemsAreUnique(RemainderQuiz.PlacementOptions);
+            CollectionAssert.Contains(RemainderQuiz.PlacementOptions, RemainderQuiz.PlacementAnswer(line));
+        }
     }
 }

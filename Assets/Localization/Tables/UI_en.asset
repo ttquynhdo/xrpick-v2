@@ -885,11 +885,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 770818612006912
-    m_Localized: '<b>{cartons} cartons + {pieces} pieces</b>
+    m_Localized: '<b>{cartons} cartons + {pieces} pieces, unordered allowed</b>
 
-      Put the full
-      cartons into the order container first, then the loose pieces from the opened
-      carton.'
+      Put
+      the full cartons into the order container first, then the loose pieces from
+      the opened carton.'
     m_Metadata:
       m_Items: []
   - m_Id: 773084278558720
@@ -1003,6 +1003,31 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5054402919272451
     m_Localized: To the tasks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301761486848
+    m_Localized: How may you put the cartons and loose pieces into the order container?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681152
+    m_Localized: Only one by one and in order
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681153
+    m_Localized: Always put in separated by a separator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681154
+    m_Localized: Putting them in unordered is allowed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681155
+    m_Localized: '<color=#EB5757><b>Not correct.</b></color> Read Empf Kz in the
+      WMS: it shows how you may put the goods in.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681156
+    m_Localized: <color=#27AE60><b>Correct!</b></color> Now answer the third question.
     m_Metadata:
       m_Items: []
   references:

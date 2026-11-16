@@ -83,3 +83,7 @@ D35–D38 trong `docs/requirements/questions-for-instructor.md` (nghĩa EKZ 0/2/
 - `docs/decisions/003-ekz-placement.md` dòng 31–46 (đã kiểm).
 - Ảnh `TestEvidence/review-P801/10-concept-ekz-samples.png`, `16-complex-jumbled-box.webp` (xr-ux-reviewer: thấy).
 - Chưa kiểm: thùng đơn Mixed đủ chỗ cho 3 ô + vùng đổ túi (đo trong Editor khi làm); `OrderConfirm` là nơi duy nhất gọi `placementCheck` (unity-reviewer).
+
+## Sửa đổi 2026-11-16 (#123, decision 039)
+- Dòng „Complex: người học tự đọc Empf Kz, không có gợi ý“ được thay một phần: ở position 1, sau hai câu tính, Remainder Quiz hỏi câu 3 („Frage 3 von 3“) cách đặt các phần vào thùng đơn; thân câu không ghi „000“, đáp án đúng „Ungeordnet einlegen ist erlaubt“ (cùng nghĩa `concept.quiz.ekz_000.poured`), nhiễu là quy tắc EKZ 3 và EKZ 4–6. Thùng kho chỉ vào khi đúng cả 3 câu. Position 2 vẫn tự đọc, không câu hỏi.
+- Giữ nguyên: Complex 000/000, không chấm cách xếp (không `EKZ_PLACEMENT`), LVS không vẽ gì.

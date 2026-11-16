@@ -18,19 +18,26 @@ using UnityEngine.UI;
 /// neutral how-to line.
 /// #93, decision 026 (6): once both answers are right, shelf card 2 shows the result („2 Kartons + 5 Stück“) and,
 /// after the same hold and once the storage box stands at the work spot, the cluster and the worked example hide.
+/// #123, docs/decisions/039: a third question („Frage 3 von 3“) asks how the goods go into the order container; its
+/// body never names the Empf Kz value, so the trainee has to read it in the LVS. The storage box comes only after
+/// all three answers are right.
 /// </summary>
 public class RemainderQuizController : MonoBehaviour
 {
     // Loc table UI (#11, #54). The rich text (colour, bold) is part of the table entries. {count} = number.
     private const string QuestionCartonsKey = "complex.quiz.q_cartons";
     private const string QuestionLooseKey = "complex.quiz.q_loose";
+    private const string QuestionPlacementKey = "complex.quiz.q_placement";
+    private const string PlacementOptionKeyPrefix = "complex.quiz.placement.";   // + RemainderQuiz.Placement*
     private const string CartonOneKey = "complex.quiz.option_carton_one";
     private const string CartonsKey = "complex.quiz.option_cartons";
     private const string PieceOneKey = "complex.quiz.option_piece_one";
     private const string PiecesKey = "complex.quiz.option_pieces";
     private const string WrongCartonsKey = "complex.quiz.wrong_cartons";
     private const string WrongLooseKey = "complex.quiz.wrong_loose";
+    private const string WrongPlacementKey = "complex.quiz.wrong_placement";
     private const string NextQuestionKey = "complex.quiz.next";
+    private const string ThirdQuestionKey = "complex.quiz.next_third";
     private const string DoneKey = "complex.quiz.done";
     private const string HowToKey = "complex.quiz.how_to";
     private const string ProgressKey = "concept.quiz.progress";
@@ -39,6 +46,12 @@ public class RemainderQuizController : MonoBehaviour
 
     private const string CartonsId = "cartons";
     private const string LooseId = "loose";
+    private const string PlacementId = "ekz";
+
+    private const int CartonsQuestion = 0;
+    private const int LooseQuestion = 1;
+    private const int PlacementQuestion = 2;
+    private const int QuestionCount = 3;
 
     private static readonly string[] Letters = { "A", "B", "C" };
 
@@ -68,20 +81,21 @@ public class RemainderQuizController : MonoBehaviour
     private Toggle[] toggles;
     private TMP_Text[] labels;
     private UnityAction<bool>[] listeners;
-    private IReadOnlyList<int> options;
+    // Answer keys of the shown question, button order A, B, C: invariant numbers or RemainderQuiz.Placement*.
+    private IReadOnlyList<string> options;
     private int question;
     private bool isSetUp;
     private bool switching;
 
     public bool IsAnswered { get; private set; }
 
-    // Answer of the last switched-on toggle as an invariant integer, e.g. "2" (for #28).
+    // Answer of the last switched-on toggle: an invariant integer, e.g. "2", or a placement key (for #28).
     public string LastAnswerKey { get; private set; }
 
-    // Question id ("cartons" / "loose"), answer key, correct. #28 will log it.
+    // Question id ("cartons" / "loose" / "ekz"), answer key, correct. #28 logs it.
     public event Action<string, string, bool> AnswerChosen;
 
-    // #97, decision 035: both answers are right (raised once).
+    // #97, decision 035: all answers are right (raised once; three questions since #123).
     public event Action Answered;
 
     private void Awake()
@@ -142,6 +156,12 @@ public class RemainderQuizController : MonoBehaviour
         if (!isSetUp)
             return;
 
+        // #123: the placement answer follows Empf Kz; an empty field would silently rate every answer wrong.
+        if (string.IsNullOrEmpty(container.CurrentLine?.empfKz))
+        {
+            Debug.LogError($"{nameof(RemainderQuizController)}: the first order line has no Empf Kz, so the placement question cannot be rated.", this);
+        }
+
         ShowQuestion(0);
         feedbackText.text = Loc.Get(HowToKey);
     }
@@ -165,12 +185,22 @@ public class RemainderQuizController : MonoBehaviour
     {
         question = index;
         OrderLine line = container.CurrentLine;
-        options = index == 0 ? RemainderQuiz.CartonOptions(line) : RemainderQuiz.LooseOptions(line);
-        questionText.text = Loc.Get(index == 0 ? QuestionCartonsKey : QuestionLooseKey);
+        options = index switch
+        {
+            CartonsQuestion => NumberKeys(RemainderQuiz.CartonOptions(line)),
+            LooseQuestion => NumberKeys(RemainderQuiz.LooseOptions(line)),
+            _ => RemainderQuiz.PlacementOptions,
+        };
+        questionText.text = Loc.Get(index switch
+        {
+            CartonsQuestion => QuestionCartonsKey,
+            LooseQuestion => QuestionLooseKey,
+            _ => QuestionPlacementKey,
+        });
 
         if (progressText != null)
         {
-            progressText.text = Loc.Get(ProgressKey, ("n", index + 1), ("total", 2));
+            progressText.text = Loc.Get(ProgressKey, ("n", index + 1), ("total", QuestionCount));
         }
 
         foreach (Toggle toggle in toggles)
@@ -203,27 +233,41 @@ public class RemainderQuizController : MonoBehaviour
             }
         }
 
-        int answer = options[index];
         OrderLine line = container.CurrentLine;
-        int correct = question == 0 ? RemainderQuiz.FullCartons(line) : RemainderQuiz.LoosePieces(line);
-        bool right = answer == correct;
+        string correct = question switch
+        {
+            CartonsQuestion => RemainderQuiz.FullCartons(line).ToString(CultureInfo.InvariantCulture),
+            LooseQuestion => RemainderQuiz.LoosePieces(line).ToString(CultureInfo.InvariantCulture),
+            _ => RemainderQuiz.PlacementAnswer(line),
+        };
 
-        LastAnswerKey = answer.ToString(CultureInfo.InvariantCulture);
-        string questionId = question == 0 ? CartonsId : LooseId;
+        LastAnswerKey = options[index];
+        bool right = LastAnswerKey == correct;
+        string questionId = question switch
+        {
+            CartonsQuestion => CartonsId,
+            LooseQuestion => LooseId,
+            _ => PlacementId,
+        };
         ResearchLogger.LogQuizAnswer(OutcomeEvents.QuizComplexRemainder, questionId, LastAnswerKey, right);
         AnswerChosen?.Invoke(questionId, LastAnswerKey, right);
 
         if (!right)
         {
-            feedbackText.text = Loc.Get(question == 0 ? WrongCartonsKey : WrongLooseKey);
+            feedbackText.text = Loc.Get(question switch
+            {
+                CartonsQuestion => WrongCartonsKey,
+                LooseQuestion => WrongLooseKey,
+                _ => WrongPlacementKey,
+            });
             RefreshLabels();
             return;
         }
 
-        if (question == 0)
+        if (question < PlacementQuestion)
         {
-            feedbackText.text = Loc.Get(NextQuestionKey);
-            StartCoroutine(ShowSecondQuestionAfterHold());
+            feedbackText.text = Loc.Get(question == CartonsQuestion ? NextQuestionKey : ThirdQuestionKey);
+            StartCoroutine(ShowNextQuestionAfterHold(question + 1));
             return;
         }
 
@@ -256,14 +300,14 @@ public class RemainderQuizController : MonoBehaviour
     // We are inside the pressed toggle's onValueChanged(true). The SDK's AnimatorOverrideLayerWeight listens after us,
     // so switching that toggle off here would reach it before the outer "true" and leave it looking selected.
     // #85: the wait is the "Richtig!" hold; touches meanwhile are not rated and not logged.
-    private IEnumerator ShowSecondQuestionAfterHold()
+    private IEnumerator ShowNextQuestionAfterHold(int next)
     {
         switching = true;
         SetTogglesInteractable(false);
         yield return new WaitForSeconds(PackageQuizController.CorrectHoldSeconds);
         switching = false;
         SetTogglesInteractable(true);
-        ShowQuestion(1);
+        ShowQuestion(next);
         feedbackText.text = Loc.Get(HowToKey);
     }
 
@@ -288,12 +332,27 @@ public class RemainderQuizController : MonoBehaviour
         }
     }
 
-    private string AnswerText(int value)
+    private string AnswerText(string key)
     {
-        if (question == 0)
+        if (question == PlacementQuestion)
+            return Loc.Get(PlacementOptionKeyPrefix + key);
+
+        int value = int.Parse(key, CultureInfo.InvariantCulture);
+        if (question == CartonsQuestion)
             return value == 1 ? Loc.Get(CartonOneKey) : Loc.Get(CartonsKey, ("count", value));
 
         return value == 1 ? Loc.Get(PieceOneKey) : Loc.Get(PiecesKey, ("count", value));
+    }
+
+    private static IReadOnlyList<string> NumberKeys(IReadOnlyList<int> numbers)
+    {
+        var keys = new string[numbers.Count];
+        for (int i = 0; i < numbers.Count; i++)
+        {
+            keys[i] = numbers[i].ToString(CultureInfo.InvariantCulture);
+        }
+
+        return keys;
     }
 
     // Also at the next position, in case the hold was cut short (object disabled).

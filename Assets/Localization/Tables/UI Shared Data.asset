@@ -911,6 +911,30 @@ MonoBehaviour:
     m_Key: welcome.tasks.button
     m_Metadata:
       m_Items: []
+  - m_Id: 5059301761486848
+    m_Key: complex.quiz.q_placement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681152
+    m_Key: complex.quiz.placement.ordered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681153
+    m_Key: complex.quiz.placement.separator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681154
+    m_Key: complex.quiz.placement.poured
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681155
+    m_Key: complex.quiz.wrong_placement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681156
+    m_Key: complex.quiz.next_third
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

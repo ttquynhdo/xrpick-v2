@@ -6,6 +6,7 @@ ConceptScene,ekz_003,ekz_placement,,D3
 ConceptScene,ekz_000,ekz_placement,,D3
 ComplexScene,cartons,calculate_quantity,,P4a
 ComplexScene,loose,calculate_loose,,P4b
+ComplexScene,ekz,ekz_placement,,D3
 ComplexScene,position_1,,true,
 ComplexScene,position_2,,false,
 MixedPickingScene,position_1,,,P3

@@ -634,27 +634,31 @@ local({
   # Complex position_1 scaffold (#93): "019"/"025" = quiz_visible, "029" =
   # result_on_card. The pilot set holds both, so position_1 is split in the
   # item chart and the phase chart; position 2 and the study set are not.
-  stopifnot(identical(pilot_set$complex_p1_scaffold(c("019", "025", "029", NA)),
-                      c("quiz_visible", "quiz_visible", "result_on_card", "quiz_visible")))
+  stopifnot(identical(pilot_set$complex_p1_scaffold(c("019", "025", "029", "035", "036", NA)),
+                      c("quiz_visible", "quiz_visible", "result_on_card", "result_on_card", "ekz_question",
+                        "quiz_visible")))
   cp1 <- p_items %>% filter(scene == "ComplexScene", item == "position_1")
   stopifnot(all(cp1$scaffold_level[cp1$participant_id == "P813"] == "result_on_card"),
             all(cp1$scaffold_level[cp1$participant_id %in% c("P811", "P812")] == "quiz_visible"),
             all(is.na(p_items$scaffold_level[!(p_items$scene == "ComplexScene" & p_items$item == "position_1")])))
   cx <- as.character(pilot_set$item_shares$x_label[pilot_set$item_shares$scene == "ComplexScene"])
   # The result_on_card label lists every layout of that level: P813 "029",
-  # P814 "032", P815 "033", P816 "034".
-  stopifnot(all(c("Complex\nposition_1\n[019/025]", "Complex\nposition_1\n[029/032/033/034/036]", "Complex\nposition_2") %in% cx),
+  # P814 "032", P815/P817 "033", P816 "034"; "036" (P818, #123: third
+  # question ekz before storage box 1) is a level of its own.
+  stopifnot(all(c("Complex\nposition_1\n[019/025]", "Complex\nposition_1\n[029/032/033/034]",
+                  "Complex\nposition_1\n[036]", "Complex\nposition_2") %in% cx),
             !"Complex\nposition_1" %in% cx,
             any(grepl("set mixes Complex position_1 scaffold", p_warn)),
             !any(grepl("set mixes Complex position_1 scaffold", warn_lines)),
             !any(grepl("\\[", as.character(item_shares$x_label))))
   slots <- levels(pilot_set$proc_long$slot)
-  stopifnot(all(c("Complex\nposition 1\n[019/025]", "Complex\nposition 1\n[029/032/033/034/036]", "Complex\nposition 2") %in% slots))
+  stopifnot(all(c("Complex\nposition 1\n[019/025]", "Complex\nposition 1\n[029/032/033/034]",
+                  "Complex\nposition 1\n[036]", "Complex\nposition 2") %in% slots))
   pp <- read_csv(file.path(pilot_dir, "process_by_position.csv"), show_col_types = FALSE,
                  col_types = cols(layout_version = col_character()))
   stopifnot(all(c("layout_version", "scaffold_level") %in% names(pp)),
             identical(sort(unique(na.omit(pp$scaffold_level[pp$scene == "ComplexScene" & pp$position == 1]))),
-                      c("quiz_visible", "result_on_card")),
+                      c("ekz_question", "quiz_visible", "result_on_card")),
             all(is.na(pp$scaffold_level[!(pp$scene == "ComplexScene" & pp$position == 1)])))
   # The hint event names are in the catalogue (no "not in the v2 catalogue" note for them).
   stopifnot(all(c("concept_hint_shown", "concept_hint_cleared") %in% pilot_set$known_events))
@@ -718,8 +722,9 @@ local({
     rated <- os %>% filter(evidence == "rated")
     stopifnot(all(rated$n > 0), all(rated$share >= 0 & rated$share <= 1),
               all(rated$share_lo <= rated$share & rated$share <= rated$share_hi))
-    # D3 = the two EKZ quiz questions, P3 = the Mixed positions, whole first attempt (items.csv).
-    d3_items <- os_set$it %>% filter(scene == "ConceptScene", item %in% c("ekz_003", "ekz_000"))
+    # D3 = the two Concept EKZ questions + the Complex ekz question (#123, "036"), P3 = the Mixed positions, whole first attempt (items.csv).
+    d3_items <- os_set$it %>% filter(scene == "ConceptScene" & item %in% c("ekz_003", "ekz_000") |
+                                        scene == "ComplexScene" & item == "ekz")
     mx_items <- os_set$it %>% filter(scene == "MixedPickingScene", kind == "position")
     stopifnot(os$n[os$objective_id == "D3"] == nrow(d3_items),
               os$k[os$objective_id == "D3"] == sum(d3_items$first_attempt_correct %in% TRUE),
@@ -934,6 +939,47 @@ local({
   stopifnot(all(pilot_set$station_waits$station_wait_group[pilot_set$station_waits$participant_id == "P818"] == "033_on"),
             all(pilot_set$menu_after_done$menu_cue[pilot_set$menu_after_done$participant_id == "P818"] == "highlight"),
             pilot_set$lane_demo_delay_for("036") == 8)
+
+  # 8z2. Complex third question ekz (#123, decision 039, layout "036"). P818
+  #      touches ordered, separator, then poured (right) after loose, and
+  #      presses the red button before it (confirm_ignored quiz_first). The
+  #      item maps to ekz_placement / D3 (item_skills.csv); Complex presses
+  #      still never test ekz_placement (scene_skills.csv), so the touch is in
+  #      items.csv and objectives_summary.csv, not in the skill rates, and
+  #      it raises no "scene_skills.csv doesn't list" warning. Storage box 1
+  #      starts only after the right ekz touch; older layouts have no ekz item.
+  stopifnot(!any(pilot_set$scene_skills$scene == "ComplexScene" & pilot_set$scene_skills$skill == "ekz_placement"))
+  ek <- p_items %>% filter(scene == "ComplexScene", item == "ekz")
+  stopifnot(nrow(ek) == 1, ek$participant_id == "P818", ek$skill == "ekz_placement", ek$kind == "quiz",
+            isFALSE(ek$first_attempt_correct), ek$attempts == 3, isTRUE(ek$reached_correct),
+            is.na(ek$scaffold_level), !any(items$item == "ekz" & items$scene == "ComplexScene"))
+  ek_t <- pilot_set$presses %>% filter(participant_id == "P818", scene == "ComplexScene",
+                                       quiz %in% "complex_remainder") %>% arrange(t, line)
+  stopifnot(identical(unique(ek_t$item), c("cartons", "loose", "ekz")),
+            identical(ek_t$selected[ek_t$item == "ekz"], c("ordered", "separator", "poured")),
+            !any(ek_t$counted))
+  stopifnot(!any(pilot_set$skill_rates$scene == "ComplexScene" & pilot_set$skill_rates$skill == "ekz_placement"),
+            !any(grepl("scene_skills.csv doesn't list", c(p_warn, warn_lines), fixed = TRUE)),
+            !any(grepl("has no skill in item_skills.csv|is not in item_skills.csv", c(p_warn, warn_lines))))
+  d3 <- read_csv(file.path(pilot_dir, "objectives_summary.csv"), show_col_types = FALSE) %>%
+    filter(objective_id == "D3")
+  stopifnot(grepl("Complex:ekz", d3$sources, fixed = TRUE))
+  cq <- read_csv(file.path(pilot_dir, "complex_quiz.csv"), show_col_types = FALSE,
+                 col_types = cols(layout_version = col_character()))
+  cq8 <- cq %>% filter(participant_id == "P818")
+  stopifnot(nrow(cq8) == 1, cq8$scaffold_level == "ekz_question", cq8$quiz_questions == 3,
+            cq8$quiz_touches >= 5, isTRUE(cq8$ekz_right_before_box), cq8$quiz_s > 0,
+            cq8$first_confirm_p1_s > cq8$quiz_s,
+            all(cq$quiz_questions[cq$participant_id != "P818" & !is.na(cq$quiz_s)] == 2),
+            !any(cq$ekz_right_before_box[cq$scaffold_level != "ekz_question"] %in% TRUE),
+            !any(grepl("started without a right quiz_answer ekz", c(p_warn, warn_lines), fixed = TRUE)))
+  ev8c <- pilot_set$v2_events %>% filter(participant_id == "P818", scene == "ComplexScene") %>% arrange(t, line)
+  ev_qid <- map_chr(ev8c$data, ~ as.character(.x$question_id %||% NA))
+  box1 <- which(ev8c$event == "station_move_start" & map_chr(ev8c$data, ~ as.character(.x$what %||% NA)) == "storage_in")[1]
+  ekz_ok <- which(ev8c$event == "quiz_answer" & ev_qid %in% "ekz" & map_lgl(ev8c$data, ~ isTRUE(.x$correct)))
+  qf <- which(ev8c$event == "confirm_ignored" & map_chr(ev8c$data, ~ as.character(.x$reason %||% NA)) %in% "quiz_first")
+  stopifnot(length(ekz_ok) == 1, ekz_ok < box1,
+            any(qf > max(which(ev_qid %in% "loose")) & qf < min(which(ev_qid %in% "ekz"))))
 
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.

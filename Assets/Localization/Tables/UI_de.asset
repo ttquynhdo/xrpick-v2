@@ -881,9 +881,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 770818612006912
-    m_Localized: "<b>{cartons} Kartons + {pieces} St\xFCck</b>\nLegen Sie zuerst
-      die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den
-      Auftragsbeh\xE4lter."
+    m_Localized: "<b>{cartons} Kartons + {pieces} St\xFCck, ungeordnet erlaubt</b>\nLegen
+      Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton
+      in den Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 773084278558720
@@ -997,6 +997,33 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5054402919272451
     m_Localized: Zu den Aufgaben
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301761486848
+    m_Localized: "Wie d\xFCrfen Sie die Kartons und losen Teile in den Auftragsbeh\xE4lter
+      geben?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681152
+    m_Localized: Nur einzeln und geordnet einlegen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681153
+    m_Localized: Immer mit Zwischenlage getrennt einlegen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681154
+    m_Localized: Ungeordnet einlegen ist erlaubt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681155
+    m_Localized: "<color=#EB5757><b>Nicht richtig.</b></color> Lesen Sie im LVS das
+      Feld Empf Kz: Es zeigt, wie Sie die Ware einlegen d\xFCrfen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5059301765681156
+    m_Localized: <color=#27AE60><b>Richtig!</b></color> Beantworten Sie jetzt die
+      dritte Frage.
     m_Metadata:
       m_Items: []
   references:

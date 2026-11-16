@@ -754,12 +754,17 @@ answer_quiz <- function(s, quiz, question_id, selected, k, right) {
 
 # One question, touched until right (a touched toggle is rated at once,
 # decision 020). After 4 wrong touches the trainee finds the right one.
-ask_question <- function(s, person, quiz, question_id, q) {
+# wrong_first: wrong keys touched first, in this order (edge cases; no random draw for them).
+ask_question <- function(s, person, quiz, question_id, q, wrong_first = NULL) {
   k <- 0
   repeat {
     k <- k + 1
-    wrong <- k < 5 && runif(1) < p_error(person, q$skill, k)
-    selected <- if (wrong) sample(setdiff(q$keys, q$right), 1) else q$right
+    if (k <= length(wrong_first)) {
+      selected <- wrong_first[[k]]
+    } else {
+      wrong <- k < 5 && runif(1) < p_error(person, q$skill, k)
+      selected <- if (wrong) sample(setdiff(q$keys, q$right), 1) else q$right
+    }
     if (answer_quiz(s, quiz, question_id, selected, k, q$right)) break
     advance(s, runif(1, 3, 10))  # read the feedback line, touch again
   }
@@ -1234,14 +1239,31 @@ run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
 # ComplexScene before position 1: the remainder quiz (full cartons, loose
 # pieces). Some trainees press the red button first (the #58 reminder,
 # confirm_ignored "quiz_first"). Both right -> storage box 1 rides in.
-run_remainder_quiz <- function(s, person) {
+# Layout "036" (#123, decision 039): a third question ekz (how the goods go
+# into the order container; Complex is Empf Kz 000, so "poured" is right)
+# comes after loose; box 1 rides in only when it is right. Older layouts keep
+# exactly the two questions (and their random draws).
+remainder_questions_for <- function(layout) {
+  if (!layout_at_least(layout, 36)) return(remainder_questions)
+  c(remainder_questions,
+    list(ekz = list(keys = c("ordered", "separator", "poured"), right = "poured", skill = "ekz_placement")))
+}
+# wrong_first: fixed wrong first touches per question, e.g. list(ekz = "ordered").
+# quiz_first_before: a question id; the red button is pressed (the #58
+# reminder, confirm_ignored quiz_first) just before that question is answered.
+run_remainder_quiz <- function(s, person, wrong_first = list(), quiz_first_before = NULL) {
   if (runif(1) < 0.15) {
     advance(s, runif(1, 3, 10))
     ignore_confirm(s, "quiz_first", 1)
   }
-  for (qid in names(remainder_questions)) {
+  questions <- remainder_questions_for(s$layout)
+  for (qid in names(questions)) {
     advance(s, runif(1, 5, 15))
-    ask_question(s, person, "complex_remainder", qid, remainder_questions[[qid]])
+    if (identical(quiz_first_before, qid)) {
+      ignore_confirm(s, "quiz_first", 1)
+      advance(s, runif(1, 2, 5))
+    }
+    ask_question(s, person, "complex_remainder", qid, questions[[qid]], wrong_first = wrong_first[[qid]])
   }
   ride_first_box_in(s)
   advance(s, runif(1, 20, 50))  # pick the cartons and loose rings of position 1
@@ -1257,7 +1279,8 @@ run_remainder_quiz <- function(s, person) {
 # crash_after_position: stop right after this position's ride (for a crash).
 run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
                         forced = list(), end_on_correct = FALSE,
-                        double_cause_pause = FALSE, crash_after_position = NULL) {
+                        double_cause_pause = FALSE, crash_after_position = NULL,
+                        remainder_wrong_first = list(), quiz_first_before = NULL) {
   scene <- s$scene
   positions <- order_positions[[scene]]
   advance(s, runif(1, 30, 70))  # read the WMS order and pick packages
@@ -1269,7 +1292,9 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
     maybe_pause(s)
   }
   maybe_unity_error(s)
-  if (scene == "ComplexScene" && max_confirms > 0) run_remainder_quiz(s, person)
+  if (scene == "ComplexScene" && max_confirms > 0) {
+    run_remainder_quiz(s, person, remainder_wrong_first, quiz_first_before)
+  }
 
   for (pos_no in seq_along(positions)) {
     k <- 0
@@ -1854,18 +1879,24 @@ run_full_course(p817, "bbb2222", "2026-11-07T08:00:00Z", language = "EN", layout
 assign(".Random.seed", rng_before_p817, envir = globalenv())
 
 # P818 (#121/#124, decision 038): the current build, layout "036". Same as
-# "035" everywhere except WelcomeScene: the learning objectives come first and
+# "035" except WelcomeScene and Complex position 1: the learning objectives come first and
 # „Zu den Aufgaben" writes welcome_tasks_opened before the two
 # welcome_practice_done. The headset comes off for 25 s while reading, so the
 # logged reading time (active) is 25 s shorter than the wall time; R must use
 # the logged value (objectives_read_s). Concept with the 8 s lane demo of
-# "035". Own random stream, restored, like P817.
+# "035". ComplexScene (#123, decision 039): the remainder quiz asks
+# ekz third; P818 touches ordered, then separator, then poured (right), and
+# presses the red button before it (#58 reminder). Box 1 comes after poured.
+# Own random stream, restored, like P817.
 rng_before_p818 <- .Random.seed
 set.seed(818)
 p818 <- new_person("P818")
 run_full_course(p818, "ddd4444", "2026-11-16T09:00:00Z", language = "EN", layout = "036",
                 special = list(WelcomeScene = list(read_pause_s = 25),
-                               ConceptScene = list(hints = p814_hints)))
+                               ConceptScene = list(hints = p814_hints),
+                               # #123: the ekz question, wrong twice first, red button pressed before it.
+                               ComplexScene = list(remainder_wrong_first = list(ekz = c("ordered", "separator")),
+                                                   quiz_first_before = "ekz")))
 assign(".Random.seed", rng_before_p818, envir = globalenv())
 
 # ---- 8. Write the files ----------------------------------------------------
