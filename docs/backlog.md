@@ -22,7 +22,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **ĐỢT FESTO (thêm 2026-11-16, từ review nhóm 2026-11-09, `docs/review-notes-team-2026-11-09.md`; Festo review 18/11, design freeze 19/11).** Khối này đứng trước khối ĐỢT CUỐI; việc còn lại của ĐỢT CUỐI (build, buổi P803, gửi file duyệt, học R #102) vẫn giữ.
 - **A. „Sửa ngay“, trước 18/11 (chỉ chữ + chỉnh nhỏ, không cần decision):** #119 (chỉ CSV) → #116 (Welcome) → #117 (Welcome + Concept, sau #116) ∥ #118 (Concept; không chạy cùng lúc với #117 vì cùng ConceptScene) → #120 (Complex, sau #116). Cuối nhóm: `german-reviewer` duyệt mọi chữ mới một lần, `ImportCsv`, chạy lại `InstructionShelfLayout` ở scene có thẻ đổi chữ, hỏi `data-analyst` có cần đổi `layout_version` không (#118 đổi tour Concept, decision 024: dữ liệu Concept trước/sau không gộp), một build.
 - **B. Cần `solution-decision`, sau Festo review (18/11), trước hoặc sau freeze tuỳ phản hồi:** #121 (Welcome theo chuỗi), #122 (ví dụ Complex, sau #119), #123 (Empf Kz 000 ở Complex), #124 (Menu). Có thể chạy một `solution-decision` chung cho #121 + #124 (cùng câu hỏi „làm sao người học thấy bước/bài tiếp theo“). **Cập nhật 2026-11-16:** decision 038 (#121 + #124, làm chung) và 039 (#123) đã accepted; #122 không cần decision (chỉ chữ, đi thẳng `localize-strings` + `unity-safe-change`); thêm #128 (tên bài 4).
-- **C. Chờ các bạn tả lại:** #125 (chữ nào gần/xa), #126 (nút nào không ăn). **Vòng sau:** #127 audio.
+- **C. Chờ các bạn tả lại:** #125 (chữ nào gần/xa). #126 verified-mcp 2026-11-16 (ScrollRect huỷ click khi ngón trượt; tool `PokeButtonFixer`), chờ test kính H1. **Vòng sau:** #127 audio.
 
 **ĐỢT CUỐI (người dùng chốt 2026-11-06: gộp mọi việc còn lại vào một đợt; 2026-11-07 chốt build cuối để demo).** Khối này thay mọi thứ tự cũ bên dưới (các khối cũ chỉ còn là lịch sử). Không thêm feature mới trước demo.
 - **A. Trước build (đổi app, Claude làm, không cần kính):**
@@ -71,7 +71,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   3. **Sau decision:** Concept tuần tự trên một nhánh: #104 → #105 → #107 (verified-mcp, merged vào `main` 42c805d, đã push 2026-11-05); #110 bỏ (người dùng 2026-11-05). Song song được (khác scene): #108 (Basic, Mixed) → #109 (Basic, Mixed, Complex; sau #108 vì cùng scene) → #111 (4 scene, cuối cùng vì đụng mọi thùng).
   4. **Data/R:** #102 → #114. **Cập nhật 2026-11-06:** #108, #109, #111 verified-mcp (bước 3 xong, `main` 9e2a28f, chưa push); việc kế tiếp là #102. **Cập nhật 2026-11-06 (sau):** #114 done (8654c31); #102 chỉ còn phần học R (mở khoá xong, `selftest.R` xanh) và bước log thật Concept.
   5. **Cuối đợt:** đổi `layout_version` một lần ("033" → "034", vì #108 có thể đổi chấm EKZ, và #109 bỏ câu gọi Menu nên khoảng `task_completed` → `menu_select` ở Basic/Mixed không so được với dữ liệu cũ (data-analyst 2026-11-06); không chạy pilot/study bằng build giữa đợt; #110 đã bỏ nên cách chấm quiz không đổi), `data-analyst` sửa spec + R một lần (gồm phần R của #108: `item_skills.csv` Basic `position_1` × `ekz_placement` có hỗ trợ, lọc press × skill; cần #102 để `selftest.R` chạy); `german-reviewer` duyệt mọi chữ mới một lần → #13 export → một build → một buổi test kính (P803). **Cập nhật 2026-11-06:** `layout_version` "034" + R (2322219), rà tiếng Đức (d2cb395), #13 export (3932327, chờ E1: mở trong Excel) đã xong, `main` đã push. Còn lại: (a) bạn gửi `docs/i18n/review/review-2026-11-06.csv` cho người duyệt; (b) một build từ `main` → buổi test kính cho mọi mục `verified-mcp` (#103, #104, #105, #107, #108, #109, #111, #113); (c) không cần kính, làm lúc chờ: phần học R của #102.
-- **Rà lại 2026-11-16 (sau #123):** trước design freeze 19/11 còn hai mục chữ nhỏ, không cần kính để làm, tuần tự vì cùng sửa `strings-todo.csv`: **#128** (tên bài 4) → **#122** (bảng ví dụ Complex; #119 đã xong). Rồi `german-reviewer` một lần cho chữ mới → một build từ `main` → buổi test kính cho mọi mục `verified-mcp` (mới nhất #115–#117, #120, #121, #123, #124). Bị chặn, cần nhóm chỉ rõ: #125 (chữ nào gây chóng mặt), #126 (nút nào không ăn; P0 nên hỏi trước buổi test). Để sau: #127 (vòng sau), #98 (khi có dữ liệu pilot), #102 (học R).
+- **Rà lại 2026-11-16 (sau #123):** trước design freeze 19/11 còn hai mục chữ nhỏ, không cần kính để làm, tuần tự vì cùng sửa `strings-todo.csv`: **#128** (tên bài 4) → **#122** (bảng ví dụ Complex; #119 đã xong). Rồi `german-reviewer` một lần cho chữ mới → một build từ `main` → buổi test kính cho mọi mục `verified-mcp` (mới nhất #115–#117, #120, #121, #123, #124). Bị chặn, cần nhóm chỉ rõ: #125 (chữ nào gây chóng mặt). #126 verified-mcp 2026-11-16, test kính H1 trong buổi test. Để sau: #127 (vòng sau), #98 (khi có dữ liệu pilot), #102 (học R).
 - **Buổi test kính tiếp theo (rà lại 2026-11-02, sau khi bạn báo #25, #33, #35, #41, #47 đạt):** #21 H1 làm lại (túi SCHRAUBE B không còn biến mất khi cầm) + H2 (đọc thẻ kết quả, xem đổi thùng), N6 ✅ 2026-11-02, #49 done. Mới: #50 thùng đơn chạy tiếp tới khu Versand ở cửa kho (D11, D15 nhóm đã trả lời), decision 014 (phương án B, 2026-11-02), verified-mcp: test kính H1 (xem cả chuyến, FPS), H2 (kiện đang cầm ở lại).
 - **Sau #41 (2026-11-02):** thứ tự cho trạm làm việc là #41 → #35 → #47. #47 cần cả #35 (dời thẻ và Menu khỏi mép bàn) lẫn #41 (cùng sửa thùng đơn). #35 và #47 đã có decision 011, không cần `solution-decision` lại. Người dùng chọn làm #35 ngay sau #41 (2026-11-02).
 - **Để sau buổi demo (người dùng 2026-11-01, demo ngày 2026-11-02):** #35, #13, #29, #30, #42, #39, #36, #40, #46, #23 không làm trước demo; xếp lại thứ tự sau demo. Các mục còn mở có thể làm trước demo: #25, #33, #21, #41, #19, #47, #11, #12, #28, #31.
@@ -2166,15 +2166,16 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 
 ### #126 [P0] Nút bấm không ăn
 - **Type:** bug
-- **Scene(s):** chưa rõ
-- **Files:** chưa rõ
-- **Problem:** (C14) Các bạn báo nút không hoạt động tốt, chưa có bước tái hiện.
-- **Done when:** (sau khi tái hiện) Nút đó phản hồi mỗi lần chạm bằng ngón tay trên Quest.
-- **Inspector work expected:** —
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** các scene (ScrollRect trong `Menu`, `Tour Nav Bar/NextButton|BackButton`, `AnswerOption` + `AnswerOption/BackButton`, `Remainder Quiz`, `Tasks Button`); `BoundsClipper` `Surface` của các nút đơn; Meta SDK `PointableCanvasModule.ProcessDrag` (không sửa)
+- **Problem:** (C14, tái hiện 2026-11-16) Mọi nút canvas nằm trong một `Scroll View` (ScrollRect của template Meta). Khi ngón trượt quá `pixelDragThreshold` (10 px ≈ 1,7 cm trong Editor, ước tính 5–6 mm trên Quest) lúc đang ấn, `PointableCanvasModule` bắt đầu „kéo“ và huỷ click, dù ngón vẫn trên nút (thử trong Play: „Weiter“ ở Concept, trượt 2 cm → không chuyển bước; 1 cm → chuyển). Menu có 2 ScrollRect cuộn được (Elastic) nên bấm sát viền làm cả danh sách nhích. Mục Menu cao 2,6 cm, giữa hai mục có khe chết 4 mm. Vùng chạm (`Surface`) của „Weiter“/„Zurück“/„Zu den Aufgaben“ cao 4,3 cm, thấp hơn nút 4,5 cm.
+- **Done when:** Ấn nút „Weiter“ của tour Concept, trượt ngón 2 cm mà vẫn trên nút rồi nhả → tour chuyển bước. Tương tự cho „Zurück“ (tour và quiz), nút A/B/C quiz Concept, A/B/C `Remainder Quiz` Complex, „Zu den Aufgaben“ Welcome và mục Menu ở cả 5 scene (trượt ngang 2 cm, mục rộng 18 cm). Ấn rồi trượt ngón ra ngoài hẳn nút rồi nhả → nút không ăn. Ấn rồi trượt ngón trên Menu → danh sách không nhích. Chạm vào khe giữa hai mục Menu → mở một trong hai mục kề bên. Chạm sát mép trên/dưới của „Weiter“, „Zurück“, „Zu den Aufgaben“ → nút ăn. (code) Không còn ScrollRect nào bật phía trên một nút canvas trong 5 scene. Trên Quest, bấm mỗi nút 10 lần liên tiếp bằng ngón thật → 10/10 lần ăn.
+- **Inspector work expected:** yes (tắt ScrollRect, `raycastPadding` mục Menu, cỡ `BoundsClipper`; làm bằng code qua MCP)
 - **Công:** S
-- **Test trên kính:** bắt buộc
+- **Test trên kính:** bắt buộc (bấm bằng tay thật, 10 lần mỗi nút)
 - **Depends on:** —
-- **Status:** blocked (cần biết nút nào, scene nào, bấm thế nào; hoặc giờ trong video)
+- **Test report:** docs/test-reports/bl126.md
+- **Status:** verified-mcp (19/20 ✅, chờ test tay H1 trên Quest)
 
 ### #127 [Feature] Âm thanh đúng/sai và audio thay bớt chữ
 - **Type:** feature

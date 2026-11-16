@@ -1742,7 +1742,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 121712528}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
   m_Name: 
@@ -3730,7 +3730,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 353810771}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
   m_Name: 
@@ -7177,7 +7177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _position: {x: 0, y: 0, z: 0}
-  _size: {x: 1, y: 1, z: 1}
+  _size: {x: 1, y: 1.6194682, z: 1}
 --- !u!4 &629424426
 Transform:
   m_ObjectHideFlags: 0
@@ -12704,6 +12704,14 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.21960786
       objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.w
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.y
+      value: -5
+      objectReference: {fileID: 0}
     - target: {fileID: 7312330184604319513, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -15379,6 +15387,14 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.21960786
       objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.w
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.y
+      value: -5
+      objectReference: {fileID: 0}
     - target: {fileID: 7312330184604319513, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -16558,7 +16574,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1413730982}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
   m_Name: 
@@ -17221,6 +17237,14 @@ PrefabInstance:
     - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_Color.r
       value: 0.21960786
+      objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.w
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.y
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 7312330184604319513, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_IsActive
@@ -18746,6 +18770,14 @@ PrefabInstance:
     - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_Color.r
       value: 0.21960786
+      objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.w
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.y
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 7312330184604319513, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_IsActive
@@ -20535,6 +20567,14 @@ PrefabInstance:
     - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_Color.r
       value: 0.21960786
+      objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.w
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6178605582243598111, guid: 41f0c6b657dffc944900710127356b17, type: 3}
+      propertyPath: m_RaycastPadding.y
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 7312330184604319513, guid: 41f0c6b657dffc944900710127356b17, type: 3}
       propertyPath: m_IsActive
