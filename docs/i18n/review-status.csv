@@ -16,7 +16,7 @@ welcome.panel.know,<b>Nach dem Kurs kennen Sie:</b>\n• die Felder im Lagerverw
 welcome.panel.can,"<b>Nach dem Kurs können Sie:</b>\n• die Angaben im LVS ablesen und mit dem Etikett vergleichen\n• Kartons nach EKZ einlegen\n• mehrere Auftragspositionen nacheinander kommissionieren\n• ausrechnen, wie viele volle Kartons und lose Teile Sie brauchen",proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
 welcome.panel.duration,"Dauer: 5 Lektionen, je etwa 5 Minuten",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#86, decision 034)"
 common.panel.see_cards,Ihre Aufgaben stehen links auf den Karten.,proposed,german-reviewer (agent),2026-11-02,#35
-welcome.panel.next,Danach wählen Sie im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.panel.next,Danach wählen Sie im Menü die markierte Lektion.,proposed,german-reviewer (agent),2026-11-16,#117: Agent OK after one fix
 mixed.card.task_body,"<b>Sie lernen, mehrere Auftragspositionen nacheinander zu kommissionieren.</b>\nSo stimmen bei jeder Position Material und Menge, auch wenn Verpackung und EKZ wechseln.",proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
 mixed.card.step1_body,"Lesen Sie für die aktuelle Position ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,german-reviewer (agent),2026-11-05,#87
 common.card.step2_pick_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
@@ -199,7 +199,7 @@ concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu
 concept.hint.storage_wrong_material,In diesem Lagerbehälter liegt Material mit einer anderen Materialnummer. Nehmen Sie es heraus.,proposed,,2026-11-05,#100 new
 concept.tour.to_questions,Zu den Fragen,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 complex.card.step2_body_answered,"<b>{cartons} Kartons + {pieces} Stück</b>\nLegen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93); add a singular key if the order ever needs 1 carton
-concept.tour.material_flow.action_done,Wählen Sie jetzt im Menü die nächste Lektion.,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
+concept.tour.material_flow.action_done,"Wählen Sie jetzt die markierte Lektion im Menü. Um die Erklärung zu wiederholen, drücken Sie „Von vorn“.",proposed,german-reviewer (agent),2026-11-16,#117: Agent OK after one fix
 concept.quiz.label_by_matnr.q,Im LVS steht die Mat.-Nr 738190. Welches Etikett passt?,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 concept.quiz.label_by_matnr.738910,Mat.-Nr: 738910,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 concept.quiz.label_by_matnr.738190,Mat.-Nr: 738190,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review

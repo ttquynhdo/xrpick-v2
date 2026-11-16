@@ -465,7 +465,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627435
-    m_Localized: Then choose the next lesson in the menu.
+    m_Localized: Then choose the highlighted lesson in the menu.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627436
@@ -901,7 +901,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 773084278558720
-    m_Localized: Now choose the next lesson in the menu.
+    m_Localized: Now choose the highlighted lesson in the menu. To repeat the explanation,
+      press "Start over".
     m_Metadata:
       m_Items: []
   - m_Id: 970336074862592

@@ -464,7 +464,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627435
-    m_Localized: "Danach w\xE4hlen Sie im Men\xFC die n\xE4chste Lektion."
+    m_Localized: "Danach w\xE4hlen Sie im Men\xFC die markierte Lektion."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627436
@@ -895,7 +895,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 773084278558720
-    m_Localized: "W\xE4hlen Sie jetzt im Men\xFC die n\xE4chste Lektion."
+    m_Localized: "W\xE4hlen Sie jetzt die markierte Lektion im Men\xFC. Um die Erkl\xE4rung
+      zu wiederholen, dr\xFCcken Sie \u201EVon vorn\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 970336074862592
