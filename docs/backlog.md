@@ -19,6 +19,11 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
+**ĐỢT FESTO (thêm 2026-11-16, từ review nhóm 2026-11-09, `docs/review-notes-team-2026-11-09.md`; Festo review 18/11, design freeze 19/11).** Khối này đứng trước khối ĐỢT CUỐI; việc còn lại của ĐỢT CUỐI (build, buổi P803, gửi file duyệt, học R #102) vẫn giữ.
+- **A. „Sửa ngay“, trước 18/11 (chỉ chữ + chỉnh nhỏ, không cần decision):** #119 (chỉ CSV) → #116 (Welcome) → #117 (Welcome + Concept, sau #116) ∥ #118 (Concept; không chạy cùng lúc với #117 vì cùng ConceptScene) → #120 (Complex, sau #116). Cuối nhóm: `german-reviewer` duyệt mọi chữ mới một lần, `ImportCsv`, chạy lại `InstructionShelfLayout` ở scene có thẻ đổi chữ, hỏi `data-analyst` có cần đổi `layout_version` không (#118 đổi tour Concept, decision 024: dữ liệu Concept trước/sau không gộp), một build.
+- **B. Cần `solution-decision`, sau Festo review (18/11), trước hoặc sau freeze tuỳ phản hồi:** #121 (Welcome theo chuỗi), #122 (ví dụ Complex, sau #119), #123 (Empf Kz 000 ở Complex), #124 (Menu). Có thể chạy một `solution-decision` chung cho #121 + #124 (cùng câu hỏi „làm sao người học thấy bước/bài tiếp theo“).
+- **C. Chờ các bạn tả lại:** #125 (chữ nào gần/xa), #126 (nút nào không ăn). **Vòng sau:** #127 audio.
+
 **ĐỢT CUỐI (người dùng chốt 2026-11-06: gộp mọi việc còn lại vào một đợt; 2026-11-07 chốt build cuối để demo).** Khối này thay mọi thứ tự cũ bên dưới (các khối cũ chỉ còn là lịch sử). Không thêm feature mới trước demo.
 - **A. Trước build (đổi app, Claude làm, không cần kính):**
   1. `german-reviewer` duyệt một lần mọi chữ mới/đổi từ #86 tới #113 (`docs/i18n/strings-todo.csv`), sửa CSV, `LocalizationBinder.ImportCsv()`; nếu chữ thẻ đổi thì chạy lại `InstructionShelfLayout` ở scene đó.
@@ -2021,3 +2026,151 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl115.md
 - **Status:** verified-mcp (10/10 ✅ MCP/code, chờ test tay H1 trên kính)
+
+## Review nhóm 2026-11-09 (Prototype v2, English, Notion „Internal team review“)
+
+Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu với CSV và scene 2026-11-16). Mỗi chữ đổi đi qua `localize-strings` (EN + DE), `german-reviewer` duyệt một lần cuối đợt; thẻ đổi chữ thì chạy lại `InstructionShelfLayout` ở scene đó.
+
+### #116 [P1] Welcome: tiêu đề „Learning objectives“, „You will know / You will be able to“, câu „positions“ dễ hiểu, thẻ 1 nói đặt hộp xuống
+- **Type:** logic
+- **Scene(s):** WelcomeScene (chữ dùng chung cũng hiện ở MixedPickingScene thẻ mục tiêu, ComplexScene `Congratulations`)
+- **Files:** `docs/i18n/strings-todo.csv` (`welcome.panel.title`, `welcome.panel.know`, `welcome.panel.can`, `welcome.card.step1_body`, `mixed.card.task_body`, `complex.end.summary`), `Assets/Scenes/WelcomeScene.unity` (chỉ nếu bảng phải rộng hơn)
+- **Problem:** (C1, C4, C9) Tiêu đề „What you will learn“ và „You know / You can“ không nói đây là mục tiêu sẽ đạt. Gạch „pick several positions one after another“ dùng „position“ mà người mới chưa biết là một dòng của đơn. Thẻ 1 chỉ nói „lift it up“, người học nhấc hộp rồi không biết làm gì.
+- **Done when:** Ở Welcome bảng `Info Panel` có tiêu đề „Learning objectives“ (DE tương ứng), cụm đầu mở bằng „You will know:“, cụm sau „You will be able to:“. Gạch thứ 3 của cụm sau nói việc nhặt từng dòng của đơn bằng chữ người mới hiểu; cùng câu đó là chữ đậm của thẻ mục tiêu Mixed và dòng tương ứng trong `complex.end.summary`. Mọi gạch vẫn vừa một dòng ở cả EN và DE. Thẻ 1 Welcome nói nhấc hộp lên rồi đặt xuống lại. Đổi ngôn ngữ EN ↔ DE: cả hai bản đều hiện đúng, không có `{key}`.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** nhanh (đọc bảng Welcome)
+- **Depends on:** —
+- **Status:** todo
+
+### #117 [P1] Chuyển bài: câu nói chọn bài được tô sáng trong Menu; Concept nói rõ „Start over“ chỉ để xem lại
+- **Type:** logic
+- **Scene(s):** WelcomeScene, ConceptScene
+- **Files:** `docs/i18n/strings-todo.csv` (`welcome.panel.next`, `concept.tour.material_flow.action_done`)
+- **Problem:** (C5, C6) „Then choose the next lesson in the menu“ không nhắc bài đã được tô xanh trong Menu. Cuối Concept nút phải đổi lại thành „Start over“ ngay dưới màn hình, người học bấm nhầm thay vì chọn bài 3.
+- **Done when:** Ở Welcome câu cuối bảng nói: để sang phần tiếp theo, chọn bài được tô sáng trong Menu. Ở Concept sau câu hỏi đúng cuối cùng, dòng hành động của thanh tour nói: chọn bài được tô sáng trong Menu để học tiếp, hoặc bấm „Start over“ để xem lại phần giải thích. Dòng đó vừa chỗ trên `Step Panel` ở EN và DE.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** nhanh (đọc câu cuối Concept)
+- **Depends on:** #116 (cùng WelcomeScene / CSV, làm sau)
+- **Status:** todo
+
+### #118 [P1] Concept tour: bước 1 giới thiệu màn hình WMS và „customer order“, bước 5–6 bỏ tới khi Ist = Soll, bước 9 không lẫn trái/phải, bước 11 thùng chạy chậm hơn
+- **Type:** logic
+- **Scene(s):** ConceptScene
+- **Files:** `docs/i18n/strings-todo.csv` (`concept.tour.intro.body`, `concept.tour.cartons.action`, `concept.tour.ist.action`, `concept.tour.empf_kz_000.action`), `Assets/Scenes/ConceptScene.unity` (`WmsFieldTour.steps[]` marker bước 9; `Lane Flow Demo` `startDelay`/tốc độ), `Assets/Scripts/Concept/LaneFlowDemo.cs`
+- **Problem:** (C7, C8, C11, C12, C13) Bước 1 nói „Here you see an order“: không rõ màn hình trước mặt là WMS, „order“ dễ hiểu sai. Không câu nào nói bỏ carton tiếp tới khi Ist = Soll. Bước 9 bảo so hai mẫu „to the left“ (đúng chỗ mẫu), nhưng cùng lúc bảng EKZ và mũi tên bật lên bên phải, người học nhìn sang phải. Bước 11 thùng chạy đi sau 4 s, quá nhanh với lần đầu thấy băng chạy.
+- **Done when:** Bước 1 nói màn hình trước mặt là WMS và trên đó là một customer order (DE theo glossary). Ở bước 5 và 6, dòng hành động nói bỏ carton vào thùng đơn tới khi Ist bằng Soll. Ở bước 9, từ chỗ đứng, câu chỉ đúng chỗ hai thùng mẫu và không có vật mới nào bật lên ở phía ngược với câu (bảng EKZ chỉ hiện từ bước 10, hoặc câu nhắc cả bảng bên phải). Ở bước 11 thùng kho bắt đầu chạy muộn hơn 4 s (số chốt khi làm, ghi vào test report) và cả chuyến chậm hơn hiện nay. „Von vorn“, Back và các bước khác vẫn như cũ. Ở Basic/Mixed/Complex thời gian chờ 4 s không đổi.
+- **Inspector work expected:** yes (marker bước 9, giá trị `startDelay`/tốc độ của `Lane Flow Demo`)
+- **Công:** S
+- **Test trên kính:** nhanh (bước 9 nhìn đúng phía, bước 11 đủ thời gian xem)
+- **Depends on:** —
+- **Status:** todo
+
+### #119 [P1] Phép chia nói „Soll : Verp.-Einh.“ theo tên ô LVS, không „VPE“
+- **Type:** logic
+- **Scene(s):** ConceptScene, ComplexScene (chỉ chữ trong CSV)
+- **Files:** `docs/i18n/strings-todo.csv` (`concept.quiz.cartons_from_soll.25.wrong`, `complex.quiz.wrong_cartons`, `complex.quiz.wrong_loose`)
+- **Problem:** (C15) Lời giải thích nói „Divide Soll by VPE“ trong khi ô trên LVS tên „Verp.-Einh.“; VPE là chữ trên nhãn carton. Người học không biết lấy số ở đâu.
+- **Done when:** Ở Concept câu hỏi `cartons_from_soll`, chọn „25 cartons“ → lời giải thích nói chia Soll cho Verp.-Einh. Ở Complex chọn sai câu 1 → „Soll divided by Verp.-Einh.“; chọn sai câu 2 → công thức dùng Verp.-Einh. và dấu „−“. EN và DE đều không còn „VPE“ trong ba câu đó.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** —
+- **Status:** todo
+
+### #120 [P1] Complex: bảng chúc mừng ngắn, mỗi mục tiêu một dấu ✓
+- **Type:** logic
+- **Scene(s):** ComplexScene
+- **Files:** `Assets/Scenes/ComplexScene.unity` (`Congratulations`: `TXT_SummaryTitle`, `TXT_Summary`), `docs/i18n/strings-todo.csv` (`complex.end.summary`), `Assets/Prefabs/DoneCheck.prefab`
+- **Problem:** (C21) Bảng chúc mừng lặp lại đủ 7 gạch mục tiêu của Welcome thành một khối chữ dài; người học vừa xong khoá không đọc.
+- **Done when:** Khi bảng chúc mừng hiện, mỗi mục tiêu là một dòng ngắn có dấu ✓ (`DoneCheck`) phía trước, không còn đoạn văn dài. Tiêu đề, câu bàn đạp chân („At the real picking station you confirm with your foot.“), `Code: P<nnn>` và câu tháo kính vẫn hiện và đọc được. Bảng không che màn LVS (màn đã tắt, #113). EN và DE vừa bảng. (code) Decision 034 ghi rõ phần tóm tắt cuối khoá được thay.
+- **Inspector work expected:** yes (dựng dòng ✓ trên `Congratulations`)
+- **Công:** S
+- **Test trên kính:** nhanh (đọc bảng cuối)
+- **Depends on:** #116 (dùng câu mục tiêu mới)
+- **Status:** todo
+
+### #121 [Feature] Welcome: mục tiêu ngắn có biểu tượng, hiện theo chuỗi (mục tiêu trước, việc sau), chỉ bước tiếp theo
+- **Type:** feature
+- **Scene(s):** WelcomeScene (thẻ mục tiêu các bài nếu đổi câu)
+- **Files:** `Assets/Scenes/WelcomeScene.unity` (`Info Panel`, `InstructionShelf`), `Assets/Scripts/Welcome/WelcomePracticeFeedback.cs`, CSV
+- **Problem:** (C2, C3, C10) Welcome đưa cùng lúc mục tiêu, thời lượng, chỉ dẫn thẻ, Menu, hộp và nút: quá nhiều để đọc. Sau khi nhấc hộp không có gì chỉ sang bước 2.
+- **Done when:** (viết lại khi có decision) Người học nhập mã xong thấy mục tiêu trước, phần việc (thẻ, hộp, nút) hiện sau một hành động rõ ràng. Mỗi mục tiêu ngắn hơn hiện nay và có biểu tượng. Sau khi nhấc hộp, thẻ 2 được làm nổi.
+- **Inspector work expected:** yes
+- **Công:** M
+- **Test trên kính:** nhanh
+- **Depends on:** #116; cần `solution-decision` (thay một phần decision 027/034)
+- **Status:** todo
+
+### #122 [Feature] Complex: bảng ví dụ nêu công thức trước và nhắc dùng số trên WMS
+- **Type:** feature
+- **Scene(s):** ComplexScene
+- **Files:** `docs/i18n/strings-todo.csv` (`complex.example.title`, `complex.example.body`), `Assets/Scenes/ComplexScene.unity` (`Worked Example`, nếu bảng phải cao hơn)
+- **Problem:** (C16, C17) Người học chép số 64 của ví dụ thay vì số của đơn. Ví dụ viết „64 - 60 = 4“ mà không nói vì sao trừ; công thức chỉ hiện khi đã trả lời sai.
+- **Done when:** Bảng ví dụ nêu trước công thức „Full cartons = Soll : Verp.-Einh.“ và „Loose pieces = Soll − (Verp.-Einh. × cartons)“, rồi mới tới các số 64/20, dùng dấu „−“. Bảng có một câu nói dùng số trên WMS cho đơn của mình. Bảng vẫn nằm ngay dưới cụm câu hỏi, không chồng lên cụm hay thùng, đọc được từ chỗ đứng. EN và DE.
+- **Inspector work expected:** có thể (chiều cao bảng)
+- **Công:** S
+- **Test trên kính:** nhanh (đọc bảng ví dụ)
+- **Depends on:** #119 (cùng cách gọi Verp.-Einh.)
+- **Status:** todo
+
+### #123 [Feature] Complex: người học để ý Empf Kz 000
+- **Type:** feature
+- **Scene(s):** ComplexScene
+- **Files:** chưa rõ (thẻ, LVS hoặc thùng; theo decision)
+- **Problem:** (C18) Ở bài cuối Empf Kz là 000 ở cả hai position, người học không để ý. Từ #105 bài thực hành không vẽ gì lên LVS.
+- **Done when:** (viết lại khi có decision) Ở position 1 người học thấy Empf Kz 000 được làm nổi ở một chỗ, không trái quy tắc „một ký hiệu một nghĩa“.
+- **Inspector work expected:** yes
+- **Công:** S–M
+- **Test trên kính:** nhanh
+- **Depends on:** cần `solution-decision` (đụng #105, decision 036/037)
+- **Status:** todo
+
+### #124 [Feature] Menu dễ nhận ra
+- **Type:** feature
+- **Scene(s):** cả 5 scene
+- **Files:** chưa rõ (theo decision)
+- **Problem:** (C20) Người học không nhận ra Menu bên phải bàn. Nhóm đề xuất mũi tên, nhưng mũi tên cam đang chỉ có nghĩa „nhìn/cầm cái này“ trong tour Concept (decision 037 mục 5).
+- **Done when:** (viết lại khi có decision) Lúc cần chuyển bài, người học tìm thấy Menu mà không phải hỏi.
+- **Inspector work expected:** yes
+- **Công:** S–M
+- **Test trên kính:** nhanh
+- **Depends on:** #117; cần `solution-decision`
+- **Status:** todo
+
+### #125 [P2] Chữ nổi lúc gần lúc xa gây chóng mặt
+- **Type:** bug
+- **Scene(s):** chưa rõ
+- **Files:** chưa rõ (ứng viên: dấu cảnh báo `EkzPlacementCheck.MarkLoose` quay theo camera, thẻ `ConceptBoxHints`)
+- **Problem:** (C19) Các bạn thấy chữ nổi phía trước khi gần khi xa. Thẻ, thanh tour và Menu đứng yên, nên chưa biết chữ nào.
+- **Done when:** (sau khi biết chữ nào) Chữ đó đứng yên ở một khoảng cách cố định khi người học nhìn quanh.
+- **Inspector work expected:** —
+- **Công:** S
+- **Test trên kính:** bắt buộc (cảm giác chóng mặt)
+- **Depends on:** —
+- **Status:** blocked (cần các bạn chỉ chữ nào, ở scene nào)
+
+### #126 [P0] Nút bấm không ăn
+- **Type:** bug
+- **Scene(s):** chưa rõ
+- **Files:** chưa rõ
+- **Problem:** (C14) Các bạn báo nút không hoạt động tốt, chưa có bước tái hiện.
+- **Done when:** (sau khi tái hiện) Nút đó phản hồi mỗi lần chạm bằng ngón tay trên Quest.
+- **Inspector work expected:** —
+- **Công:** S
+- **Test trên kính:** bắt buộc
+- **Depends on:** —
+- **Status:** blocked (cần biết nút nào, scene nào, bấm thế nào; hoặc giờ trong video)
+
+### #127 [Feature] Âm thanh đúng/sai và audio thay bớt chữ
+- **Type:** feature
+- **Scene(s):** cả khoá
+- **Files:** —
+- **Problem:** (C22, C23) Đúng/sai chưa có âm thanh; phải đọc quá nhiều.
+- **Done when:** (viết khi có decision ở vòng sau)
+- **Inspector work expected:** yes
+- **Công:** M–L
+- **Test trên kính:** bắt buộc
+- **Depends on:** —
+- **Status:** todo (vòng sau, ngoài phạm vi trước design freeze 19/11 theo kế hoạch Notion)
