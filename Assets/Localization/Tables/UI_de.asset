@@ -465,7 +465,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627435
-    m_Localized: "Danach w\xE4hlen Sie im Men\xFC die markierte Lektion."
+    m_Localized: "W\xE4hlen Sie danach im Men\xFC die markierte Lektion."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627436
@@ -637,8 +637,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182467
-    m_Localized: "25 ist die VPE (im LVS: Verp.-Einh.): die St\xFCckzahl in einem
-      Karton. Teilen Sie Soll durch Verp.-Einh."
+    m_Localized: ' that is the number of pieces in one carton. Divide Soll by Verp.-Einh.'
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473
@@ -888,8 +887,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 773084278558720
-    m_Localized: "W\xE4hlen Sie jetzt die markierte Lektion im Men\xFC. Um die Erkl\xE4rung
-      zu wiederholen, dr\xFCcken Sie \u201EVon vorn\u201C."
+    m_Localized: "W\xE4hlen Sie jetzt im Men\xFC die markierte Lektion. Dr\xFCcken
+      Sie \u201EVon vorn\u201C, um die Erkl\xE4rung zu wiederholen."
     m_Metadata:
       m_Items: []
   - m_Id: 970336074862592
@@ -970,7 +969,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5042288934653956
-    m_Localized: das LVS mit dem Etikett vergleichen
+    m_Localized: Angaben im LVS mit dem Etikett vergleichen
     m_Metadata:
       m_Items: []
   - m_Id: 5042288934653957

@@ -16,7 +16,7 @@ welcome.panel.know,<b>Nach dem Kurs kennen Sie:</b>\n• die Felder im Lagerverw
 welcome.panel.can,"<b>Nach dem Kurs können Sie:</b>\n• die Angaben im LVS ablesen und mit dem Etikett vergleichen\n• Kartons nach EKZ einlegen\n• mehrere Auftragspositionen nacheinander kommissionieren\n• ausrechnen, wie viele volle Kartons und lose Teile Sie brauchen",proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
 welcome.panel.duration,"Dauer: 5 Lektionen, je etwa 5 Minuten",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#86, decision 034)"
 common.panel.see_cards,Ihre Aufgaben stehen links auf den Karten.,proposed,german-reviewer (agent),2026-11-02,#35
-welcome.panel.next,Danach wählen Sie im Menü die markierte Lektion.,proposed,german-reviewer (agent),2026-11-16,#117: Agent OK after one fix
+welcome.panel.next,Wählen Sie danach im Menü die markierte Lektion.,proposed,german-reviewer (agent),2026-11-16,Agent: corrected in batch review #116-#120
 mixed.card.task_body,"<b>Sie lernen, mehrere Auftragspositionen nacheinander zu kommissionieren.</b>\nSo stimmen bei jeder Position Material und Menge, auch wenn Verpackung und EKZ wechseln.",proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
 mixed.card.step1_body,"Lesen Sie für die aktuelle Position ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,german-reviewer (agent),2026-11-05,#87
 common.card.step2_pick_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
@@ -131,7 +131,7 @@ concept.quiz.cartons_from_soll.2,2 Kartons,proposed,german-reviewer (agent),2026
 concept.quiz.cartons_from_soll.2.wrong,2 Kartons sind nur 50 Stück.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.4,4 Kartons,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.cartons_from_soll.25,25 Kartons,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
-concept.quiz.cartons_from_soll.25.wrong,25 ist die VPE (im LVS: Verp.-Einh.): die Stückzahl in einem Karton. Teilen Sie Soll durch Verp.-Einh.,proposed,german-reviewer (agent),2026-11-16,#119: Agent OK
+concept.quiz.cartons_from_soll.25.wrong,"25 ist die VPE (im LVS: Verp.-Einh.), also die Stückzahl in einem Karton. Teilen Sie Soll durch Verp.-Einh.",proposed,german-reviewer (agent),2026-11-16,Agent: corrected in batch review #116-#120
 concept.quiz.ekz_003.q,Empf Kz 003: Wie geben Sie die Kartons in den Auftragsbehälter?,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#94, cartons/bags examples; einfüllen still to confirm with instructor)"
 concept.quiz.ekz_003.ordered,Einzeln und geordnet einlegen,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.quiz.ekz_003.poured,Ungeordnet einlegen,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#107, decision 036)"
@@ -198,7 +198,7 @@ concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu
 concept.hint.storage_wrong_material,In diesem Lagerbehälter liegt Material mit einer anderen Materialnummer. Nehmen Sie es heraus.,proposed,,2026-11-05,#100 new
 concept.tour.to_questions,Zu den Fragen,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
 complex.card.step2_body_answered,"<b>{cartons} Kartons + {pieces} Stück</b>\nLegen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93); add a singular key if the order ever needs 1 carton
-concept.tour.material_flow.action_done,"Wählen Sie jetzt die markierte Lektion im Menü. Um die Erklärung zu wiederholen, drücken Sie „Von vorn“.",proposed,german-reviewer (agent),2026-11-16,#117: Agent OK after one fix
+concept.tour.material_flow.action_done,"Wählen Sie jetzt im Menü die markierte Lektion. Drücken Sie „Von vorn“, um die Erklärung zu wiederholen.",proposed,german-reviewer (agent),2026-11-16,Agent: corrected in batch review #116-#120
 concept.quiz.label_by_matnr.q,Im LVS steht die Mat.-Nr 738190. Welches Etikett passt?,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 concept.quiz.label_by_matnr.738910,Mat.-Nr: 738910,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 concept.quiz.label_by_matnr.738190,Mat.-Nr: 738190,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
@@ -216,7 +216,7 @@ complex.end.know.1,die Felder im LVS,proposed,german-reviewer (agent),2026-11-16
 complex.end.know.2,Lager- und Auftragsbehälter,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
 complex.end.know.3,den Unterschied zwischen Empf Kz 003 und 000,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
 complex.end.can_title,Sie können jetzt:,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
-complex.end.can.1,das LVS mit dem Etikett vergleichen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.can.1,Angaben im LVS mit dem Etikett vergleichen,proposed,german-reviewer (agent),2026-11-16,Agent: corrected in batch review #116-#120
 complex.end.can.2,Kartons nach EKZ einlegen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
 complex.end.can.3,mehrere Auftragspositionen kommissionieren,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
 complex.end.can.4,volle Kartons und lose Teile ausrechnen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
