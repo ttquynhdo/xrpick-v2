@@ -958,6 +958,13 @@ local({
             all(cq37$quiz_layout[cq37$participant_id != "P819"] == "near_panel"),
             all(cq37$quiz_questions[cq37$participant_id == "P819" & !is.na(cq37$quiz_s)] == 3),
             isTRUE(all(cq37$ekz_right_before_box[cq37$participant_id == "P819"])))
+  # #137: "037" swaps tour steps 8/9; tour_steps.csv names them per layout.
+  ts37 <- read_csv(file.path(pilot_dir, "tour_steps.csv"), show_col_types = FALSE,
+                   col_types = cols(layout_version = col_character()))
+  stopifnot(all(ts37$step_id[ts37$step_index == 8 & ts37$layout_version == "037"] == "empf_kz_000"),
+            all(ts37$step_id[ts37$step_index == 9 & ts37$layout_version == "037"] == "empf_kz_003"),
+            all(ts37$step_id[ts37$step_index == 8 & ts37$layout_version == "036"] == "empf_kz_003"),
+            any(ts37$layout_version == "037"), any(ts37$layout_version == "036"))
 
   # 8z2. Complex third question ekz (#123, decision 039, layout "036"). P818
   #      touches ordered, separator, then poured (right) after loose, and

@@ -2302,3 +2302,57 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl135.md
 - **Status:** verified-mcp (7/7 ✅ MCP/code, nhánh `feat/135-text-comfort-audit`; không có case tay, chỉ tool Editor)
+
+### #136 [P1] Concept: mũi tên cam tắt hẳn sau lần cầm carton đầu tiên
+- **Type:** bug
+- **Scene(s):** ConceptScene
+- **Files:** `Assets/Scripts/Concept/MarkerHideOnGrab.cs`
+- **Problem:** (review 2026-11-17, F1 trong `docs/review-notes-2026-11-17.md`) Mũi tên cam `STECKER C Marker` tắt khi người học cầm carton, nhưng tour bật lại nó ở bước 3 (`verp_einh`) và mỗi lần „Zurück“. Người học đã cầm carton rồi mà mũi tên vẫn chỉ vào carton, đúng lúc dòng hành động cũng bảo cầm carton.
+- **Done when:** Ở bước 2, chưa cầm carton nào: mũi tên hiện trên thùng kho. Cầm một carton STECKER C ở bước 2: mũi tên tắt. Thả carton ra, bấm „Weiter“ sang bước 3: mũi tên không hiện lại. Bấm „Zurück“ về bước 2, hoặc „Von vorn“ rồi đi tới bước 2: mũi tên không hiện lại. Vào lại ConceptScene từ Menu: mũi tên hiện lại ở bước 2 cho tới lần cầm đầu tiên. (code) Cờ „đã cầm“ chỉ sống trong một lượt vào scene, không ghi log.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** nhanh (cầm carton bằng tay thật ở bước 2, rồi sang bước 3)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl136.md
+- **Status:** verified-mcp (5/5 ✅ MCP/code, chờ test tay H1)
+
+### #137 [P1] Concept: đơn mẫu đổi sang Empf Kz 000, bước 8–9 của tour đổi theo
+- **Type:** logic
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene `WMS_Monitor/SampleWmsOrder` (`line.empfKz`), `Sample Description/WmsFieldTour.steps` (bước 8–9), `Tour Markers/Caption empf_kz_003|000`, `EKZ Overview Arrow`, `Layout Slots/EKZ Sample 003|000` (dòng lý do), `docs/i18n/strings-todo.csv` (`concept.tour.empf_kz_*`), `analysis/make_fake_data.R` (thứ tự bước tour)
+- **Problem:** (review 2026-11-17, F3) LVS của đơn mẫu ghi Empf Kz 003 (EKZ 3: từng cái, có thứ tự), nhưng ở Concept người học bỏ carton vào thùng đơn lộn xộn mà không có hậu quả. Màn hình và việc làm mâu thuẫn ngay lúc dạy quy tắc EKZ. Người dùng chọn 2026-11-17: đổi đơn mẫu sang 000 (thay phần „Concept mẫu 003“ của decision 028).
+- **Done when:** Ô Empf Kz của đơn mẫu hiện 000 nền xám. Ở bước 8 („Empf Kz“) chú thích nói 000 = EKZ 0, carton được nằm lộn xộn, và chỉ thùng mẫu „Empf Kz 000“ hiện, có dòng „Beispiel – nicht zum Greifen.“. Ở bước 9 („Anderer Wert: Empf Kz 003“) cả hai thùng mẫu, bảng EKZ và mũi tên hiện, mũi tên chỉ hàng EKZ 3. Bấm „Zurück“ từ bước 9 về bước 8: thùng mẫu 003 và bảng EKZ tắt. Tour vẫn đi đủ 11 bước tới „Zu den Fragen“. (code) Id bước `tour_step` không đổi, chỉ đổi thứ tự (`empf_kz_000` trước `empf_kz_003`); `layout_version` vẫn "037", spec và R ghi lại.
+- **Inspector work expected:** no (đã làm qua MCP)
+- **Công:** M
+- **Test trên kính:** nhanh (đọc bước 8–9, thấy ô Empf Kz xám 000)
+- **Depends on:** —
+- **Decision:** người dùng chọn 2026-11-17 (hướng (a) của F3), thay phần „Concept mẫu 003“ của decision 028; không chạy `solution-decision`
+- **Test report:** docs/test-reports/bl137.md
+- **Status:** verified-mcp (6/6 ✅ MCP/code, chờ test tay H1)
+
+### #138 [P1] Concept: mũi tên cam đứng thẳng, chỉ xuống tâm thùng kho
+- **Type:** bug
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene `STECKER C Marker` (vị trí, hướng, `Tip`)
+- **Problem:** (người dùng 2026-11-17) Mũi tên cam nằm ngang, thấp hơn miệng thùng kho, đuôi lấn qua thành trước, nên trông như cắm xuyên thùng; đầu mũi tên là ô vuông. Có từ #105/#88, không do #136.
+- **Done when:** Ở bước 2, mũi tên đứng thẳng ngay trên tâm thùng kho, đầu nhọn chỉ xuống, quay mặt về chỗ đứng. Đầu nhọn cách miệng thùng 3 cm, khi nhún lên không chạm thành hay carton. Nhìn từ chỗ đứng hay từ gần, không phần nào bị thành thùng cắt.
+- **Inspector work expected:** no (đã làm qua MCP)
+- **Công:** S
+- **Test trên kính:** nhanh (nhìn mũi tên ở bước 2)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl138.md
+- **Status:** verified-mcp (3/3 ✅ MCP/code, chờ test tay H1)
+
+### #139 [P1] Mixed/Complex: thẻ kết quả bảo để nguyên hàng của vị trí trước trong thùng đơn
+- **Type:** logic
+- **Scene(s):** MixedPickingScene, ComplexScene
+- **Files:** `docs/i18n/strings-todo.csv` (`mixed.feedback.position_done`, `complex.feedback.position_done`), `Assets/Scripts/MixPickingContainer.cs`, `Assets/Scripts/PiecesContainerCounter.cs`, `Assets/Scripts/MixPickingValidator.cs`
+- **Problem:** (review 2026-11-17, F2 trong `docs/review-notes-2026-11-17.md`, video `material.mp4`) Sau khi xác nhận đúng vị trí 1, hàng của vị trí 1 ở lại thùng đơn (cố ý, decision 012/016) nhưng không có gì nói điều đó; người thử lấy hàng cũ ra và để chúng lơ lửng. Ngoài ra, lấy bất kỳ kiện nào ra (kể cả hàng đã xong) đều tắt thẻ kết quả, nên một câu nhắc trên thẻ sẽ biến mất đúng lúc người học bắt đầu dọn hàng cũ.
+- **Done when:** Ở Mixed và Complex, xác nhận đúng vị trí 1 → thẻ kết quả có câu „Lassen Sie die Ware im Auftragsbehälter liegen.“ (EN „Leave the goods in the order container.“) và không còn „der nächste kommt von links“. Khi thẻ đang hiện, lấy một kiện của vị trí 1 ra khỏi thùng đơn hoặc đặt lại vào → thẻ vẫn hiện, chữ không đổi. Đặt một kiện của vị trí 2 vào thùng đơn, hoặc lấy ra → thẻ tắt như trước. Xác nhận sai ở vị trí 1 hoặc 2 vẫn báo lỗi như trước; xác nhận đúng cuối cùng không đổi. Chữ DE và EN dài nhất vừa thẻ ở cỡ chữ cố định (view `confirm`, cả hai scene). (code) Thẻ chỉ bị xoá khi kiện của vị trí hiện tại thay đổi (hàng đã xong = `confirmedPackages`); ở Mixed, chỗ đặt EKZ 003 thay đổi chỉ xoá thẻ khi dòng hiện tại cần chỗ đặt.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** nhanh (đọc thẻ, lấy một kiện cũ ra rồi đặt lại)
+- **Depends on:** —
+- **Decision:** người dùng chọn phương án A trong phiên fork, 2026-11-17 (không chạy `solution-decision`)
+- **Test report:** docs/test-reports/bl139.md
+- **Status:** verified-mcp (12/12 ✅ MCP/code, chờ test tay H1)

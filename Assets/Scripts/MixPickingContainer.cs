@@ -79,7 +79,7 @@ public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositioned
         {
             OrderContainerLog.Changed(this, true, package, packagesInside.Count);
             Recalculate();
-            ContentsChanged?.Invoke();
+            RaiseIfCurrent(package);
         }
     }
 
@@ -94,6 +94,17 @@ public class MixedPickingContainer : MonoBehaviour, IWmsOrderSource, IPositioned
         {
             OrderContainerLog.Changed(this, false, package, packagesInside.Count);
             Recalculate();
+            RaiseIfCurrent(package);
+        }
+    }
+
+    // #139: goods of a finished position may be taken out and put back without clearing the result card, which
+    // tells the trainee to leave them in the order container. They count for nothing (Ist, rating), so no listener
+    // needs the change; the container log above still records it.
+    private void RaiseIfCurrent(PackageData package)
+    {
+        if (!confirmedPackages.Contains(package))
+        {
             ContentsChanged?.Invoke();
         }
     }

@@ -85,7 +85,7 @@ public class PiecesContainerCounter : MonoBehaviour, IWmsOrderSource, IPositione
         {
             OrderContainerLog.Changed(this, true, item, objectsInside.Count);
             Recalculate();
-            ContentsChanged?.Invoke();
+            RaiseIfCurrent(item);
         }
     }
 
@@ -100,6 +100,17 @@ public class PiecesContainerCounter : MonoBehaviour, IWmsOrderSource, IPositione
         {
             OrderContainerLog.Changed(this, false, item, objectsInside.Count);
             Recalculate();
+            RaiseIfCurrent(item);
+        }
+    }
+
+    // #139: goods of a finished position may be taken out and put back without clearing the result card, which
+    // tells the trainee to leave them in the order container. They count for nothing (Ist, rating), so no listener
+    // needs the change; the container log above still records it.
+    private void RaiseIfCurrent(PackageData item)
+    {
+        if (!confirmedPackages.Contains(item))
+        {
             ContentsChanged?.Invoke();
         }
     }

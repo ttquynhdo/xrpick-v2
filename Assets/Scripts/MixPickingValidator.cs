@@ -56,7 +56,7 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         }
         if (placementCheck != null)
         {
-            placementCheck.PlacementChanged += ClearResult;
+            placementCheck.PlacementChanged += HandlePlacementChanged;
         }
         if (stationStock is IStationStock stock)
         {
@@ -72,7 +72,7 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         }
         if (placementCheck != null)
         {
-            placementCheck.PlacementChanged -= ClearResult;
+            placementCheck.PlacementChanged -= HandlePlacementChanged;
         }
         if (stationStock is IStationStock stock)
         {
@@ -112,6 +112,16 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
                     break;
                 }
             }
+        }
+    }
+
+    // #139: a carton of a finished Empf Kz 003 position leaving or entering its snap place must not hide the result
+    // card that tells the trainee to leave the goods in the order container; only the current line's places count.
+    private void HandlePlacementChanged()
+    {
+        if (container != null && EkzPlacementCheck.NeedsPlaces(container.CurrentLine))
+        {
+            ClearResult();
         }
     }
 

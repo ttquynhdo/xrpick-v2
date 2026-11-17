@@ -259,9 +259,16 @@ remainder_questions <- list(
   loose   = list(keys = c("5", "20", "55"), right = "5", skill = "calculate_loose"))
 
 # The 11 steps of the Concept field tour (WmsFieldTour; keys concept.tour.<id>).
-# The quiz opens at the last one, material_flow.
+# The quiz opens at the last one, material_flow. Up to layout "036" the sample
+# order showed Empf Kz 003, so step 8 was empf_kz_003 and step 9 empf_kz_000;
+# from "037" (#137) the sample order shows 000 and the two steps swap (same
+# ids, same events). step_index 8/9 therefore mean different steps per layout.
 tour_steps <- c("intro", "material", "verp_einh", "soll", "cartons", "ist", "rest",
                 "empf_kz_003", "empf_kz_000", "not_used", "material_flow")
+tour_steps_for <- function(layout) {
+  if (!layout_at_least(layout, 37)) return(tour_steps)
+  replace(tour_steps, 8:9, c("empf_kz_000", "empf_kz_003"))
+}
 
 # Chance of an error on attempt k: lower for able trainees, for later attempts
 # at the same item, for skills practised before, and for a scaffolded item
@@ -1153,6 +1160,8 @@ concept_move <- function(s, obj, from, to, carry_s = 1.5, reason = NULL, clears 
 # Layout "032" (#92): the 6 storage cartons are the only packages; a step
 # shown after material_flow resets them (concept_left_flow, section 5b4).
 run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
+  # Step order of this build's layout (#137: steps 8/9 swapped from "037").
+  tour_steps <- tour_steps_for(s$layout)
   unlocked <- FALSE
   s$tour_step <- NULL
   s$on_next_step <- NULL
@@ -1906,7 +1915,8 @@ assign(".Random.seed", rng_before_p818, envir = globalenv())
 # Complex question ekz, 8 s lane demo, 4 s station wait, Menu highlight).
 # R must split ConceptScene from "036" (decision 024) and keep Complex
 # position_1 times apart from P818 (quiz_layout read_far). P819 answers ekz
-# right at once. Own random stream, restored, like P818.
+# right at once. #137: its Concept tour shows empf_kz_000 as step 8 and
+# empf_kz_003 as step 9 (tour_steps_for). Own random stream, restored, like P818.
 rng_before_p819 <- .Random.seed
 set.seed(819)
 p819 <- new_person("P819")

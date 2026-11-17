@@ -348,21 +348,21 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627400
-    m_Localized: Empf Kz
+    m_Localized: 'Anderer Wert: Empf Kz 003'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627401
-    m_Localized: 'Hier steht, wie Sie die Teile einlegen: 003 ist EKZ 3, also einzeln
-      und geordnet wie die Kartons im Beispiel.'
+    m_Localized: "Bei anderen Auftr\xE4gen kann hier 003 stehen, das ist EKZ 3: Dann
+      legen Sie die Kartons einzeln und geordnet ein, wie im Beispiel."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627402
-    m_Localized: 'Anderer Wert: Empf Kz 000'
+    m_Localized: Empf Kz
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: "Bei anderen Auftr\xE4gen kann hier 000 stehen, das ist EKZ 0: Die
-      Kartons d\xFCrfen ungeordnet liegen wie im Beispiel."
+    m_Localized: "Hier steht, wie Sie die Teile einlegen: 000 ist EKZ 0, also d\xFCrfen
+      die Kartons ungeordnet liegen wie im Beispiel."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -527,9 +527,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
-    m_Localized: "Position {position} ist erledigt.\nDer Lagerbeh\xE4lter f\xE4hrt
-      weg, der n\xE4chste kommt von links. Sehen Sie den Beh\xE4ltern auf der Rollenbahn
-      zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab."
+    m_Localized: "Position {position} ist erledigt. Lassen Sie die Ware im Auftragsbeh\xE4lter
+      liegen.\nDer Lagerbeh\xE4lter f\xE4hrt weg. Sehen Sie den Beh\xE4ltern auf
+      der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position}
+      ab."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
@@ -602,9 +603,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
-    m_Localized: "Position {done} ist erledigt.\nDer Lagerbeh\xE4lter f\xE4hrt weg,
-      der n\xE4chste kommt von links. Sehen Sie den Beh\xE4ltern auf der Rollenbahn
-      zu.\nLesen Sie dann im LVS die Angaben zu Position {next} ab."
+    m_Localized: "Position {done} ist erledigt. Lassen Sie die Ware im Auftragsbeh\xE4lter
+      liegen.\nDer Lagerbeh\xE4lter f\xE4hrt weg. Sehen Sie den Beh\xE4ltern auf
+      der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next} ab."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465
@@ -857,13 +858,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810630
-    m_Localized: "Sehen Sie sich links neben dem Bildschirm das Beispiel \u201EEmpf
-      Kz 003\u201C an."
+    m_Localized: "Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.
+      Sehen Sie danach rechts die EKZ-\xDCbersicht an."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810631
-    m_Localized: "Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.
-      Sehen Sie danach rechts die EKZ-\xDCbersicht an."
+    m_Localized: "Sehen Sie sich links neben dem Bildschirm das Beispiel \u201EEmpf
+      Kz 000\u201C an."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632

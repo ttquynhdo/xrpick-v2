@@ -2666,13 +2666,18 @@ if (nrow(bad_step) > 0) {
 }
 tour_rows <- tour_rows %>% filter(!is.na(step_index), step_index >= 1)
 n_steps <- if (!is.null(tour_n_steps)) tour_n_steps else if (nrow(tour_rows) > 0) max(tour_rows$step_index) else NA_integer_
-# Step names per index (the tour's step_id), for the table and the charts.
-step_names <- tour_rows %>% filter(!is.na(step_id)) %>% count(step_index, step_id) %>%
-  group_by(step_index) %>% slice_max(n, n = 1, with_ties = FALSE) %>% ungroup() %>% select(-n)
-odd_names <- tour_rows %>% distinct(step_index, step_id) %>% count(step_index) %>% filter(n > 1)
+# Step names per layout_version and index (the tour's step_id), for the table
+# and the charts. The step order may differ between layouts: #137 swapped
+# steps 8/9 in "037" (empf_kz_000 before empf_kz_003; "036" and older:
+# empf_kz_003 before empf_kz_000), so a step_index is only named within its
+# layout and never across layouts. Compare one step across layouts by step_id.
+step_names <- tour_rows %>% filter(!is.na(step_id)) %>% count(layout_version, step_index, step_id) %>%
+  group_by(layout_version, step_index) %>% slice_max(n, n = 1, with_ties = FALSE) %>% ungroup() %>% select(-n)
+odd_names <- tour_rows %>% distinct(layout_version, step_index, step_id) %>%
+  count(layout_version, step_index) %>% filter(n > 1)
 if (nrow(odd_names) > 0) {
-  warn("tour step_index with more than one step_id (renamed step? the name of the most frequent is used): ",
-       paste(odd_names$step_index, collapse = ", "))
+  warn("tour step_index with more than one step_id within one layout (renamed step? the name of the most frequent is used): ",
+       paste0("layout ", layout_label(odd_names$layout_version), " step ", odd_names$step_index, collapse = ", "))
 }
 
 # Visit facts: end of the visit and the first quiz touch.
@@ -2752,7 +2757,7 @@ if (nrow(tour_visits) > 0) {
               ev_restart = sum(direction == "restart"), .groups = "drop")
   tour_steps <- tour_visits %>%
     crossing(step_index = seq_len(n_steps)) %>%
-    left_join(step_names, by = "step_index") %>%
+    left_join(step_names, by = c("layout_version", "step_index")) %>%
     left_join(per_step_shown, by = c("session_id", "scene_visit", "step_index")) %>%
     left_join(per_step_left, by = c("session_id", "scene_visit", "step_index")) %>%
     mutate(zurueck_available = tour_has_zurueck(layout_version),
@@ -2770,15 +2775,19 @@ if (nrow(tour_visits) > 0) {
 }
 write_csv(tour_steps, file.path(output_dir, "tour_steps.csv"), na = "")
 
-# Step label on the x axis, e.g. "5 cartons" (step_index and step_id), in step order.
-step_label_of <- function(i) paste(i, coalesce(step_names$step_id[match(i, step_names$step_index)], ""))
+# Step label on the x axis, e.g. "5 cartons" (step_index and step_id of the
+# row's own layout), in step order; each layout panel has its own x axis
+# (free_x), because steps 8/9 differ between "036" and "037" (#137).
+step_label_of <- function(i, id) paste(i, coalesce(id, ""))
 
 # Charts from the first Concept visit with a tour per participant (repeat
 # visits after a crash are second exposures). One panel per layout_version,
 # so "019" and "025" are never pooled (decision 024).
 tour_first <- tour_steps %>%
   group_by(participant_id) %>% filter(visit_no == min(visit_no)) %>% ungroup() %>%
-  mutate(step_label = factor(step_label_of(step_index), levels = step_label_of(seq_len(max(0, n_steps, na.rm = TRUE)))),
+  arrange(step_index, step_id) %>%
+  mutate(step_label = step_label_of(step_index, step_id),
+         step_label = factor(step_label, levels = unique(step_label)),
          layout_panel = paste0("layout ", layout_label(layout_version)))
 
 title_tour <- "Which ConceptScene tour step holds the trainee longest?"
@@ -2793,7 +2802,7 @@ if (nrow(tour_first) == 0 || all(is.na(tour_first$active_s))) {
     geom_jitter(width = 0.12, height = 0, size = 2, alpha = 0.6, colour = "#0072B2") +
     geom_point(data = tour_n, aes(y = median_s), shape = 18, size = 4, colour = "#D55E00") +
     geom_text(data = tour_n, aes(y = y, label = paste0("n=", n)), vjust = -0.8, size = 3, colour = "grey30") +
-    facet_wrap(~ layout_panel, ncol = 1) +
+    facet_wrap(~ layout_panel, ncol = 1, scales = "free_x") +
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.2))) +
     labs(title = title_tour,
          subtitle = paste0("Dot = one participant's active seconds on the step (all showings, pauses removed; ",
@@ -2824,7 +2833,7 @@ if (nrow(tour_back) == 0) {
     geom_col(colour = "white", linewidth = 0.2) +
     geom_text(data = back_n, aes(y = total, label = paste0(people, "/", n), fill = NULL),
               vjust = -0.4, size = 3, colour = "grey30") +
-    facet_wrap(~ layout_panel, ncol = 1) +
+    facet_wrap(~ layout_panel, ncol = 1, scales = "free_x") +
     scale_fill_manual(values = c("#56B4E9", "#D55E00"), name = NULL) +
     scale_y_continuous(expand = expansion(mult = c(0, 0.25))) +
     labs(title = title_back,
@@ -3779,7 +3788,7 @@ validity_limits <- c(
   "- Time-to-correct only covers visits that reached correct; the 'never' counts show who is missing.",
   "- Q4 (paper SSQ): the logs hold no frame-rate, frame-drop, head-movement or tracking data (decision 022). SSQ change (post - pre) can only be read against headset removals, pauses, an early end (end_status, abbruchgrund) and active time, for the whole session (no per-scene sickness).",
   "- Q5 (paper NASA-TLX, once at the end, raw = unweighted mean): who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.",
-  "- ConceptScene tour (tour_steps.csv): Back presses are derived from step_index (-1 = Zurück) and exist only for layout_version \"025\" on; \"019\" logs and headers without layout_version have NA, not 0. A Zurück < 2 s after Weiter is read as a likely mis-press, not proven. Step time ends at the next step or the first quiz answer: time spent looking elsewhere (label board, packages) is in it.",
+  "- ConceptScene tour (tour_steps.csv): Back presses are derived from step_index (-1 = Zurück) and exist only for layout_version \"025\" on; \"019\" logs and headers without layout_version have NA, not 0. A Zurück < 2 s after Weiter is read as a likely mis-press, not proven. Step time ends at the next step or the first quiz answer: time spent looking elsewhere (label board, packages) is in it. Steps 8 and 9 swap from layout \"037\" (#137: empf_kz_000 before empf_kz_003): step_id is named per layout; compare a step across layouts by step_id, never by step_index.",
   "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).",
   "- Mixed position_1 (#94, decision 028): builds before #94 had Empf Kz 000 there (placement never rated), from #94 (line.empf_kz logged, layout \"029\") Empf Kz 003 (3 snap places, EKZ_PLACEMENT possible); an earlier \"029\" build without the field counts as 000. In a set with both, position_1 is split ([Empf Kz 000] / [Empf Kz 003]) in first_attempt_by_item.png and time_by_phase.png; the per-scene Mixed numbers (error_rate_MixedPickingScene, time_to_correct, error codes) still pool both and an Empf Kz 003 visit can have more presses (EKZ retries). The ekz_placement rate counts only presses with the right quantity at an Empf Kz 003 position (EKZ opportunities): its n is small and a wrong-quantity press is no EKZ attempt.",
   "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card); from \"036\" (#123) the quiz has a third question (ekz, how the goods go into the order container) before storage box 1 (ekz_question); from \"037\" (#130, decision 040) the question and the Worked Example sit at the depth of the screen and only the A/B/C row near the hands (same ekz_question, quiz_layout read_far, split from \"036\" like a level). In a set with more than one level position_1 is split in first_attempt_by_item.png and time_by_phase.png, and complex_quiz.csv gives quiz_s (scene enter -> storage box 1) and first_confirm_p1_s per visit with scaffold_level; the per-scene Complex numbers (time_to_correct_by_scene.png, time_to_first_confirm_s, error_codes_by_scene.png) still pool the levels, and from \"036\" they contain a longer quiz. The ekz question is the only Complex test of ekz_placement (D3) and sits in items.csv / objectives_summary.csv, not in the skill-rate charts (Complex presses never test placement).",
