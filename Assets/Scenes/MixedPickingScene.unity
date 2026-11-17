@@ -4465,7 +4465,7 @@ MonoBehaviour:
   - {fileID: 1845363376}
   - {fileID: 980817742}
   snapSound: {fileID: 447496043}
-  showPlacesAtStart: 0
+  showPlacesAtStart: 1
   outlineMaterial: {fileID: 2100000, guid: 3b007082e2269ab409c2d276f6e05dc2, type: 2}
   outlineSize: {x: 0.166, y: 0.111}
   outlineStroke: 0.008

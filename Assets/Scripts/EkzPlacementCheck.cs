@@ -8,8 +8,8 @@ using UnityEngine;
 /// own snap place (one by one, aligned). Tracks which cartons are snapped from the SnapInteractable events;
 /// the validator asks only when the trainee confirms. Quantity counting never reads this.
 /// #108, decision 037 (1, 3): each place gets a thin outline on the container floor, inside the carton footprint, so a
-/// filled place no longer looks empty. Basic shows them from the start (showPlacesAtStart); Mixed position 1 only after
-/// its first placement error (ShowPlaces). #131: the loose cartons get no mark of their own; a loose carton lies on
+/// filled place no longer looks empty. Basic and (#152) Mixed show them from the start (showPlacesAtStart);
+/// Mixed hides them once position 2 (Empf Kz 000) has its storage container (MixedPickingValidator). #131: the loose cartons get no mark of their own; a loose carton lies on
 /// another carton or outside the outlined places, and the free outline shows where it goes.
 /// </summary>
 public class EkzPlacementCheck : MonoBehaviour
@@ -21,7 +21,7 @@ public class EkzPlacementCheck : MonoBehaviour
     [SerializeField] private AudioSource snapSound;
 
     [Header("Place outlines (#108)")]
-    [Tooltip("Basic: outlines visible from the start. Mixed: hidden until the first placement error (ShowPlaces).")]
+    [Tooltip("Outlines visible from the start (Basic and Mixed since #152). Off: hidden until ShowPlaces(true).")]
     [SerializeField] private bool showPlacesAtStart = true;
 
     [Tooltip("Material of the outline strokes.")]

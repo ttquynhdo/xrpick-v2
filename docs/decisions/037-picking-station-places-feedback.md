@@ -42,3 +42,9 @@ D4, D6, D35 (còn mở); D43 (trong Auftragsbehälter có vạch/chỗ cố đ�
 ## Sửa đổi #131 (2026-11-17, người dùng chọn)
 Bỏ dấu `warning` vàng trên carton lỏng (mục 3, U3). Từ bản 034 mỗi ô chỉ nhận 1 carton, carton thả gần ô trống thì tự khớp và `CartonSettler` đặt carton lỏng nằm phẳng, nên carton lỏng luôn nằm chồng lên carton khác hoặc ngoài cột ô viền; ô viền trắng còn trống chỉ chỗ đặt. Dấu nổi trên carton và quay theo đầu (checklist T8, nghi vấn C19). Câu 2 của `order.feedback.ekz3_loose`: „Legen Sie jeden Karton auf einen eigenen Platz.“ Người học tự tìm carton sai (lần bấm thứ 2 không còn chỉ là thử–sai theo dấu). Thẻ báo Concept (#100) dán phẳng lên thành trước thùng, không quay theo đầu.
 
+
+## Sửa đổi #157 (2026-11-17, người dùng chọn)
+- **Mục 1 (Mixed vị trí 1, #152):** 3 ô viền hiện **ngay từ đầu** vị trí 1, như Basic (`showPlacesAtStart` bật). Lý do: buổi thử R13 — không thấy ô thì người thử không biết đặt đâu và hiểu là lỗi. Ô vẫn tắt khi thùng kho vị trí 2 dừng (`Settled`).
+- **Mục 2 (#140):** carton thả **trên** một ô trống (tới 15 cm trên miệng thùng) thì vào ô đó; carton đặt trong ô cầm lên thì rời ô hẳn. Thả ngoài các ô vẫn nằm lỏng (lỗi EKZ vẫn xảy ra được).
+- **Mục 6 (log/R):** người dùng chấp nhận mất phép đo: từ `layout_version` „038“ không lần bấm nào ở Basic hay Mixed `position_1` còn đo `ekz_placement` (ô hiện ở cả hai) → mục tiêu **P2 = `observed`** (không `rated`) cho build „038“; `EKZ_PLACEMENT` vẫn được log (lỗi khi đang thấy ô). Hiểu biết 003/000 vẫn được chấm qua câu hỏi Concept (`ekz_003`/`ekz_000`) và Complex (`ekz`) = D3. `skill_scaffolds.csv`: Mixed `position_1` `always` từ „038“.
+- **Thả ngoài ô / ngoài thùng (#153):** mọi kiện thả giữa không trung rơi thẳng (vẫn kinematic) vào thùng bên dưới, lên mặt bàn, hoặc — trên sàn — về chỗ đã lấy (`PackageDropper`). Thứ tự quyết định: ô trống → `CartonSettler` (thùng đơn Basic/Mixed) → thùng bên dưới → mặt bàn → về chỗ lấy.

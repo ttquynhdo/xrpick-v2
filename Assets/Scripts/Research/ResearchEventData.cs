@@ -17,8 +17,10 @@ public static class ResearchEventData
     // boxes) and reworded tour steps 1, 5, 6, 9 (#118); "036" = WelcomeScene in two steps (decision 038, #121/#124:
     // objectives first, „Zu den Aufgaben“ → welcome_tasks_opened, step frame, card 3 „Lektion wählen“); "037" = read far,
     // touch near (decision 040, #129/#130: Concept step text, action line and quiz question at the screen, buttons and
-    // A/B/C lower near the hands; Complex worked example and question at the screen). R tells logs apart by it.
-    public const string LayoutVersion = "037";
+    // A/B/C lower near the hands; Complex worked example and question at the screen); "038" = #157: Mixed EKZ place
+    // outlines from the start (#152), cartons leave snap places cleanly and snap when let go above a free place (#140),
+    // packages let go in the air drop straight down or return to where they were grabbed (#153). R tells logs apart by it.
+    public const string LayoutVersion = "038";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
     public static readonly string[] EventGroups = { "session", "outcome", "interaction" };

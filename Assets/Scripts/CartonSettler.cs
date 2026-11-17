@@ -10,7 +10,8 @@ using UnityEngine;
 /// never while it is held, while the station stock moves or once the order container has been shipped, and never
 /// sideways out of the container. #157: a carton let go above the rim (up to AboveRim) is laid into the container too,
 /// so nothing hangs over it; a carton let go over a free place snaps into it instead (the places' trigger zones reach
-/// above the rim). Bags (no SnapInteractor) are left alone.
+/// above the rim). Bags (no SnapInteractor) are left alone. #153: everything else let go in the air is PackageDropper's
+/// (Covers tells it which cartons are this settler's).
 /// </summary>
 public class CartonSettler : MonoBehaviour
 {
@@ -35,6 +36,7 @@ public class CartonSettler : MonoBehaviour
     [SerializeField] private OrderBoxConveyor conveyor;
 
     private readonly Dictionary<Grabbable, Coroutine> pending = new();
+    private readonly HashSet<Grabbable> cartons = new();
     private readonly List<(Grabbable grabbable, System.Action<PointerEvent> handler)> subscriptions = new();
     private float floorY;
 
@@ -61,6 +63,7 @@ public class CartonSettler : MonoBehaviour
                 continue;
 
             Grabbable captured = grabbable;
+            cartons.Add(grabbable);
             System.Action<PointerEvent> handler = evt => HandlePointerEvent(captured, evt);
             grabbable.WhenPointerEventRaised += handler;
             subscriptions.Add((grabbable, handler));
@@ -130,11 +133,7 @@ public class CartonSettler : MonoBehaviour
 
         Physics.SyncTransforms();
         Bounds zone = containerZone.bounds;
-        // #157: a hand often lets go above the rim; a carton over the container still belongs in it.
-        Vector3 bodyCentre = body.bounds.center;
-        if (bodyCentre.x < zone.min.x || bodyCentre.x > zone.max.x
-            || bodyCentre.z < zone.min.z || bodyCentre.z > zone.max.z
-            || bodyCentre.y < zone.min.y || bodyCentre.y > zone.max.y + AboveRim)
+        if (!InReach(body, zone))
             return false;
 
         // Lid up, keeping the direction the carton points to.
@@ -177,8 +176,39 @@ public class CartonSettler : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// #153: true when this settler lays the released package down (a carton of this scene with a SnapInteractor,
+    /// over the order container up to AboveRim, while it may settle), so PackageDropper leaves it alone.
+    /// </summary>
+    public bool Covers(Grabbable grabbable)
+    {
+        if (grabbable == null || containerZone == null || !cartons.Contains(grabbable))
+            return false;
+        // TrySettle does nothing then, so the carton must not be left hanging: PackageDropper takes it.
+        if (stationStock is IStationStock stock && stock.IsMoving)
+            return false;
+        if (conveyor != null && conveyor.IsShipped)
+            return false;
+
+        BoxCollider body = grabbable.GetComponent<BoxCollider>();
+        if (body == null)
+            return false;
+
+        Physics.SyncTransforms();
+        return InReach(body, containerZone.bounds);
+    }
+
+    // #157: a hand often lets go above the rim; a carton over the container still belongs in it.
+    private static bool InReach(BoxCollider body, Bounds zone)
+    {
+        Vector3 bodyCentre = body.bounds.center;
+        return bodyCentre.x >= zone.min.x && bodyCentre.x <= zone.max.x
+            && bodyCentre.z >= zone.min.z && bodyCentre.z <= zone.max.z
+            && bodyCentre.y >= zone.min.y && bodyCentre.y <= zone.max.y + AboveRim;
+    }
+
     // Hands only: the SnapInteractor also selects the carton while it sits in a place.
-    private static int HeldByHand(Grabbable grabbable)
+    internal static int HeldByHand(Grabbable grabbable)
     {
         SnapInteractor snap = grabbable.GetComponentInChildren<SnapInteractor>();
         int snapSelects = snap != null && snap.HasSelectedInteractable ? 1 : 0;

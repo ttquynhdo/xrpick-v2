@@ -2589,7 +2589,7 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Test trên kính:** bắt buộc (tay thật: đặt 3 chỗ ở Mixed, 6 chỗ ở Basic, thả trên bàn và ngoài bàn)
 - **Depends on:** bước đầu = tái hiện #140 (Simulator hoặc kính) trước khi thiết kế; phần #153 (thả ngoài thùng) cần `solution-decision` ngắn (unity-reviewer + data-analyst), có thể sau design freeze 19/11
 - **Test report:** docs/test-reports/bl157.md
-- **Status:** in progress (nhánh `fix/157-package-drop-target`; phần #140 verified-mcp 8/8 MCP/code ✅, chờ test tay M5, H1, H2; còn phần #152 viền Mixed từ đầu, #153 thả ngoài thùng)
+- **Status:** verified-mcp (nhánh `fix/157-package-drop-target`; #140 8/8, #152 + #153 14/14 MCP/code ✅ sau review; `layout_version` „038“, P2 = observed theo người dùng 2026-11-17, decision 037 sửa đổi #157; chờ test tay M5, H1, H2, H3)
 
 ### #158 [P2] Lỗ hổng test: thêm case khung-hình, Simulator cầm/thả và một lượt nhìn kính trước khi ghi `verified-mcp`
 - **Type:** refactor
