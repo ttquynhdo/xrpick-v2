@@ -38,3 +38,7 @@ D4, D6, D35 (còn mở); D43 (trong Auftragsbehälter có vạch/chỗ cố đ�
 
 ## Bằng chứng
 `Assets/Scripts/EkzPlacementCheck.cs` (chỉ biết carton đã snap; Ist độc lập); `Assets/Scripts/OrderFeedback.cs` + CSV `order.feedback.ekz3_loose`; `docs/decisions/003-ekz-placement.md`, `028-ekz-course-plan.md`, `033-confirm-pause-container-change-cue.md`; `Assets/Scripts/StationRideCue.cs`; carton Basic kinematic, không trọng lực (`BasicPickingScene.unity`); `analysis/analyse_set.R:1911` (`scaffolded` lọc theo item), `analysis/objectives.csv`; `docs/pilot-P802-summary.md`; Kommissionierung slide 6, 8, 9 (qua requirements-analyst: EKZ 3 „einzeln und orientiert“, không có tài liệu về ô, marker hay phản hồi sau F6). Chưa đo: toạ độ thẻ mới so với tay, nút đỏ, `Box Sign`; ô có nhận nhiều carton không.
+
+## Sửa đổi #131 (2026-11-17, người dùng chọn)
+Bỏ dấu `warning` vàng trên carton lỏng (mục 3, U3). Từ bản 034 mỗi ô chỉ nhận 1 carton, carton thả gần ô trống thì tự khớp và `CartonSettler` đặt carton lỏng nằm phẳng, nên carton lỏng luôn nằm chồng lên carton khác hoặc ngoài cột ô viền; ô viền trắng còn trống chỉ chỗ đặt. Dấu nổi trên carton và quay theo đầu (checklist T8, nghi vấn C19). Câu 2 của `order.feedback.ekz3_loose`: „Legen Sie jeden Karton auf einen eigenen Platz.“ Người học tự tìm carton sai (lần bấm thứ 2 không còn chỉ là thử–sai theo dấu). Thẻ báo Concept (#100) dán phẳng lên thành trước thùng, không quay theo đầu.
+

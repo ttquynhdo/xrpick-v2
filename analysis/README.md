@@ -318,6 +318,15 @@ places after error]`). From `"034"` the Basic/Mixed result card no longer
 names the Menu; the next Menu item is highlighted after the order box
 departs: `menu_after_done.csv` splits by `menu_cue` (`text` / `highlight`).
 The `"034"` box signs and storage-carton rearrangement (#111) change no field.
+From `"037"` (#131) a placement error no longer puts a yellow warning mark on
+each loose carton (layouts `"034"`–`"036"` had one); the outlines stay as
+above. The `ekz_placement` rate is unaffected: every press made after an
+`EKZ_PLACEMENT` (when the marks used to show) is already left out of it by
+`skill_scaffolds.csv`. What changes is the retry after that error: `attempts`,
+`reached_correct` and the check/time-to-correct of Basic and Mixed
+`position_1` in a visit with an `EKZ_PLACEMENT`. Don't pool those retries
+across `"036"`-or-older (marks) and `"037"` (no marks); first attempts stay
+comparable. `"037"` holds #131 only when the build has it (check `build`).
 
 **Mixed position 1 Empf Kz (#94, decision 028).** Builds before #94 had
 Empf Kz `000` at Mixed `position_1` (cartons put in any way, never rated);

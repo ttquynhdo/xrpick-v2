@@ -538,7 +538,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627449
     m_Localized: With Empf Kz 003 each carton lies on its own and in order, never
-      on top of another. Put cartons with a warning sign into a free spot.
+      on top of another. Put each carton on a spot of its own.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627450

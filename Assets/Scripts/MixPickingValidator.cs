@@ -121,11 +121,6 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         if (IsCompleted)
             return;
 
-        if (placementCheck != null)
-        {
-            placementCheck.ClearMarks();
-        }
-
         if (feedbackText != null)
         {
             feedbackText.text = string.Empty;
@@ -177,10 +172,8 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         if (placementWrong)
         {
             ShowResult(OrderFeedback.Title(), ResultCardStyle.Wrong, OrderFeedback.ExplainEkz3Placement());
-            // #108, decision 037 (1, 3): from the first placement error the places stay visible for this position,
-            // and the loose cartons are marked until the result is cleared.
+            // #108, decision 037 (1): from the first placement error the places stay visible for this position.
             placementCheck.ShowPlaces(true);
-            placementCheck.MarkLoose(container.CurrentPositionPackages);
             return;
         }
 

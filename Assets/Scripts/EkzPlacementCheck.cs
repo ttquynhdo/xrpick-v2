@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Oculus.Interaction;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// #41, docs/decisions/003: EKZ 3 in BasicPickingScene (#94, decision 028: also Mixed position 1). Each carton in the order container must sit in its
@@ -10,8 +9,8 @@ using UnityEngine.UI;
 /// the validator asks only when the trainee confirms. Quantity counting never reads this.
 /// #108, decision 037 (1, 3): each place gets a thin outline on the container floor, inside the carton footprint, so a
 /// filled place no longer looks empty. Basic shows them from the start (showPlacesAtStart); Mixed position 1 only after
-/// its first placement error (ShowPlaces). After a placement error every loose carton gets a yellow warning mark
-/// (MarkLoose) until the validator clears its result (ClearMarks).
+/// its first placement error (ShowPlaces). #131: the loose cartons get no mark of their own; a loose carton lies on
+/// another carton or outside the outlined places, and the free outline shows where it goes.
 /// </summary>
 public class EkzPlacementCheck : MonoBehaviour
 {
@@ -36,21 +35,10 @@ public class EkzPlacementCheck : MonoBehaviour
     [Tooltip("How far below the snap pose the container floor lies (the snap pose holds the carton slightly above it).")]
     [SerializeField] private float outlineDrop = 0.022f;
 
-    [Header("Loose carton mark (#108)")]
-    [Tooltip("Meta warning icon shown above each loose carton after a placement error.")]
-    [SerializeField] private Sprite warningSprite;
-
-    [SerializeField] private Color warningColor = new(1f, 0.82f, 0.1f, 1f);
-
-    [Tooltip("Width of the mark in metres.")]
-    [SerializeField] private float markSize = 0.05f;
-
     private const float OutlineHeight = 0.002f;
     private const float OutlineLift = 0.001f;
-    private const float MarkLift = 0.045f;
 
     private readonly List<GameObject> outlines = new();
-    private readonly List<(GameObject mark, PackageData package)> marks = new();
 
     // #94, decision 028: Empf Kz 003 (EKZ 3) is the only class rated by placement.
     private const string OrderedEmpfKz = "003";
@@ -117,71 +105,6 @@ public class EkzPlacementCheck : MonoBehaviour
         }
     }
 
-    /// <summary>The active packages of the list that do not sit in a snap place.</summary>
-    public List<PackageData> LoosePackages(IEnumerable<PackageData> packages)
-    {
-        var loose = new List<PackageData>();
-        foreach (PackageData package in packages)
-        {
-            if (package != null && package.isActiveAndEnabled && !snapped.Contains(package))
-            {
-                loose.Add(package);
-            }
-        }
-
-        return loose;
-    }
-
-    /// <summary>#108: a yellow warning mark above every loose carton; replaces earlier marks.</summary>
-    public void MarkLoose(IEnumerable<PackageData> packages)
-    {
-        ClearMarks();
-        if (warningSprite == null)
-        {
-            Debug.LogError("EkzPlacementCheck: warningSprite is not assigned; loose cartons get no mark.", this);
-            return;
-        }
-
-        foreach (PackageData package in LoosePackages(packages))
-        {
-            marks.Add((BuildMark(package), package));
-        }
-    }
-
-    public void ClearMarks()
-    {
-        foreach ((GameObject mark, PackageData _) in marks)
-        {
-            if (mark != null)
-            {
-                Destroy(mark);
-            }
-        }
-        marks.Clear();
-    }
-
-    public int MarkCount => marks.Count;
-
-    private void LateUpdate()
-    {
-        if (marks.Count == 0)
-            return;
-
-        // Each mark stays above its carton (it may be lifted or laid flat again) and faces the eyes.
-        Camera eyes = Camera.main;
-        foreach ((GameObject mark, PackageData package) in marks)
-        {
-            if (mark == null || package == null)
-                continue;
-
-            mark.transform.position = MarkPosition(package);
-            if (eyes != null)
-            {
-                mark.transform.rotation = Quaternion.LookRotation(mark.transform.position - eyes.transform.position, Vector3.up);
-            }
-        }
-    }
-
     private void BuildOutlines()
     {
         if (outlineMaterial == null)
@@ -225,60 +148,6 @@ public class EkzPlacementCheck : MonoBehaviour
         meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
     }
 
-    private GameObject BuildMark(PackageData package)
-    {
-        var mark = new GameObject("Loose Carton Mark", typeof(RectTransform), typeof(Canvas));
-        var rect = (RectTransform)mark.transform;
-        rect.sizeDelta = new Vector2(100f, 100f);
-        rect.localScale = Vector3.one * (markSize / 100f);
-        mark.GetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
-
-        var icon = new GameObject("Icon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-        icon.transform.SetParent(mark.transform, false);
-        var iconRect = (RectTransform)icon.transform;
-        iconRect.anchorMin = Vector2.zero;
-        iconRect.anchorMax = Vector2.one;
-        iconRect.offsetMin = iconRect.offsetMax = Vector2.zero;
-        var image = icon.GetComponent<Image>();
-        image.sprite = warningSprite;
-        image.color = warningColor;
-        image.preserveAspect = true;
-        image.raycastTarget = false;
-
-        mark.transform.position = MarkPosition(package);
-        return mark;
-    }
-
-    // Above the carton's top, so it never covers the label of a neighbour lying lower.
-    private static Vector3 MarkPosition(PackageData package)
-    {
-        Bounds bounds = BoundsOf(package);
-        return new Vector3(bounds.center.x, bounds.max.y + MarkLift, bounds.center.z);
-    }
-
-    private static Bounds BoundsOf(PackageData package)
-    {
-        var bounds = new Bounds(package.transform.position, Vector3.zero);
-        bool first = true;
-        foreach (MeshRenderer meshRenderer in package.GetComponentsInChildren<MeshRenderer>())
-        {
-            if (!meshRenderer.enabled)
-                continue;
-
-            if (first)
-            {
-                bounds = meshRenderer.bounds;
-                first = false;
-            }
-            else
-            {
-                bounds.Encapsulate(meshRenderer.bounds);
-            }
-        }
-
-        return bounds;
-    }
-
     private void OnDisable()
     {
         if (places != null)
@@ -294,7 +163,6 @@ public class EkzPlacementCheck : MonoBehaviour
         }
 
         snapped.Clear();
-        ClearMarks();
     }
 
     // True when every active package sits in a snap place. Destroyed or disabled cartons are not in the

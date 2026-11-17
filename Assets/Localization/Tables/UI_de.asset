@@ -534,7 +534,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627449
     m_Localized: "Bei Empf Kz 003 liegt jeder Karton einzeln und geordnet, nie \xFCbereinander.
-      Legen Sie Kartons mit Warnzeichen auf einen freien Platz."
+      Legen Sie jeden Karton auf einen eigenen Platz."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627450

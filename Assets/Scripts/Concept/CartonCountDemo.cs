@@ -31,6 +31,8 @@ public class CartonCountDemo : MonoBehaviour
     [SerializeField] private float gap = 0.015f;
 
     private bool atStep;
+    private int shownIndex = -1;
+    private readonly TagFacing facing = new();
 
     private void OnEnable()
     {
@@ -106,6 +108,12 @@ public class CartonCountDemo : MonoBehaviour
             }
         }
 
+        if (index != shownIndex)
+        {
+            shownIndex = index;
+            facing.Reset();
+        }
+
         if (index < 0 || carton == null || totals[index] == null)
             return;
 
@@ -114,9 +122,8 @@ public class CartonCountDemo : MonoBehaviour
         RectTransform tag = totals[index];
         float halfHeight = tag.rect.height * tag.lossyScale.y * 0.5f;
         Vector3 position = new(bounds.center.x, bounds.max.y + gap + halfHeight, bounds.center.z);
-        Quaternion rotation = eyes != null
-            ? Quaternion.LookRotation(position - eyes.position, Vector3.up)
-            : tag.rotation;
+        // #131: upright, turned to the eyes only when this total appears or its carton moves.
+        Quaternion rotation = eyes != null ? facing.For(position, eyes.position) : tag.rotation;
         tag.SetPositionAndRotation(position, rotation);
     }
 }

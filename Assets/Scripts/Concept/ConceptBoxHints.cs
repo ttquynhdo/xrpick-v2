@@ -36,9 +36,6 @@ public class ConceptBoxHints : MonoBehaviour
     [Tooltip("Inactive world-space canvas with one TMP text; shown beside the package with the hint.")]
     [SerializeField] private RectTransform tagTemplate;
 
-    [Tooltip("Eyes; empty = Camera.main.")]
-    [SerializeField] private Transform head;
-
     [Tooltip("Gap between the container's front wall and the tag, in metres.")]
     [SerializeField] private float gap = 0.02f;
 
@@ -241,19 +238,16 @@ public class ConceptBoxHints : MonoBehaviour
         if (!shown.HasValue)
             return;
 
-        Transform eyes = head != null ? head : Camera.main != null ? Camera.main.transform : null;
-        if (eyes == null)
-            return;
-
         Package package = packages[shown.Value.PackageId];
         BoxCollider zone = shown.Value.Box == ConceptBox.Order ? orderZone : storageZone;
-        PlaceOnFrontWall(zone, package.Bounds().center, eyes.position);
+        PlaceOnFrontWall(zone, package.Bounds().center);
     }
 
-    // On the container's front wall, right in front of the package, facing the eyes. Beside the package the tag would
-    // be hidden: from the standing spot the tour bar covers the inner half of both containers and the Menu the space
+    // On the container's front wall, right in front of the package, flat on the wall like a sticker (#131: turned to
+    // the eyes it swam with the head, and its far half went into the container). Beside the package the tag would be
+    // hidden: from the standing spot the tour bar covers the inner half of both containers and the Menu the space
     // right of the order container, while the front wall is always in view (a package in a container is seen over it).
-    private void PlaceOnFrontWall(BoxCollider zone, Vector3 package, Vector3 eyes)
+    private void PlaceOnFrontWall(BoxCollider zone, Vector3 package)
     {
         Transform t = zone.transform;
         Vector3 local = t.InverseTransformPoint(package);
@@ -267,7 +261,10 @@ public class ConceptBoxHints : MonoBehaviour
         local.z = zone.center.z - half.z - frontGap;
 
         Vector3 position = t.TransformPoint(local);
-        tagTemplate.SetPositionAndRotation(position, Quaternion.LookRotation(position - eyes, Vector3.up));
+        // A canvas is read from behind its forward, so its forward points into the container.
+        Vector3 intoBox = Vector3.ProjectOnPlane(t.forward, Vector3.up);
+        Quaternion flat = intoBox.sqrMagnitude > 1e-6f ? Quaternion.LookRotation(intoBox, Vector3.up) : t.rotation;
+        tagTemplate.SetPositionAndRotation(position, flat);
     }
 
     // Packages inside the zone and not held; a package inside another lying package (a ring in its opened carton)

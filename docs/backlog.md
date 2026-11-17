@@ -26,7 +26,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **ĐỢT CHỮ (thêm 2026-11-17, từ #125 / C19, checklist `docs/text-comfort-checklist.md`; sau Festo review 18/11):**
   1. **#135** trước (tool đo, không đổi app, không cần kính): đo lại rẻ sau mỗi thay đổi, đo thêm T11/T12.
   2. **#131** (chỉ code ở 3 script, không sửa scene) song song với bước 3.
-  3. **Decision 040 (2026-11-17, accepted):** chữ cần đọc ra xa cạnh LVS, nút ở gần; Menu/bàn phím giữ chỗ. Làm ngay, trước freeze 19/11: #129 (Concept) ∥ #130 (Complex), ra **một** build `layout_version` "037" (spec + R cùng thay đổi, `data-analyst` duyệt); nếu Concept không kịp thì ship phương án thay thế của 040 trong cùng build. #134 chỉ còn ghi ngoại lệ + kiểm trên kính.
+  3. **Decision 040 (2026-11-17, accepted):** chữ cần đọc ra xa cạnh LVS, nút ở gần; Menu/bàn phím giữ chỗ. Làm ngay, trước freeze 19/11: #129 (Concept) ∥ #130 (Complex), ra **một** build `layout_version` "037" (spec + R cùng thay đổi, `data-analyst` duyệt; build "037" phải có cả #131, spec đã ghi); nếu Concept không kịp thì ship phương án thay thế của 040 trong cùng build. #134 chỉ còn ghi ngoại lệ + kiểm trên kính.
   4. **#133** (kệ thẻ, 5 scene) cần `solution-decision` riêng; không chạy song song với #129/#130/#134 vì cùng scene.
   5. **#132** (cỡ chữ cố định, Concept + Complex) sau #129 và #130 (cỡ chữ tính theo khoảng cách mới).
   6. Một build, một buổi test kính chung: hỏi người thử *đang nhìn chữ nào* lúc thấy khó chịu.
@@ -2242,12 +2242,14 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene
 - **Files:** `Assets/Scripts/Concept/ConceptBoxHints.cs:239` (`LateUpdate` → `PlaceOnFrontWall`), `Assets/Scripts/Concept/CartonCountDemo.cs:76` (`LateUpdate` → `ShowTotal`), `Assets/Scripts/EkzPlacementCheck.cs:165` (`LateUpdate`, dấu `MarkLoose`), `Assets/Scripts/Concept/TagPlacement.cs`
 - **Problem:** (checklist T8) Ba loại chữ/dấu gọi `Quaternion.LookRotation(vị trí − đầu)` ở mọi khung hình, nên nghiêng và xoay theo mọi cử động nhỏ của đầu (cả khi cúi). Người học có thể thấy chữ „bơi“. Meta khuyên không dùng chữ bám theo đầu; billboard chỉ nên quay theo trục đứng hoặc được làm mượt.
-- **Done when:** Thẻ báo `Box Hints/Hint Tag` đang hiện trên thành thùng: di camera (đầu) sang trái/phải 20 cm, rồi cúi/ngẩng, thẻ không đổi hướng. Thẻ chỉ đổi hướng khi được đặt lại (có kiện khác được đặt, hoặc kiện di chuyển). Nhãn tổng `Total 1–3`: như trên. Dấu vàng carton lỏng ở Basic và Mixed: như trên, và vẫn đi theo carton khi carton được nhấc lên. (code) Hướng chỉ quay quanh trục đứng (không nghiêng theo pitch) và được tính một lần lúc đặt. Hồi quy: Concept C8 (thẻ báo đúng chỗ), bước `cartons`, lỗi Empf Kz 003 ở Basic/Mixed.
+- **Done when:** Thẻ báo `Box Hints/Hint Tag` đang hiện trên thành thùng: di camera (đầu) sang trái/phải 20 cm, rồi cúi/ngẩng, thẻ không đổi hướng; thẻ nằm phẳng trên thành trước, không phần nào lọt vào trong thùng (bổ sung 2026-11-17: người dùng thấy thẻ xuyên thùng). Nhãn tổng `Total 1–3`: di đầu như trên, nhãn không đổi hướng; nhãn chỉ đổi hướng khi được đặt lại (carton khác được đặt, hoặc carton di chuyển). Basic và Mixed vị trí 1: xếp sai một carton rồi bấm nút đỏ → thẻ „Nicht richtig“ với câu mới „… Legen Sie jeden Karton auf einen eigenen Platz.“, không có dấu vàng nào trên carton (người dùng chọn 2026-11-17: bỏ dấu, decision 037 sửa đổi #131). (code) Nhãn tổng chỉ quay quanh trục đứng (không nghiêng theo pitch) và được tính một lần lúc đặt. Hồi quy: Concept C8 (thẻ báo đúng chỗ), bước `cartons`, lỗi Empf Kz 003 ở Basic/Mixed (B3b, M3b).
 - **Inspector work expected:** no
 - **Công:** S
 - **Test trên kính:** bắt buộc (cảm giác khi nhìn quanh thẻ)
 - **Depends on:** —
-- **Status:** todo
+- **Decision:** docs/decisions/037-picking-station-places-feedback.md (sửa đổi #131: bỏ dấu vàng)
+- **Test report:** docs/test-reports/bl131.md
+- **Status:** verified-mcp (12/14 ✅ MCP/code, chờ test tay K1 (nhìn quanh thẻ) và K2 (tìm carton sai không cần dấu) trên kính; cùng build "037")
 
 ### #132 [P2] Concept, Complex: cỡ chữ cố định (không autoSize) và chữ cần đọc ≥ 0,8°
 - **Type:** feature
