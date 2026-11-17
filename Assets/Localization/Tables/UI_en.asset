@@ -621,8 +621,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627466
     m_Localized: "Read in the WMS: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
-      and <nobr>Empf Kz</nobr>. Then answer the questions below the screen \u2013
-      the \"Example\" right below them helps with the maths."
+      and <nobr>Empf Kz</nobr>. Then answer the questions to the right of the screen
+      \u2013 the \"Example\" to the left of the screen helps with the maths."
     m_Metadata:
       m_Items: []
   - m_Id: 15832974233600
@@ -698,7 +698,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 336383051698176
-    m_Localized: First answer the questions below the screen.
+    m_Localized: First answer the questions to the right of the screen.
     m_Metadata:
       m_Items: []
   - m_Id: 340851944198144

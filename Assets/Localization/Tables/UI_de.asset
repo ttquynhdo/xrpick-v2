@@ -614,8 +614,9 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627466
     m_Localized: "Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
-      und <nobr>Empf Kz</nobr>. Beantworten Sie dann die Fragen unter dem Bildschirm
-      \u2013 das \u201EBeispiel\u201C direkt darunter hilft beim Rechnen."
+      und <nobr>Empf Kz</nobr>. Beantworten Sie dann die Fragen rechts neben dem
+      Bildschirm \u2013 das \u201EBeispiel\u201C links neben dem Bildschirm hilft
+      beim Rechnen."
     m_Metadata:
       m_Items: []
   - m_Id: 15832974233600
@@ -691,7 +692,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 336383051698176
-    m_Localized: Beantworten Sie zuerst die Fragen unter dem Bildschirm.
+    m_Localized: Beantworten Sie zuerst die Fragen rechts neben dem Bildschirm.
     m_Metadata:
       m_Items: []
   - m_Id: 340851944198144

@@ -53,7 +53,7 @@ complex.feedback.position_done,"Position {done} ist erledigt.
 Der Lagerbehälter fährt weg, der nächste kommt von links. Sehen Sie den Behältern auf der Rollenbahn zu.
 Lesen Sie dann im LVS die Angaben zu Position {next} ab.",proposed,german-reviewer,2026-11-05,"#99 (decision 033): watch sentence added; „danach“/„dann“, „zu Position“ per german-reviewer"
 complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-02,#53 (quiz hint moved to card 1)
-complex.card.step1_body_position1,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>. Beantworten Sie dann die Fragen unter dem Bildschirm – das „Beispiel“ direkt darunter hilft beim Rechnen.",proposed,german-reviewer (agent),2026-11-05,#87
+complex.card.step1_body_position1,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>. Beantworten Sie dann die Fragen rechts neben dem Bildschirm – das „Beispiel“ links neben dem Bildschirm hilft beim Rechnen.",proposed,german-reviewer (agent),2026-11-17,#87; #130 places
 basic.result.correct.text,Der Auftrag ist richtig.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,claude,2026-11-06,"#109 (decision 037): Menu sentence removed, the Menu item is highlighted instead; rest unchanged from #99 review"
 basic.result.correct.title,Richtig!,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 basic.result.incorrect.title,Nicht richtig,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
@@ -152,7 +152,7 @@ concept.ekz.5,"Wie EKZ 3, Teile in zwei Ebenen mit Zwischenlage trennen.",propos
 concept.ekz.6,"Wie EKZ 3, Teile in allen Ebenen mit Zwischenlage trennen.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.8,ESD-geschützte Teile. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.9,Sonderverpackung. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
-complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen unter dem Bildschirm.,proposed,german-reviewer (agent),2026-11-03,#58; Agent: OK; wording as complex.card.step1_body_position1
+complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen rechts neben dem Bildschirm.,proposed,german-reviewer (agent),2026-11-17,#130 places; #58; Agent: OK; wording as complex.card.step1_body_position1
 concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.cartons.body,= 3 Kartons,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#91, result line of the caption next to Soll/Verp.-Einh.)"
 concept.tour.empf_kz_000.title,Anderer Wert: Empf Kz 000,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied

@@ -21,6 +21,9 @@ using UnityEngine.UI;
 /// #123, docs/decisions/039: a third question („Frage 3 von 3“) asks how the goods go into the order container; its
 /// body never names the Empf Kz value, so the trainee has to read it in the LVS. The storage box comes only after
 /// all three answers are right.
+/// #130, docs/decisions/040 (read far, touch near): the question, „Frage n von 3“ and the worked example are captions at
+/// the screen's depth (WMS_Monitor/Head/Screen/Screen Captions); only the A/B/C row and its feedback line stay low near
+/// the hands. All of them fade out together (PanelFade).
 /// </summary>
 public class RemainderQuizController : MonoBehaviour
 {
@@ -72,7 +75,7 @@ public class RemainderQuizController : MonoBehaviour
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private TMP_Text feedbackText;
 
-    [Tooltip("Hidden once both answers are right and the storage box has arrived (#93): the question cluster and the worked-example board.")]
+    [Tooltip("Faded out once all answers are right and the storage box has arrived (#93): the A/B/C cluster, the question caption and the worked-example caption (#130).")]
     [SerializeField] private GameObject[] hideWhenPositionDone;
 
     [Tooltip("Body of shelf card 2; shows the trainee's result after both answers (#93). PositionTexts writes it again at position 2.")]
@@ -368,10 +371,7 @@ public class RemainderQuizController : MonoBehaviour
 
         foreach (GameObject target in hideWhenPositionDone)
         {
-            if (target != null)
-            {
-                target.SetActive(false);
-            }
+            PanelFade.SetVisible(target, false);
         }
     }
 }

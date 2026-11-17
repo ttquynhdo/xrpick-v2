@@ -1,7 +1,7 @@
 # Quyết định 036: ConceptScene tour v3: câu hành động có mục đích, khung trên LVS, hai mẫu EKZ cùng carton, khoá 2 s sau câu sai
 
 - **Backlog:** #104, #105, #107, #110 (#106 bỏ, xem dưới)
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted; phần thanh tour (lựa chọn người dùng 2026-11-05, mục „Không làm“ #106) mở lại và thay bằng decision 040 (2026-11-17)
 - **Ngày:** 2026-11-05
 - **Ý kiến đã xét:** requirements-analyst, instructional-design-reviewer, xr-ux-reviewer, unity-reviewer, german-reviewer, data-analyst (proposal mode, độc lập); decision-synthesizer.
 - **Lựa chọn của người dùng (2026-11-05):** chấp nhận khuyến nghị, **trừ phần thanh tour**: người dùng thấy thanh tour hiện tại không có vấn đề, nên thanh giữ chỗ và hình dạng của #89 (decision 026 mục 1), chữ của bước vẫn ở trên thanh, và #106 bỏ. Mặc định được chọn: mẫu 000 đổi sang carton (bỏ lựa chọn S1 của 031); khoá 2 s; không thêm log cho chạm trong lúc khoá.
