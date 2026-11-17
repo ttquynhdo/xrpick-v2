@@ -24,7 +24,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **1. Ngay:** **#157** (P0) bắt đầu bằng tái hiện chỗ đặt giữa ở Mixed (Simulator hoặc kính), rồi thiết kế „một cơ chế quyết định khi thả“; phần thả ngoài thùng (#153) có thể sau freeze 19/11. Song song (khác file): **#158** (chỉ skill/doc) và **#143** (chỉ CSV + glossary).
 - **2. Song song với #157 (khác scene):** **#156** (Welcome + Concept, không cần decision) → **#141** (layer canvas cong, 5 scene: chạy sau khi #156 xong Welcome/Concept và #157 xong Mixed, vì đụng mọi scene).
 - **3. Một `solution-decision` chung cho #155** (**xong 2026-11-18: decision 041, phương án B**; #155 in progress trên `feat/155-text-rule`, thứ tự CSV (#145, #144) → #147 → #146, một build "039"; phần câu hỏi của #154 làm sau #155) (chạy song song với bước 1–2, chỉ là phân tích): xong decision → #155 (5 scene) → phần câu hỏi của #154; phần còn lại của #154 (luật + tool + chú thích tour) làm được ngay sau #156 (cùng ConceptScene). Một lần đổi `layout_version` cho #155 (+ #157 nếu log đổi).
-- **4. Xen khi scene rảnh:** #151 (mặt bàn, 4 scene).
+- **4. Xen khi scene rảnh:** #151 (mặt bàn, 4 scene; verified-mcp 2026-11-18 trên `feat/151-desk-edges`, chờ K1 trong buổi test kính).
 - **5. Cuối đợt:** `german-reviewer` duyệt mọi chữ mới, `ImportCsv`, `InstructionShelfLayout` + `TextComfortAudit` ở 5 scene, một build, một buổi test kính (theo #158: có lượt Simulator cho #157).
 
 **ĐỢT FESTO (thêm 2026-11-16, từ review nhóm 2026-11-09, `docs/review-notes-team-2026-11-09.md`; Festo review 18/11, design freeze 19/11).** Khối này đứng trước khối ĐỢT CUỐI; việc còn lại của ĐỢT CUỐI (build, buổi P803, gửi file duyệt, học R #102) vẫn giữ.
@@ -2514,7 +2514,8 @@ Nguồn: `docs/review-notes-checklist-2026-11-17.md` (R1–R16, góp ý người
 - **Công:** M
 - **Test trên kính:** nhanh (nhìn hai mép bàn)
 - **Depends on:** — (không chạy song song với mục khác sửa cùng scene)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl151.md
+- **Status:** verified-mcp (13/13 ✅ MCP/code, chờ test tay K1 trên kính; nhánh `feat/151-desk-edges`; mặt bàn x −1,021…0,728, thừa 5 cm ngoài mỗi ray ngoài)
 
 ### #152 [Feature] Mixed: viền chỗ đặt EKZ 003 hiện ngay từ đầu vị trí 1
 - **Type:** feature
