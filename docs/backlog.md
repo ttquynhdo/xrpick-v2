@@ -2416,7 +2416,8 @@ Nguồn: `docs/review-notes-checklist-2026-11-17.md` (R1–R16, góp ý người
 - **Công:** S
 - **Test trên kính:** không (ảnh MCP view `instructions`, `confirm` bản EN)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl143.md
+- **Status:** verified-mcp (9/9 MCP + 2 code ✅; nhánh `feat/156-show-hide-rules`; không cần test kính)
 
 ### #144 [P1] Concept bước 8–9: bỏ câu chỉ chỗ ví dụ, giữ câu dẫn sang bảng EKZ
 - **Type:** logic
@@ -2577,7 +2578,7 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Test trên kính:** nhanh (đi tour Concept, mở bước việc ở Welcome)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl156.md
-- **Status:** verified-mcp (19/19 MCP + 2 code ✅, chờ test tay H1–H3; nhánh `feat/156-show-hide-rules`, chưa commit)
+- **Status:** verified-mcp (19/19 MCP + 2 code ✅, chờ test tay H1–H3; nhánh `feat/156-show-hide-rules`, c843f13)
 
 ### #157 [P0] Gốc D: một cơ chế duy nhất quyết định kiện nằm đâu khi thả (chỗ đặt → thùng → mặt bàn)
 - **Type:** bug

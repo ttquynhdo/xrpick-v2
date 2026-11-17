@@ -181,7 +181,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627362
-    m_Localized: 'PACKAGE PLACED: {placed}'
+    m_Localized: 'Cartons in the order container: {placed}'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627363
@@ -240,7 +240,7 @@ MonoBehaviour:
     m_Localized: '<b>You learn to read the data in the WMS and compare it with the
       label.</b>
 
-      That way you take the right material in the right amount
+      That way you take the right material in the right quantity
       in every order.'
     m_Metadata:
       m_Items: []
@@ -429,11 +429,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627425
-    m_Localized: 1. Grab the box
+    m_Localized: 1. Grab the carton
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627426
-    m_Localized: Grab the box with one hand, lift it up and put it down again.
+    m_Localized: Grab the carton with one hand, lift it up and put it down again.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627427
@@ -473,12 +473,12 @@ MonoBehaviour:
     m_Localized: '<b>You learn to pick several order lines one after another.</b>
 
       That
-      way material and quantity are right for every position, even when packaging
+      way material and quantity are right for every order line, even when packaging
       and EKZ change.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627437
-    m_Localized: 'Read for the current position: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
+    m_Localized: 'Read for the current order line: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
       and <nobr>Empf Kz</nobr>.'
     m_Metadata:
       m_Items: []
@@ -527,13 +527,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
-    m_Localized: 'Position {position} is done. Leave the goods in the order container.
+    m_Localized: 'Order line {position} is done. Leave the goods in the order container.
 
       The
       storage container leaves. Watch the containers on the roller conveyor.
 
       Then
-      read the data of position {next_position} in the WMS.'
+      read the data of order line {next_position} in the WMS.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
@@ -551,7 +551,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627452
-    m_Localized: How many full cartons do you take for this position?
+    m_Localized: How many full cartons do you take for this order line?
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627453
@@ -605,13 +605,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
-    m_Localized: 'Position {done} is done. Leave the goods in the order container.
+    m_Localized: 'Order line {done} is done. Leave the goods in the order container.
 
       The
       storage container leaves. Watch the containers on the roller conveyor.
 
       Then
-      read the details of position {next} in the WMS.'
+      read the data of order line {next} in the WMS.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465
@@ -941,7 +941,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1029442483654656
-    m_Localized: Position {position}
+    m_Localized: Order line {position}
     m_Metadata:
       m_Items: []
   - m_Id: 1077644968726528
