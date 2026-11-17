@@ -2392,7 +2392,8 @@ Nguồn: `docs/review-notes-checklist-2026-11-17.md` (R1–R16, góp ý người
 - **Công:** S–M
 - **Test trên kính:** bắt buộc (lỗi có thể chỉ thấy trên Quest)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl141.md
+- **Status:** verified-mcp (4/4 MCP + 1 code ✅, chờ test kính H1–H2; nhánh `feat/156-show-hide-rules`)
 
 ### #142 [P1] Chữ cỡ cố định bị tràn hoặc bị cắt: chú thích `cartons`, nhãn „In der Übung“, dòng phản hồi quiz
 - **Type:** bug
