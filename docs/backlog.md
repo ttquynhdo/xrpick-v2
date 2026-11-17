@@ -26,7 +26,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **ĐỢT CHỮ (thêm 2026-11-17, từ #125 / C19, checklist `docs/text-comfort-checklist.md`; sau Festo review 18/11):**
   1. **#135** trước (tool đo, không đổi app, không cần kính): đo lại rẻ sau mỗi thay đổi, đo thêm T11/T12.
   2. **#131** (chỉ code ở 3 script, không sửa scene) song song với bước 3.
-  3. **Một `solution-decision` chung cho #129 + #130 + #134** (câu hỏi chung: bảng vừa chạm vừa đọc đặt ở đâu khi Meta khuyên chạm 42–46 cm, đọc ≥ 1 m, tránh 0,5–0,8 m). Rồi #129 (Concept) ∥ #130 (Complex) (khác scene); #134 sau (Menu ở cả 5 scene).
+  3. **Decision 040 (2026-11-17, accepted):** chữ cần đọc ra xa cạnh LVS, nút ở gần; Menu/bàn phím giữ chỗ. Làm ngay, trước freeze 19/11: #129 (Concept) ∥ #130 (Complex), ra **một** build `layout_version` "037" (spec + R cùng thay đổi, `data-analyst` duyệt); nếu Concept không kịp thì ship phương án thay thế của 040 trong cùng build. #134 chỉ còn ghi ngoại lệ + kiểm trên kính.
   4. **#133** (kệ thẻ, 5 scene) cần `solution-decision` riêng; không chạy song song với #129/#130/#134 vì cùng scene.
   5. **#132** (cỡ chữ cố định, Concept + Complex) sau #129 và #130 (cỡ chữ tính theo khoảng cách mới).
   6. Một build, một buổi test kính chung: hỏi người thử *đang nhìn chữ nào* lúc thấy khó chịu.
@@ -2214,11 +2214,12 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Scene(s):** ConceptScene
 - **Files:** ConceptScene (`Interactables/Tour Nav Bar`, `Interactables/AnswerOption`, `Layout Slots/Nav Bar`, `Layout Slots/Quiz`), `Assets/Scripts/Concept/LaneFlowDemo.cs` (`hideWhileRiding`), `Assets/Scripts/Concept/PackageQuizController.cs` (cụm thế chỗ thanh tour), `Assets/Scripts/Concept/WmsFieldTour.cs` (`SetBarVisible`)
 - **Problem:** (C19, checklist T1/T2/T3/T6/T10) Mỗi bước tour người học đọc dòng hành động trên thanh tour ở 0,69 m (cúi −42°), rồi nhìn chú thích ở 1,23 m và ô LVS ở 1,10–1,20 m (cao hơn ~30°, lệch ~37°): mắt đổi tiêu cự ~0,6 diop, 11 lần. Thanh tour (0,68–0,71 m) và cụm câu hỏi (0,66 m) nằm trong vùng 0,5–0,8 m mà Meta khuyên tránh. Thanh và cụm câu hỏi tắt/bật đột ngột (lúc thùng chạy, lúc „Zu den Fragen“).
-- **Done when:** Từ chỗ đứng (mắt (0, 1,6, 0)), chữ trên thanh tour và cụm câu hỏi cách mắt ngoài khoảng 0,5–0,8 m (theo decision: ≤ 0,46 m để chạm hoặc ≥ 1,0 m), đo bằng tool #135. Ở mỗi bước tour, chênh tiêu cự giữa dòng hành động và chú thích/ô LVS của bước đó < 0,5 diop, hoặc decision ghi lý do giữ. Từ tầm mắt 1,45–1,75 m thanh và cụm không che dialog LVS (quy tắc #84). Đứng tại chỗ (không bước tới), ngón tay bấm được „Zurück“, „Weiter“, „Zu den Fragen“ và A/B/C. Khi thùng bắt đầu chạy ở bước 11, thanh mờ dần chứ không tắt phụt. Khi bấm „Zu den Fragen“, cụm câu hỏi mờ dần vào chỗ thanh.
+- **Done when:** Từ chỗ đứng (mắt (0, 1,6, 0)), chữ của bước (`TXT_Step`), dòng hành động (`TXT_Action`) và câu hỏi Concept cách mắt ≥ 1,0 m, đo bằng tool #135. Dải nút gần (`Zurück`, „Schritt n von 11“, `Weiter`, „Zu den Fragen“) và hàng A/B/C cách mắt ≤ 0,46 m; trên đó chỉ có nhãn nút, số bước, đáp án ngắn và dòng phản hồi. Ở mỗi bước có chú thích, dòng hành động nằm trong/dưới `Caption <id>` của bước đó, và chênh tiêu cự giữa dòng hành động và chú thích/ô LVS của bước đó < 0,5 diop. Ở bước không có chú thích (`intro`, `not_used`, `material_flow`), chữ của bước nằm ở chỗ chú thích cạnh viền màn hình. Dòng phản hồi A/B/C nằm ngay dưới hàng nút (lý do giữ chênh tiêu cự này ghi trong decision 040). Từ tầm mắt 1,45–1,75 m, dải nút, hàng A/B/C và chữ cạnh viền không che dialog LVS. Đứng tại chỗ (không bước tới), ngón tay bấm được `Zurück`, `Weiter`, „Zu den Fragen“ và A/B/C. Dải nút và hàng A/B/C không nằm trên đường tay đi từ thùng kho sang thùng đơn khi nhặt carton. Khi thùng bắt đầu chạy ở bước 11, dải nút mờ dần chứ không tắt phụt, và chữ của bước cạnh viền không che làn giữa và thùng đơn từ chỗ đứng. Khi bấm „Zu den Fragen“, hàng A/B/C mờ dần vào chỗ dải nút và câu hỏi thay chỗ chữ của bước; thanh và cụm câu hỏi không hiện cùng lúc. Hồi quy: `tour_step`, `quiz_unlocked`, `quiz_answer` ghi như trước, `layout_version` "037".
 - **Inspector work expected:** yes (vị trí thanh, cụm câu hỏi, `Layout Slots`; chạy lại `PokeButtonFixer`)
-- **Công:** M
+- **Công:** M–L
 - **Test trên kính:** bắt buộc (đọc từng bước tour, cảm giác đổi tiêu cự, với tay bấm)
-- **Depends on:** `solution-decision` chung với #130, #134; #135 (tool đo)
+- **Depends on:** #135 ; cùng build "037" với #130
+- **Decision:** docs/decisions/040-read-far-touch-near.md
 - **Status:** todo
 
 ### #130 [Feature] ComplexScene vị trí 1: cụm câu hỏi và bảng ví dụ không ở vùng 0,5–0,8 m, bớt cúi đầu
@@ -2226,11 +2227,12 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Scene(s):** ComplexScene
 - **Files:** ComplexScene (`Remainder Quiz`, `Worked Example`), `Assets/Scripts/Complex/RemainderQuizController.cs`
 - **Problem:** (checklist T1/T3/T6) Cụm câu hỏi ở 0,62 m (1,61 diop); bảng ví dụ ở 0,64–0,66 m, cúi −54°; ô LVS 1,15 m; thẻ kệ 1,53 m (0,65 diop). Như vậy mắt đổi tiêu cự ~1 diop trong một bước, và đây là chỗ cúi sâu nhất khoá. Bảng ví dụ chỉ để đọc mà lại nằm trong vùng 0,5–0,8 m.
-- **Done when:** Từ chỗ đứng, chữ cụm câu hỏi và bảng ví dụ cách mắt ngoài 0,5–0,8 m (theo decision chung với #129), đo bằng tool #135. Bảng ví dụ không thấp hơn −35° so với tầm mắt. Chênh tiêu cự giữa câu hỏi, bảng ví dụ và ô LVS < 0,5 diop, hoặc decision ghi lý do. Đứng tại chỗ, ngón tay bấm được A/B/C. Từ tầm mắt 1,45–1,75 m cụm và bảng không che dialog LVS. Khi trả lời đúng cả 3 câu, cụm và bảng vẫn ẩn sau 1,5 s như #93.
+- **Done when:** Từ chỗ đứng, bảng ví dụ (`Worked Example`) và câu hỏi cách mắt ≥ 1,0 m, đo bằng tool #135; bảng ví dụ nằm cạnh viền trái, ngang hàng Soll/Verp.-Einh., không thấp hơn −35° so với tầm mắt. (code) Bảng ví dụ không nằm trên canvas có poke. Hàng A/B/C và dòng phản hồi cách mắt ≤ 0,46 m, và không nằm trên đường tay đi từ thùng kho sang thùng đơn. Chênh tiêu cự giữa bảng ví dụ, câu hỏi và ô LVS < 0,5 diop. Đứng tại chỗ, ngón tay bấm được A/B/C. Từ tầm mắt 1,45–1,75 m, bảng và cụm không che dialog LVS; bảng ví dụ không che làn trái khi thùng kho vào chỗ. Khi trả lời đúng cả 3 câu, bảng và cụm vẫn ẩn sau 1,5 s như #93. Hồi quy: `quiz_answer` ghi như trước, `layout_version` "037" (cùng build với #129).
 - **Inspector work expected:** yes (vị trí `Remainder Quiz`, `Worked Example`; chạy lại `PokeButtonFixer`)
 - **Công:** M
 - **Test trên kính:** bắt buộc (đọc, với tay, cúi đầu)
-- **Depends on:** `solution-decision` chung với #129, #134; #135
+- **Depends on:** #135 ; cùng build "037" với #129
+- **Decision:** docs/decisions/040-read-far-touch-near.md
 - **Status:** todo
 
 ### #131 [P2] Thẻ báo, nhãn tổng và dấu vàng không xoay theo mỗi cử động đầu
@@ -2269,16 +2271,17 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Depends on:** `solution-decision` (chỗ đặt kệ khi bàn, làn trái và LVS đã chiếm chỗ), #135
 - **Status:** todo
 
-### #134 [Feature] Menu và bàn phím nhập mã: ngoài vùng 0,5–0,8 m
+### #134 [Feature] Menu và bàn phím nhập mã: giữ chỗ (ngoại lệ T2, decision 040), kiểm bấm trúng trên kính
 - **Type:** feature
 - **Scene(s):** cả 5 scene (Menu), WelcomeScene (`Participant Entry`)
 - **Files:** `Menu` (canvas (0,52, 1,15, 0,27)) ở 5 scene, WelcomeScene `Participant Entry` (0, 1,22, 0,40)
 - **Problem:** (checklist T2/T5/T6) Menu cách mắt 0,74–0,76 m, lệch 44–62°, cúi −45°. Bàn phím và các bảng xác nhận/tiếp tục/cảnh báo cách 0,55–0,57 m, cúi tới −57°. Cả hai nằm trong vùng Meta khuyên tránh (chạm thì 42–46 cm, đọc thì ≥ 1 m).
-- **Done when:** (theo decision chung với #129) Từ chỗ đứng, chữ Menu và bàn phím cách mắt ngoài 0,5–0,8 m, đo bằng tool #135. Menu như nhau ở cả 5 scene. Đứng tại chỗ, ngón tay bấm được mọi bài trong Menu và mọi phím. Từ chỗ đứng, Menu không che thùng đơn hay thẻ kết quả. Người điều phối vẫn nhập mã được khi người học đội kính.
-- **Inspector work expected:** yes (vị trí Menu ở 5 scene, `Participant Entry`; chạy lại `PokeButtonFixer`)
-- **Công:** M
-- **Test trên kính:** bắt buộc (với tay, đọc)
-- **Depends on:** `solution-decision` chung với #129, #130; #135
+- **Done when:** Menu và bàn phím nhập mã giữ vị trí hiện tại (ngoại lệ T2 ghi trong decision 040: Menu dùng một lần cuối bài, bàn phím do người điều phối bấm). Menu như nhau ở cả 5 scene. Người học đứng tại chỗ, đội kính, bấm trúng mọi bài trong Menu ngay lần đầu. Người điều phối nhập được mã trên bàn phím khi người học đội kính. Checklist ghi ngoại lệ này cho Menu và bàn phím.
+- **Inspector work expected:** no (chỉ ghi ngoại lệ vào checklist)
+- **Công:** S
+- **Test trên kính:** bắt buộc (bấm Menu, nhập mã)
+- **Depends on:** #135
+- **Decision:** docs/decisions/040-read-far-touch-near.md
 - **Status:** todo
 
 ### #135 [P2] Tool Editor đo chữ theo checklist (khoảng cách, góc, cỡ, tương phản, nút bấm)
