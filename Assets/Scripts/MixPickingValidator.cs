@@ -80,8 +80,8 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         }
     }
 
-    // #108, decision 037 (1): the places shown after a placement error stay until the next position's storage
-    // container has stopped (the same moment the cards turn to the next position, decision 035).
+    // #108, decision 037 (1); #152: the places (shown from the start, or again after a placement error) stay until the
+    // next position's storage container has stopped (the same moment the cards turn to the next position, decision 035).
     private void HidePlacesAfterPosition()
     {
         if (placementCheck != null && container != null && !EkzPlacementCheck.NeedsPlaces(container.CurrentLine))

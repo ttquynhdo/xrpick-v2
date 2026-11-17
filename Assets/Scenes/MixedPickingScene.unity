@@ -326,8 +326,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &67462568
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1662,7 +1662,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 20
+  m_Spacing: 16
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -4246,7 +4246,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -4465,14 +4465,11 @@ MonoBehaviour:
   - {fileID: 1845363376}
   - {fileID: 980817742}
   snapSound: {fileID: 447496043}
-  showPlacesAtStart: 0
+  showPlacesAtStart: 1
   outlineMaterial: {fileID: 2100000, guid: 3b007082e2269ab409c2d276f6e05dc2, type: 2}
   outlineSize: {x: 0.166, y: 0.111}
   outlineStroke: 0.008
   outlineDrop: 0.022
-  warningSprite: {fileID: 21300000, guid: efed5fd53de8b8b4cadc08e143488fa0, type: 3}
-  warningColor: {r: 1, g: 0.82, b: 0.1, a: 1}
-  markSize: 0.05
 --- !u!82 &447496043
 AudioSource:
   m_ObjectHideFlags: 0
@@ -8174,8 +8171,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 16
-    m_Right: 16
+    m_Left: 8
+    m_Right: 8
     m_Top: 6
     m_Bottom: 6
   m_ChildAlignment: 0
@@ -8506,7 +8503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f86b14a27b52f4f9298c33015b5c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.Grabbable
-  _transferOnSecondSelection: 0
+  _transferOnSecondSelection: 1
   _addNewPointsToFront: 0
   _forwardElement: {fileID: 0}
   _oneGrabTransformer: {fileID: 0}
@@ -9971,7 +9968,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -10460,7 +10457,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f86b14a27b52f4f9298c33015b5c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.Grabbable
-  _transferOnSecondSelection: 0
+  _transferOnSecondSelection: 1
   _addNewPointsToFront: 0
   _forwardElement: {fileID: 0}
   _oneGrabTransformer: {fileID: 0}
@@ -11367,8 +11364,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &1123640035
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -13497,11 +13494,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1405374979815418662, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_Pivot.x
-      value: 0.5
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 1405374979815418662, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_Pivot.y
-      value: 1
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 1405374979815418662, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_AnchorMax.x
@@ -13521,11 +13518,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1405374979815418662, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 30
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 1405374979815418662, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 30
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 1405374979815418662, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_LocalPosition.x
@@ -13561,7 +13558,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1405374979815418662, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1405374979815418662, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -13585,7 +13582,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6113346535800519422, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_IgnoreLayout
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6113346535800519422, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_PreferredWidth
@@ -13594,6 +13591,14 @@ PrefabInstance:
     - target: {fileID: 6113346535800519422, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
       propertyPath: m_PreferredHeight
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8021351349423817043, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8021351349423817043, guid: 544fb79b7a7b0334dbec4bc1883d5668, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13818,7 +13823,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f86b14a27b52f4f9298c33015b5c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.Grabbable
-  _transferOnSecondSelection: 0
+  _transferOnSecondSelection: 1
   _addNewPointsToFront: 0
   _forwardElement: {fileID: 0}
   _oneGrabTransformer: {fileID: 0}
@@ -13982,7 +13987,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -14902,7 +14907,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f86b14a27b52f4f9298c33015b5c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.Grabbable
-  _transferOnSecondSelection: 0
+  _transferOnSecondSelection: 1
   _addNewPointsToFront: 0
   _forwardElement: {fileID: 0}
   _oneGrabTransformer: {fileID: 0}
@@ -17405,7 +17410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f86b14a27b52f4f9298c33015b5c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.Grabbable
-  _transferOnSecondSelection: 0
+  _transferOnSecondSelection: 1
   _addNewPointsToFront: 0
   _forwardElement: {fileID: 0}
   _oneGrabTransformer: {fileID: 0}
@@ -18810,7 +18815,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f86b14a27b52f4f9298c33015b5c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.Grabbable
-  _transferOnSecondSelection: 0
+  _transferOnSecondSelection: 1
   _addNewPointsToFront: 0
   _forwardElement: {fileID: 0}
   _oneGrabTransformer: {fileID: 0}
@@ -20089,8 +20094,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &1992498747
 Rigidbody:
   m_ObjectHideFlags: 0

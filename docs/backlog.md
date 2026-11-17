@@ -12,12 +12,20 @@ Mục #32–#40 và các dòng **Bổ sung (review UX)**: review UI/UX theo tả
 
 Mỗi mục = 1 phiên làm việc = 1 nhánh. Không đánh số lại; mục xong thì ghi `done (commit …)`.
 
-**Trạng thái:** `todo` → `in progress` → `verified-mcp (x/y ✅, chờ test tay)` → `done (commit …, test x/x ✅)`; hoặc `blocked (lý do)`; mục bị bỏ ghi `dropped (lý do)`. Chỉ ghi `done` khi mọi case trong `docs/test-reports/bl<nn>.md` đều ✅, kể cả phần bạn test bằng tay. Các dòng **Bổ sung** được gộp vào **Done when** / **Scene(s)** khi bắt đầu làm mục đó.
+**Trạng thái:** `todo` → `in progress` → `verified-mcp (x/y ✅, chờ test tay)` → `done (commit …, test x/x ✅)`; hoặc `blocked (lý do)`; mục bị bỏ ghi `dropped (lý do)`; mục người dùng đóng mà chưa đủ test tay ghi `closed (lý do)` (2026-11-17: mọi mục #1–#135 còn mở). Chỉ ghi `done` khi mọi case trong `docs/test-reports/bl<nn>.md` đều ✅, kể cả phần bạn test bằng tay. Các dòng **Bổ sung** được gộp vào **Done when** / **Scene(s)** khi bắt đầu làm mục đó.
 
 Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luyện sai · **P2** bảo trì, mở đường cho việc khác · **P3** dọn dẹp.
 
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
+
+**ĐỢT CHECKLIST 2026-11-17 (thêm 2026-11-17, từ `docs/review-notes-checklist-2026-11-17.md` R1–R16 + F2b; gộp theo gốc lỗi cùng ngày; đứng trước mọi khối cũ).** Mục #1–#135 còn mở đã `closed` (người dùng 2026-11-17). Không hai mục cùng sửa một `.unity` một lúc.
+- **Đang mở:** 4 mục gốc #154 (A: bố cục chữ cố định), #155 (B: luật chữ, decision chung), #156 (C: hiện/ẩn theo bước), #157 (D: đặt kiện khi thả, P0); mục lẻ #141 (canvas cong hai lớp), #143 (EN theo glossary), #151 (mặt bàn); quy trình #158; #137–#139 chờ test tay H1. Mục #136, #140, #142, #144–#150, #152, #153 đã gộp vào mục gốc (nội dung giữ làm case test).
+- **1. Ngay:** **#157** (P0) bắt đầu bằng tái hiện chỗ đặt giữa ở Mixed (Simulator hoặc kính), rồi thiết kế „một cơ chế quyết định khi thả“; phần thả ngoài thùng (#153) có thể sau freeze 19/11. Song song (khác file): **#158** (chỉ skill/doc) và **#143** (chỉ CSV + glossary).
+- **2. Song song với #157 (khác scene):** **#156** (Welcome + Concept, không cần decision) → **#141** (layer canvas cong, 5 scene: chạy sau khi #156 xong Welcome/Concept và #157 xong Mixed, vì đụng mọi scene).
+- **3. Một `solution-decision` chung cho #155** (chạy song song với bước 1–2, chỉ là phân tích): xong decision → #155 (5 scene) → phần câu hỏi của #154; phần còn lại của #154 (luật + tool + chú thích tour) làm được ngay sau #156 (cùng ConceptScene). Một lần đổi `layout_version` cho #155 (+ #157 nếu log đổi).
+- **4. Xen khi scene rảnh:** #151 (mặt bàn, 4 scene).
+- **5. Cuối đợt:** `german-reviewer` duyệt mọi chữ mới, `ImportCsv`, `InstructionShelfLayout` + `TextComfortAudit` ở 5 scene, một build, một buổi test kính (theo #158: có lượt Simulator cho #157).
 
 **ĐỢT FESTO (thêm 2026-11-16, từ review nhóm 2026-11-09, `docs/review-notes-team-2026-11-09.md`; Festo review 18/11, design freeze 19/11).** Khối này đứng trước khối ĐỢT CUỐI; việc còn lại của ĐỢT CUỐI (build, buổi P803, gửi file duyệt, học R #102) vẫn giữ.
 - **A. „Sửa ngay“, trước 18/11 (chỉ chữ + chỉnh nhỏ, không cần decision):** #119 (chỉ CSV) → #116 (Welcome) → #117 (Welcome + Concept, sau #116) ∥ #118 (Concept; không chạy cùng lúc với #117 vì cùng ConceptScene) → #120 (Complex, sau #116). Cuối nhóm: `german-reviewer` duyệt mọi chữ mới một lần, `ImportCsv`, chạy lại `InstructionShelfLayout` ở scene có thẻ đổi chữ, hỏi `data-analyst` có cần đổi `layout_version` không (#118 đổi tour Concept, decision 024: dữ liệu Concept trước/sau không gộp), một build.
@@ -526,7 +534,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test report:** docs/test-reports/bl36.md
 - **Bổ sung (review 2026-11-03, mở lại):** Concept `Interactables/[GG_Package]` (KABELVERBINDER A): sticker mặt trước quay sang phải (+x), không về phía trainee, chữ xoay ≈90°, xám mảnh; nhãn `Label Top` cũng xoay (ảnh `ConceptScene/views/labels.png`, `instructions_wide.png`). Done when "mọi kiện" chưa đạt ở Concept. Cũng kiểm: 3 carton RING D ở Complex (`GGB/[VPE_1..3]/Cube/Text (TMP)`) có cỡ font khác nhau (0.06 / 0.06 / 0.15), chụp `labels` sau khi trả lời câu hỏi.
 - **Bổ sung (2026-11-04, sửa phần mở lại):** carton Concept đã xoay về 0°, nhãn trước và nhãn trên đọc đúng chiều. 3 nhãn RING D ở Complex cùng cỡ (0,65, chữ hoa 9,3 mm), không cần sửa. Nhãn túi SCHRAUBE B ở Concept bị bảng quiz (#73) che khi đứng tại chỗ, nên túi được dời về phía trước 13 cm (người dùng chọn 2026-11-04). Thêm case tay H3: cầm túi mà không chạm nhầm nút quiz.
-- **Status:** verified-mcp (2026-11-04: lần mở lại 9/9 ✅, chờ test tay H1–H3)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (2026-11-04: lần mở lại 9/9 ✅, chờ test tay H1–H3))
 
 ### #37 [P2] Menu: trong tầm với, đánh dấu bài đang làm, khó chạm nhầm
 - **Type:** logic
@@ -567,7 +575,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** nhanh (cầm thùng, chạm nút, nghe âm thanh)
 - **Depends on:** #9; nên làm cùng hoặc sau #27 (bàn phím nhập mã cũng nằm ở Welcome)
 - **Test report:** docs/test-reports/bl39.md
-- **Status:** verified-mcp (10/10 ✅, chờ test tay H1 trên kính; âm thanh = tiếng bấm sẵn có của nút)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (10/10 ✅, chờ test tay H1 trên kính; âm thanh = tiếng bấm sẵn có của nút))
 
 ### #40 [Feature] Làm nổi bước hiện tại trên thẻ hướng dẫn
 - **Type:** feature
@@ -581,7 +589,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #25, #35 (thẻ đã lên giá mới); D19 chỉ để xác nhận, không chặn
 - **Decision:** docs/decisions/017-current-step-highlight.md
 - **Test report:** docs/test-reports/bl40.md
-- **Status:** verified-mcp (15/15 ✅, chờ test tay H1 cầm thật, H2 thả/lấy thật, H3 liếc lại giá trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (15/15 ✅, chờ test tay H1 cầm thật, H2 thả/lấy thật, H3 liếc lại giá trên kính))
 
 ---
 
@@ -609,7 +617,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Decision:** docs/decisions/002-localization-mechanism.md
 - **Bổ sung (2026-11-01, từ #26, đã gộp vào Done when 2026-11-02):** header của log nghiên cứu có trường `language` (hiện `null`). Trước khi thu dữ liệu thật, `language` phải khác `null` (ghi `DE`/`EN` lúc bắt đầu phiên) ~~và phải có sự kiện `language_change` cho chế độ thử~~ (thay bằng "ngôn ngữ cố định theo phiên", không có sự kiện đổi ngôn ngữ; spec §3/§9, data-analyst duyệt 2026-11-02). Ở chế độ nghiên cứu (mã ngoài dải thử) ngôn ngữ khoá ở DE.
 - **Test report:** docs/test-reports/bl11.md
-- **Status:** verified-mcp (commit 6e67608, 16/16 MCP ✅, chờ test tay L9 build ConceptScene trên Quest, L10 chạm nút ngôn ngữ trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (commit 6e67608, 16/16 MCP ✅, chờ test tay L9 build ConceptScene trên Quest, L10 chạm nút ngôn ngữ trên kính))
 
 ### #12 [Feature] Text cố định trong 5 scene sang bảng dịch (EN + DE)
 - **Type:** refactor
@@ -681,7 +689,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #12, #54, #55
 - **Decision:** docs/decisions/002-localization-mechanism.md
 - **Test report:** docs/test-reports/bl13.md
-- **Status:** verified-mcp (6/7 ✅ code, chờ bạn E1: mở file trong Excel; công cụ `docs/i18n/review_tool.py`, export đầu tiên `docs/i18n/review/review-2026-11-06.csv`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (6/7 ✅ code, chờ bạn E1: mở file trong Excel; công cụ `docs/i18n/review_tool.py`, export đầu tiên `docs/i18n/review/review-2026-11-06.csv`))
 
 ### #10 [Feature] Dựng panel WMS giống dialog Kommissionierung thật
 - **Type:** feature
@@ -765,7 +773,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Bổ sung (2026-11-01, decision 008):** từ #10, Ist trên dialog tăng dần khi cân, nên phép chia có dư (55 = 2×25 + 5) không còn được chấm qua việc đặt hàng; #19 nên kiểm phép chia trực tiếp (ví dụ hỏi "Wie viele Kartons?" trước khi cầm kiện).
 - **Test report:** docs/test-reports/bl19.md
 - **Bổ sung (2026-11-03, decision 019):** case H-held (kiện đang cầm lúc đổi thùng) chuyển sang #71, vì #71 thay cách đổi thùng kho.
-- **Status:** verified-mcp (30/30 MCP ✅, chờ test tay C6, C7, C14, B1 trên kính; H-held chuyển sang #71; theo giả định A5, A7, A12, A13)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (30/30 MCP ✅, chờ test tay C6, C7, C14, B1 trên kính; H-held chuyển sang #71; theo giả định A5, A7, A12, A13))
 
 ### #20 [Feature] Dạy Soll/Ist/Rest, EKZ, Anweisung trước khi dùng
 - **Type:** feature
@@ -869,7 +877,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** nhanh (nhìn bàn sau và màn hình từ chỗ đứng)
 - **Depends on:** #47, #50
 - **Test report:** docs/test-reports/bl51.md
-- **Status:** verified-mcp (3/4 ✅, chờ test tay H1: nhìn bàn sau trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (3/4 ✅, chờ test tay H1: nhìn bàn sau trên kính))
 
 ### #52 [P1] ConceptScene: nút „Weiter“ và A/B/C to hơn, xa người hơn, gần chỗ đọc
 - **Type:** feature
@@ -884,7 +892,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Decision:** docs/decisions/015-concept-buttons-next-to-reading.md
 - **Test report:** docs/test-reports/bl52.md
 - **Bổ sung (review 2026-11-03):** cách trả lời và thứ tự tour → quiz tách thành #61 (cần decision); #52 chỉ giữ tầm với, cỡ và chỗ đặt nút.
-- **Status:** verified-mcp (13/16 ✅, chờ test tay H1–H3 trên kính: tầm với, bấm trúng, không bấm nhầm khi cầm kiện; thêm 2026-11-03 case người mới tự nhận ra nút A/B/C, chưa có trong `bl52.md`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (13/16 ✅, chờ test tay H1–H3 trên kính: tầm với, bấm trúng, không bấm nhầm khi cầm kiện; thêm 2026-11-03 case người mới tự nhận ra nút A/B/C, chưa có trong `bl52.md`))
 
 ### #53 [Feature] ComplexScene: thẻ 1 nhắc trả lời câu hỏi dưới màn hình
 - **Type:** feature
@@ -897,7 +905,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** nhanh (đọc thẻ)
 - **Depends on:** #40 (cùng sửa thẻ ComplexScene); D20
 - **Test report:** docs/test-reports/bl53.md
-- **Status:** verified-mcp (9/9 ✅, chờ test tay T4-kính: đọc thẻ ở cả 2 position; theo giả định D20)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (9/9 ✅, chờ test tay T4-kính: đọc thẻ ở cả 2 position; theo giả định D20))
 
 ### #56 [P1] BasicPickingScene: 6 carton EKZ 3 xếp sát nhau như pictogram EKZ 3
 - **Type:** logic
@@ -910,7 +918,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Test trên kính:** bắt buộc (đặt carton cuối bằng tay thật khi các ô bên cạnh đã có carton)
 - **Depends on:** #41, #47
 - **Test report:** docs/test-reports/bl56.md
-- **Status:** verified-mcp (16/18 ✅, chờ test tay H1, H2)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (16/18 ✅, chờ test tay H1, H2))
 
 ### #57 [Feature] ConceptScene: bảng tổng quan các EKZ
 - **Type:** feature
@@ -924,7 +932,7 @@ Mục tiêu: bỏ những gì làm trainee phải tìm, quay đầu, đọc lạ
 - **Depends on:** #55, #52 (cùng sửa bố cục ConceptScene). Không bị chặn; nghĩa các cấp 2, 4–9 chờ người hướng dẫn xác nhận (D21–D25), chữ để `proposed`.
 - **Decision:** docs/decisions/018-concept-ekz-overview-board.md
 - **Test report:** docs/test-reports/bl57.md
-- **Status:** verified-mcp (21/21 MCP ✅, chờ test tay E8b đọc bảng trên kính; theo giả định nghĩa EKZ slide 8, D21–D24)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (21/21 MCP ✅, chờ test tay E8b đọc bảng trên kính; theo giả định nghĩa EKZ slide 8, D21–D24))
 
 ### #22 [Feature] Bài quyết định: chọn cách đếm và xử lý Mindermenge
 - **Type:** feature
@@ -1012,7 +1020,7 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Test trên kính:** nhanh (đọc thẻ từ chỗ đứng)
 - **Depends on:** #33, #58 (cùng thẻ `Result` ở Complex: làm #58 trước)
 - **Test report:** docs/test-reports/bl59.md
-- **Status:** verified-mcp (11/11 MCP ✅, chờ test tay H1 đọc thẻ trên kính; thẻ `Correct` ở Basic chỉ kiểm bố cục)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (11/11 MCP ✅, chờ test tay H1 đọc thẻ trên kính; thẻ `Correct` ở Basic chỉ kiểm bố cục))
 
 ### #60 [P1] ConceptScene: dạy phép tính Soll : VPE trong tour, sửa bước `Empf Kz 000`
 - **Type:** logic
@@ -1050,7 +1058,7 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Test trên kính:** nhanh (đọc thẻ)
 - **Depends on:** #53
 - **Test report:** docs/test-reports/bl62.md
-- **Status:** verified-mcp (17/17 MCP ✅, chờ test tay T10 đọc thẻ trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (17/17 MCP ✅, chờ test tay T10 đọc thẻ trên kính))
 
 ### #63 [P3] Welcome, Concept: thẻ cuối trên giá cùng cỡ, sát thẻ trên như ở Basic/Mixed/Complex
 - **Type:** cleanup
@@ -1076,7 +1084,7 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Test trên kính:** nhanh
 - **Depends on:** #59 (thẻ kết quả to lên có thể chạm chân Menu)
 - **Test report:** docs/test-reports/bl64.md
-- **Status:** verified-mcp (7/8 ✅, chờ test tay F6 đọc Menu trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (7/8 ✅, chờ test tay F6 đọc Menu trên kính))
 
 ### #65 [P3] Tổng kết cuối khoá theo đúng 5 mục tiêu ở Welcome
 - **Type:** logic
@@ -1114,7 +1122,7 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Test trên kính:** không
 - **Depends on:** A5
 - **Test report:** docs/test-reports/bl67.md
-- **Status:** verified-mcp (10/11 ✅, chờ test tay H1; 2026-11-03, theo giả định A5)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (10/11 ✅, chờ test tay H1; 2026-11-03, theo giả định A5))
 
 ### #68 [P3] ConceptScene `Info Panel`: bỏ tiêu đề trùng và TMP cũ
 - **Type:** cleanup
@@ -1139,7 +1147,7 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Test trên kính:** nhanh (bấm nút)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl69.md
-- **Status:** verified-mcp (5/5 MCP ✅, chờ test tay R5: bấm nút bằng tay trên Quest)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (5/5 MCP ✅, chờ test tay R5: bấm nút bằng tay trên Quest))
 
 ### #70 [P3] ComplexScene: bảng ví dụ gần cụm câu hỏi hơn
 - **Type:** logic
@@ -1186,7 +1194,7 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Bổ sung (2026-11-03, ảnh trạm + bảng OIS2 + dialog cũ):** các số 1–10 trên `old/Orderpicking.png` là 10 bước của bảng bấm giờ „OIS2 Kommi2“ (bảng ánh xạ: `docs/requirements/wms-specs/kommissionierplatz-photo.md`). Cách đọc ba làn (suy ra, chờ D26): **làn trái** chỉ đưa thùng kho tới (người dùng nhớ: một chiều), thùng tiếp theo chờ sẵn ở đó; thùng kho được kéo vào **làn giữa** (chỗ làm việc, bước 1), lấy hàng ở đó, sau F6 tự chạy về kho theo làn giữa (bước 9); **làn phải** giữ thùng đơn qua nhiều lượt pick (bước 3, 6); đơn xong thì kéo thùng đơn sang làn giữa, thùng tự đi (bước 10, „in 40% der Fälle“). Không có phím "xong đơn" trên cả hai dialog; nghiêng về lượt F6 cuối là đủ (D26 c). Người dùng nhớ trạm có camera tự quét mã thùng (D26 d), nên app không cần bước quét. **Độ tin cậy nguồn:** thứ tự bước = bảng OIS2 + ảnh, khớp nhau (khá cao, nhưng thuộc `old/`, khu Kommi2, câu C1 còn mở); vị trí làn = ảnh + suy luận + người dùng nhớ; nghĩa 3 ô thùng trên dialog cũ = suy luận; đường về của thùng kho = suy luận. **Khác app hiện tại, decision cho #71 cần xét:** thùng kho vào từ trái rồi về kho qua làn giữa; thùng đơn kéo sang làn giữa rồi mới đi (#50 đang cho chạy theo làn phải); băng chuyền kho #49 (vòng khép kín) có thể phải đổi; người học có tự kéo thùng (bước 1, 3, 10) không. `Picks 2/4` (B14) = nhiều lượt pick từ một thùng kho: không mô phỏng nếu không cần.
 - **Bổ sung (2026-11-03, decision 019):** người dùng mở rộng mục này sang cả 5 scene và chọn ba làn tự động (học viên không tự kéo), bảng 10 bước ở Concept, thùng kế tiếp ẩn, thùng 1 của Complex trượt vào từ trái, làn giữa là dải con lăn giữa hai thùng (khe nới ra bằng bề ngang thùng), làn trái va cột giá thẻ thì dời cột. Basic tách thành #72. *Done when* ở trên đã thay bằng bản theo decision 019.
 - **Test report:** docs/test-reports/bl71.md
-- **Status:** verified-mcp (18/18 case MCP/code ✅ sau khi sửa, chờ test tay T5, H1–H4 trên kính; theo giả định D26a–f, D11, D17, D18, D27, C1, D12)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (18/18 case MCP/code ✅ sau khi sửa, chờ test tay T5, H1–H4 trên kính; theo giả định D26a–f, D11, D17, D18, D27, C1, D12))
 
 ### #72 [Feature] BasicPickingScene: ba làn và thùng chạy đi theo decision 019
 - **Type:** feature
@@ -1200,7 +1208,7 @@ Nguồn: review lần 3 cả 5 scene trên nhánh `feat/57-ekz-overview` (4078b9
 - **Depends on:** #71
 - **Decision:** docs/decisions/019-station-three-lanes-flow.md
 - **Test report:** docs/test-reports/bl72.md
-- **Status:** verified-mcp (8/10 case MCP/code ✅, chờ test tay T6, T7 trên kính; theo giả định D26a–f, D11, D17, D18, D27, C1)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (8/10 case MCP/code ✅, chờ test tay T6, T7 trên kính; theo giả định D26a–f, D11, D17, D18, D27, C1))
 
 ### #73 [P1] ConceptScene: tour dạy Soll : VPE, bảng 10 bước ba làn, quiz chạm là chấm và mở sau tour, dọn `Info Panel`
 - **Type:** logic
@@ -1394,7 +1402,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** decision 027 (làm sau hoặc cùng #87: tiêu đề cụm cùng kiểu với thẻ mục tiêu); D33, D39, D42 (không chặn)
 - **Decision:** docs/decisions/027-task-card-template-welcome-goals.md; docs/decisions/034-welcome-goals-know-can-objectives.md (thay 027 mục 5)
 - **Test report:** docs/test-reports/bl86.md
-- **Status:** verified-mcp (11/13 ✅, chờ test tay trên kính và X7 cả luồng)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (11/13 ✅, chờ test tay trên kính và X7 cả luồng))
 
 ### #87 [Feature] Mẫu thẻ nhiệm vụ chung: thẻ mục tiêu khác thẻ bước, khoảng cách đều, bảng co theo nội dung
 - **Type:** feature
@@ -1408,7 +1416,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** decision 027; làm trước #86 và #97
 - **Decision:** docs/decisions/027-task-card-template-welcome-goals.md
 - **Test report:** docs/test-reports/bl87.md
-- **Status:** verified-mcp (14/16 MCP/code ✅, D10 một phần (mixed thẻ 2 dài hơn 4 ký tự theo instructional-design-reviewer), chờ test tay H1 đọc thẻ trên kính DE/EN; nhánh `feat/87-task-card-template`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (14/16 MCP/code ✅, D10 một phần (mixed thẻ 2 dài hơn 4 ký tự theo instructional-design-reviewer), chờ test tay H1 đọc thẻ trên kính DE/EN; nhánh `feat/87-task-card-template`))
 
 ### #88 [Feature] Chuẩn kiện và nhãn: một cỡ cho mỗi loại kiện ở mọi bài, một nhãn nhỏ trên nắp
 - **Type:** feature
@@ -1422,7 +1430,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** thay #36 khi xong; A14 (giả định, không chặn)
 - **Decision:** docs/decisions/029-package-size-and-label-standard.md
 - **Test report:** docs/test-reports/bl88.md
-- **Status:** verified-mcp (16/16 ✅ MCP/code; nhãn nắp 60 %, chữ hoa ≈ 5 mm; S5 đọc nhãn từ chỗ đứng chuyển sang H2; chờ test tay H1–H2 trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (16/16 ✅ MCP/code; nhãn nắp 60 %, chữ hoa ≈ 5 mm; S5 đọc nhãn từ chỗ đứng chuyển sang H2; chờ test tay H1–H2 trên kính))
 
 ### #89 [Feature] ConceptScene: một thanh tour ở giữa, sát dưới màn hình, chứa chữ của bước và Back/Next, hiện từ thẻ 2
 - **Type:** feature
@@ -1436,7 +1444,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** decision 026
 - **Decision:** docs/decisions/026-concept-study-desk.md
 - **Test report:** docs/test-reports/bl89.md
-- **Status:** verified-mcp (17/17 MCP/code ✅, chờ test tay H1–H4 trên kính; nhánh `feat/89-concept-tour-bar`; thanh đè cụm câu hỏi ở bước 11 cho tới #93, trừ lúc thùng chạy)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (17/17 MCP/code ✅, chờ test tay H1–H4 trên kính; nhánh `feat/89-concept-tour-bar`; thanh đè cụm câu hỏi ở bước 11 cho tới #93, trừ lúc thùng chạy))
 
 ### #90 [Feature] ConceptScene: giải thích nhãn hiện ngay cạnh kiện đang cầm, chú thích ô tách „làm gì“ khỏi „là gì“
 - **Type:** feature
@@ -1450,7 +1458,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** decision 026; #88 (cỡ kiện và nhãn)
 - **Decision:** docs/decisions/026-concept-study-desk.md
 - **Test report:** docs/test-reports/bl90.md
-- **Status:** verified-mcp (10/10 MCP/code ✅, chờ test tay H1–H3 trên kính; nhánh `feat/90-label-card-near-package`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (10/10 MCP/code ✅, chờ test tay H1–H3 trên kính; nhánh `feat/90-label-card-near-package`))
 
 ### #91 [Feature] ConceptScene bước `cartons`: phép tính đặt cạnh ô Soll/Verp.-Einh. và carton đếm
 - **Type:** feature
@@ -1465,7 +1473,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** #89 (chỗ chữ của bước), #88 (cỡ carton)
 - **Decision:** docs/decisions/026-concept-study-desk.md; phần số LVS: docs/decisions/030-concept-box-hints.md (Rest cố định 120, carton STECKER C trên bàn giữ làm mẫu ngoài hai thùng)
 - **Test report:** docs/test-reports/bl91.md
-- **Status:** verified-mcp (9/9 MCP/code ✅; xem lại khi đeo kính ở buổi test chung; nhánh `feat/91-cartons-next-to-fields`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (9/9 MCP/code ✅; xem lại khi đeo kính ở buổi test chung; nhánh `feat/91-cartons-next-to-fields`))
 
 ### #92 [Feature] ConceptScene: một chuỗi thao tác tại thùng kho; vật trông như kiện thì cầm được, ngoại lệ có ký hiệu + một dòng lý do
 - **Type:** feature
@@ -1479,7 +1487,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** #101 (thẻ mẫu EKZ); thay #96 (bỏ). Câu hỏi D39, D40, D12, A13 không chặn
 - **Decision:** docs/decisions/032-concept-one-picking-flow-grab-rule.md (thay mục 5 của docs/decisions/026-concept-study-desk.md)
 - **Test report:** docs/test-reports/bl92.md
-- **Status:** verified-mcp (17/18 MCP/code ✅; `selftest.R` chưa chạy được vì Windows chặn `tidyr`/`readr`; chờ test tay H1–H2 trên kính; nhánh `feat/92-concept-one-picking-flow`, commit 55c4ee2; layout "032")
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (17/18 MCP/code ✅; `selftest.R` chưa chạy được vì Windows chặn `tidyr`/`readr`; chờ test tay H1–H2 trên kính; nhánh `feat/92-concept-one-picking-flow`, commit 55c4ee2; layout "032"))
 
 ### #93 [Feature] Cụm câu hỏi xong việc thì thu lại (Concept + Complex)
 - **Type:** feature
@@ -1493,7 +1501,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** decision 026; phần Complex làm được riêng
 - **Decision:** docs/decisions/026-concept-study-desk.md
 - **Test report:** docs/test-reports/bl93.md
-- **Status:** verified-mcp (19/21 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/93-quiz-folds-away`, commit 2f3f68e; layout "029")
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (19/21 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/93-quiz-folds-away`, commit 2f3f68e; layout "029"))
 
 ### #94 [Feature] Kế hoạch EKZ cho cả khoá và vật mẫu thực tế (EKZ 0 / EKZ 3)
 - **Type:** feature
@@ -1507,7 +1515,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** decision 026 (bàn học Concept, chỗ đặt thùng mẫu); giả định D4, D34 (câu hỏi D35–D38)
 - **Decision:** docs/decisions/028-ekz-course-plan.md
 - **Test report:** docs/test-reports/bl94.md
-- **Status:** verified-mcp (19/19 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/94-ekz-course-plan`, commit 3ae591f; layout "029", phân biệt bằng `line.empf_kz`; thùng mẫu Concept trên bàn sau bên trái màn hình, xem bổ sung decision 028)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (19/19 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/94-ekz-course-plan`, commit 3ae591f; layout "029", phân biệt bằng `line.empf_kz`; thùng mẫu Concept trên bàn sau bên trái màn hình, xem bổ sung decision 028))
 
 ### #95 [P2] Băng chuyền: ray thừa ở ba làn, tấm gỗ vắt trên băng ở trạm trống
 - **Type:** bug
@@ -1520,7 +1528,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Test trên kính:** không (ảnh Editor đủ)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl95.md
-- **Status:** verified-mcp (11/11 MCP/code ✅; không cần test kính, xem lại băng ở buổi test chung; nhánh `fix/95-conveyor-rails`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (11/11 MCP/code ✅; không cần test kính, xem lại băng ở buổi test chung; nhánh `fix/95-conveyor-rails`))
 
 ### #96 [P2] ComplexScene: vòng rời xuyên qua carton và nảy ra khỏi thùng đơn
 - **Type:** bug
@@ -1546,7 +1554,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** #87 (decision 027: ✓ không bao giờ ở thẻ „Aufgabe“, giữ chỗ ở thẻ mới). Người dùng chốt 2026-11-04: sang vị trí 2 thì ✓ của vị trí 1 tắt (khác Welcome/Concept, nơi ✓ không bao giờ tắt, vì ở đây thẻ đổi sang việc mới)
 - **Decision:** docs/decisions/035-done-checks-picking-position-strip.md
 - **Test report:** docs/test-reports/bl97.md
-- **Status:** verified-mcp (16/18 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/97-done-checks-picking`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (16/18 ✅, chờ test tay H1–H2 trên kính; nhánh `feat/97-done-checks-picking`))
 
 ### #98 [Feature] Rút gọn dần chữ trên thẻ qua các bài (fading)
 - **Type:** feature
@@ -1558,7 +1566,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Công:** S
 - **Test trên kính:** nhanh (đọc thẻ ở bài 4–5)
 - **Depends on:** #87; dữ liệu pilot; `solution-decision` (xr-ux-reviewer khuyên không đổi nội dung bước)
-- **Status:** todo
+- **Status:** closed (người dùng đóng 2026-11-17, chưa làm; trước đó: todo)
 
 ### #99 [Feature] Sau khi bấm nút đỏ đúng: chờ ngắn cho người học đọc phản hồi, gợi ý nhìn tại thùng, rồi thùng mới chạy
 - **Type:** feature
@@ -1572,7 +1580,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** — ; D41 (người hướng dẫn, không chặn). Mỗi lần đổi thùng thêm ~3,4 s, cả khoá thêm ~17 s
 - **Decision:** docs/decisions/033-confirm-pause-container-change-cue.md
 - **Test report:** docs/test-reports/bl99.md
-- **Status:** verified-mcp (13/14 MCP/code ✅, T9b chưa chạy; `selftest.R` không chạy được vì #102; chờ test tay H1–H3, T9b; nhánh `feat/99-read-before-ride`, commit a45f4e7)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (13/14 MCP/code ✅, T9b chưa chạy; `selftest.R` không chạy được vì #102; chờ test tay H1–H3, T9b; nhánh `feat/99-read-before-ride`, commit a45f4e7))
 
 ### #100 [Feature] ConceptScene: báo ngay khi người học bỏ kiện sai hoặc thừa vào thùng kho / thùng đơn
 - **Type:** feature
@@ -1586,7 +1594,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** #91 (số LVS, carton đếm); trước #92 (#92 đổi vẻ ngoài carton đếm và kiện trong thùng kho). Giả định D12, A8 chưa có người hướng dẫn xác nhận (không chặn)
 - **Decision:** docs/decisions/030-concept-box-hints.md
 - **Test report:** docs/test-reports/bl100.md
-- **Status:** verified-mcp (24/24 ✅, chờ test tay M1–M3)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (24/24 ✅, chờ test tay M1–M3))
 
 ### #101 [Feature] ConceptScene: mẫu EKZ 003 có 3 carton cùng hướng, thẻ mẫu mang hình của bảng EKZ
 - **Type:** feature
@@ -1600,7 +1608,7 @@ Các mục về ConceptScene (#89–#93) cùng sửa một scene và cùng bố 
 - **Depends on:** #94; làm trước #92 (#92 đổi vẻ ngoài của mẫu). D36 không chặn (decision 031: túi đúng với cả hai câu trả lời)
 - **Decision:** docs/decisions/031-concept-ekz-samples-link-board.md
 - **Test report:** docs/test-reports/bl101.md
-- **Status:** verified-mcp (11/12 ✅, chờ test tay H1 trên kính; nhánh `feat/101-concept-ekz-samples`; 3 carton xếp hàng ngang vì bàn sau chỉ sâu 34 cm, thùng 000 hẹp lại 21 cm)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (11/12 ✅, chờ test tay H1 trên kính; nhánh `feat/101-concept-ekz-samples`; 3 carton xếp hàng ngang vì bàn sau chỉ sâu 34 cm, thùng 000 hẹp lại 21 cm))
 
 ## Test kính 2026-11-05 (video P802, English, cả khoá)
 
@@ -1619,7 +1627,7 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Test trên kính:** bắt buộc (cầm bằng tay thật, khoảng cách cầm)
 - **Depends on:** —; làm trước #108 (đặt carton vào ô)
 - **Test report:** docs/test-reports/bl103.md
-- **Status:** verified-mcp (5/5 MCP/code ✅, chờ test tay T5–T8 trên kính; nhánh `fix/103-grab-zone`; nguyên nhân: sticker `Cube` của 7 carton Complex nằm 7 cm trước hộp; quả cầu cầm 5 cm của SDK vẫn còn)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (5/5 MCP/code ✅, chờ test tay T5–T8 trên kính; nhánh `fix/103-grab-zone`; nguyên nhân: sticker `Cube` của 7 carton Complex nằm 7 cm trước hộp; quả cầu cầm 5 cm của SDK vẫn còn))
 
 ### #104 [Feature] ConceptScene: bỏ thẻ chữ cạnh kiện đang cầm; mỗi dòng hành động nói việc và mục đích; rút gọn chữ bước 11
 - **Type:** feature
@@ -1633,7 +1641,7 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Depends on:** decision chung ConceptScene (#104–#107)
 - **Decision:** docs/decisions/036-concept-tour-v3.md
 - **Test report:** docs/test-reports/bl104.md
-- **Status:** verified-mcp (19/20 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`; chữ mới `proposed`, german-reviewer agent đã duyệt)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (19/20 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`; chữ mới `proposed`, german-reviewer agent đã duyệt))
 
 ### #105 [Feature] ConceptScene: chỉ ô LVS rõ ràng: mũi tên trên màn hình tới đúng ô, chú thích thẳng hàng, marker không che nhãn
 - **Type:** feature
@@ -1647,7 +1655,7 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Depends on:** decision chung ConceptScene (#104–#107)
 - **Decision:** docs/decisions/036-concept-tour-v3.md
 - **Test report:** docs/test-reports/bl105.md
-- **Status:** verified-mcp (13/14 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (13/14 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`))
 
 ### #106 [Feature] ConceptScene: thanh tour không che thùng đơn khi phải thao tác
 - **Type:** feature
@@ -1674,7 +1682,7 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Depends on:** decision chung ConceptScene; liên quan ý tưởng vật EKZ 0 của P801 R19 (vít, phụ kiện ống)
 - **Decision:** docs/decisions/036-concept-tour-v3.md
 - **Test report:** docs/test-reports/bl107.md
-- **Status:** verified-mcp (12/13 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`; carton nửa cỡ theo yêu cầu người dùng 2026-11-05)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (12/13 ✅ MCP/code, chờ test tay H1 trên kính; nhánh `feat/104-concept-tour-v3`; carton nửa cỡ theo yêu cầu người dùng 2026-11-05))
 
 ### #108 [Feature] Basic, Mixed: người học thấy được chỗ đặt carton theo Empf Kz 003; carton không nằm nghiêng lơ lửng
 - **Type:** feature
@@ -1688,7 +1696,7 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Depends on:** #103 (vùng cầm, verified-mcp)
 - **Decision:** docs/decisions/037-picking-station-places-feedback.md
 - **Test report:** docs/test-reports/bl108.md
-- **Status:** verified-mcp (18/20 ✅ MCP/code, chờ test tay H1 trên kính; phần log/R (`layout_version`, `item_skills.csv`, R, `selftest.R`) chuyển sang bước 5 cuối đợt, cần #102; nhánh `feat/108-ekz-places-visible`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (18/20 ✅ MCP/code, chờ test tay H1 trên kính; phần log/R (`layout_version`, `item_skills.csv`, R, `selftest.R`) chuyển sang bước 5 cuối đợt, cần #102; nhánh `feat/108-ekz-places-visible`))
 
 ### #109 [Feature] Basic, Mixed, Complex: phản hồi sau khi bấm nút đỏ ở chỗ người học đang nhìn; một ký hiệu một nghĩa
 - **Type:** feature
@@ -1702,7 +1710,7 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Depends on:** — (decision 037: thẻ ở thành trước thùng, không chờ #111); làm sau #108 (cùng scene)
 - **Decision:** docs/decisions/037-picking-station-places-feedback.md
 - **Test report:** docs/test-reports/bl109.md
-- **Status:** verified-mcp (17/17 ✅ MCP/code, chờ test tay F2-đọc, F7-tay, H1 trên kính; nhánh `feat/109-result-card-at-box`; thẻ đặt sát miệng thùng (mép trên y 0.962) thay vì y 0.80–0.85 để xa tay ấn nút)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (17/17 ✅ MCP/code, chờ test tay F2-đọc, F7-tay, H1 trên kính; nhánh `feat/109-result-card-at-box`; thẻ đặt sát miệng thùng (mép trên y 0.962) thay vì y 0.80–0.85 để xa tay ấn nút))
 
 ### #110 [Feature] Concept, Complex: câu trả lời sai khoá nút một lúc để người học đọc lời giải thích
 - **Type:** feature
@@ -1727,7 +1735,7 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Công:** M (4 scene, tuần tự)
 - **Test trên kính:** nhanh
 - **Depends on:** —; không chạy cùng mục khác sửa cùng scene
-- **Status:** verified-mcp (18/21 ✅ MCP/code, chờ test tay H1–H3 trên kính; nhánh `feat/111-box-signs`; người dùng 2026-11-06: xếp lại carton Complex để biển không bị che, Basic cùng quy tắc)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (18/21 ✅ MCP/code, chờ test tay H1–H3 trên kính; nhánh `feat/111-box-signs`; người dùng 2026-11-06: xếp lại carton Complex để biển không bị che, Basic cùng quy tắc))
 - **Test report:** docs/test-reports/bl111.md
 
 ### #112 [P3] Đĩa kết thúc phiên của người điều phối ra khỏi tầm nhìn của người học
@@ -1753,7 +1761,7 @@ Các mục ConceptScene (#104–#107) cùng sửa một scene và cùng thanh to
 - **Test trên kính:** nhanh
 - **Depends on:** — (người dùng chọn 2026-11-05: khi kết thúc thì tắt LVS, chỉ hiện bảng)
 - **Test report:** docs/test-reports/bl113.md
-- **Status:** verified-mcp (6/6 MCP/code ✅, chờ test tay H1 trên kính; nhánh `feat/113-congrats-wms-off`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (6/6 MCP/code ✅, chờ test tay H1 trên kính; nhánh `feat/113-congrats-wms-off`))
 
 ## Feature – Log dữ liệu nghiên cứu
 
@@ -1871,7 +1879,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Bổ sung (#41, 2026-11-02):** Basic có thêm lỗi cách đặt EKZ 3 (đủ số nhưng có carton không khớp ô). Lỗi này không nằm trong `OrderRule` (nó do `OrderConfirm` + `EkzPlacementCheck` quyết định), nên #28 cần một mã lỗi riêng cho nó, và phải cập nhật spec log, `make_fake_data.R`, `analyse.R` cùng lúc.
 - **Bổ sung (review data-analyst bước 2, 2026-11-04):** `wait_s` (union `station_move_start`→`arrived`) chưa bằng thời gian học viên bị chặn: nút đỏ đã bị chặn 0.6 s trước `station_move_start` (`startDelay`), và `storage_out` chạy tiếp vài giây sau khi trạm đã rảnh (`IsMoving` hết khi thùng rời trạm 0.7 m). **Đã chốt 2026-11-04 (người dùng chọn sửa trong R):** `wait_s` = hợp các khoảng từ trigger (`position_completed` của position trước, hoặc `quiz_answer` cuối ở Complex position 1) tới `storage_in` arrived, cắt ở `task_completed` (spec §6, `analyse.R`, `selftest.R`); không thêm sự kiện C#.
 - **Test report:** docs/test-reports/bl28.md
-- **Status:** verified-mcp (21/23 ✅, chờ test tay T1–T2; bước 1 + bước 2 trên nhánh `feat/28-research-log-v2`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (21/23 ✅, chờ test tay T1–T2; bước 1 + bước 2 trên nhánh `feat/28-research-log-v2`))
 
 ### #29 [Feature] Log thao tác: cầm/thả, thùng, nút, kiểu điều khiển
 - **Type:** feature
@@ -1894,7 +1902,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Bổ sung (review cuối #26, 2026-11-01):** không gọi `ResearchLogger.Log` trong `Awake`/`OnEnable` của scene vừa nạp (vd. `input_mode_change` ban đầu, đăng ký `GrabLogger`): `activeSceneChanged` chạy sau các hàm đó nên sự kiện rơi vào lượt scene trước. Ghi từ `Start` trở đi.
 - **Decision:** docs/decisions/021-research-log-catalogue-v2.md (rút gọn: grab đăng ký lúc chạy, không `GrabLogger` trong Inspector; tay/tracking/rơi sàn sang #74)
 - **Test report:** docs/test-reports/bl29.md
-- **Status:** verified-mcp (19/21 ✅, chờ test tay H1 cầm thật, H2 chạm mục Menu khoá trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (19/21 ✅, chờ test tay H1 cầm thật, H2 chạm mục Menu khoá trên kính))
 
 ### #30 [Feature] Hướng nhìn (theo đầu), luồng tư thế và hiệu năng
 - **Type:** feature
@@ -1943,7 +1951,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Bổ sung (review cuối #44, 2026-11-01):** thêm ô "Abbruchgrund" vào phiếu giấy (mệt/chóng mặt, thời gian, chạm nhầm, khác), nối theo `participant_id`; không đưa vào app.
 - **Depends on:** #28 (cần `summary.csv`). Spec mục 9 (2026-11-01): người điều phối xoá log trên kính ngay sau khi chép về và kiểm tra đủ file.
 - **Test report:** docs/test-reports/bl31.md
-- **Status:** verified-mcp (5/7 ✅, chờ bạn thử M1 chép log 2 phiên theo hướng dẫn, M2 nhập 2 phiếu và chạy `analyse.R`)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (5/7 ✅, chờ bạn thử M1 chép log 2 phiên theo hướng dẫn, M2 nhập 2 phiếu và chạy `analyse.R`))
 
 ### #75 [Feature] Dải mã pilot P800–P899: chọn được ngôn ngữ, phân tích riêng
 - **Type:** feature
@@ -1957,7 +1965,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Test trên kính:** nhanh (một phiên pilot EN trong buổi test)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl75.md
-- **Status:** verified-mcp (12/13 ✅, chờ test tay P1: một phiên pilot `P801` English trên Quest, rồi chạy `analyse.R` trên log đó)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (12/13 ✅, chờ test tay P1: một phiên pilot `P801` English trên Quest, rồi chạy `analyse.R` trên log đó))
 
 ### #43 [Feature] Bài kiểm tra ngắn trong VR ở đầu và cuối khóa
 - **Type:** feature
@@ -1984,7 +1992,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Depends on:** #26 (biết chế độ thử/nghiên cứu), #27 (mã được nhập ở Welcome), #18 và #35 (tên, vị trí, đánh dấu mục trong Menu: làm sau để không sửa Menu hai lần; #37 đã gộp vào #35). Câu hỏi còn lại cho Menu: có cần cho "chơi lại bài hiện tại" khi nghiên cứu không (spec nói mỗi người chạy một lần, nên mặc định là không).
 - **Giả định (2026-11-04, người dùng chọn):** chỉ bài kế tiếp mở, và chỉ sau khi xong bài đang học (Welcome: cầm thùng + bấm nút đỏ; Concept: đúng cả 4 câu; Basic/Mixed: `OrderCompleted`); bài đang học và các bài trước luôn khoá; ở Complex mọi mục khoá (kết thúc qua `FacilitatorEndSession`). Không có nút vượt cho người điều phối. Phần `menu_select … blocked` chuyển sang #29.
 - **Test report:** docs/test-reports/bl42.md
-- **Status:** verified-mcp (14/14 ✅, chờ test tay H1, H2 và phần crash thật của K4)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (14/14 ✅, chờ test tay H1, H2 và phần crash thật của K4))
 
 ### #102 [P2] Data/R sau #92: mở khoá tidyr/readr, chạy selftest cho layout "032", học R từng bước
 - **Type:** refactor (kiểm tra phần R + học)
@@ -2008,7 +2016,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Công:** S (mở khoá + chạy selftest); phần học: thêm 3–5 buổi ngắn
 - **Test trên kính:** không
 - **Depends on:** #92 (commit 55c4ee2). Người dùng chọn 2026-11-05: làm sau các mục feature còn lại (#99 → #87 → #86 → #97), trước bước „hợp đồng log / build cuối“
-- **Status:** todo (2026-11-06: tidyr/readr nạp được lại, `selftest.R` chạy hết và báo OK với layout "034" (P816), nên bước mở khoá đã xong; phần học R và log thật Concept vẫn còn)
+- **Status:** closed (người dùng đóng 2026-11-17, chưa làm; trước đó: todo (2026-11-06: tidyr/readr nạp được lại, `selftest.R` chạy hết và báo OK với layout "034" (P816), nên bước mở khoá đã xong; phần học R và log thật Concept vẫn còn))
 
 ### #114 [P2] R: bỏ các lần cầm giả do ô snap trong log cũ, đếm vào `data_quality.snap_grab_artifacts`
 - **Type:** refactor (analysis)
@@ -2034,7 +2042,7 @@ Nguồn: `docs/research-logging-spec.md` (bản nháp, 2026-11-01). Mục tiêu:
 - **Test trên kính:** nhanh (cầm cổ và thân túi bằng tay thật)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl115.md
-- **Status:** verified-mcp (10/10 ✅ MCP/code, chờ test tay H1 trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (10/10 ✅ MCP/code, chờ test tay H1 trên kính))
 
 ## Review nhóm 2026-11-09 (Prototype v2, English, Notion „Internal team review“)
 
@@ -2051,7 +2059,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh (đọc bảng Welcome)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl116.md
-- **Status:** verified-mcp (12/13 ✅ MCP/code, chờ test tay H1: đọc bảng Welcome và thẻ 1 trên kính; commit 5f0954a)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (12/13 ✅ MCP/code, chờ test tay H1: đọc bảng Welcome và thẻ 1 trên kính; commit 5f0954a))
 
 ### #117 [P1] Chuyển bài: câu nói chọn bài được tô sáng trong Menu; Concept nói rõ „Start over“ chỉ để xem lại
 - **Type:** logic
@@ -2064,7 +2072,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh (đọc câu cuối Concept)
 - **Depends on:** #116 (cùng WelcomeScene / CSV, làm sau)
 - **Test report:** docs/test-reports/bl117.md
-- **Status:** verified-mcp (8/9 ✅ MCP/code, chờ test tay H1: đọc dòng cuối Concept trên kính; commit bc050b1)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (8/9 ✅ MCP/code, chờ test tay H1: đọc dòng cuối Concept trên kính; commit bc050b1))
 
 ### #118 [P1] Concept tour: bước 1 giới thiệu màn hình WMS và „customer order“, bước 5–6 bỏ tới khi Ist = Soll, bước 9 không lẫn trái/phải, bước 11 thùng chạy chậm hơn
 - **Type:** logic
@@ -2077,7 +2085,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh (bước 9 nhìn đúng phía, bước 11 đủ thời gian xem)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl118.md
-- **Status:** verified-mcp (11/11 MCP/code ✅, chờ test tay I4b, I5b; layout_version "035")
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (11/11 MCP/code ✅, chờ test tay I4b, I5b; layout_version "035"))
 
 ### #119 [P1] Phép chia nói „Soll : Verp.-Einh.“ theo tên ô LVS, không „VPE“
 - **Type:** logic
@@ -2103,7 +2111,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh (đọc bảng cuối)
 - **Depends on:** #116 (dùng câu mục tiêu mới)
 - **Test report:** docs/test-reports/bl120.md
-- **Status:** verified-mcp (8/8 MCP/code ✅, chờ test tay E8: đọc bảng cuối trên kính)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (8/8 MCP/code ✅, chờ test tay E8: đọc bảng cuối trên kính))
 
 ### #121 [Feature] Welcome: mục tiêu ngắn có biểu tượng, hiện theo chuỗi (mục tiêu trước, việc sau), chỉ bước tiếp theo
 - **Type:** feature
@@ -2117,7 +2125,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh
 - **Depends on:** #116
 - **Test report:** docs/test-reports/bl121.md
-- **Status:** verified-mcp (14/15 ✅ MCP/code, chờ test tay W12 trên Quest; layout_version "036")
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (14/15 ✅ MCP/code, chờ test tay W12 trên Quest; layout_version "036"))
 
 ### #122 [Feature] Complex: bảng ví dụ nêu công thức trước và nhắc dùng số trên WMS
 - **Type:** feature
@@ -2130,7 +2138,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh (đọc bảng ví dụ)
 - **Depends on:** #119 (cùng cách gọi Verp.-Einh.)
 - **Test report:** docs/test-reports/bl122.md
-- **Status:** verified-mcp (8/9 ✅ MCP/code, chờ test tay E6: đọc bảng ví dụ trên kính; dấu trừ là „–“ vì font không có „−“; thêm: `complex.quiz.wrong_loose` cùng công thức với bảng)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (8/9 ✅ MCP/code, chờ test tay E6: đọc bảng ví dụ trên kính; dấu trừ là „–“ vì font không có „−“; thêm: `complex.quiz.wrong_loose` cùng công thức với bảng))
 
 ### #123 [Feature] Complex: người học để ý Empf Kz 000
 - **Type:** feature
@@ -2144,7 +2152,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh
 - **Depends on:** — (câu hỏi người hướng dẫn D45, D47 không chặn)
 - **Test report:** docs/test-reports/bl123.md
-- **Status:** verified-mcp (15/16 ✅ MCP/code, chờ test tay Q14 trên Quest; layout_version "036" cùng build với #121/#124)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (15/16 ✅ MCP/code, chờ test tay Q14 trên Quest; layout_version "036" cùng build với #121/#124))
 
 ### #124 [Feature] Menu dễ nhận ra
 - **Type:** feature
@@ -2158,7 +2166,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh
 - **Depends on:** #117, #121
 - **Test report:** docs/test-reports/bl124.md
-- **Status:** verified-mcp (5/6 ✅ MCP/code, chờ test tay M5 trên Quest)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (5/6 ✅ MCP/code, chờ test tay M5 trên Quest))
 
 ### #125 [P2] Chữ nổi lúc gần lúc xa gây chóng mặt
 - **Type:** bug
@@ -2170,7 +2178,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S
 - **Test trên kính:** bắt buộc (cảm giác chóng mặt)
 - **Depends on:** —
-- **Status:** thay bằng #129–#135 (2026-11-17: đo mọi chữ ở 5 scene và đối chiếu với `docs/text-comfort-checklist.md`, số đo `TestEvidence/bl125/texts.tsv`; nghi vấn chính cho C19 ở Concept: thanh tour 0,69 m rồi chú thích/LVS 1,1–1,2 m ở mỗi bước, #129)
+- **Status:** closed (người dùng đóng 2026-11-17, đã thay bằng mục khác; trước đó: thay bằng #129–#135 (2026-11-17: đo mọi chữ ở 5 scene và đối chiếu với `docs/text-comfort-checklist.md`, số đo `TestEvidence/bl125/texts.tsv`; nghi vấn chính cho C19 ở Concept: thanh tour 0,69 m rồi chú thích/LVS 1,1–1,2 m ở mỗi bước, #129))
 
 ### #126 [P0] Nút bấm không ăn
 - **Type:** bug
@@ -2183,7 +2191,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** bắt buộc (bấm bằng tay thật, 10 lần mỗi nút)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl126.md
-- **Status:** verified-mcp (commit 7531028, merged vào `main` 091996d; 19/20 ✅, chờ test tay H1 trên Quest)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (commit 7531028, merged vào `main` 091996d; 19/20 ✅, chờ test tay H1 trên Quest))
 
 ### #127 [Feature] Âm thanh đúng/sai và audio thay bớt chữ
 - **Type:** feature
@@ -2195,7 +2203,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** M–L
 - **Test trên kính:** bắt buộc
 - **Depends on:** —
-- **Status:** todo (vòng sau, ngoài phạm vi trước design freeze 19/11 theo kế hoạch Notion)
+- **Status:** closed (người dùng đóng 2026-11-17, chưa làm; trước đó: todo (vòng sau, ngoài phạm vi trước design freeze 19/11 theo kế hoạch Notion))
 
 ### #128 [P2] Tên bài 4 „4. Mehrere Auftragspositionen“ / „4. Several order lines“
 - **Type:** text
@@ -2222,7 +2230,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Depends on:** #135 ; cùng build "037" với #130
 - **Decision:** docs/decisions/040-read-far-touch-near.md
 - **Test report:** docs/test-reports/bl129.md
-- **Status:** verified-mcp (12/13 ✅ MCP/code, chờ test tay N9 trên Quest; `layout_version` "037": build nghiên cứu chỉ phát khi #130 cũng xong)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (12/13 ✅ MCP/code, chờ test tay N9 trên Quest; `layout_version` "037": build nghiên cứu chỉ phát khi #130 cũng xong))
 
 ### #130 [Feature] ComplexScene vị trí 1: cụm câu hỏi và bảng ví dụ không ở vùng 0,5–0,8 m, bớt cúi đầu
 - **Type:** feature
@@ -2236,7 +2244,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Depends on:** #135 ; cùng build "037" với #129
 - **Decision:** docs/decisions/040-read-far-touch-near.md
 - **Test report:** docs/test-reports/bl130.md
-- **Status:** verified-mcp (16/17 ✅ MCP/code, chờ test tay M8 trên kính; cùng build "037" với #129)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (16/17 ✅ MCP/code, chờ test tay M8 trên kính; cùng build "037" với #129))
 
 ### #131 [P2] Thẻ báo, nhãn tổng và dấu vàng không xoay theo mỗi cử động đầu
 - **Type:** bug
@@ -2250,7 +2258,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Depends on:** —
 - **Decision:** docs/decisions/037-picking-station-places-feedback.md (sửa đổi #131: bỏ dấu vàng)
 - **Test report:** docs/test-reports/bl131.md
-- **Status:** verified-mcp (12/14 ✅ MCP/code, chờ test tay K1 (nhìn quanh thẻ) và K2 (tìm carton sai không cần dấu) trên kính; cùng build "037")
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (12/14 ✅ MCP/code, chờ test tay K1 (nhìn quanh thẻ) và K2 (tìm carton sai không cần dấu) trên kính; cùng build "037"))
 
 ### #132 [P2] Concept, Complex: cỡ chữ cố định (không autoSize) và chữ cần đọc ≥ 0,8°
 - **Type:** feature
@@ -2263,7 +2271,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh (đọc chú thích, câu hỏi, ghi chú carton)
 - **Depends on:** #129, #130 (cỡ tính theo khoảng cách mới), #135
 - **Test report:** docs/test-reports/bl132.md
-- **Status:** verified-mcp (14/16 ✅ MCP/code, chờ test tay K1 (đọc và chạm trên kính) và K2 (ghi chú carton, ngoại lệ); cùng build "037"; người dùng chọn: nới rộng hàng A/B/C)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (14/16 ✅ MCP/code, chờ test tay K1 (đọc và chạm trên kính) và K2 (ghi chú carton, ngoại lệ); cùng build "037"; người dùng chọn: nới rộng hàng A/B/C))
 
 ### #133 [Feature] Kệ thẻ hướng dẫn: một vị trí cho cả 5 scene, không quay đầu quá 45°, chữ thẻ ≥ 0,8°
 - **Type:** feature
@@ -2275,7 +2283,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** M–L
 - **Test trên kính:** bắt buộc (đọc thẻ, quay đầu)
 - **Depends on:** `solution-decision` (chỗ đặt kệ khi bàn, làn trái và LVS đã chiếm chỗ), #135
-- **Status:** todo
+- **Status:** closed (người dùng đóng 2026-11-17, chưa làm; trước đó: todo)
 
 ### #134 [Feature] Menu và bàn phím nhập mã: giữ chỗ (ngoại lệ T2, decision 040), kiểm bấm trúng trên kính
 - **Type:** feature
@@ -2288,7 +2296,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** bắt buộc (bấm Menu, nhập mã)
 - **Depends on:** #135
 - **Decision:** docs/decisions/040-read-far-touch-near.md
-- **Status:** todo
+- **Status:** closed (người dùng đóng 2026-11-17, chưa làm; trước đó: todo)
 
 ### #135 [P2] Tool Editor đo chữ theo checklist (khoảng cách, góc, cỡ, tương phản, nút bấm)
 - **Type:** refactor
@@ -2301,20 +2309,21 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** không
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl135.md
-- **Status:** verified-mcp (7/7 ✅ MCP/code, nhánh `feat/135-text-comfort-audit`; không có case tay, chỉ tool Editor)
+- **Status:** closed (người dùng đóng 2026-11-17, không test tay thêm; trước đó: verified-mcp (7/7 ✅ MCP/code, nhánh `feat/135-text-comfort-audit`; không có case tay, chỉ tool Editor))
 
 ### #136 [P1] Concept: mũi tên cam tắt hẳn sau lần cầm carton đầu tiên
 - **Type:** bug
 - **Scene(s):** ConceptScene
 - **Files:** `Assets/Scripts/Concept/MarkerHideOnGrab.cs`
 - **Problem:** (review 2026-11-17, F1 trong `docs/review-notes-2026-11-17.md`) Mũi tên cam `STECKER C Marker` tắt khi người học cầm carton, nhưng tour bật lại nó ở bước 3 (`verp_einh`) và mỗi lần „Zurück“. Người học đã cầm carton rồi mà mũi tên vẫn chỉ vào carton, đúng lúc dòng hành động cũng bảo cầm carton.
-- **Done when:** Ở bước 2, chưa cầm carton nào: mũi tên hiện trên thùng kho. Cầm một carton STECKER C ở bước 2: mũi tên tắt. Thả carton ra, bấm „Weiter“ sang bước 3: mũi tên không hiện lại. Bấm „Zurück“ về bước 2, hoặc „Von vorn“ rồi đi tới bước 2: mũi tên không hiện lại. Vào lại ConceptScene từ Menu: mũi tên hiện lại ở bước 2 cho tới lần cầm đầu tiên. (code) Cờ „đã cầm“ chỉ sống trong một lượt vào scene, không ghi log.
+- **Done when:** Ở bước 2, chưa cầm carton nào: mũi tên hiện trên thùng kho. Cầm một carton STECKER C ở bước 2: mũi tên tắt. Thả carton ra, bấm „Weiter“ sang bước 3: mũi tên không hiện lại, kể cả trong một khung hình (không nháy). Bấm „Zurück“ về bước 2, hoặc „Von vorn“ rồi đi tới bước 2: mũi tên không hiện lại, không nháy. Vào lại ConceptScene từ Menu: mũi tên hiện lại ở bước 2 cho tới lần cầm đầu tiên. (code) Cờ „đã cầm“ chỉ sống trong một lượt vào scene, không ghi log. (code) Ngay trong khung tour bật marker, mũi tên đã không được vẽ (không chờ `Update` khung sau).
+- **Bổ sung (R14, test kính 2026-11-17):** H1 ❌ một phần: sau khi đã cầm, bấm „Weiter“ thì mũi tên nháy lên một khung hình rồi mới tắt. Nguyên nhân (đã đọc code): `MarkerHideOnGrab.OnEnable` chỉ đặt `hideNow`, `SetActive(false)` chờ tới `Update` khung sau. Hướng sửa: ẩn ngay trong `OnEnable` (tắt `Canvas`/renderer hoặc `CanvasGroup.alpha = 0`) hoặc để `WmsFieldTour` không bật marker đã xong. Test MCP cũ chỉ đọc `activeSelf` sau khi bấm nên không bắt được.
 - **Inspector work expected:** no
 - **Công:** S
 - **Test trên kính:** nhanh (cầm carton bằng tay thật ở bước 2, rồi sang bước 3)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl136.md
-- **Status:** verified-mcp (5/5 ✅ MCP/code, chờ test tay H1)
+- **Status:** gộp vào #156 (2026-11-17, gộp theo gốc lỗi; trước đó: todo (mở lại 2026-11-17: H1 trên kính ❌, mũi tên nháy một khung, R14; trước đó verified-mcp 5/5))
 
 ### #137 [P1] Concept: đơn mẫu đổi sang Empf Kz 000, bước 8–9 của tour đổi theo
 - **Type:** logic
@@ -2356,3 +2365,244 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Decision:** người dùng chọn phương án A trong phiên fork, 2026-11-17 (không chạy `solution-decision`)
 - **Test report:** docs/test-reports/bl139.md
 - **Status:** verified-mcp (12/12 ✅ MCP/code, chờ test tay H1)
+
+## Test tay theo checklist 2026-11-17 (R1–R16 + F2b)
+
+Nguồn: `docs/review-notes-checklist-2026-11-17.md` (R1–R16, góp ý người dùng trong lúc điền `docs/manual-test-checklist-2026-11-17.md`, đã đối chiếu với code/scene/CSV trên `main` bdf77d0) và F2 phần (b) còn mở của `docs/review-notes-2026-11-17.md`. R14 mở lại #136 (không thành mục mới). R16 là câu hỏi; câu trả lời ghi ở file review, phần việc nằm ở #153. Mọi chữ đổi đi qua `localize-strings` (EN + DE), `german-reviewer` duyệt một lần cuối đợt; thẻ đổi chữ thì chạy lại `InstructionShelfLayout`, chữ/khung đổi thì chạy lại `TextComfortAudit`.
+
+### #140 [P0] Mixed vị trí 1: chỗ đặt giữa không giữ được carton, carton tự xê dịch khi không cầm — bài 4 không hoàn thành được
+- **Type:** bug
+- **Scene(s):** MixedPickingScene (kiểm cả BasicPickingScene: cùng `EkzPlacementCheck`, `BoxSnapper`, `CartonSettler`)
+- **Files:** `EkzPlacementCheck`, `CartonSettler` (script), MixedPickingScene `PlasticBox_Order/BoxSnapper*`, sticker `Cube` của 6 carton KABELVERBINDER A
+- **Problem:** (R13) Trên kính, người thử không đặt được carton vào chỗ giữa (`(1)`, „chỗ 2“): carton cứ trượt ra ngoài, nên không đủ 3 chỗ và bài 4 kẹt (với mã nghiên cứu, bài 5 cũng bị khoá). Một carton nằm nghiêng tựa thành thùng và xê dịch mà tay không chạm. Chưa tái hiện; nghi vấn: vùng hover 16 × 11 × 10 cm của chỗ giữa chồng lên hai chỗ bên (carton chọn chỗ gần nhất đã đầy), `CartonSettler` đè lên snap, hoặc sticker `Cube` của carton Mixed nằm sai chỗ làm tay cầm từ xa (lỗi #103 chỉ sửa ở Complex).
+- **Done when:** Mixed vị trí 1: thả lần lượt 3 carton gần 3 chỗ đặt (trên, giữa, dưới) → mỗi carton nằm đúng chỗ của nó, có tiếng snap; xác nhận → „Richtig!“. Chỗ trên đã có carton, thả carton thứ hai gần chỗ giữa → carton vào chỗ giữa, không bị đẩy ra ngoài. Thả carton giữa hai chỗ → carton vào một chỗ trống, không nằm nghiêng tựa thành. Carton không bị cầm đứng yên 10 s, lệch < 1 mm. Đưa tay sát (≤ 3 cm) một carton mà không nắm → carton không di chuyển. Basic: 6 carton vào 6 chỗ vẫn → `Correct`. (code) `PackageStandardizer.Check()` không báo sticker lồi ở Mixed.
+- **Inspector work expected:** có thể (vùng hover, vị trí sticker)
+- **Công:** M
+- **Test trên kính:** bắt buộc (tay thật, đặt cả 3 chỗ, nhiều lần)
+- **Depends on:** —
+- **Status:** gộp vào #157 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #141 [P1] Bàn phím nhập mã và Menu hiện hai lớp (canvas cong + canvas phẳng phía sau)
+- **Type:** bug
+- **Scene(s):** WelcomeScene (`Participant Entry/EntryCanvas`, `Menu`); Menu ở cả 5 scene
+- **Files:** các `Unity Canvas` / `Canvas Mesh` / `CurvedUnityCanvas` (layer, `_renderingMode`), camera mắt (`CenterEyeAnchor`, culling mask)
+- **Problem:** (R1) Trên kính, sau bàn phím cong có một bảng thứ hai lệch ra ở cạnh phải và cạnh dưới; Menu cũng vậy. Bảng trông như vỡ và có hai mặt ở hai độ sâu. Trong WelcomeScene, `Unity Canvas` của các bảng cong nằm ở hai layer khác nhau (2 ở `Water`, 1 ở `UI`); nghi canvas phẳng gốc vẫn được camera mắt vẽ.
+- **Done when:** Trên Quest, nhìn bàn phím WelcomeScene và Menu ở cả 5 scene từ chỗ đứng và từ bên cạnh: chỉ thấy một bảng cong, không mép bảng nào phía sau. Chạm phím số và mục Menu vẫn ăn 10/10 (như #126 H1). Ảnh MCP view `entry` và `menu` không có bảng thứ hai. (code) Mọi `Unity Canvas` của bảng cong cùng một layer mà camera mắt không vẽ, theo mẫu Meta.
+- **Inspector work expected:** có (layer / culling mask)
+- **Công:** S–M
+- **Test trên kính:** bắt buộc (lỗi có thể chỉ thấy trên Quest)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl141.md
+- **Status:** verified-mcp (4/4 MCP + 1 code ✅, chờ test kính H1–H2; nhánh `feat/156-show-hide-rules`)
+
+### #142 [P1] Chữ cỡ cố định bị tràn hoặc bị cắt: chú thích `cartons`, nhãn „In der Übung“, dòng phản hồi quiz
+- **Type:** bug
+- **Scene(s):** ConceptScene, ComplexScene
+- **Files:** ConceptScene `Tour Markers/Caption cartons` (+ `Action Row` do `WmsFieldTour.PlaceActionRow` gắn), `EKZ Overview` (ô `concept.ekz.in_training`), `AnswerOption/Unity Canvas/Feedback`; ComplexScene `Remainder Quiz` (dòng phản hồi)
+- **Problem:** (R6, R9, phần phụ của R11) Sau #132 (cỡ chữ cố định) có ô không nới theo: dòng hành động ở bước `cartons` nằm ngoài nền chú thích (`Caption cartons` đặt tay, không có layout group); „In the exercise“ ở bảng EKZ mất chữ „I“ đầu và chữ cuối; dòng phản hồi „Not correct …“ dưới A/B/C bị mép dưới cụm cắt.
+- **Done when:** Ở bước `cartons`, dòng hành động (icon bàn tay + chữ) nằm trong nền xanh của chú thích, DE và EN. Ở bước 9, nhãn „In der Übung“ / „In the exercise“ ở hàng EKZ 0 và EKZ 3 hiện đủ chữ, lề hai bên bằng nhau. Trả lời sai câu có phản hồi dài nhất ở Concept và ở Complex (DE và EN) → cả dòng phản hồi nằm trong cụm, không chữ nào bị cắt. Không chữ nào nhỏ hơn cỡ của #132. (code) `TextComfortAudit` không báo chữ tràn khỏi rect ở hai scene.
+- **Inspector work expected:** no (qua MCP)
+- **Công:** S–M
+- **Test trên kính:** nhanh (đọc ba chỗ trên)
+- **Depends on:** — (nếu #147 dời câu hỏi vào cụm đáp án thì phần dòng phản hồi làm cùng #147)
+- **Status:** gộp vào #154 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #143 [P1] Tiếng Anh: „Position 1/2“ → „Order line 1/2“ ở Mixed và Complex
+- **Type:** logic
+- **Scene(s):** MixedPickingScene, ComplexScene
+- **Files:** `docs/i18n/strings-todo.csv` (`common.position.label`, `mixed.card.step1_body`, `mixed.feedback.position_done`, `complex.feedback.position_done`, `complex.quiz.q_cartons`; `mixed.card.task_body` cùng #145), `docs/i18n/glossary.csv` (dòng `Position`), `Cards/Position Strip`
+- **Problem:** (R15) Tên bài 4 đã là „Several order lines“ (#128) và nhóm thấy „positions“ khó hiểu, nhưng dải trên giá thẻ, thẻ 1 Mixed, thẻ kết quả và câu hỏi Complex vẫn ghi „Position“; glossary còn cho phép nhãn ngắn „Position 1/2“ trong EN. DE giữ „Position“ (chữ của LVS). Bổ sung (2026-11-17, gộp theo gốc lỗi): glossary cho phép hai cách gọi nên rà **mọi** câu EN trong CSV theo glossary, không chỉ 6 câu „position“.
+- **Done when:** Bản EN: dải trên giá thẻ hiện „Order line 1 · Order line 2“, thẻ 1 Mixed nói „current order line“, thẻ kết quả nói „Order line 1 is done.“, câu hỏi Complex nói „this order line“. Không câu EN nào trong CSV còn chữ „position“. Bản DE không đổi. Dải EN vừa một dòng trên giá thẻ; thẻ kết quả EN vừa thẻ. Glossary dòng `Position`: EN luôn là „order line“.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không (ảnh MCP view `instructions`, `confirm` bản EN)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl143.md
+- **Status:** verified-mcp (9/9 MCP + 2 code ✅; nhánh `feat/156-show-hide-rules`; không cần test kính)
+
+### #144 [P1] Concept bước 8–9: bỏ câu chỉ chỗ ví dụ, giữ câu dẫn sang bảng EKZ
+- **Type:** logic
+- **Scene(s):** ConceptScene
+- **Files:** `docs/i18n/strings-todo.csv` (`concept.tour.empf_kz_000.action`, `concept.tour.empf_kz_003.action`), `Assets/Scripts/Concept/WmsFieldTour.cs` (`PlaceActionRow`: ẩn dòng trống)
+- **Problem:** (R8) Hai thùng mẫu có thẻ to „Empf Kz 000 = EKZ 0“ / „Empf Kz 003 = EKZ 3“ và thân chú thích đã nói „wie im Beispiel“, nên câu „Sehen Sie sich links neben dem Bildschirm das Beispiel … an“ / „Vergleichen Sie die beiden Beispiele links …“ lặp lại. Câu dẫn sang bảng EKZ bên phải thì cần, vì lúc đó người học còn đang nhìn bên trái.
+- **Done when:** Ở bước 8, không có dòng hành động (không icon bàn tay, không ô trống). Ở bước 9, dòng hành động chỉ còn câu dẫn sang bảng EKZ bên phải (DE + EN). Các bước khác vẫn có dòng hành động như trước. „Zurück“ từ bước 9 về 8 rồi „Weiter“: dòng hành động ẩn/hiện đúng theo bước. (code) Key hành động rỗng → `Action Row` tắt.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** nhanh (đọc bước 8–9)
+- **Depends on:** — (ghi ngoại lệ bước 8 vào decision 036, luật „mỗi `.action` nói việc + mục đích“)
+- **Status:** gộp vào #155 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #145 [Feature] Bớt chữ trên giá thẻ: bỏ câu „So …“ ở thẻ mục tiêu (5 scene), rút thẻ bước Basic/Mixed/Complex, lề đều
+- **Type:** feature
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** `docs/i18n/strings-todo.csv` (`welcome.card.task_body`, `concept.card.task_body`, `basic.task.intro`, `mixed.card.task_body`, `complex.card.task_body`, `basic.step1.text` (+ kiểm `basic.card.step1_body` còn dùng không), thẻ bước Mixed/Complex), `Assets/Scripts/Editor/InstructionShelfLayout.cs`
+- **Problem:** (R2, R12) Câu „So …“ / „That way …“ (lý do) trên thẻ mục tiêu ít giá trị mà thêm chữ phải đọc trong VR. Thẻ 1 Basic liệt kê 4 ô LVS, mỗi ô hai tên, thêm câu định nghĩa Rest không dùng ở bài này: đọc lâu mới hiểu. Lề trong thẻ và khoảng trống dưới thẻ cuối chưa đều giữa các scene.
+- **Done when:** Ở cả 5 scene, thẻ mục tiêu chỉ còn câu đậm „Sie lernen, …“ (DE + EN). Thẻ 1 Basic gọi các ô bằng nhãn LVS, không tên dài trong ngoặc, không câu Rest. Thẻ bước ở Basic, Mixed, Complex theo cùng một giới hạn độ dài (ghi trong decision). Ở 5 scene: lề trong mọi thẻ bằng nhau, khoảng cách giữa thẻ 1,2 cm, khoảng trống từ thẻ cuối tới mép bảng bằng nhau (Complex: phần trống trên thẻ đầu được ghi lý do nếu lớn hơn). Ảnh view `instructions` 5 scene, DE và EN. (code) `InstructionShelfLayout` chạy lại ở 5 scene.
+- **Inspector work expected:** no (tool)
+- **Công:** M
+- **Test trên kính:** nhanh (đọc giá thẻ 5 bài)
+- **Depends on:** `solution-decision` (sửa decision 027: bỏ câu lý do, luật độ dài thẻ bước); #143 (chữ Mixed cùng key)
+- **Status:** gộp vào #155 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #146 [Feature] Concept: bỏ thẻ 1 „Etikett lesen“, tour mở ngay
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** `Assets/Scripts/Concept/ConceptCardProgress.cs`, `Assets/Scripts/Orders/ConceptCardTracker.cs` (+ `ConceptCardTrackerTests`), `Assets/Scripts/Concept/WmsFieldTour.cs` (`Open`, `autoOpenSeconds`), `InstructionShelf` Concept, `docs/i18n/strings-todo.csv` (`concept.card.step1_*`), log/R (`layout_version`)
+- **Problem:** (R4) Thẻ 1 bảo lấy carton và đọc nhãn trước khi tour giải thích các chữ trên nhãn, nên người học đọc mà không hiểu; bước 2–3 của tour lại bảo cầm carton và so nhãn lần nữa. Thẻ 1 hiện chỉ là cổng mở tour (lần cầm đầu tiên, hoặc 60 s).
+- **Done when:** ConceptScene có 2 thẻ bước („LVS kennenlernen“, „Fragen beantworten“) dưới thẻ mục tiêu. Vào scene → thanh tour hiện ngay (hoặc sau khoảng ngắn ghi trong decision), khung xanh ở thẻ „LVS kennenlernen“, bước 1 được log. Mở câu hỏi → ✓ thẻ đó, khung sang thẻ câu hỏi; trả lời đúng cả 4 → ✓ thẻ câu hỏi. Mũi tên STECKER C vẫn chỉ carton ở bước 2. (code) `ConceptCardTracker` và test EditMode theo 2 thẻ; `layout_version` mới, spec + `make_fake_data.R` + `analyse_set.R` cùng đổi, `selftest.R` xanh, `data-analyst` duyệt.
+- **Inspector work expected:** no (qua MCP)
+- **Công:** M
+- **Test trên kính:** nhanh (vào Concept, thấy tour ngay)
+- **Depends on:** `solution-decision` (sửa decision 024 mục 6–7 và 026/#89 „thanh hiện từ thẻ 2“); #145 (cùng giá thẻ Concept)
+- **Status:** gộp vào #155 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #147 [Feature] Câu hỏi nằm ngay trên cụm đáp án (Concept + Complex), không tách câu hỏi xa / đáp án gần
+- **Type:** feature
+- **Scene(s):** ConceptScene, ComplexScene
+- **Files:** `PackageQuizController`, `Complex/RemainderQuizController`, `AnswerOption`, `Remainder Quiz`, `Tour Markers/Caption question`, `Screen Captions/Caption question`, log/R (`layout_version`)
+- **Problem:** (R11, trả lời câu N9 của #129) Câu hỏi ở cạnh màn hình (~1,2–1,3 m), đáp án A/B/C thấp gần tay, cách ~50°: người học phải nhìn qua lại và đổi tiêu cự cho mỗi lựa chọn (split attention), nhất là câu `label_by_matnr` phải so số. Người dùng muốn bố cục như sách: câu hỏi trên, đáp án dưới, cùng một thẻ. Đi ngược decision 040 („read far, touch near“).
+- **Done when:** Ở Concept (4 câu) và Complex vị trí 1 (3 câu), câu hỏi và „Frage n von …“ nằm ngay trên hàng A/B/C trong cùng một cụm; dòng phản hồi dưới hàng nút. Từ chỗ đứng, đọc câu hỏi và các đáp án không cần quay đầu. Đứng yên chạm được A/B/C. Không còn chữ câu hỏi cạnh màn hình. Chữ trong cụm đạt ngưỡng của decision mới (`TextComfortAudit`). (code) `layout_version` mới, spec + R tách Concept/Complex `position_1` theo layout, `data-analyst` duyệt.
+- **Inspector work expected:** no (qua MCP)
+- **Công:** M–L
+- **Test trên kính:** bắt buộc (đọc + chạm, so cảm giác với build "037")
+- **Depends on:** `solution-decision` (sửa decision 040; xr-ux-reviewer + instructional-design-reviewer + data-analyst), chạy chung với #148
+- **Status:** gộp vào #155 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #148 [Feature] Luật bề rộng tối thiểu cho chú thích tour (số ký tự mỗi dòng), tool đo kiểm
+- **Type:** feature
+- **Scene(s):** ConceptScene, ComplexScene
+- **Files:** `Tour Markers/Caption *`, `Screen Captions/Caption *`, `docs/text-comfort-checklist.md` (ngưỡng mới), `Assets/Scripts/Editor/TextComfortAudit.cs`
+- **Problem:** (R10) #132 đặt chú thích bên phải màn hình rộng 360 ở cỡ chữ 34, nên một dòng chỉ chứa 2–3 từ (bước `not_used`, `intro`, `material_flow`, `cartons`, câu hỏi); mắt nhảy dòng liên tục. Checklist không có ngưỡng ký tự/dòng.
+- **Done when:** Checklist có ngưỡng ký tự mỗi dòng cho chữ đọc (có nguồn). `TextComfortAudit` báo mọi TMP dưới ngưỡng. Mọi chú thích tour ở Concept và chú thích Complex, DE và EN, đạt ngưỡng mà không nhỏ hơn cỡ của #132. Đường dẫn của tour vẫn chạm chú thích. Ảnh MCP các bước `intro`, `not_used`, `material_flow`, `cartons`.
+- **Inspector work expected:** no (qua MCP)
+- **Công:** M
+- **Test trên kính:** nhanh (đọc vài bước tour)
+- **Depends on:** cùng `solution-decision` với #147 (bên phải có ít chỗ: dời chú thích, đổi cạnh hoặc rút chữ); #142
+- **Status:** gộp vào #154 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #149 [Feature] Concept: biển „Lagerbehälter“ / „Auftragsbehälter“ luôn hiện như các bài sau
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene `PlasticBox_Storage|Order/Box Sign`, `Sample Description/WmsFieldTour.steps[].markers` (bước 5, 6, 11)
+- **Problem:** (R7) Ở Concept hai biển là marker của tour, chỉ hiện ở bước 5, 6, 11, nên bấm „Weiter“ là biển biến mất; người thử tưởng lỗi. Tên hai thùng được nhắc ở nhiều chữ khác (thẻ, bước `cartons`, dòng hành động). Ở Basic, Mixed, Complex biển luôn hiện.
+- **Done when:** Ở Concept hai biển hiện từ lúc vào scene và ở mọi bước tour, kể cả sau „Zurück“ / „Von vorn“. Ở bước 11 biển đi theo thùng khi thùng chạy, rồi về chỗ cũ khi tour đặt lại. Từ chỗ đứng không biển nào bị thanh tour hay carton che (view `container`).
+- **Inspector work expected:** no (qua MCP)
+- **Công:** S
+- **Test trên kính:** nhanh (đi qua vài bước, biển vẫn còn)
+- **Depends on:** — (sửa nhỏ #92/decision 032 „biển là marker của bước 5, 6, 11“)
+- **Status:** gộp vào #156 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #150 [Feature] Welcome bước làm việc: không để băng „Willkommen bei XPick!“ đứng một mình trên cao
+- **Type:** feature
+- **Scene(s):** WelcomeScene
+- **Files:** WelcomeScene `Participant Entry` (`ParticipantEntryController.objectiveRoots`), canvas `Welcome`
+- **Problem:** (R3) Ở bước mục tiêu băng là đầu của bảng mục tiêu. Bấm „Zu den Aufgaben“ → bảng và nút ẩn (`objectiveRoots` = `Info Panel`, `Tasks Button`, đã kiểm trong scene), còn băng `Welcome` (y 1.63) ở lại một mình giữa khoảng trống, trong khi mọi việc ở dưới thấp: trông chơi vơi.
+- **Done when:** Sau „Zu den Aufgaben“, không còn băng tiêu đề một mình trên cao (hướng đề xuất: thêm `Welcome` vào `objectiveRoots`, để Welcome bước 2 giống bố cục các bài sau). Ở bước mục tiêu, băng vẫn hiện trên bảng như trước. Phiên mới vào lại WelcomeScene → băng hiện lại ở bước mục tiêu. Log `welcome_tasks_opened` không đổi.
+- **Inspector work expected:** có (một phần tử trong `objectiveRoots`)
+- **Công:** S
+- **Test trên kính:** nhanh
+- **Depends on:** — (người dùng chọn hướng khi bắt đầu; sửa nhỏ decision 038)
+- **Status:** gộp vào #156 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #151 [Feature] Mặt bàn khớp băng con lăn: hai mép cân nhau
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene, ConceptScene
+- **Files:** `Desk` (SDK) trong 4 scene hoặc `RollerConveyorThreeLanes` prefab, `RearBench`
+- **Problem:** (R5) Từ khi có làn trái (#71), băng chìa ra khỏi mép trái bàn (con lăn đè một phần lên mặt bàn, nửa ngoài không có bàn), còn bên phải mặt bàn thò ra ngoài thùng đơn một dải trống. Nhìn mất cân đối. Chưa đo mép bàn.
+- **Done when:** Ở 4 scene, từ chỗ đứng (view `overview`, `container`): mép trái và mép phải mặt bàn cách ray ngoài cùng của băng một khoảng bằng nhau (hoặc trùng ray ngoài). Không con lăn nào nằm một nửa trên mặt bàn. 4 chân `RearBench` vẫn đứng trên mặt bàn. Giá thẻ, nút đỏ, Menu, hai thùng không dời; tay vẫn với tới cả hai thùng. Thùng chạy không xuyên mặt bàn.
+- **Inspector work expected:** có thể (kích thước bàn)
+- **Công:** M
+- **Test trên kính:** nhanh (nhìn hai mép bàn)
+- **Depends on:** — (không chạy song song với mục khác sửa cùng scene)
+- **Status:** todo
+
+### #152 [Feature] Mixed: viền chỗ đặt EKZ 003 hiện ngay từ đầu vị trí 1
+- **Type:** feature
+- **Scene(s):** MixedPickingScene
+- **Files:** MixedPickingScene `PlasticBox_Order/EkzPlacementCheck` (`showPlacesAtStart`, đang 0; Basic 1), log/R (`analysis/skill_scaffolds.csv`, cột `ekz_places`)
+- **Problem:** (R13, phần viền) Ở Mixed viền chỗ đặt chỉ hiện sau lần đặt trúng đầu tiên (#108, decision 037), nên người thử không biết chỗ đặt ở đâu và hiểu là lỗi. Basic hiện viền ngay từ đầu.
+- **Done when:** Vào Mixed vị trí 1 → 3 viền trắng hiện trên đáy thùng đơn trước khi đặt carton nào. Vị trí 2 (Empf Kz 000) → viền tắt khi thùng kho mới dừng, như trước. (code) R coi mọi lần bấm ở Mixed vị trí 1 của build mới là có hỗ trợ (`skill_scaffolds.csv`), `layout_version` mới, spec ghi lại, `data-analyst` duyệt.
+- **Inspector work expected:** có (một ô tick)
+- **Công:** S
+- **Test trên kính:** nhanh
+- **Depends on:** #140 (cùng scene, sau khi chỗ đặt chạy đúng); người dùng xác nhận đổi decision 037 cho Mixed
+- **Status:** gộp vào #157 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### #153 [Feature] Kiện thả ngoài thùng rơi thẳng xuống mặt bên dưới, không treo lơ lửng (không bật trọng lực thật)
+- **Type:** feature
+- **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** `CartonSettler` (mở rộng) hoặc component mới; `PackageGrabLogger` / `OrderContainerLog` (không thêm log rác)
+- **Problem:** (F2 phần (b) của `docs/review-notes-2026-11-17.md`, R16) Kiện kinematic, không trọng lực: thả ngoài thùng thì treo giữa không trung, trông như lỗi. Bật trọng lực thật làm kiện rơi khỏi bàn, nảy, hất nhau, đè lên chỗ đặt và sinh chuỗi `container_enter/exit` rác (câu trả lời R16). Hướng đề xuất: thả xuống thì rơi thẳng có kiểm soát tới mặt bên dưới (bàn, thùng, kiện khác), vẫn kinematic.
+- **Done when:** Thả một carton / túi / vòng lơ lửng trên bàn → nó nằm xuống mặt bàn ngay bên dưới. Thả trên thùng kho hoặc thùng đơn → nằm vào thùng như hiện nay (Basic/Mixed: `CartonSettler` và snap không đổi). Thả ngoài bàn (trên sàn) → kiện về chỗ ban đầu hoặc nằm trên sàn (decision chọn). Kiện đang cầm, đang chở trên băng, hoặc đã gửi đi không bị đụng. (code) Mỗi lần thả sinh tối đa một sự kiện `container_*` khi kiện vào hoặc ra thùng; không có sự kiện nào khi kiện chỉ rơi xuống bàn.
+- **Inspector work expected:** có thể
+- **Công:** M–L
+- **Test trên kính:** bắt buộc (tay thật, thả nhiều chỗ)
+- **Depends on:** `solution-decision` (unity-reviewer + xr-ux-reviewer + data-analyst); sau #140 (cùng `CartonSettler`); sau design freeze 19/11
+- **Status:** gộp vào #157 (2026-11-17, gộp theo gốc lỗi; trước đó: todo)
+
+### Gộp theo gốc lỗi (người dùng 2026-11-17)
+
+Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng test. Mỗi gốc thành một mục (#154–#158), làm trên một nhánh, một test report. Mục con giữ nguyên số và nội dung (Problem / Done when chi tiết), status ghi `gộp vào #<gốc>`; khi làm mục gốc thì các câu **Done when** của mục con là case test của mục gốc. Còn đứng riêng: #141 (canvas cong hai lớp), #151 (mặt bàn), #143 (mở rộng thành rà mọi câu EN theo glossary).
+
+### #154 [P1] Gốc A: luật bố cục cho chữ cỡ cố định — ô tự giãn, bề rộng theo ký tự mỗi dòng, tool bắt chữ tràn/cắt
+- **Type:** bug
+- **Scene(s):** ConceptScene, ComplexScene (luật + tool cho cả 5 scene)
+- **Files:** `Assets/Scripts/Editor/TextComfortAudit.cs`, `docs/text-comfort-checklist.md`, ConceptScene `Tour Markers/Caption *`, `EKZ Overview`, `AnswerOption`; ComplexScene `Screen Captions/Caption *`, `Remainder Quiz`; `Assets/Scripts/Concept/WmsFieldTour.cs` (`PlaceActionRow`)
+- **Problem:** #132 khoá cỡ chữ nhưng ô chứa chữ vẫn có kích thước đặt tay: chữ tràn ra ngoài nền (R6, `Caption cartons`), bị cắt (R9 „In the exercise“, dòng phản hồi quiz), hoặc ô hẹp tới mức một dòng 2–3 từ (R10). `TextComfortAudit` không kiểm tràn, cắt hay ký tự/dòng (không đọc `ContentSizeFitter`, `overflowMode`, mask), nên lỗi lọt qua MCP.
+- **Done when:** Mọi câu **Done when** của #142 và #148. Checklist có luật: mọi ô chữ cần đọc tự giãn theo chữ (layout group + fitter, hoặc tool đo và đặt cỡ như `InstructionShelfLayout`), có lề trong đều, bề rộng tối thiểu theo ngưỡng ký tự/dòng. `TextComfortAudit` báo (a) chữ vượt khỏi rect hoặc khỏi nền cha, (b) chữ bị mask/ô cha cắt, (c) dòng dưới ngưỡng ký tự, cho DE và EN (đổi locale trong tool). Chạy tool ở cả 5 scene: không còn dòng báo (a)–(c), hoặc mỗi ngoại lệ có lý do trong checklist.
+- **Inspector work expected:** no (qua MCP/tool)
+- **Công:** M–L
+- **Test trên kính:** nhanh (đọc các chú thích tour, bảng EKZ, phản hồi quiz)
+- **Depends on:** chỗ đặt câu hỏi Concept/Complex theo #155 (decision chung); phần không đụng câu hỏi làm được trước
+- **Status:** todo
+
+### #155 [Feature] Gốc B: một luật chữ cho cả khoá — chữ chỉ có khi nói điều cảnh không tự cho thấy; sửa các decision bắt buộc chữ
+- **Type:** feature
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** `docs/decisions/` (027, 036, 024/026, 040), `docs/i18n/strings-todo.csv`, `Assets/Scripts/Concept/ConceptCardProgress.cs`, `Orders/ConceptCardTracker.cs`, `Concept/WmsFieldTour.cs`, `PackageQuizController.cs`, `Complex/RemainderQuizController.cs`, `Assets/Scripts/Editor/InstructionShelfLayout.cs`, log/R (`layout_version`)
+- **Problem:** Nhiều chữ thừa có mặt vì decision bắt buộc chúng: câu lý do „So …“ trên thẻ mục tiêu (027, R2), dòng hành động ở mọi bước tour (036, R8), thẻ 1 Concept làm cổng mở tour (024/026, R4), thẻ bước Basic liệt kê lại điều Concept đã dạy (R12); câu hỏi tách xa đáp án theo „read far, touch near“ (040, R11) làm người học nhìn qua lại. Vá từng câu sẽ lại va các decision này.
+- **Done when:** Một `solution-decision` (instructional-design-reviewer, xr-ux-reviewer, german-reviewer, data-analyst) ra một decision mới thay các phần liên quan của 027, 036, 024/026, 040, ghi luật chữ (khi nào được có chữ, giới hạn độ dài thẻ bước, chỗ đặt câu hỏi so với đáp án). Mọi câu **Done when** của #144, #145, #146, #147 đúng theo decision đó. Một lần đổi `layout_version` cho cả gốc (spec + `make_fake_data.R` + `analyse_set.R`, `selftest.R` xanh). Ảnh view `instructions` 5 scene, `quiz` Concept/Complex, DE và EN.
+- **Inspector work expected:** no (qua MCP)
+- **Công:** L
+- **Test trên kính:** bắt buộc (đọc + chạm cụm câu hỏi; đọc giá thẻ 5 bài)
+- **Depends on:** #143 (chữ Mixed); làm trước phần câu hỏi của #154
+- **Status:** todo
+
+### #156 [P1] Gốc C: bảng quy tắc hiện/ẩn theo bước; không vật nào nháy, mất hay bị bỏ lại ngoài ý muốn
+- **Type:** bug
+- **Scene(s):** WelcomeScene, ConceptScene (rà cả 3 bài picking)
+- **Files:** `Assets/Scripts/Concept/MarkerHideOnGrab.cs`, `Concept/WmsFieldTour.cs` (`steps[].markers`), `ParticipantEntry/ParticipantEntryController.cs` (`objectiveRoots`), các script gọi `SetActive` theo bước (16 file, gồm `PanelFade`, `PackageQuizController`, `InstructionStepHighlighter`, `ConceptBoxHints`), `docs/` (bảng quy tắc)
+- **Problem:** Mỗi script tự bật/tắt vật theo luật riêng, không có chỗ nào nói „ở bước X vật nào hiện“: mũi tên được bật rồi mới tắt ở khung sau nên nháy (R14, #136); biển thùng Concept là marker tour nên biến mất khi đổi bước (R7, #149); băng Welcome không nằm trong nhóm bị ẩn nên bị bỏ lại một mình (R3, #150).
+- **Done when:** Mọi câu **Done when** của #136, #149, #150. Có một bảng (doc) liệt kê mọi vật bật/tắt theo bước ở Welcome và Concept: ai bật, ai tắt, điều kiện. (code) Không script nào bật một vật rồi mới quyết định ẩn ở khung sau: rà 16 file, mỗi chỗ cùng kiểu `MarkerHideOnGrab` được sửa hoặc ghi lý do. Case test đọc trạng thái hiển thị ngay trong khung bấm, không chỉ khung sau.
+- **Inspector work expected:** có thể (`objectiveRoots`)
+- **Công:** M
+- **Test trên kính:** nhanh (đi tour Concept, mở bước việc ở Welcome)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl156.md
+- **Status:** verified-mcp (19/19 MCP + 2 code ✅, chờ test tay H1–H3; nhánh `feat/156-show-hide-rules`, c843f13)
+
+### #157 [P0] Gốc D: một cơ chế duy nhất quyết định kiện nằm đâu khi thả (chỗ đặt → thùng → mặt bàn)
+- **Type:** bug
+- **Scene(s):** MixedPickingScene, BasicPickingScene, ComplexScene, ConceptScene
+- **Files:** `EkzPlacementCheck`, `CartonSettler`, MixedPickingScene/BasicPickingScene `PlasticBox_Order/BoxSnapper*` (vùng hover), sticker `Cube` của carton (cả 4 scene), `Assets/Scripts/Editor/PackageStandardizer.cs`, `PackageGrabLogger` / `OrderContainerLog`
+- **Problem:** Lúc thả, ba cơ chế cùng giành quyết định: snap của SDK (vùng hover 16 × 11 × 10 cm, có thể chồng nhau), `CartonSettler` (đặt carton trong thùng đơn), và collider (thân carton là trigger, chỉ sticker `Cube` solid; sticker sai chỗ làm tay cầm từ xa, #103 chỉ sửa ở Complex). Kết quả: chỗ đặt giữa ở Mixed không giữ carton, carton tự xê dịch, bài 4 kẹt (R13, #140); viền chỗ đặt hiện muộn nên không biết đặt đâu (#152); kiện thả ngoài thùng treo lơ lửng (F2b/R16, #153). **Nguyên nhân tìm được (2026-11-17, bl157):** (1) carton Mixed thiếu `Grabbable._transferOnSecondSelection` (Basic có) nên tay cầm carton đã đặt thì chỗ đặt không nhả, carton đi nửa đường, thả ra treo mà chỗ vẫn bị chiếm; (2) vùng nhận chỉ tới 9,5 cm trên đáy thùng và `CartonSettler` chỉ nhận carton có tâm trong thùng, nên carton thả từ trên miệng thùng treo lơ lửng. Người dùng chọn: thả trên một chỗ trống thì vào chỗ đó.
+- **Done when:** Mọi câu **Done when** của #140, #152, #153. (code) Khi thả chỉ một chỗ quyết định đích theo thứ tự: chỗ đặt trống gần nhất → thùng dưới kiện → mặt bàn dưới kiện → về chỗ ban đầu (ngoài bàn); `CartonSettler` và snap không còn cùng đụng một kiện. Vùng hover các chỗ đặt không chồng nhau (đo, ghi số). `PackageStandardizer.Check()` không báo sticker lồi ở cả 4 scene. Mỗi lần thả sinh tối đa một sự kiện `container_*`, không sự kiện khi kiện chỉ rơi xuống bàn; `data-analyst` duyệt nếu log đổi.
+- **Inspector work expected:** có thể (vùng hover, sticker)
+- **Công:** L
+- **Test trên kính:** bắt buộc (tay thật: đặt 3 chỗ ở Mixed, 6 chỗ ở Basic, thả trên bàn và ngoài bàn)
+- **Depends on:** bước đầu = tái hiện #140 (Simulator hoặc kính) trước khi thiết kế; phần #153 (thả ngoài thùng) cần `solution-decision` ngắn (unity-reviewer + data-analyst), có thể sau design freeze 19/11
+- **Test report:** docs/test-reports/bl157.md
+- **Status:** verified-mcp (nhánh `fix/157-package-drop-target`; #140 8/8, #152 + #153 14/14 MCP/code ✅ sau review; `layout_version` „038“, P2 = observed theo người dùng 2026-11-17, decision 037 sửa đổi #157; chờ test tay M5, H1, H2, H3)
+
+### #158 [P2] Lỗ hổng test: thêm case khung-hình, Simulator cầm/thả và một lượt nhìn kính trước khi ghi `verified-mcp`
+- **Type:** refactor
+- **Scene(s):** — (quy trình)
+- **Files:** `.claude/skills/unity-safe-change/` (SKILL + `testing.md`), `docs/manual-test-checklist-2026-11-17.md` (mẫu)
+- **Problem:** R1, R13, R14 đều qua MCP nhưng hỏng trên kính: MCP chỉ đọc trạng thái sau khi bấm (không thấy khung nháy), không cầm tay thật, không thấy cách Quest vẽ canvas cong.
+- **Done when:** `unity-safe-change` yêu cầu thêm 3 loại case khi phù hợp: (1) đọc trạng thái hiển thị ngay trong khung xảy ra sự kiện, (2) tái hiện cầm/thả bằng Meta XR Simulator cho mục đụng tương tác kiện, (3) một lượt nhìn kính 5 phút cho mục đụng canvas/render, trước khi ghi `verified-mcp`. `testing.md` có cách chạy (1) và (2). Checklist test tay dạng bảng (như file 2026-11-17) được tạo tự động từ các test report còn ⏳.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl158.md
+- **Status:** verified-mcp (5/5 ✅ code/MCP, không có case tay; skill local `.claude/skills/unity-safe-change/`, checklist tạo bằng `manual_checklist.py`)

@@ -51,3 +51,6 @@ Review nhóm 2026-11-09 (`docs/review-notes-team-2026-11-09.md`): nhập mã xon
 - Decisions 011, 017, 027 mục 7, 034, 037 mục 4–5/U2.
 - `analysis/analyse_set.R` (`menu_cue` chỉ Basic/Mixed).
 - `docs/review-notes-team-2026-11-09.md` C2, C3, C10, C20; ảnh của buổi test (thư mục thesis `07_presentations`).
+
+## Sửa đổi #156 (2026-11-17, R3)
+Bấm „Zu den Aufgaben“ ẩn cả băng tiêu đề `Welcome` cùng bảng mục tiêu và nút (`objectiveRoots` = `Welcome`, `Info Panel`, `Tasks Button`), để bước 2 không còn một băng tiêu đề đứng một mình trên cao. Bước 1 và log `welcome_tasks_opened` không đổi.

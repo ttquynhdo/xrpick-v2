@@ -162,10 +162,12 @@ public class LaneFlowDemo : MonoBehaviour
         changed = true;
         yield return new WaitForSeconds(startDelay);
 
+        bool questionsOffered = false;
         while (boxHints != null && !boxHints.IsClear)
         {
             // Decision 036: a hint must not keep the trainee from the questions.
             tour.ShowFollowUp();
+            questionsOffered = true;
             yield return null;
         }
 
@@ -173,7 +175,13 @@ public class LaneFlowDemo : MonoBehaviour
         {
             boxHints.LogSuspended = true;
         }
-        HideViewBlockers();
+
+        // #156: once the questions were offered, the trainee may be in the middle of one; the ride then leaves the bar
+        // and the quiz where they are instead of fading them out (and leaving the question caption alone).
+        if (!questionsOffered)
+        {
+            HideViewBlockers();
+        }
 
         yield return FillOrder();
 

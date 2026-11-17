@@ -28,7 +28,7 @@ local({
   source("analysis/analyse.R", local = TRUE)
 
   # 2. One row per study participant: P101-P115; the test ID P950 is dropped,
-  #    the pilot IDs P801-P803, P811-P819 are in their own set (8q).
+  #    the pilot IDs P801-P803, P811-P820 are in their own set (8q).
   stopifnot(nrow(wide) == 15)
   stopifnot(!"P950" %in% wide$participant_id)
   stopifnot(!"P950" %in% data_quality$participant_id)
@@ -460,7 +460,7 @@ local({
   missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
   if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
   stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
-  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815", "P816", "P817", "P818", "P819")
+  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815", "P816", "P817", "P818", "P819", "P820")
   stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
             identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
   is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
@@ -574,7 +574,7 @@ local({
   stopifnot(any(grepl("concept_hint_cleared without a preceding", p_warn) & grepl("P813", p_warn)),
             sum(grepl("concept_hint_", p_warn, fixed = TRUE)) == 1, !any(grepl("concept_hint_", warn_lines, fixed = TRUE)))
   # Older layouts: no tags existed, so every hint column is NA (not 0).
-  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815", "P816", "P817", "P818", "P819"))
+  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815", "P816", "P817", "P818", "P819", "P820"))
   stopifnot(nrow(old_v) > 0, !any(old_v$hints_logged), all(is.na(old_v$hints_shown)),
             all(is.na(old_v$hint_shown_s)), all(is.na(old_v$material_flow_wait_max_s)))
   stopifnot(nrow(concept_hints_by_visit) > 0, !any(concept_hints_by_visit$hints_logged),
@@ -623,7 +623,7 @@ local({
                                                       pilot_set$visits$scene == "ConceptScene"]))
   # Older layouts: NA, not 0; no container warnings on the fake data.
   stopifnot(all(is.na(pilot_set$concept_containers_by_visit$order_enters[
-              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815", "P816", "P817", "P818", "P819")])),
+              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815", "P816", "P817", "P818", "P819", "P820")])),
             !any(concept_containers_by_visit$containers_logged),
             !any(grepl("container_\\* line|ConceptScene (order|storage) container", c(p_warn, warn_lines))))
   # label_by_matnr replaces material_by_matnr from "032", same skill.
@@ -647,16 +647,19 @@ local({
   cx <- as.character(pilot_set$item_shares$x_label[pilot_set$item_shares$scene == "ComplexScene"])
   # The result_on_card label lists every layout of that level: P813 "029",
   # P814 "032", P815/P817 "033", P816 "034"; "036" (P818, #123: third
-  # question ekz before storage box 1) is a level of its own.
+  # question ekz before storage box 1) is a level of its own; "037" (read_far)
+  # and "038" (P820, #157: read_far + drop rule fall) are two more.
   stopifnot(all(c("Complex\nposition_1\n[019/025]", "Complex\nposition_1\n[029/032/033/034]",
-                  "Complex\nposition_1\n[036]", "Complex\nposition_1\n[037]", "Complex\nposition_2") %in% cx),
+                  "Complex\nposition_1\n[036]", "Complex\nposition_1\n[037]", "Complex\nposition_1\n[038]",
+                  "Complex\nposition_2\n[drop hang]", "Complex\nposition_2\n[drop fall]") %in% cx),
             !"Complex\nposition_1" %in% cx,
             any(grepl("set mixes Complex position_1 scaffold", p_warn)),
             !any(grepl("set mixes Complex position_1 scaffold", warn_lines)),
             !any(grepl("\\[", as.character(item_shares$x_label))))
   slots <- levels(pilot_set$proc_long$slot)
   stopifnot(all(c("Complex\nposition 1\n[019/025]", "Complex\nposition 1\n[029/032/033/034]",
-                  "Complex\nposition 1\n[036]", "Complex\nposition 1\n[037]", "Complex\nposition 2") %in% slots))
+                  "Complex\nposition 1\n[036]", "Complex\nposition 1\n[037]", "Complex\nposition 1\n[038]",
+                  "Complex\nposition 2\n[drop hang]", "Complex\nposition 2\n[drop fall]") %in% slots))
   pp <- read_csv(file.path(pilot_dir, "process_by_position.csv"), show_col_types = FALSE,
                  col_types = cols(layout_version = col_character()))
   stopifnot(all(c("layout_version", "scaffold_level") %in% names(pp)),
@@ -715,13 +718,16 @@ local({
                            dir = pilot_dir))) {
     os <- os_set$o
     stopifnot(file.exists(file.path(os_set$dir, "objectives_summary.csv")),
-              identical(os$objective_id, c("D1", "D2", "D3", "P0", "P1", "P2", "P3", "P4a", "P4b")),
+              identical(unique(os$objective_id), c("D1", "D2", "D3", "P0", "P1", "P2", "P3", "P4a", "P4b")),
               all(os$knowledge_type == if_else(startsWith(os$objective_id, "D"), "declarative", "procedural")))
     none <- os %>% filter(evidence == "none")
     stopifnot(identical(none$objective_id, "D1"), is.na(none$n), is.na(none$n_persons), is.na(none$share),
               is.na(none$share_lo))
     # A measured objective without data has n 0 and share NA, never 0 %.
     stopifnot(all(is.na(os$share[os$n %in% 0L])), all(!is.na(os$share[which(os$n > 0)])))
+    # One row per objective, except P2 in a set with "038" and older builds (#157).
+    stopifnot(identical(os$objective_id[duplicated(os$objective_id)],
+                        if (identical(os_set$dir, pilot_dir)) "P2" else character(0)))
     rated <- os %>% filter(evidence == "rated")
     stopifnot(all(rated$n > 0), all(rated$share >= 0 & rated$share <= 1),
               all(rated$share_lo <= rated$share & rated$share <= rated$share_hi))
@@ -785,7 +791,10 @@ local({
   # P816 ("034") adds the EKZ place help level (#108, 8x), so Empf Kz 003 is
   # split once more: places hidden ("029"-"033") / places after error ("034").
   stopifnot(all(c("Mixed\nposition_1\n[Empf Kz 000]", "Mixed\nposition_1\n[Empf Kz 003, places hidden]",
-                  "Mixed\nposition_1\n[Empf Kz 003, places after error]", "Mixed\nposition_2") %in% mx),
+                  "Mixed\nposition_1\n[Empf Kz 003, places after error]",
+                  "Mixed\nposition_1\n[Empf Kz 003, places shown, drop snaps]",
+                  # #157: position 2 split by drop rule (P820 "038").
+                  "Mixed\nposition_2\n[drop hang]", "Mixed\nposition_2\n[drop fall]") %in% mx),
             !"Mixed\nposition_1" %in% mx,
             any(grepl("set mixes Mixed position_1 Empf Kz", p_warn)),
             !any(grepl("EKZ_PLACEMENT where the app does not rate", p_warn)),
@@ -804,8 +813,11 @@ local({
   #     Mixed p1: EKZ_PLACEMENT, EKZ_PLACEMENT, correct (outlines after the
   #     first EKZ_PLACEMENT); Mixed p2: correct.
   sc_rows <- pilot_set$skill_scaffolds
-  stopifnot(nrow(sc_rows) == 2, all(sc_rows$skill == "ekz_placement"), all(sc_rows$from_layout == 34L),
-            identical(sort(sc_rows$shown), c("after_error", "always")))
+  # Mixed has two rows (#157): after_error from "034", always from "038".
+  stopifnot(nrow(sc_rows) == 3, all(sc_rows$skill == "ekz_placement"),
+            identical(sort(sc_rows$from_layout), c(34L, 34L, 38L)),
+            identical(sort(sc_rows$shown), c("after_error", "always", "always")),
+            identical(sc_rows$shown[sc_rows$scene == "MixedPickingScene" & sc_rows$from_layout == 38L], "always"))
   # Press x skill pairs: Basic all 3 presses (ekz only), Mixed p1 presses 2 and 3.
   pr816 <- pilot_set$presses %>% filter(participant_id == "P816", event == "confirm_pressed") %>%
     arrange(t, line)
@@ -819,7 +831,7 @@ local({
             setequal(scf$press_id[scf$press_id %in% pr816$press_id],
                      c(b816$press_id, m816$press_id[2:3])),
             # Older layouts never scaffold a skill ("036" = "034" outside Welcome: P818 may).
-            !any(scf$press_id %in% pilot_set$presses$press_id[!pilot_set$presses$participant_id %in% c("P816", "P818", "P819")]))
+            !any(scf$press_id %in% pilot_set$presses$press_id[!pilot_set$presses$participant_id %in% c("P816", "P818", "P819", "P820")]))
   sr816 <- pilot_set$skill_rates %>% filter(participant_id == "P816")
   # Basic: no ekz_placement test at all from "034"; quantity tested by all 3 presses, 1 error.
   stopifnot(!any(sr816$scene == "BasicPickingScene" & sr816$skill == "ekz_placement"),
@@ -850,7 +862,8 @@ local({
             "ekz_places" %in% names(ppe),
             all(ppe$ekz_places[ppe$participant_id == "P816" & ppe$scene == "BasicPickingScene"] == "always"))
   bx <- as.character(pilot_set$item_shares$x_label[pilot_set$item_shares$scene == "BasicPickingScene"])
-  stopifnot(setequal(bx, c("Basic\nposition_1\n[places hidden]", "Basic\nposition_1\n[places shown]")),
+  stopifnot(setequal(bx, c("Basic\nposition_1\n[places hidden]", "Basic\nposition_1\n[places shown]",
+                         "Basic\nposition_1\n[places shown, drop snaps]")),
             any(grepl("set mixes EKZ place help in BasicPickingScene", p_warn)),
             any(grepl("set mixes EKZ place help in MixedPickingScene", p_warn)),
             !any(grepl("set mixes EKZ place help", warn_lines)),
@@ -864,7 +877,7 @@ local({
             file.exists(file.path(output_dir, "menu_after_done.csv")))
   mad <- pilot_set$menu_after_done
   stopifnot(identical(sort(unique(mad$menu_cue[mad$participant_id == "P816"])), "highlight"),
-            all(mad$menu_cue[!mad$participant_id %in% c("P816", "P818", "P819")] == "text"),
+            all(mad$menu_cue[!mad$participant_id %in% c("P816", "P818", "P819", "P820")] == "text"),
             all(menu_after_done$menu_cue == "text"),
             nrow(mad %>% filter(participant_id == "P816")) == 2,
             all(!is.na(mad$departed_t[mad$participant_id == "P816"])),
@@ -929,7 +942,7 @@ local({
   stopifnot(length(to_i) == 1, length(pd_i) == 2, all(pd_i > to_i),
             # wall time from scene_enter is 25 s (the pause) longer than the logged active time
             abs((ev818$t[to_i] - ev818$t[ev818$event == "scene_enter"]) - 25 - v818$objectives_read_s) < 0.01)
-  stopifnot(all(is.na(pilot_set$visits$objectives_read_s[!pilot_set$visits$participant_id %in% c("P818", "P819") |
+  stopifnot(all(is.na(pilot_set$visits$objectives_read_s[!pilot_set$visits$participant_id %in% c("P818", "P819", "P820") |
                                                          pilot_set$visits$scene != "WelcomeScene"])),
             all(is.na(visits$objectives_read_s)))
   stopifnot("objectives_read_s_WelcomeScene" %in% names(pilot_set$wide),
@@ -955,7 +968,7 @@ local({
   stopifnot("quiz_layout" %in% names(cq37),
             all(cq37$quiz_layout[cq37$participant_id == "P819"] == "read_far"),
             all(cq37$scaffold_level[cq37$participant_id == "P819"] == "ekz_question"),
-            all(cq37$quiz_layout[cq37$participant_id != "P819"] == "near_panel"),
+            all(cq37$quiz_layout[!cq37$participant_id %in% c("P819", "P820")] == "near_panel"),
             all(cq37$quiz_questions[cq37$participant_id == "P819" & !is.na(cq37$quiz_s)] == 3),
             isTRUE(all(cq37$ekz_right_before_box[cq37$participant_id == "P819"])))
   # #137: "037" swaps tour steps 8/9; tour_steps.csv names them per layout.
@@ -965,6 +978,67 @@ local({
             all(ts37$step_id[ts37$step_index == 9 & ts37$layout_version == "037"] == "empf_kz_003"),
             all(ts37$step_id[ts37$step_index == 8 & ts37$layout_version == "036"] == "empf_kz_003"),
             any(ts37$layout_version == "037"), any(ts37$layout_version == "036"))
+  # 8z4. Layout "038" (#157, P820): no event changes. Mixed position 1
+  #      outlines its places from the start (skill_scaffolds.csv: the "038"
+  #      always row wins over the "034" after_error row), so even its first
+  #      EKZ_PLACEMENT press is no ekz_placement test; Basic/Mixed position_1
+  #      get ekz_places "always+drop_snap" (split from "034"-"037"); packages
+  #      fall after grab_end, so late container_enter lines must still link
+  #      to their grab_end (Concept, incl. the carton that went back to the
+  #      storage container); ConceptScene is its own level; the set mixes
+  #      drop rules (warned in the pilot set only).
+  stopifnot(identical(pilot_set$ekz_places_level(rep("MixedPickingScene", 4), "position_1", "003",
+                                                 c("033", "034", "037", "038")),
+                      c("hidden", "after_error", "after_error", "always+drop_snap")),
+            identical(pilot_set$ekz_places_level(c("BasicPickingScene", "BasicPickingScene", "MixedPickingScene"),
+                                                 c("position_1", "position_1", "position_2"), c("003", "003", "000"),
+                                                 c("037", "038", "038")),
+                      c("always", "always+drop_snap", NA_character_)),
+            identical(pilot_set$drop_rule(c("037", "038", "040", NA)), c("hang", "fall", "fall", NA)))
+  m820 <- pilot_set$presses %>% filter(participant_id == "P820", scene == "MixedPickingScene",
+                                       event == "confirm_pressed", position %in% 1L)
+  stopifnot(nrow(m820) == 2, all(m820$press_id %in% scf$press_id[scf$skill == "ekz_placement"]),
+            # No picking-scene ekz_placement measure left (Concept's quiz keeps its own).
+            !any(pilot_set$skill_rates$participant_id == "P820" & pilot_set$skill_rates$skill == "ekz_placement" &
+                   pilot_set$skill_rates$scene %in% c("BasicPickingScene", "MixedPickingScene")),
+            nrow(pilot_set$obj_code_tests %>% filter(participant_id == "P820", objective_id == "P2")) == 0)
+  i820 <- pi %>% filter(participant_id == "P820", item == "position_1",
+                        scene %in% c("BasicPickingScene", "MixedPickingScene"))
+  stopifnot(nrow(i820) == 2, all(i820$ekz_places == "always+drop_snap"),
+            all(ppe$ekz_places[ppe$participant_id == "P820" & ppe$position %in% 1L &
+                                 ppe$scene %in% c("BasicPickingScene", "MixedPickingScene")] == "always+drop_snap"),
+            "ConceptScene [038]" %in% pilot_set$chart_scene_levels,
+            any(grepl("set mixes drop rules", p_warn, fixed = TRUE)),
+            !any(grepl("set mixes drop rules", warn_lines, fixed = TRUE)))
+  # P2 evidence per layout (user decision 2026-11-17): rated up to "037",
+  # observed from "038". A "038"-only set reports only the observed row; the
+  # pilot set (both) has two rows; an older-only set only the rated one.
+  orf <- function(lays) pilot_set$objective_rows_for(lays) %>% filter(objective_id == "P2")
+  stopifnot(identical(orf(38L)$evidence, "observed"), identical(orf(c(34L, 37L))$evidence, "rated"),
+            identical(orf(c(34L, 38L))$evidence, c("rated", "observed")), identical(orf(integer(0))$evidence, "observed"),
+            nrow(pilot_set$objective_rows_for(38L)) == 9)
+  p2o <- pilot_set$objectives_summary %>% filter(objective_id == "P2")
+  stopifnot(identical(p2o$evidence, c("rated", "observed")), identical(p2o$to_layout, c("038", NA)),
+            identical(p2o$from_layout, c(NA, "038")), p2o$measure[2] == "ekz_positions_right_with_places",
+            p2o$n_persons[2] == 1L, p2o$k[2] == 1L, p2o$n[1] > 0,
+            any(grepl("objectives_summary.csv holds more than one row for P2", p_warn, fixed = TRUE)),
+            !any(grepl("objectives_summary.csv holds more than one row", warn_lines, fixed = TRUE)),
+            all(is.na(objectives_summary$from_layout)))
+  # Drop rule split (#157): Mixed position_2 and Complex are never pooled across "037"/"038".
+  stopifnot(all(ppe$drop_rule[ppe$participant_id == "P820"] == "fall"),
+            all(ppe$drop_rule[ppe$participant_id == "P819"] == "hang"),
+            pilot_set$complex_p1_group("038") == "ekz_question+read_far+fall",
+            pilot_set$complex_p1_group("037") == "ekz_question+read_far",
+            all(cq37$drop_rule[cq37$participant_id == "P820"] == "fall"),
+            all(c("Mixed\nposition 2\n[drop hang]", "Mixed\nposition 2\n[drop fall]",
+                  "Complex\nposition 2\n[drop fall]") %in% levels(pilot_set$proc_long$slot)),
+            all(c("MixedPickingScene [drop hang]", "MixedPickingScene [drop fall]", "ComplexScene [drop fall]") %in%
+                  levels(pilot_set$ttc_people$scene)),
+            !any(grepl("drop", levels(ttc_people$scene))))
+  cc820 <- pilot_set$concept_containers_by_visit %>% filter(participant_id == "P820")
+  stopifnot(nrow(cc820) >= 1, all(cc820$container_unlinked_lines == 0), all(cc820$container_count_breaks == 0),
+            sum(cc820$storage_enters) >= 2,
+            !any(grepl("ConceptScene container_* line(s) without a grab", p_warn, fixed = TRUE)))
 
   # 8z2. Complex third question ekz (#123, decision 039, layout "036"). P818
   #      touches ordered, separator, then poured (right) after loose, and
@@ -999,7 +1073,7 @@ local({
   stopifnot(nrow(cq8) == 1, cq8$scaffold_level == "ekz_question", cq8$quiz_questions == 3,
             cq8$quiz_touches >= 5, isTRUE(cq8$ekz_right_before_box), cq8$quiz_s > 0,
             cq8$first_confirm_p1_s > cq8$quiz_s,
-            all(cq$quiz_questions[!cq$participant_id %in% c("P818", "P819") & !is.na(cq$quiz_s)] == 2),
+            all(cq$quiz_questions[!cq$participant_id %in% c("P818", "P819", "P820") & !is.na(cq$quiz_s)] == 2),
             !any(cq$ekz_right_before_box[cq$scaffold_level != "ekz_question"] %in% TRUE),
             !any(grepl("started without a right quiz_answer ekz", c(p_warn, warn_lines), fixed = TRUE)))
   ev8c <- pilot_set$v2_events %>% filter(participant_id == "P818", scene == "ComplexScene") %>% arrange(t, line)

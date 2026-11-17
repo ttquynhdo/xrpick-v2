@@ -19,9 +19,11 @@
 # new grab_start (like the real P802, build 727eee1). P818 runs
 # layout "036" (#121, decision 038): WelcomeScene writes welcome_tasks_opened
 # („Zu den Aufgaben", reading time of the learning objectives) before the two
-# welcome_practice_done; older layouts never write it. P819 runs the current
-# layout "037" (#129/#130, decision 040): same events as "036", other panel
-# layout in ConceptScene and Complex position 1.
+# welcome_practice_done; older layouts never write it. P819 runs layout
+# "037" (#129/#130, decision 040): same events as "036", other panel layout
+# in ConceptScene and Complex position 1. P820 runs the current layout "038"
+# (#157): same events; Mixed position 1 outlines its EKZ places from the
+# start, packages let go in the air fall (container_enter after grab_end).
 # Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
@@ -36,7 +38,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P819, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P820, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -846,12 +848,23 @@ container_change <- function(s, entered, obj, item, pos, form) {
 }
 
 # Grab a package in the storage box, carry it into the order container (the
-# trigger sees it while it is still held), let go.
+# trigger sees it while it is still held), let go. From layout "038" (#157)
+# the trainee lets go above the rim and the package falls in: grab_end
+# first, container_enter drop_fall_s later (same random draws, so the other
+# fake people keep their numbers).
+drop_fall_s <- 0.3
 put_in <- function(s, item, pos, form) {
   obj <- next_object(s, item, form)
   advance(s, round(side_runif(1, 3), 3))      # find the package
   grab_start(s, obj, item)
   advance(s, round(side_runif(0.8, 2.5), 3))  # carry it over
+  if (layout_at_least(s$layout, 38)) {
+    advance(s, round(side_runif(0.2, 0.8), 3))
+    grab_end(s, obj, item)
+    advance(s, drop_fall_s)                    # the fall into the container
+    container_change(s, TRUE, obj, item, pos, form)
+    return(invisible())
+  }
   container_change(s, TRUE, obj, item, pos, form)
   advance(s, round(side_runif(0.2, 0.8), 3))
   grab_end(s, obj, item)
@@ -1131,7 +1144,8 @@ concept_move <- function(s, obj, from, to, carry_s = 1.5, reason = NULL, clears 
   advance(s, carry_s)
   grab_end(s, obj, "stecker_c")
   if (!is.null(to)) {
-    advance(s, 0.011)
+    # From layout "038" (#157) a carton let go above a container falls in.
+    advance(s, if (layout_at_least(s$layout, 38)) drop_fall_s else 0.011)
     concept_container(s, TRUE, obj, to)
     if (!is.null(reason)) {
       advance(s, 0.5)
@@ -1924,6 +1938,40 @@ run_full_course(p819, "eee5555", "2026-11-17T09:00:00Z", language = "EN", layout
                 special = list(ConceptScene = list(hints = p814_hints)))
 assign(".Random.seed", rng_before_p819, envir = globalenv())
 
+# P820 (#157): layout "038". No event or field changes. Mixed position 1
+# outlines its 3 EKZ places from the start (skill_scaffolds.csv "038"
+# always), so its EKZ_PLACEMENT press below is NOT an ekz_placement test
+# (unlike P816's first one); Basic as in "034". A package let go in the air
+# falls: put_in and the Concept carton moves write grab_end first and the
+# container_enter drop_fall_s later. P820 also drops one Concept carton
+# beyond the desk: it goes back into the storage container (container_enter
+# storage 0.9 s after grab_end, at tour step material). R must split Basic/Mixed position_1
+# (ekz_places "always+drop_snap") and ConceptScene from "037", and link the
+# late enters to their grab_end. Own random stream, restored, like P819.
+p820_hints <- p814_hints
+p820_hints$material <- function(s) {
+  p814_hints$material(s)
+  # Carton 2 let go beyond the desk: back to where it was grabbed.
+  advance(s, 2)
+  grab_start(s, concept_cartons[2], "stecker_c")
+  advance(s, 0.011)
+  concept_container(s, FALSE, concept_cartons[2], "storage")
+  advance(s, 1.2)
+  grab_end(s, concept_cartons[2], "stecker_c")
+  advance(s, 0.9)                              # the way back
+  concept_container(s, TRUE, concept_cartons[2], "storage")
+}
+rng_before_p820 <- .Random.seed
+set.seed(820)
+p820 <- new_person("P820")
+run_full_course(p820, "fff6666", "2026-11-18T09:00:00Z", language = "EN", layout = "038",
+                special = list(ConceptScene = list(hints = p820_hints),
+                               MixedPickingScene = list(forced = list(
+                                 "1" = list(fixed_press(3, list(err("EKZ_PLACEMENT"))),
+                                            fixed_press(3, list())),
+                                 "2" = list(fixed_press(3, list()))))))
+assign(".Random.seed", rng_before_p820, envir = globalenv())
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1976,7 +2024,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P819  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P820  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -2045,7 +2093,8 @@ paper_rows <- list(
   paper_row("P816"),
   paper_row("P817"),
   paper_row("P818"),
-  paper_row("P819"))
+  paper_row("P819"),
+  paper_row("P820"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

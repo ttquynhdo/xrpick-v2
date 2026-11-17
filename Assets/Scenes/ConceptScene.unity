@@ -19342,7 +19342,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -20751,8 +20751,6 @@ MonoBehaviour:
     - {fileID: 1152504464}
     - {fileID: 1243818454}
     - {fileID: 1062688695}
-    - {fileID: 1766893706}
-    - {fileID: 2008951128}
     captionTitle: {fileID: 2082765882}
     captionBody: {fileID: 1808399132}
     hasFollowUp: 0
@@ -20760,8 +20758,6 @@ MonoBehaviour:
     markers:
     - {fileID: 1869403295}
     - {fileID: 1376889647}
-    - {fileID: 1766893706}
-    - {fileID: 2008951128}
     captionTitle: {fileID: 23285088}
     captionBody: {fileID: 644304441}
     hasFollowUp: 0
@@ -20802,8 +20798,6 @@ MonoBehaviour:
     markers:
     - {fileID: 457490579}
     - {fileID: 1099480853}
-    - {fileID: 1766893706}
-    - {fileID: 2008951128}
     captionTitle: {fileID: 0}
     captionBody: {fileID: 0}
     hasFollowUp: 1
@@ -42881,7 +42875,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -53442,7 +53436,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -55204,7 +55198,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -68741,7 +68735,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1766893707
 RectTransform:
   m_ObjectHideFlags: 0
@@ -68782,7 +68776,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
   m_UseReflectionProbes: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -72596,7 +72590,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -78362,7 +78356,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2008951129
 RectTransform:
   m_ObjectHideFlags: 0
@@ -78403,7 +78397,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
   m_UseReflectionProbes: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -182,10 +183,8 @@ public class WmsFieldTour : MonoBehaviour
             backLabel.text = Loc.Get(BackKey);
         }
 
-        foreach (Step step in steps)
-        {
-            SetMarkers(step, false);
-        }
+        // No step shown yet: every marker off.
+        ShowMarkersOf(null);
 
         actionRowHeight = actionRow.rect.height;
         stepCaption.SetActive(false);
@@ -256,7 +255,15 @@ public class WmsFieldTour : MonoBehaviour
         PanelFade.SetVisible(actionRow.gameObject, visible);
         if (!HasCaption(steps[current]))
         {
-            PanelFade.SetVisible(stepCaption, visible);
+            // #156: the quiz's question caption takes this spot when the bar hides, so leave at once (no overlap).
+            if (visible)
+            {
+                PanelFade.SetVisible(stepCaption, true);
+            }
+            else
+            {
+                PanelFade.HideNow(stepCaption);
+            }
         }
     }
 
@@ -312,12 +319,7 @@ public class WmsFieldTour : MonoBehaviour
         current = index;
         followUpShown = false;
 
-        // Steps may share a marker group: hide all first, then show the current step's.
-        foreach (Step other in steps)
-        {
-            SetMarkers(other, false);
-        }
-        SetMarkers(steps[index], true);
+        ShowMarkersOf(steps[index]);
 
         Step step = steps[index];
         ShowTexts();
@@ -434,16 +436,34 @@ public class WmsFieldTour : MonoBehaviour
         actionText.text = Loc.Get(StepKeyPrefix + step.id + (followUpShown ? ".action_after" : ".action"));
     }
 
-    private static void SetMarkers(Step step, bool active)
+    // #156: steps may share a marker. Each marker is set once to its final state: a marker of both the old and the new
+    // step stays on (no OnDisable/OnEnable, so a bobbing arrow doesn't jump), and a marker whose gate says it is done
+    // (IStepMarkerGate) is never switched on, not even for one frame.
+    private void ShowMarkersOf(Step shown)
     {
-        if (step.markers == null)
-            return;
-
-        foreach (GameObject marker in step.markers)
+        var show = new HashSet<GameObject>();
+        if (shown?.markers != null)
         {
-            if (marker != null)
+            foreach (GameObject marker in shown.markers)
             {
-                marker.SetActive(active);
+                if (marker != null && (!marker.TryGetComponent(out IStepMarkerGate gate) || gate.MayShow))
+                {
+                    show.Add(marker);
+                }
+            }
+        }
+
+        foreach (Step step in steps)
+        {
+            if (step.markers == null)
+                continue;
+
+            foreach (GameObject marker in step.markers)
+            {
+                if (marker != null && marker.activeSelf != show.Contains(marker))
+                {
+                    marker.SetActive(show.Contains(marker));
+                }
             }
         }
     }

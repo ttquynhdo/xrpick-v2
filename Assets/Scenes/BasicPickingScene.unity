@@ -1282,8 +1282,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &74329910
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1423,8 +1423,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &74952658
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3931,8 +3931,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &273594242
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -10475,9 +10475,6 @@ MonoBehaviour:
   outlineSize: {x: 0.166, y: 0.111}
   outlineStroke: 0.008
   outlineDrop: 0.022
-  warningSprite: {fileID: 21300000, guid: efed5fd53de8b8b4cadc08e143488fa0, type: 3}
-  warningColor: {r: 1, g: 0.82, b: 0.1, a: 1}
-  markSize: 0.05
 --- !u!82 &786606229
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10792,8 +10789,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &857841241
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -11650,7 +11647,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -15260,8 +15257,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &1342360181
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -18248,7 +18245,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -19894,7 +19891,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -20750,8 +20747,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.32, y: 0.22, z: 0.2}
-  m_Center: {x: -0.29305282, y: 0.5957031, z: -0.23175293}
+  m_Size: {x: 0.32, y: 0.6622969, z: 0.2}
+  m_Center: {x: -0.29305282, y: 0.81685156, z: -0.23175293}
 --- !u!54 &1888890480
 Rigidbody:
   m_ObjectHideFlags: 0

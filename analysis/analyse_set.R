@@ -131,7 +131,10 @@ item_skills <- read_csv(file.path(analysis_folder, "item_skills.csv"), show_col_
 # the help visible is left out of that skill's rate and of its objective
 # (numerator AND denominator); the press still counts for the other skills.
 # item_skills.csv can't hold this: it has one row per item, and "scaffolded"
-# there takes the whole press out.
+# there takes the whole press out. A scene x item x skill can have several
+# rows (Mixed position 1: "after_error" from "034", "always" from "038",
+# #157): a build uses the row with the highest from_layout <= its layout
+# (scaffold_row_for), never more than one.
 skill_scaffolds <- read_csv(file.path(analysis_folder, "skill_scaffolds.csv"), show_col_types = FALSE,
                             col_types = cols(.default = col_character())) %>%
   transmute(scene = trimws(scene), item = trimws(item), skill = trimws(skill),
@@ -143,6 +146,34 @@ if (nrow(bad_scaffolds) > 0) {
   stop("skill_scaffolds.csv: from_layout must be a number, shown 'always' or 'after_error', and the skill ",
        "listed for the scene in scene_skills.csv; check row(s): ",
        paste(bad_scaffolds$scene, bad_scaffolds$item, bad_scaffolds$skill, collapse = "; "))
+}
+
+# Row of skill_scaffolds.csv that applies to one scene x item x skill in a
+# build of layout lay (integer): the highest from_layout <= lay; NA when no
+# row applies (older build, other item, no layout).
+scaffold_row_for <- function(scene, item, skill, lay) {
+  n <- max(length(scene), length(item), length(skill), length(lay))
+  scene <- rep_len(scene, n); item <- rep_len(item, n); skill <- rep_len(skill, n); lay <- rep_len(lay, n)
+  map_int(seq_len(n), function(j) {
+    rows <- which(skill_scaffolds$scene %in% scene[j] & skill_scaffolds$item %in% item[j] &
+                    skill_scaffolds$skill %in% skill[j] & !is.na(lay[j]) & skill_scaffolds$from_layout <= lay[j])
+    if (length(rows) == 0) NA_integer_ else rows[which.max(skill_scaffolds$from_layout[rows])]
+  })
+}
+
+# Drop rule (#157, layout "038"): a package let go in the air falls straight
+# down into the container below it, onto the desk, or (beyond the desk) back
+# to where it was grabbed; up to "037" it hung where it was let go. From
+# "038" a Basic/Mixed carton grabbed from a snap place also leaves it cleanly
+# and one let go up to 15 cm above the rim over a free place snaps into it.
+# No event or field changes; a container_enter can now follow its grab_end
+# by the length of the fall. Picking and placement are easier, so Basic and
+# Mixed position_1 are split by it (ekz_places gets "+drop_snap"), and a set
+# that mixes the two rules is warned (pick_s of every position).
+drop_rule_from_layout <- 38L
+drop_rule <- function(layout_version) {
+  lay <- suppressWarnings(as.integer(layout_version))
+  case_when(is.na(lay) ~ NA_character_, lay >= drop_rule_from_layout ~ "fall", TRUE ~ "hang")
 }
 
 # A position item without a skill in item_skills.csv (all of them until the
@@ -769,6 +800,10 @@ press_skill_scaffolded <- presses %>%
   mutate(scene = as.character(scene), lay = suppressWarnings(as.integer(layout_version))) %>%
   inner_join(skill_scaffolds, by = c("scene", "item"), relationship = "many-to-many") %>%
   filter(coalesce(lay >= from_layout, FALSE)) %>%
+  # Only the row of this build: the highest from_layout <= its layout (#157).
+  group_by(press_id, skill) %>%
+  slice_max(from_layout, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
   mutate(has_skill_error = map2_lgl(codes, skill, ~ any(skill_map$skill[match(.x, skill_map$error_code)] %in% .y))) %>%
   arrange(session_id, scene, scene_visit, item, skill, t, line) %>%
   group_by(session_id, scene, scene_visit, item, skill) %>%
@@ -780,15 +815,19 @@ press_skill_scaffolded <- presses %>%
 # EKZ place help of a position (#108): NA where the position is not Empf Kz
 # "003" (or a quiz item); "hidden" = no outlines in this build; else the
 # "shown" value of skill_scaffolds.csv for ekz_placement ("always" /
-# "after_error"). A build property of the position, not of one press (Mixed
-# "after_error": the first press is still made without the outlines).
+# "after_error") of the row that applies to the build (scaffold_row_for), plus
+# "+drop_snap" from layout "038" (#157: a carton leaves its place cleanly
+# when grabbed and snaps in when let go above a free place). A build property
+# of the position, not of one press (Mixed "after_error": the first press is
+# still made without the outlines).
 ekz_places_level <- function(scene, item, empf_kz, layout_version) {
-  key <- skill_scaffolds %>% filter(skill == "ekz_placement")
-  i <- match(paste(as.character(scene), item), paste(key$scene, key$item))
   lay <- suppressWarnings(as.integer(layout_version))
+  i <- scaffold_row_for(as.character(scene), item, rep("ekz_placement", length(lay)), lay)
+  shown <- skill_scaffolds$shown[i]
   case_when(!empf_kz %in% "003" ~ NA_character_,
-            !is.na(i) & coalesce(lay >= key$from_layout[i], FALSE) ~ key$shown[i],
-            TRUE ~ "hidden")
+            is.na(shown) ~ "hidden",
+            drop_rule(layout_version) %in% "fall" ~ paste0(shown, "+drop_snap"),
+            TRUE ~ shown)
 }
 
 # Invariant (spec section 6): correct == (no error codes). Report every break.
@@ -1690,12 +1729,16 @@ complex_p1_quiz_layout <- function(layout_version) {
   lay <- suppressWarnings(as.integer(layout_version))
   if_else(coalesce(lay >= 37L, FALSE), "read_far", "near_panel")
 }
-# Chart group = scaffold level, plus the reading layout from "037" on.
+# Chart group = scaffold level, plus the reading layout from "037" on, plus
+# the drop rule from "038" (#157: packages let go in the air fall, so the
+# picking part of position 1 is easier; "037" and "038" are never pooled).
 complex_p1_group <- function(layout_version) {
   sc <- complex_p1_scaffold(layout_version)
-  if_else(complex_p1_quiz_layout(layout_version) == "read_far", paste0(sc, "+read_far"), sc)
+  sc <- if_else(complex_p1_quiz_layout(layout_version) == "read_far", paste0(sc, "+read_far"), sc)
+  if_else(drop_rule(layout_version) %in% "fall", paste0(sc, "+fall"), sc)
 }
-complex_p1_groups <- c(complex_p1_levels, paste0(complex_p1_levels, "+read_far"))
+complex_p1_groups <- c(complex_p1_levels, paste0(complex_p1_levels, "+read_far"),
+                       paste0(complex_p1_levels, "+read_far+fall"))
 p1_levels <- complex_p1_group(session_layout$layout_version)
 mixed_p1_scaffold <- n_distinct(p1_levels) > 1
 # Chart label per group = the layouts of the set with that group, e.g. "019/025".
@@ -1703,8 +1746,8 @@ p1_level_label <- map_chr(set_names(complex_p1_groups), function(l)
   paste(sort(unique(layout_label(session_layout$layout_version[p1_levels == l]))), collapse = "/"))
 if (mixed_p1_scaffold) {
   present <- intersect(complex_p1_groups, p1_levels)
-  warn("set mixes Complex position_1 scaffold or quiz layout (layout ",
-       paste(p1_level_label[present], "=", present, collapse = ", "), "; #93, #123, #130): ComplexScene position_1 in ",
+  warn("set mixes Complex position_1 scaffold, quiz layout or drop rule (layout ",
+       paste(p1_level_label[present], "=", present, collapse = ", "), "; #93, #123, #130, #157): ComplexScene position_1 in ",
        "first_attempt_by_item.png and time_by_phase.png is split, never pooled; items.csv, ",
        "process_by_position.csv and complex_quiz.csv carry scaffold_level (complex_quiz.csv also quiz_layout)")
 }
@@ -1736,6 +1779,9 @@ if (mixed_m1_ekz) {
 # scenes is never pooled across levels: first_attempt_by_item.png and
 # time_by_phase.png split it, items.csv and process_by_position.csv carry
 # ekz_places, and the ekz_placement rate is split in the skill charts.
+# From "038" (#157) Mixed position 1 also shows its places from the start and
+# both scenes get the easier snap/drop: level "always+drop_snap" (Basic and
+# Mixed), never pooled with "always" / "after_error" of "034"-"037".
 # Level of a session = that of its first press at the item.
 ekz_place_items <- skill_scaffolds %>% filter(skill == "ekz_placement") %>% distinct(scene, item)
 ekz_places_session <- presses %>%
@@ -1747,7 +1793,8 @@ ekz_places_session <- presses %>%
   mutate(ekz_places = ekz_places_level(scene, item, empf_kz, layout_version)) %>%
   filter(!is.na(ekz_places)) %>%
   select(session_id, participant_id, scene, item, layout_version, ekz_places)
-ekz_places_text <- c(hidden = "places hidden", always = "places shown", after_error = "places after error")
+ekz_places_text <- c(hidden = "places hidden", always = "places shown", after_error = "places after error",
+                     `always+drop_snap` = "places shown, drop snaps", `after_error+drop_snap` = "places after error, drop snaps")
 ekz_places_split <- ekz_places_session %>% group_by(scene) %>%
   summarise(split = n_distinct(ekz_places) > 1, .groups = "drop") %>%
   { setNames(.$split, .$scene) }
@@ -1757,9 +1804,32 @@ for (sc in names(ekz_places_split)[ekz_places_split]) {
   warn("set mixes EKZ place help in ", sc, " position_1 (",
        paste(map_chr(sort(unique(lv$ekz_places)), function(l) paste0(l, ": ", paste(sort(unique(
          lv$participant_id[lv$ekz_places == l])), collapse = ", "))), collapse = "; "),
-       "; #108, layout \"034\"): position_1 is split in first_attempt_by_item.png, time_by_phase.png and ",
+       "; #108, layout \"034\"; #157, \"038\"): position_1 is split in first_attempt_by_item.png, time_by_phase.png and ",
        "the ekz_placement skill charts, never pooled; items.csv and process_by_position.csv carry ekz_places")
 }
+# Drop rule (#157, layout "038"): every position of every picking scene and
+# the Concept carton moves are easier from "038" (no package hangs in the
+# air). When a set mixes the rules nothing of the picking scenes is pooled
+# across them: Basic/Mixed position_1 by ekz_places ("+drop_snap"), Complex
+# position_1 by complex_p1_group ("+fall"), every other position by
+# chart_item ("[drop hang]" / "[drop fall]") and the picking scenes in
+# time_to_correct_by_scene.png by ttc_scene(); ConceptScene by layout
+# (decision 024). process_by_position.csv and complex_quiz.csv carry drop_rule.
+drop_rules_in_set <- session_layout %>% mutate(drop_rule = drop_rule(layout_version)) %>%
+  left_join(sessions %>% select(session_id, participant_id), by = "session_id")
+# Logs without a layout are flagged by mixed_layout already; compare known rules only.
+mixed_drop_rule_set <- n_distinct(na.omit(drop_rules_in_set$drop_rule)) > 1
+if (mixed_drop_rule_set) {
+  warn("set mixes drop rules (",
+       paste(map_chr(sort(unique(na.omit(drop_rules_in_set$drop_rule))), function(l) paste0(
+         l, ": ", paste(sort(unique(drop_rules_in_set$participant_id[
+           drop_rules_in_set$drop_rule %in% l])), collapse = ", "))), collapse = "; "),
+       "; #157, layout \"038\": packages let go in the air fall instead of hanging): every picking position in ",
+       "first_attempt_by_item.png and time_by_phase.png and the picking scenes in time_to_correct_by_scene.png ",
+       "are split by drop rule, never pooled; process_by_position.csv and complex_quiz.csv carry drop_rule. ",
+       "Per-scene error charts and wide.csv still pool both: filter by layout_version")
+}
+
 # ekz_places of one position_1 of a session (NA for other items / no press there).
 session_ekz_places <- function(scene, item, session_id) {
   ekz_places_session$ekz_places[match(paste(session_id, as.character(scene), item),
@@ -1801,6 +1871,10 @@ chart_item <- function(scene, item, session_id) {
             (mixed_m1_ekz | ep_split) & !is.na(m1) ~
               paste0(item, " [Empf Kz ", m1, if_else(ep_split, paste0(", ", ep_text), ""), "]"),
             ep_split ~ paste0(item, " [", ep_text, "]"),
+            # Drop rule (#157): any other picking position of a set that mixes the rules.
+            mixed_drop_rule_set & as.character(scene) %in% red_button_scenes & str_detect(coalesce(item, ""), "^position_") ~
+              paste0(item, " [drop ", coalesce(drop_rule(sessions$layout_version[match(session_id, sessions$session_id)]),
+                                              "unknown"), "]"),
             TRUE ~ item)
 }
 
@@ -1843,6 +1917,8 @@ complex_quiz <- enters %>% filter(scene == "ComplexScene") %>%
          scaffold_level = complex_p1_scaffold(layout_version),
          # Reading layout of the quiz (#130, "037" on read_far): never pool quiz_s across it.
          quiz_layout = complex_p1_quiz_layout(layout_version),
+         # Drop rule (#157): first_confirm_p1_s includes picking; never pool hang and fall.
+         drop_rule = drop_rule(layout_version),
          # Not asked before "036": NA (not measured), never FALSE.
          ekz_right_before_box = if_else(scaffold_level == "ekz_question", ekz_right_before_box, NA),
          quiz_s = active_between_t(session_id, enter_t, box1_t),
@@ -1854,7 +1930,7 @@ for (i in seq_len(nrow(cq_bad))) {
        cq_bad$layout_version[i], " but storage box 1 started without a right quiz_answer ekz before it (#123)")
 }
 write_csv(complex_quiz %>% select(participant_id, session_id, scene_visit, counting, repeat_visit, layout_version,
-                                  scaffold_level, quiz_layout, quiz_questions, quiz_touches, ekz_right_before_box,
+                                  scaffold_level, quiz_layout, drop_rule, quiz_questions, quiz_touches, ekz_right_before_box,
                                   quiz_s, first_confirm_p1_s) %>%
             arrange(participant_id, session_id, scene_visit),
           file.path(output_dir, "complex_quiz.csv"), na = "")
@@ -2459,9 +2535,21 @@ ggsave(file.path(output_dir, "error_codes_by_scene.png"), p_codes, width = 10, h
 title_ttc <- "How long does it take to reach a correct order in each scene?"
 # Everyone who entered a scene with outcome logging: reached correct on the
 # counting visit, or not (no correct, or no confirm at all).
-# In a mixed-layout set ConceptScene is one group per layout (section 8b).
+# In a mixed-layout set ConceptScene is one group per layout (section 8b),
+# and in a set that mixes drop rules (#157) each picking scene is one group
+# per rule ("[drop hang]" / "[drop fall]").
+ttc_scene <- function(scene, session_id) {
+  sc <- as.character(chart_scene(scene, session_id))
+  if (!mixed_drop_rule_set) return(factor(sc, levels = chart_scene_levels))
+  rule <- coalesce(drop_rule(sessions$layout_version[match(session_id, sessions$session_id)]), "unknown")
+  sc <- if_else(sc %in% red_button_scenes, paste0(sc, " [drop ", rule, "]"), sc)
+  lv <- unlist(map(chart_scene_levels, function(l) {
+    if (l %in% red_button_scenes) paste0(l, " [drop ", c("hang", "fall", "unknown"), "]") else l
+  }))
+  factor(sc, levels = intersect(lv, unique(c(sc, chart_scene_levels[!chart_scene_levels %in% red_button_scenes]))))
+}
 ttc_people <- visits %>% filter(outcome_logged) %>%
-  mutate(scene = chart_scene(scene, session_id)) %>%
+  mutate(scene = ttc_scene(scene, session_id)) %>%
   group_by(participant_id, scene) %>%
   summarise(has_counting = any(counting & confirm_count > 0, na.rm = TRUE),
             # Picking scenes: minus the box-change wait (decision 033), so the
@@ -2581,10 +2669,11 @@ process <- proc_positions %>%
          # EKZ place help of an Empf Kz 003 position (#108).
          ekz_places = ekz_places_level(scene, item, empf_kz, layout_version),
          chart_item = chart_item(scene, item, session_id),
+         drop_rule = drop_rule(layout_version),
          scene = factor(scene, levels = levels(visits$scene))) %>%
   arrange(participant_id, scene, scene_visit, position)
 write_csv(process %>% select(participant_id, session_id, scene, scene_visit, counting, repeat_visit,
-                             layout_version, position, scaffolded, scaffold_level, empf_kz, ekz_places, completed, presses,
+                             layout_version, drop_rule, position, scaffolded, scaffold_level, empf_kz, ekz_places, completed, presses,
                              read_s, pick_s, check_s, position_s),
           file.path(output_dir, "process_by_position.csv"), na = "")
 
@@ -3145,6 +3234,14 @@ concept_start_counts <- c(order = 0L, storage = 6L)
 # Soll in cartons of the sample order (SampleWmsOrder: 120 pieces, VPE 40).
 concept_soll_cartons <- 3L
 concept_grab_link_s <- 0.1
+# From layout "038" (#157) a carton let go in the air falls (short animation)
+# into the container below it, or, let go beyond the desk, goes back to
+# where it was grabbed (the storage container): its container_enter then
+# comes up to concept_drop_link_s after its grab_end, never before it.
+concept_drop_link_s <- 2
+concept_enter_link_s <- function(layout_version) {
+  if_else(drop_rule(layout_version) %in% "fall", concept_drop_link_s, concept_grab_link_s)
+}
 
 # Demo resets: tour_step lines whose previous tour_step of the visit (file
 # line order) was material_flow.
@@ -3181,17 +3278,22 @@ cc_grab_lines <- grab_rows %>% filter(as.character(scene) == "ConceptScene") %>%
   transmute(session_id, scene_visit, object_id, g_event = event, g_t = t)
 cc_rows <- cc_rows %>%
   mutate(row_id = row_number(),
-         link_event = if_else(event == "container_exit", "grab_start", "grab_end")) %>%
+         link_event = if_else(event == "container_exit", "grab_start", "grab_end"),
+         # Enter after a fall (#157, "038" on): grab_end before it, within the fall.
+         link_s = if_else(event == "container_enter", concept_enter_link_s(layout_version), concept_grab_link_s),
+         link_after = event == "container_enter" & drop_rule(layout_version) %in% "fall") %>%
   left_join(cc_grab_lines, by = c("session_id", "scene_visit", "object_id"), relationship = "many-to-many") %>%
+  mutate(g_ok = !is.na(g_t) & g_event %in% link_event &
+           if_else(link_after, g_t <= t + concept_grab_link_s & t - g_t <= link_s, abs(g_t - t) <= link_s)) %>%
   group_by(row_id) %>%
-  summarise(across(-c(g_event, g_t), first),
-            grab_linked = any(!is.na(g_t) & abs(g_t - t) <= concept_grab_link_s & g_event == link_event),
+  summarise(across(-c(g_event, g_t, g_ok), first),
+            grab_linked = any(g_ok, na.rm = TRUE),
             .groups = "drop") %>%
-  select(-row_id, -link_event)
+  select(-row_id, -link_event, -link_s, -link_after)
 cc_unlinked <- cc_rows %>% filter(!grab_linked)
 if (nrow(cc_unlinked) > 0) {
   warn(nrow(cc_unlinked), " ConceptScene container_* line(s) without a grab of the same carton within ",
-       concept_grab_link_s, " s (moved without the trainee? counted, flagged in concept_containers_by_visit.csv): ",
+       concept_grab_link_s, " s (enter after a fall from layout \"038\": ", concept_drop_link_s, " s) (moved without the trainee? counted, flagged in concept_containers_by_visit.csv): ",
        paste(unique(cc_unlinked$participant_id), collapse = ", "))
 }
 
@@ -3262,11 +3364,56 @@ if (any(concept_containers_by_visit$containers_logged)) {
 #            P0: persons with an outcome-logged visit of all three picking
 #            scenes; share = persons who completed (task_completed) each of
 #            them. Who never reached a scene is left out, not counted as 0.
+#            P2 from layout "038" (#157, user decision 2026-11-17): Mixed
+#            position 1 shows its EKZ places from the start, so no press
+#            tests placement any more; persons with an Empf Kz 003 position
+#            (Basic/Mixed position_1) in a "038"-or-newer session; share =
+#            persons who got every such position right (reached_correct),
+#            with the places visible.
 #   none     n and share NA: not measured, never 0 %.
+# An objective can change its evidence with a layout: objectives.csv may hold
+# several rows per objective_id with from_layout (empty = from the first
+# build). A row covers the sessions whose layout_version is >= its
+# from_layout and < the next row's (a session without layout counts as the
+# oldest). objectives_summary.csv gets one row per objectives.csv row whose
+# layouts occur in the set, so a "038"-only set reports P2 as observed only
+# (never an empty rated share); an objective none of whose rows occur keeps
+# its newest row (n 0). from_layout / to_layout say which builds a row holds.
 # Pooling mixes scenes and layouts: read with items.csv for the change over
 # the course (this table says what each objective rests on, not improvement).
 objectives <- read_csv(file.path(analysis_folder, "objectives.csv"), show_col_types = FALSE,
                        col_types = cols(.default = col_character()))
+if (!"from_layout" %in% names(objectives)) objectives$from_layout <- NA_character_
+objectives <- objectives %>%
+  mutate(from_layout = na_if(trimws(coalesce(from_layout, "")), ""),
+         from_lay = coalesce(suppressWarnings(as.integer(from_layout)), 0L)) %>%
+  arrange(match(objective_id, unique(objective_id)), from_lay) %>%
+  group_by(objective_id) %>%
+  mutate(to_lay = lead(from_lay), n_rows = n()) %>%
+  ungroup()
+bad_obj_rows <- objectives %>%
+  filter(!is.na(from_layout) & is.na(suppressWarnings(as.integer(from_layout))) |
+           duplicated(paste(objective_id, from_lay)) |
+           !evidence %in% c("rated", "observed", "none"))
+if (nrow(bad_obj_rows) > 0) {
+  stop("objectives.csv: from_layout must be empty or a number, once per objective_id, and evidence ",
+       "'rated', 'observed' or 'none'; check row(s): ", paste(bad_obj_rows$objective_id, collapse = ", "))
+}
+# Integer layout of a session (no layout = 0, the oldest builds).
+session_lay <- function(session_id) {
+  coalesce(suppressWarnings(as.integer(sessions$layout_version[match(session_id, sessions$session_id)])), 0L)
+}
+in_period <- function(lay, from_lay, to_lay) lay >= from_lay & (is.na(to_lay) | lay < to_lay)
+# Rows of objectives.csv to report for a set whose sessions have layouts lays.
+objective_rows_for <- function(lays) {
+  objectives %>%
+    mutate(present = map2_lgl(from_lay, to_lay, ~ any(in_period(lays, .x, .y)))) %>%
+    group_by(objective_id) %>%
+    filter(n_rows == 1 | present | (!any(present) & is.na(to_lay))) %>%
+    ungroup() %>%
+    select(-present)
+}
+objective_rows <- objective_rows_for(session_lay(sessions$session_id[!sessions$schema_version %in% 1L]))
 item_objectives <- item_skills %>%
   mutate(objective_id = na_if(trimws(coalesce(objective_id, "")), "")) %>%
   filter(!is.na(objective_id)) %>% select(scene, item, objective_id)
@@ -3285,7 +3432,7 @@ obj_item_tests <- item_attempts %>%
   mutate(scene = as.character(scene)) %>%
   inner_join(item_objectives, by = c("scene", "item")) %>%
   group_by(participant_id, scene, item, objective_id) %>%
-  summarise(correct = first(correct), .groups = "drop")
+  summarise(correct = first(correct), session_id = first(session_id), .groups = "drop")
 # Objectives rated by EKZ_PLACEMENT: tested only at an EKZ opportunity.
 ekz_objectives <- unique(code_objectives$objective_id[code_objectives$code == "EKZ_PLACEMENT"])
 # press x objective pairs whose skill was scaffolded at the press (skill_scaffolds.csv).
@@ -3310,32 +3457,61 @@ obj_code_tests <- item_attempts %>%
   mutate(correct = map2_lgl(codes, paste(scene, objective_id), function(cs, so) {
     !any(cs %in% code_objectives$code[paste(code_objectives$scene, code_objectives$objective_id) == so])
   })) %>%
-  select(participant_id, scene, item, objective_id, correct)
-obj_rated <- bind_rows(obj_item_tests, obj_code_tests) %>%
-  group_by(objective_id) %>%
-  summarise(n_persons = n_distinct(participant_id), n = n(), k = sum(correct %in% TRUE),
-            sources = paste(sort(unique(paste0(str_remove(scene, "(Picking)?Scene"), ":", item))), collapse = ";"),
-            .groups = "drop")
+  select(participant_id, session_id, scene, item, objective_id, correct)
+obj_tests <- bind_rows(obj_item_tests, obj_code_tests) %>% mutate(lay = session_lay(session_id))
+rated_row <- function(id, from_lay, to_lay) {
+  d <- obj_tests %>% filter(objective_id == id, in_period(lay, from_lay, to_lay))
+  tibble(n_persons = n_distinct(d$participant_id), n = nrow(d), k = sum(d$correct %in% TRUE),
+         sources = paste(sort(unique(paste0(str_remove(d$scene, "(Picking)?Scene"), ":", d$item))), collapse = ";"))
+}
 
-# Observed: D2 (Concept order container) and P0 (all picking scenes completed).
-d2_persons <- concept_containers_by_visit %>% filter(containers_logged) %>%
-  group_by(participant_id) %>% summarise(done = any(order_enters > 0), .groups = "drop")
-p0_persons <- visits %>% filter(outcome_logged %in% TRUE, scene %in% red_button_scenes) %>%
-  group_by(participant_id, scene) %>% summarise(done = any(completed %in% TRUE), .groups = "drop") %>%
-  group_by(participant_id) %>% filter(n_distinct(scene) == length(red_button_scenes)) %>%
-  summarise(done = all(done), .groups = "drop")
-obs_row <- function(id, d, src) tibble(objective_id = id, n_persons = nrow(d), n = nrow(d),
-                                       k = sum(d$done), sources = src)
-obj_observed <- bind_rows(obs_row("D2", d2_persons, "Concept:container_enter order"),
-                          obs_row("P0", p0_persons, "Basic/Mixed/Complex:task_completed"))
+# Observed (per person, sessions of the row's layouts only): D2 (Concept
+# order container), P0 (all picking scenes completed), P2 from "038" (every
+# Empf Kz 003 position right, places visible).
+observed_persons <- function(id, from_lay, to_lay) {
+  if (id == "D2") {
+    concept_containers_by_visit %>% filter(containers_logged, in_period(session_lay(session_id), from_lay, to_lay)) %>%
+      group_by(participant_id) %>% summarise(done = any(order_enters > 0), .groups = "drop")
+  } else if (id == "P0") {
+    visits %>% filter(outcome_logged %in% TRUE, scene %in% red_button_scenes,
+                      in_period(session_lay(session_id), from_lay, to_lay)) %>%
+      group_by(participant_id, scene) %>% summarise(done = any(completed %in% TRUE), .groups = "drop") %>%
+      group_by(participant_id) %>% filter(n_distinct(scene) == length(red_button_scenes)) %>%
+      summarise(done = all(done), .groups = "drop")
+  } else if (id == "P2") {
+    items %>% filter(kind == "position", empf_kz %in% "003",
+                     as.character(scene) %in% c("BasicPickingScene", "MixedPickingScene"),
+                     in_period(session_lay(session_id), from_lay, to_lay)) %>%
+      group_by(participant_id) %>% summarise(done = all(reached_correct %in% TRUE), .groups = "drop")
+  } else {
+    warn("objectives.csv: no observed measure for ", id, " in analyse_set.R (left empty)")
+    NULL
+  }
+}
+observed_sources <- c(D2 = "Concept:container_enter order", P0 = "Basic/Mixed/Complex:task_completed",
+                      P2 = "Basic:position_1;Mixed:position_1 reached_correct (places visible)")
+observed_measures <- c(D2 = "did_order_container_enter", P0 = "completed_all_picking_scenes",
+                       P2 = "ekz_positions_right_with_places")
+observed_row <- function(id, from_lay, to_lay) {
+  d <- observed_persons(id, from_lay, to_lay)
+  if (is.null(d)) return(tibble(n_persons = NA_integer_, n = NA_integer_, k = NA_integer_, sources = NA_character_))
+  tibble(n_persons = nrow(d), n = nrow(d), k = sum(d$done), sources = unname(observed_sources[id]))
+}
+obj_numbers <- pmap_dfr(objective_rows %>% select(objective_id, evidence, from_lay, to_lay),
+                        function(objective_id, evidence, from_lay, to_lay) {
+  if (evidence == "rated") rated_row(objective_id, from_lay, to_lay)
+  else if (evidence == "observed") observed_row(objective_id, from_lay, to_lay)
+  else tibble(n_persons = NA_integer_, n = NA_integer_, k = NA_integer_, sources = NA_character_)
+})
+# Kept for selftest.R: rated numbers over all layouts.
+obj_rated <- obj_tests %>% group_by(objective_id) %>%
+  summarise(n_persons = n_distinct(participant_id), n = n(), k = sum(correct %in% TRUE), .groups = "drop")
 
-objectives_summary <- objectives %>%
-  left_join(bind_rows(obj_rated %>% semi_join(objectives %>% filter(evidence == "rated"), by = "objective_id"),
-                      obj_observed %>% semi_join(objectives %>% filter(evidence == "observed"), by = "objective_id")),
-            by = "objective_id") %>%
-  mutate(measure = case_when(evidence == "rated" ~ "first_attempt_correct",
-                             objective_id == "D2" ~ "did_order_container_enter",
-                             objective_id == "P0" ~ "completed_all_picking_scenes",
+objectives_summary <- objective_rows %>%
+  bind_cols(obj_numbers %>% mutate(sources = na_if(sources, ""))) %>%
+  mutate(to_layout = if_else(is.na(to_lay), NA_character_, sprintf("%03d", to_lay)),
+         measure = case_when(evidence == "rated" ~ "first_attempt_correct",
+                             evidence == "observed" ~ unname(observed_measures[objective_id]),
                              TRUE ~ NA_character_),
          # Not measured stays NA; a measured objective with no data yet has n 0 and share NA.
          n_persons = if_else(evidence == "none", NA_integer_, coalesce(n_persons, 0L)),
@@ -3346,7 +3522,14 @@ objectives_summary <- objectives_summary %>%
   bind_cols(wilson(objectives_summary$k, objectives_summary$n) %>%
               mutate(across(everything(), ~ if_else(coalesce(objectives_summary$n, 0L) > 0, round(.x, 3), NA_real_))) %>%
               rename(share_lo = lo, share_hi = hi)) %>%
-  select(objective_id, knowledge_type, evidence, measure, n_persons, n, k, share, share_lo, share_hi, sources)
+  select(objective_id, knowledge_type, evidence, from_layout, to_layout, measure, n_persons, n, k, share,
+         share_lo, share_hi, sources)
+if (any(duplicated(objectives_summary$objective_id))) {
+  dup_o <- unique(objectives_summary$objective_id[duplicated(objectives_summary$objective_id)])
+  warn("objectives_summary.csv holds more than one row for ", paste(dup_o, collapse = ", "),
+       ": the set mixes builds with different evidence for it (P2: rated up to \"037\", observed from \"038\", #157); ",
+       "read each row for its layouts (from_layout / to_layout), never add them up")
+}
 write_csv(objectives_summary, file.path(output_dir, "objectives_summary.csv"), na = "")
 
 # ---- 14. Wide file: one row per participant (for SPSS and paper forms) ---------
@@ -3795,6 +3978,7 @@ validity_limits <- c(
   "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts 4 s (layout up to \"034\") or 8 s (\"035\" on, #118) after the step; older layouts have NA, not 0.",
   "- Station start delay (decision 033, station_waits.csv): from layout \"033\" the boxes wait 4 s after a correct confirm before they ride (Complex box 1 after the remainder quiz: 0.6 s), before \"033\" 0.6 s. wait_s, wait_after_done_s and the per-scene active_s include this wait, so they are never pooled across station_wait_group; time_to_correct_by_scene.png uses time_to_correct_s minus wait_s for the picking scenes (wide.csv keeps the logged time_to_correct_s). wait_after_done_s starts at the first ride, not at task_completed, so it leaves out the start delay after the last confirm.",
   "- EKZ place help (#108, decision 037, layout \"034\", skill_scaffolds.csv): Basic position 1 outlines its 6 snap places from the start, Mixed position 1 its 3 places after the first EKZ_PLACEMENT of the visit; from \"034\" each place takes one carton, a carton released in the box lies flat, and a placement error marks the loose cartons. A press x skill pair with the outlines visible is left out of the ekz_placement rate and of P2 (numerator and denominator), so from \"034\" Basic gives no ekz_placement measure and Mixed only up to its first EKZ_PLACEMENT (P2 = the first EKZ opportunity of Mixed position 1, always made without outlines). Basic calculate_quantity stays measured although the 6 outlines equal the 6 cartons the order needs: read Basic TOO_FEW/TOO_MANY of \"034\" as a lower bound of calculation errors. position_1 of Basic and Mixed is never pooled across ekz_places levels (hidden / always / after_error; items.csv, process_by_position.csv; split charts when a set mixes them), and P802's (\"033\") placement data are not pooled with \"034\".",
+  "- Drop rule and EKZ places from the start (#157, layout \"038\"): a package let go in the air falls straight down (into the container below it, onto the desk, or beyond the desk back to where it was grabbed) instead of hanging; a Basic/Mixed carton grabbed from a snap place leaves it cleanly and one let go above a free place snaps in; Mixed position 1 outlines its 3 places from the start (skill_scaffolds.csv row \"038\" always). So from \"038\" no press anywhere tests ekz_placement: P2 is rated up to \"037\" and observed from \"038\" (objectives.csv from_layout; persons whose Empf Kz 003 positions were all right with the places visible: doing it with help, not a test; the Concept/Complex EKZ quiz questions measure D3, not P2); EKZ_PLACEMENT codes of \"038\" are made with the outlines visible; Basic/Mixed position_1 carry ekz_places \"always+drop_snap\" and are never pooled with \"037\"; a container_enter may follow its grab_end by the fall (Concept link window 2 s from \"038\"). In a set that mixes drop rules every picking position (first_attempt_by_item.png, time_by_phase.png) and the picking scenes in time_to_correct_by_scene.png are split by drop_rule (hang / fall); the per-scene error charts and wide.csv still pool both.",
   "- Menu after a done order (#109, menu_after_done.csv): up to layout \"033\" the Basic/Mixed result card told the trainee to choose the next lesson in the Menu from the correct confirm on (menu_cue text); from \"034\" the next Menu item is highlighted once the order box departs (menu_cue highlight). time_to_menu_after_done_s includes the 4 s start delay and the storage-box exit in both groups, but the cue itself comes later in \"034\"; compare within one menu_cue only. #111 (layout \"034\": box signs on the inner back wall, one note on Complex's opened carton, Basic/Complex storage cartons rearranged with the same counts and names) changes no logged field; Basic/Complex grab order and time to first grab may shift slightly, so read picking-scene grab and phase times within one layout.",
   "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).",
   "- WelcomeScene in two steps (#121/#124, decision 038, layout \"036\"): the learning objectives come first and the practice box, red button and Menu appear only after „Zu den Aufgaben\" (objectives_read_s = active seconds to that press; NA for older layouts, never 0). Welcome active_s and the times before the first welcome_practice_done of \"036\" are not comparable with \"035\"-or-older logs. objectives_read_s is time on the panel, not proof it was read.")

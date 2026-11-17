@@ -19,11 +19,10 @@ public class ParticipantCodeLabel : MonoBehaviour
             return;
 
         string id = ResearchLogger.ParticipantId;
+        // #156: can't deactivate this GameObject here (its parent is being activated); hide the text instead.
+        label.enabled = id != null;
         if (id == null)
-        {
-            gameObject.SetActive(false);
             return;
-        }
 
         label.text = Loc.Get(CodeKey, ("participant_id", id));
     }
