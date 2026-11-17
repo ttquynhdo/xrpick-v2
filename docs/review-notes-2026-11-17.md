@@ -4,7 +4,7 @@ Nguồn: tin nhắn của một bạn đã thử app (tiếng Anh, chép nguyên
 
 Cách làm như các file review trước: chỉ ghi lại, chưa sửa, chưa mở mục backlog. Khi danh sách đủ, chạy `review-to-backlog` cho cả file.
 
-**Đã chuyển vào backlog (người dùng 2026-11-17: làm ngay):** F1 → #136, F3 hướng (a) → #137, F2 phần (a) (câu nhắc trên thẻ kết quả) → #139. F2 phần (b) (kiện thả ngoài thùng lơ lửng) còn mở.
+**Đã chuyển vào backlog (người dùng 2026-11-17: làm ngay):** F1 → #136, F3 hướng (a) → #137, F2 phần (a) (câu nhắc trên thẻ kết quả) → #139. F2 phần (b) (kiện thả ngoài thùng lơ lửng) → #153 (2026-11-17, cùng R16 của `docs/review-notes-checklist-2026-11-17.md`).
 
 Mỗi mục có: **góp ý** (nguyên văn), **video**, **hiện trạng** (đọc từ code/scene trên `main` 247cb14), **ghi chú**.
 
