@@ -2604,4 +2604,5 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl158.md
+- **Status:** verified-mcp (5/5 ✅ code/MCP, không có case tay; skill local `.claude/skills/unity-safe-change/`, checklist tạo bằng `manual_checklist.py`)
