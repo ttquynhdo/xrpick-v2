@@ -4,11 +4,11 @@ end.confirm.question,Sitzung wirklich beenden?,proposed,german-reviewer (agent),
 end.confirm.cancel,Fortsetzen,proposed,german-reviewer (agent),2026-11-01,Agent proposal adopted: 'Fortsetzen' instead of 'Abbrechen' (could be read as aborting the session); EN 'Continue'
 end.confirm.end,Beenden,proposed,german-reviewer (agent),2026-11-01,Agent: OK as written
 common.card.task_title,Darum geht es,proposed,german-reviewer (agent),2026-11-05,#87
-welcome.card.task_body,"<b>Sie lernen, in der VR mit den Händen zu arbeiten.</b>\nSo können Sie sich später ganz auf den Auftrag konzentrieren.",proposed,german-reviewer (agent),2026-11-05,#87
+welcome.card.task_body,"<b>Sie lernen, in der VR mit den Händen zu arbeiten.</b>",proposed,,2026-11-18,#155 decision 041
 welcome.card.step1_title,1. Karton greifen,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.card.step1_body,"Greifen Sie den Karton mit einer Hand, heben Sie ihn hoch und stellen Sie ihn wieder ab.",proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
 welcome.card.step2_title,2. Knopf drücken,proposed,german-reviewer (agent),2026-11-01,#25
-welcome.card.step2_body,Drücken Sie mit der Fingerspitze den roten Knopf. Später bestätigen Sie damit den Auftrag.,proposed,german-reviewer (agent),2026-11-01,#25
+welcome.card.step2_body,Drücken Sie mit der Fingerspitze den roten Knopf.,proposed,,2026-11-18,#155 decision 041
 welcome.title,Willkommen bei XPick!,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.subtitle,Ein VR-Training für die Kommissionierung im Lager,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.panel.title,Lernziele,proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
@@ -17,19 +17,19 @@ welcome.panel.can,"<b>Nach dem Kurs können Sie:</b>\n• die Angaben im LVS abl
 welcome.panel.duration,"Dauer: 5 Lektionen, je etwa 5 Minuten",proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#86, decision 034)"
 common.panel.see_cards,Ihre Aufgaben stehen links auf den Karten.,proposed,german-reviewer (agent),2026-11-02,#35
 welcome.panel.next,Wählen Sie danach im Menü die markierte Lektion.,proposed,german-reviewer (agent),2026-11-16,Agent: corrected in batch review #116-#120
-mixed.card.task_body,"<b>Sie lernen, mehrere Auftragspositionen nacheinander zu kommissionieren.</b>\nSo stimmen bei jeder Position Material und Menge, auch wenn Verpackung und EKZ wechseln.",proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
+mixed.card.task_body,"<b>Sie lernen, mehrere Auftragspositionen nacheinander zu kommissionieren.</b>",proposed,,2026-11-18,#155 decision 041
 mixed.card.step1_body,"Lesen Sie für die aktuelle Position ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,german-reviewer (agent),2026-11-05,#87
 common.card.step2_pick_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
-mixed.card.step3_body,"Prüfen Sie, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,german-reviewer (agent),2026-11-05,#87
-complex.card.task_body,"<b>Sie lernen auszurechnen, wie viele volle Kartons und lose Teile Sie brauchen.</b>\nSo stimmt die Menge auch dann, wenn sie nicht in volle Kartons passt.",proposed,german-reviewer (agent),2026-11-05,#87
+mixed.card.step3_body,"Prüfen Sie, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
+complex.card.task_body,"<b>Sie lernen auszurechnen, wie viele volle Kartons und lose Teile Sie brauchen.</b>",proposed,,2026-11-18,#155 decision 041
 complex.card.step1_body,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,german-reviewer (agent),2026-11-05,#87
-complex.card.step2_body,"Rechnen Sie aus, wie viele Sie brauchen. Legen Sie zuerst die vollen Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,#87
-complex.card.step3_body,"Zählen Sie Kartons und lose Teile nach und prüfen Sie, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,german-reviewer (agent),2026-11-05,#87
+complex.card.step2_body,"Legen Sie zuerst die vollen Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,,2026-11-18,#155 decision 041
+complex.card.step3_body,"Zählen Sie nach, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
 complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
 complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
-basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,,2026-11-03,#62
+basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
 mixed.feedback.position_done,Position {position} ist erledigt. Lassen Sie die Ware im Auftragsbehälter liegen.\nDer Lagerbehälter fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-17,#139 (F2): goods stay in the order container; reviewed in the fork session
-basic.step2.text,"Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie sie so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,german-reviewer (agent),2026-11-05,#87
+basic.step2.text,"Legen Sie die nötigen Kartons so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,,2026-11-18,#155 decision 041
 order.feedback.ekz3_loose,"Bei Empf Kz 003 liegt jeder Karton einzeln und geordnet, nie übereinander. Legen Sie jeden Karton auf einen eigenen Platz.",proposed,german-reviewer (agent),2026-11-17,"#131: no warning icon on loose cartons any more, sentence 2 rewritten; agent OK (optional: plural 'liegen die Kartons' in sentence 1). Earlier: agent proposal (#108, decision 037)"
 concept.tour.material_flow.title,Weg der Behälter,proposed,german-reviewer (agent),2026-11-02,#49
 complex.quiz.q_cartons,Wie viele volle Kartons nehmen Sie für diese Position?,proposed,,2026-11-02,#19
@@ -52,24 +52,22 @@ Rechnen Sie für Ihren Auftrag mit den Zahlen aus dem LVS.",proposed,german-revi
 complex.feedback.position_done,"Position {done} ist erledigt. Lassen Sie die Ware im Auftragsbehälter liegen.
 Der Lagerbehälter fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.
 Lesen Sie dann im LVS die Angaben zu Position {next} ab.",proposed,german-reviewer (agent),2026-11-17,#139 (F2): goods stay in the order container; reviewed in the fork session
-complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-02,#53 (quiz hint moved to card 1)
-complex.card.step1_body_position1,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>. Beantworten Sie dann die Fragen rechts neben dem Bildschirm – das „Beispiel“ links neben dem Bildschirm hilft beim Rechnen.",proposed,german-reviewer (agent),2026-11-17,#87; #130 places
+complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,,2026-11-18,#155 decision 041
+complex.card.step1_body_position1,"Lesen Sie Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr> im LVS ab und beantworten Sie die Fragen.",proposed,,2026-11-18,#155 decision 041
 basic.result.correct.text,Der Auftrag ist richtig.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,claude,2026-11-06,"#109 (decision 037): Menu sentence removed, the Menu item is highlighted instead; rest unchanged from #99 review"
 basic.result.correct.title,Richtig!,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 basic.result.incorrect.title,Nicht richtig,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-basic.step1.text,"Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge (Soll), VPE (<nobr>Verp.-Einh.</nobr>), EKZ (<nobr>Empf Kz</nobr>). Rest: So viele Stück bleiben nach dem Auftrag im Lagerbehälter.",proposed,german-reviewer (agent),2026-11-02,"Agent: OK; optional 'Restmenge (Rest):' for parallel form, left to #13"
+basic.step1.text,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,,2026-11-18,#155 decision 041
 basic.step2.title,2. Kartons kommissionieren,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-basic.task.intro,"<b>Sie lernen, Kartons nach EKZ einzulegen.</b>\nSo kommt die Ware unbeschädigt an.",proposed,german-reviewer (agent),2026-11-05,#87
+basic.task.intro,"<b>Sie lernen, Kartons nach EKZ einzulegen.</b>",proposed,,2026-11-18,#155 decision 041
 common.button.f6,F6,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 common.card.step1_title,1. Angaben im LVS ablesen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 common.card.step3_title,3. Auftrag bestätigen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 complex.end.next,Bitte nehmen Sie die VR-Brille ab und melden Sie sich bei der Kursleitung.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-concept.card.step1_body,Nehmen Sie einen Karton aus dem Lagerbehälter und lesen Sie das Etikett.,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
-concept.card.step1_title,1. Etikett lesen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-concept.card.step2_body,Lesen Sie die Erklärung neben dem Feld. Drücken Sie „Weiter“.,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
-concept.card.step2_title,2. LVS kennenlernen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-concept.card.step3_title,3. Fragen beantworten,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
-concept.card.task_body,"<b>Sie lernen, die Angaben im LVS abzulesen und mit dem Etikett zu vergleichen.</b>\nSo nehmen Sie bei jedem Auftrag das richtige Material in der richtigen Menge.",proposed,german-reviewer (agent),2026-11-05,#87
+concept.card.step2_body,Lesen Sie die Erklärung neben jedem Feld und drücken Sie „Weiter“.,proposed,,2026-11-18,#155 decision 041
+concept.card.step2_title,1. LVS kennenlernen,proposed,,2026-11-18,#155 decision 041
+concept.card.step3_title,2. Fragen beantworten,proposed,,2026-11-18,#155 decision 041
+concept.card.task_body,"<b>Sie lernen, die Angaben im LVS abzulesen und mit dem Etikett zu vergleichen.</b>",proposed,,2026-11-18,#155 decision 041
 entry.confirm.correct,Korrigieren,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.confirm.yes,Ja,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.keypad.delete,Löschen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
@@ -152,15 +150,14 @@ concept.ekz.5,"Wie EKZ 3, Teile in zwei Ebenen mit Zwischenlage trennen.",propos
 concept.ekz.6,"Wie EKZ 3, Teile in allen Ebenen mit Zwischenlage trennen.",proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.8,ESD-geschützte Teile. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
 concept.ekz.9,Sonderverpackung. Nicht ohne Anweisung öffnen.,proposed,german-reviewer (agent),2026-11-03,#57; 4/5/6 and 8 rewritten after review
-complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen rechts neben dem Bildschirm.,proposed,german-reviewer (agent),2026-11-17,#130 places; #58; Agent: OK; wording as complex.card.step1_body_position1
+complex.feedback.answer_quiz_first,Beantworten Sie zuerst die Fragen.,proposed,,2026-11-18,#155 decision 041
 concept.tour.cartons.title,Anzahl Kartons,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.tour.cartons.body,= 3 Kartons,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#91, result line of the caption next to Soll/Verp.-Einh.)"
 concept.tour.empf_kz_000.title,Empf Kz,proposed,german-reviewer (agent),2026-11-17,"#137: texts of steps 8/9 swapped, sample order shows 000"
 concept.tour.empf_kz_000.body,"Hier steht, wie Sie die Teile einlegen: 000 ist EKZ 0, also dürfen die Kartons ungeordnet liegen wie im Beispiel.",proposed,german-reviewer (agent),2026-11-17,"#137: texts of steps 8/9 swapped, sample order shows 000"
 concept.tour.material_flow.body,"Der Lagerbehälter fährt über die mittlere Bahn weg, danach der fertige Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
-concept.card.step3_body,"Drücken Sie nach der Erklärung zum LVS „Zu den Fragen“. Drücken Sie dann A, B oder C.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
+concept.card.step3_body,Drücken Sie nach dem letzten Schritt „Zu den Fragen“.,proposed,,2026-11-18,#155 decision 041
 concept.quiz.locked,Die Fragen kommen nach der Erklärung zum LVS.,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.title,Ablauf am Kommissionierplatz,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.lane_left,Lagerbehälter kommt an,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.lane_middle,Behälter fahren weg,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
@@ -179,13 +176,12 @@ concept.flow.step4_weigh,Teile wiegen,proposed,german-reviewer (agent),2026-11-0
 concept.flow.step5,Teile vorverpacken,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step7,Restmenge im Lagerbehälter sichern,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step8,Leere Kartons aus dem Lagerbehälter entfernen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-complex.card.step3_body_position1,"Zählen Sie Kartons und lose Teile nach und prüfen Sie, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,german-reviewer (agent),2026-11-05,#87
-mixed.card.step3_body_position1,"Prüfen Sie, ob Ist und Soll gleich sind. Drücken Sie dann den roten Knopf (F6).",proposed,german-reviewer (agent),2026-11-05,#87
+complex.card.step3_body_position1,"Zählen Sie nach, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
+mixed.card.step3_body_position1,"Prüfen Sie, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
 order.feedback.correct_title,Richtig!,proposed,,2026-11-03,#59
 concept.lane.storage,Lagerbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 concept.lane.middle,Mittlere Bahn,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 concept.lane.order,Auftragsbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
-complex.quiz.how_to,"Drücken Sie A, B oder C, um zu antworten.",proposed,german-reviewer (agent),2026-11-04,Same text as concept.quiz.how_to (Agent: OK) (#85)
 concept.tour.intro.action,"Sehen Sie sich den Auftrag im LVS an: Dort steht, was Sie kommissionieren müssen.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.material.action,"Nehmen Sie den Karton STECKER C in die Hand und prüfen Sie, ob das Etikett zu Mat.-Nr und Bez. passt.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.verp_einh.action,"Vergleichen Sie die VPE auf dem Etikett mit Verp.-Einh.: So wissen Sie, wie viele Stück in einem Karton sind.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
@@ -193,13 +189,13 @@ concept.tour.soll.action,Merken Sie sich die Zahl im Feld Soll: Im nächsten Sch
 concept.tour.cartons.action,"Legen Sie Kartons aus dem Lagerbehälter in den Auftragsbehälter, bis Ist und Soll gleich sind.",proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#118, team review C7/C8/C11/C12)"
 concept.tour.ist.action,"Schauen Sie auf Ist: Liegt der Wert unter Soll, legen Sie Kartons nach, bis Ist und Soll gleich sind.",proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#118, team review C7/C8/C11/C12)"
 concept.tour.rest.action,"Lesen Sie Rest ab: Daran sehen Sie, wie viele Stück nach dem Auftrag im Lagerbehälter bleiben.",proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
-concept.tour.empf_kz_003.action,Vergleichen Sie die beiden Beispiele links neben dem Bildschirm. Sehen Sie danach rechts die EKZ-Übersicht an.,proposed,german-reviewer (agent),2026-11-17,"#137: texts of steps 8/9 swapped, sample order shows 000"
-concept.tour.empf_kz_000.action,Sehen Sie sich links neben dem Bildschirm das Beispiel „Empf Kz 000“ an.,proposed,german-reviewer (agent),2026-11-17,"#137: texts of steps 8/9 swapped, sample order shows 000"
+concept.tour.empf_kz_003.action,Sehen Sie sich rechts die EKZ-Übersicht mit allen Werten an.,proposed,,2026-11-18,#155 decision 041
 concept.tour.not_used.action,Sehen Sie sich die markierten Bereiche an: Die brauchen Sie in der Übung nicht.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.tour.material_flow.action,Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK after its corrections (#104, decision 036)"
 concept.hint.storage_wrong_material,In diesem Lagerbehälter liegt Material mit einer anderen Materialnummer. Nehmen Sie es heraus.,proposed,,2026-11-05,#100 new
 concept.tour.to_questions,Zu den Fragen,proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93)
-complex.card.step2_body_answered,"<b>{cartons} Kartons + {pieces} Stück</b>\nLegen Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton in den Auftragsbehälter.",proposed,german-reviewer (agent),2026-11-05,Agent: OK (#93); add a singular key if the order ever needs 1 carton
+complex.card.step2_body_answered,"<b>{cartons} Kartons + {pieces} Stück, ungeordnet erlaubt</b>
+Legen Sie zuerst die vollen Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,,2026-11-18,#155 decision 041
 concept.tour.material_flow.action_done,"Wählen Sie jetzt im Menü die markierte Lektion. Drücken Sie „Von vorn“, um die Erklärung zu wiederholen.",proposed,german-reviewer (agent),2026-11-16,Agent: corrected in batch review #116-#120
 concept.quiz.label_by_matnr.q,Im LVS steht die Mat.-Nr 738190. Welches Etikett passt?,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
 concept.quiz.label_by_matnr.738910,Mat.-Nr: 738910,proposed,german-reviewer (agent),2026-11-05,Agent: OK after #92 review
@@ -212,7 +208,7 @@ complex.storage.opened_carton,"Nehmen Sie nur die losen Teile heraus, der Karton
 common.position.label,Position {position},proposed,claude,2026-11-05,"#97: WMS word Position, identical to EN; glossary term"
 concept.tour.material_flow.body_after,In der Praxis bewegen Sie die Behälter von Hand.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
 concept.tour.material_flow.action_after,Prüfen Sie Ihr Wissen: Drücken Sie „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
-mixed.card.step2_body,"Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie sie so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,german-reviewer (agent),2026-11-06,"Final-wave pass: same rule sentence as basic.step2.text; „nach dem Empf Kz legen“ could read as „after“"
+mixed.card.step2_body,"Legen Sie die nötigen Verpackungen so ein, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,,2026-11-18,#155 decision 041
 complex.end.know_title,Sie kennen jetzt:,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
 complex.end.know.1,die Felder im LVS,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
 complex.end.know.2,Lager- und Auftragsbehälter,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"

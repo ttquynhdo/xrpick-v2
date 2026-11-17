@@ -176,6 +176,21 @@ drop_rule <- function(layout_version) {
   case_when(is.na(lay) ~ NA_character_, lay >= drop_rule_from_layout ~ "fall", TRUE ~ "hang")
 }
 
+# Shelf card text (#155, decision 041, layout "039"): every step card of
+# Basic, Mixed and Complex says one sentence (Basic card 1 lost the second
+# names of the LVS fields and the Rest sentence, card 2 "work out how many",
+# Complex position-1 card 1 the "right/left of the screen" pointers) and the
+# goal cards lost their "So ..." sentence. No event or field changes. Reading
+# the cards is part of read_s and time_to_first_grab_s (and of the time to
+# the first press), so a set that mixes "long" (up to "038") and "short"
+# ("039" on) cards splits every picking position (chart_item) and picking
+# scene (ttc_scene); process_by_position.csv carries card_text.
+card_text_from_layout <- 39L
+card_text <- function(layout_version) {
+  lay <- suppressWarnings(as.integer(layout_version))
+  case_when(is.na(lay) ~ NA_character_, lay >= card_text_from_layout ~ "short", TRUE ~ "long")
+}
+
 # A position item without a skill in item_skills.csv (all of them until the
 # study lead decides D28) is shown as "picking": the whole position right at
 # the first press, any error code.
@@ -1725,20 +1740,27 @@ complex_p1_levels <- c("quiz_visible", "result_on_card", "ekz_question")
 # time_by_phase) of "036" and "037" are not pooled: quiz_layout "near_panel"
 # (question, answers and board together below the screen, up to "036") or
 # "read_far" ("037" on).
+# From "039" (#155, decision 041) question, "Frage n von 3" and A/B/C stand
+# together in one cluster near the hands ("book"; no "Drücken Sie A, B oder
+# C" line, card 1 no longer points right/left of the screen): a third
+# reading layout, never pooled with "read_far".
 complex_p1_quiz_layout <- function(layout_version) {
   lay <- suppressWarnings(as.integer(layout_version))
-  if_else(coalesce(lay >= 37L, FALSE), "read_far", "near_panel")
+  case_when(coalesce(lay >= 39L, FALSE) ~ "book",
+            coalesce(lay >= 37L, FALSE) ~ "read_far",
+            TRUE ~ "near_panel")
 }
 # Chart group = scaffold level, plus the reading layout from "037" on, plus
 # the drop rule from "038" (#157: packages let go in the air fall, so the
 # picking part of position 1 is easier; "037" and "038" are never pooled).
 complex_p1_group <- function(layout_version) {
   sc <- complex_p1_scaffold(layout_version)
-  sc <- if_else(complex_p1_quiz_layout(layout_version) == "read_far", paste0(sc, "+read_far"), sc)
+  ql <- complex_p1_quiz_layout(layout_version)
+  sc <- if_else(ql != "near_panel", paste0(sc, "+", ql), sc)
   if_else(drop_rule(layout_version) %in% "fall", paste0(sc, "+fall"), sc)
 }
 complex_p1_groups <- c(complex_p1_levels, paste0(complex_p1_levels, "+read_far"),
-                       paste0(complex_p1_levels, "+read_far+fall"))
+                       paste0(complex_p1_levels, "+read_far+fall"), paste0(complex_p1_levels, "+book+fall"))
 p1_levels <- complex_p1_group(session_layout$layout_version)
 mixed_p1_scaffold <- n_distinct(p1_levels) > 1
 # Chart label per group = the layouts of the set with that group, e.g. "019/025".
@@ -1829,6 +1851,29 @@ if (mixed_drop_rule_set) {
        "are split by drop rule, never pooled; process_by_position.csv and complex_quiz.csv carry drop_rule. ",
        "Per-scene error charts and wide.csv still pool both: filter by layout_version")
 }
+# Shelf card text (#155, layout "039"): long cards up to "038", short from "039".
+card_texts_in_set <- session_layout %>% mutate(card_text = card_text(layout_version)) %>%
+  left_join(sessions %>% select(session_id, participant_id), by = "session_id")
+mixed_card_text_set <- n_distinct(na.omit(card_texts_in_set$card_text)) > 1
+if (mixed_card_text_set) {
+  warn("set mixes shelf card texts (",
+       paste(map_chr(sort(unique(na.omit(card_texts_in_set$card_text))), function(l) paste0(
+         l, ": ", paste(sort(unique(card_texts_in_set$participant_id[
+           card_texts_in_set$card_text %in% l])), collapse = ", "))), collapse = "; "),
+       "; #155, layout \"039\": one-sentence step cards, no \"So ...\" on the goal card): every picking position in ",
+       "first_attempt_by_item.png and time_by_phase.png and the picking scenes in time_to_correct_by_scene.png ",
+       "are split by card text, never pooled; process_by_position.csv carries card_text. ",
+       "time_to_first_grab_s in visits and wide.csv still pools both: filter by layout_version")
+}
+# Tag added to a picking item / scene label for the splits that mix in the set
+# (drop rule #157, card text #155), e.g. "drop fall, cards short"; NA when none.
+picking_split_tag <- function(layout_version, drop = mixed_drop_rule_set) {
+  parts <- cbind(if (drop) paste0("drop ", coalesce(drop_rule(layout_version), "unknown")) else NULL,
+                 if (mixed_card_text_set) paste0("cards ", coalesce(card_text(layout_version), "unknown")) else NULL)
+  if (length(layout_version) == 0) return(character(0))
+  if (is.null(parts)) return(rep(NA_character_, length(layout_version)))
+  apply(parts, 1, paste, collapse = ", ")
+}
 
 # ekz_places of one position_1 of a session (NA for other items / no press there).
 session_ekz_places <- function(scene, item, session_id) {
@@ -1867,7 +1912,7 @@ chart_item <- function(scene, item, session_id) {
   ep <- session_ekz_places(scene, item, session_id)
   ep_split <- unname(coalesce(ekz_places_split[as.character(scene)], FALSE)) & !is.na(ep)
   ep_text <- if_else(ep_split, unname(ekz_places_text[coalesce(ep, "hidden")]), NA_character_)
-  case_when(mixed_p1_scaffold & !is.na(lev) ~ paste0(item, " [", p1_level_label[lev], "]"),
+  lab <- case_when(mixed_p1_scaffold & !is.na(lev) ~ paste0(item, " [", p1_level_label[lev], "]"),
             (mixed_m1_ekz | ep_split) & !is.na(m1) ~
               paste0(item, " [Empf Kz ", m1, if_else(ep_split, paste0(", ", ep_text), ""), "]"),
             ep_split ~ paste0(item, " [", ep_text, "]"),
@@ -1876,6 +1921,16 @@ chart_item <- function(scene, item, session_id) {
               paste0(item, " [drop ", coalesce(drop_rule(sessions$layout_version[match(session_id, sessions$session_id)]),
                                               "unknown"), "]"),
             TRUE ~ item)
+  # Card text (#155): every picking position of a set that mixes "038"/"039",
+  # added inside the bracket ("position_2 [drop fall, cards short]"). Complex
+  # position_1 is split by its group already (quiz_layout "book" from "039").
+  ct_split <- mixed_card_text_set & as.character(scene) %in% red_button_scenes &
+    str_detect(coalesce(item, ""), "^position_") & !(mixed_p1_scaffold & !is.na(lev))
+  ct_tag <- paste0("cards ", coalesce(card_text(sessions$layout_version[match(session_id, sessions$session_id)]),
+                                      "unknown"))
+  case_when(!ct_split ~ lab,
+            str_detect(lab, "\\]$") ~ str_replace(lab, "\\]$", paste0(", ", ct_tag, "]")),
+            TRUE ~ paste0(lab, " [", ct_tag, "]"))
 }
 
 # Complex remainder quiz time (question 3, #123): one row per ComplexScene
@@ -2093,6 +2148,9 @@ data_quality <- sessions %>%
     # TRUE on every row when the set mixes the Menu cue after a done order
     # (#109, layout "034"): menu_after_done.csv is split by menu_cue.
     mixed_menu_cue = mixed_menu_cue_set,
+    # TRUE on every row when the set mixes long ("038"-or-older) and short
+    # ("039") shelf card texts (#155): picking positions and scenes are split.
+    mixed_card_text = mixed_card_text_set,
     n_crashes = sum(end_status == "crash"),
     # end_status of the participant = how their last session ended.
     end_status = last(end_status),
@@ -2145,7 +2203,7 @@ data_quality <- sessions %>%
          error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
          mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, mixed_layout, mixed_station_wait,
-         mixed_ekz_places, mixed_menu_cue, gap_h, n_crashes, resume_offered, resume_declined,
+         mixed_ekz_places, mixed_menu_cue, mixed_card_text, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, interaction_logged,
@@ -2540,11 +2598,15 @@ title_ttc <- "How long does it take to reach a correct order in each scene?"
 # per rule ("[drop hang]" / "[drop fall]").
 ttc_scene <- function(scene, session_id) {
   sc <- as.character(chart_scene(scene, session_id))
-  if (!mixed_drop_rule_set) return(factor(sc, levels = chart_scene_levels))
-  rule <- coalesce(drop_rule(sessions$layout_version[match(session_id, sessions$session_id)]), "unknown")
-  sc <- if_else(sc %in% red_button_scenes, paste0(sc, " [drop ", rule, "]"), sc)
+  if (!mixed_drop_rule_set && !mixed_card_text_set) return(factor(sc, levels = chart_scene_levels))
+  tag <- picking_split_tag(sessions$layout_version[match(session_id, sessions$session_id)])
+  sc <- if_else(sc %in% red_button_scenes, paste0(sc, " [", tag, "]"), sc)
+  # Every possible tag in a fixed order (hang before fall, long before short).
+  all_tags <- picking_split_tag(c("037", "038", NA, "039"))
+  all_tags <- unique(all_tags[order(match(str_extract(all_tags, "drop \\w+"), paste("drop", c("hang", "fall", "unknown"))),
+                                    match(str_extract(all_tags, "cards \\w+"), paste("cards", c("long", "short", "unknown"))))])
   lv <- unlist(map(chart_scene_levels, function(l) {
-    if (l %in% red_button_scenes) paste0(l, " [drop ", c("hang", "fall", "unknown"), "]") else l
+    if (l %in% red_button_scenes) paste0(l, " [", all_tags, "]") else l
   }))
   factor(sc, levels = intersect(lv, unique(c(sc, chart_scene_levels[!chart_scene_levels %in% red_button_scenes]))))
 }
@@ -2670,10 +2732,12 @@ process <- proc_positions %>%
          ekz_places = ekz_places_level(scene, item, empf_kz, layout_version),
          chart_item = chart_item(scene, item, session_id),
          drop_rule = drop_rule(layout_version),
+         # Shelf card text (#155): long up to "038", short from "039"; never pool read_s across it.
+         card_text = card_text(layout_version),
          scene = factor(scene, levels = levels(visits$scene))) %>%
   arrange(participant_id, scene, scene_visit, position)
 write_csv(process %>% select(participant_id, session_id, scene, scene_visit, counting, repeat_visit,
-                             layout_version, drop_rule, position, scaffolded, scaffold_level, empf_kz, ekz_places, completed, presses,
+                             layout_version, drop_rule, card_text, position, scaffolded, scaffold_level, empf_kz, ekz_places, completed, presses,
                              read_s, pick_s, check_s, position_s),
           file.path(output_dir, "process_by_position.csv"), na = "")
 
@@ -2863,6 +2927,73 @@ if (nrow(tour_visits) > 0) {
     arrange(participant_id, visit_no, step_index)
 }
 write_csv(tour_steps, file.path(output_dir, "tour_steps.csv"), na = "")
+
+# Concept tour opening (#155, decision 041, layout "039"). Up to "038" the
+# tour bar opened when shelf card 1 was done (first grab of a carton) or
+# after 60 s (#89, decision 026, from the "029" batch); from "039" card 1 is
+# gone and the bar opens by itself 2 s (game time) after the scene starts, so
+# a grab no longer opens the tour. The first tour_step of a visit is logged
+# when the bar opens, so the opening moment is read from that line, never
+# from the 2 s constant (the first frames are long: 5.3 s wall time in the
+# Editor). One row per Concept visit (sessions with outcome events):
+#   tour_opens        "auto_2s" ("039" on) / "grab_or_60s" ("029"-"038") /
+#                     "before_029" (older or no layout: not described here)
+#   tour_open_s       active seconds scene enter -> first tour_step (NA = no tour)
+#   first_grab_s      active seconds scene enter -> first grab (NA = no grab or
+#                     grabs not logged); its meaning changes with tour_opens
+#   grab_before_tour  first grab before the tour opened (NA = not measurable)
+#   grab_before_leaving_material  a carton was grabbed before the trainee first
+#                     left step "material" (decision 041 "if wrong": many FALSE
+#                     in "039" = Weiter there needs the first grab). NA = step
+#                     never left in the visit, or grabs not logged.
+# Never pooled across tour_opens.
+tour_opens <- function(layout_version) {
+  lay <- suppressWarnings(as.integer(layout_version))
+  case_when(coalesce(lay >= 39L, FALSE) ~ "auto_2s",
+            coalesce(lay >= 29L, FALSE) ~ "grab_or_60s",
+            TRUE ~ "before_029")
+}
+to_first_tour <- tour_rows %>% arrange(session_id, scene_visit, line) %>%
+  group_by(session_id, scene_visit) %>%
+  summarise(tour_t = first(t),
+            # The step after the first showing of "material" = the trainee left it.
+            material_left_t = {
+              i <- which(step_id %in% "material")
+              if (length(i) == 0 || i[1] == n()) NA_real_ else t[i[1] + 1]
+            }, .groups = "drop")
+to_first_grab <- grabs %>% filter(scene == "ConceptScene") %>%
+  group_by(session_id, scene_visit) %>% summarise(grab_t = min(start_t), .groups = "drop")
+concept_tour_open <- visits %>% filter(scene == "ConceptScene", session_id %in% outcome_sessions) %>%
+  transmute(participant_id, session_id, scene_visit, visit_no, repeat_visit, layout_version, enter_t, grab_logged) %>%
+  left_join(to_first_tour, by = c("session_id", "scene_visit")) %>%
+  left_join(to_first_grab, by = c("session_id", "scene_visit")) %>%
+  mutate(tour_opens = tour_opens(layout_version),
+         tour_open_s = active_between_t(session_id, enter_t, tour_t),
+         first_grab_s = if_else(grab_logged, active_between_t(session_id, enter_t, grab_t), NA_real_),
+         grab_before_tour = case_when(!grab_logged | is.na(tour_t) ~ NA,
+                                      is.na(grab_t) ~ FALSE,
+                                      TRUE ~ grab_t < tour_t),
+         grab_before_leaving_material = case_when(!grab_logged | is.na(material_left_t) ~ NA,
+                                                  is.na(grab_t) ~ FALSE,
+                                                  TRUE ~ grab_t < material_left_t)) %>%
+  select(participant_id, session_id, scene_visit, visit_no, repeat_visit, layout_version, tour_opens,
+         tour_open_s, first_grab_s, grab_before_tour, grab_before_leaving_material) %>%
+  arrange(participant_id, visit_no)
+# A "039" bar should open within seconds; a long wait means a hitch or a build
+# without #155 that says "039".
+slow_open <- concept_tour_open %>% filter(tour_opens == "auto_2s", tour_open_s > 20)
+for (i in seq_len(nrow(slow_open))) {
+  warn(slow_open$participant_id[i], " ConceptScene visit ", slow_open$scene_visit[i], ": layout ",
+       slow_open$layout_version[i], " but the first tour_step came ", slow_open$tour_open_s[i],
+       " active s after scene enter (the bar opens by itself after 2 s from \"039\", #155)")
+}
+mixed_tour_opens <- n_distinct(concept_tour_open$tour_opens) > 1
+if (mixed_tour_opens) {
+  warn("set mixes the Concept tour opening (", paste(sort(unique(concept_tour_open$tour_opens)), collapse = " / "),
+       "; #155, layout \"039\": the bar opens by itself after 2 s, not on the first grab): ",
+       "concept_tour_open.csv and Concept time_to_first_grab_s are never pooled across tour_opens")
+}
+write_csv(concept_tour_open, file.path(output_dir, "concept_tour_open.csv"), na = "")
 
 # Step label on the x axis, e.g. "5 cartons" (step_index and step_id of the
 # row's own layout), in step order; each layout panel has its own x axis
@@ -3974,12 +4105,13 @@ validity_limits <- c(
   "- ConceptScene tour (tour_steps.csv): Back presses are derived from step_index (-1 = Zurück) and exist only for layout_version \"025\" on; \"019\" logs and headers without layout_version have NA, not 0. A Zurück < 2 s after Weiter is read as a likely mis-press, not proven. Step time ends at the next step or the first quiz answer: time spent looking elsewhere (label board, packages) is in it. Steps 8 and 9 swap from layout \"037\" (#137: empf_kz_000 before empf_kz_003): step_id is named per layout; compare a step across layouts by step_id, never by step_index.",
   "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).",
   "- Mixed position_1 (#94, decision 028): builds before #94 had Empf Kz 000 there (placement never rated), from #94 (line.empf_kz logged, layout \"029\") Empf Kz 003 (3 snap places, EKZ_PLACEMENT possible); an earlier \"029\" build without the field counts as 000. In a set with both, position_1 is split ([Empf Kz 000] / [Empf Kz 003]) in first_attempt_by_item.png and time_by_phase.png; the per-scene Mixed numbers (error_rate_MixedPickingScene, time_to_correct, error codes) still pool both and an Empf Kz 003 visit can have more presses (EKZ retries). The ekz_placement rate counts only presses with the right quantity at an Empf Kz 003 position (EKZ opportunities): its n is small and a wrong-quantity press is no EKZ attempt.",
-  "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card); from \"036\" (#123) the quiz has a third question (ekz, how the goods go into the order container) before storage box 1 (ekz_question); from \"037\" (#130, decision 040) the question and the Worked Example sit at the depth of the screen and only the A/B/C row near the hands (same ekz_question, quiz_layout read_far, split from \"036\" like a level). In a set with more than one level position_1 is split in first_attempt_by_item.png and time_by_phase.png, and complex_quiz.csv gives quiz_s (scene enter -> storage box 1) and first_confirm_p1_s per visit with scaffold_level; the per-scene Complex numbers (time_to_correct_by_scene.png, time_to_first_confirm_s, error_codes_by_scene.png) still pool the levels, and from \"036\" they contain a longer quiz. The ekz question is the only Complex test of ekz_placement (D3) and sits in items.csv / objectives_summary.csv, not in the skill-rate charts (Complex presses never test placement).",
+  "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card); from \"036\" (#123) the quiz has a third question (ekz, how the goods go into the order container) before storage box 1 (ekz_question); from \"037\" (#130, decision 040) the question and the Worked Example sit at the depth of the screen and only the A/B/C row near the hands (same ekz_question, quiz_layout read_far, split from \"036\" like a level; from \"039\" (#155) question and A/B/C together near the hands, quiz_layout book, its own level). In a set with more than one level position_1 is split in first_attempt_by_item.png and time_by_phase.png, and complex_quiz.csv gives quiz_s (scene enter -> storage box 1) and first_confirm_p1_s per visit with scaffold_level; the per-scene Complex numbers (time_to_correct_by_scene.png, time_to_first_confirm_s, error_codes_by_scene.png) still pool the levels, and from \"036\" they contain a longer quiz. The ekz question is the only Complex test of ekz_placement (D3) and sits in items.csv / objectives_summary.csv, not in the skill-rate charts (Complex presses never test placement).",
   "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts 4 s (layout up to \"034\") or 8 s (\"035\" on, #118) after the step; older layouts have NA, not 0.",
   "- Station start delay (decision 033, station_waits.csv): from layout \"033\" the boxes wait 4 s after a correct confirm before they ride (Complex box 1 after the remainder quiz: 0.6 s), before \"033\" 0.6 s. wait_s, wait_after_done_s and the per-scene active_s include this wait, so they are never pooled across station_wait_group; time_to_correct_by_scene.png uses time_to_correct_s minus wait_s for the picking scenes (wide.csv keeps the logged time_to_correct_s). wait_after_done_s starts at the first ride, not at task_completed, so it leaves out the start delay after the last confirm.",
   "- EKZ place help (#108, decision 037, layout \"034\", skill_scaffolds.csv): Basic position 1 outlines its 6 snap places from the start, Mixed position 1 its 3 places after the first EKZ_PLACEMENT of the visit; from \"034\" each place takes one carton, a carton released in the box lies flat, and a placement error marks the loose cartons. A press x skill pair with the outlines visible is left out of the ekz_placement rate and of P2 (numerator and denominator), so from \"034\" Basic gives no ekz_placement measure and Mixed only up to its first EKZ_PLACEMENT (P2 = the first EKZ opportunity of Mixed position 1, always made without outlines). Basic calculate_quantity stays measured although the 6 outlines equal the 6 cartons the order needs: read Basic TOO_FEW/TOO_MANY of \"034\" as a lower bound of calculation errors. position_1 of Basic and Mixed is never pooled across ekz_places levels (hidden / always / after_error; items.csv, process_by_position.csv; split charts when a set mixes them), and P802's (\"033\") placement data are not pooled with \"034\".",
   "- Drop rule and EKZ places from the start (#157, layout \"038\"): a package let go in the air falls straight down (into the container below it, onto the desk, or beyond the desk back to where it was grabbed) instead of hanging; a Basic/Mixed carton grabbed from a snap place leaves it cleanly and one let go above a free place snaps in; Mixed position 1 outlines its 3 places from the start (skill_scaffolds.csv row \"038\" always). So from \"038\" no press anywhere tests ekz_placement: P2 is rated up to \"037\" and observed from \"038\" (objectives.csv from_layout; persons whose Empf Kz 003 positions were all right with the places visible: doing it with help, not a test; the Concept/Complex EKZ quiz questions measure D3, not P2); EKZ_PLACEMENT codes of \"038\" are made with the outlines visible; Basic/Mixed position_1 carry ekz_places \"always+drop_snap\" and are never pooled with \"037\"; a container_enter may follow its grab_end by the fall (Concept link window 2 s from \"038\"). In a set that mixes drop rules every picking position (first_attempt_by_item.png, time_by_phase.png) and the picking scenes in time_to_correct_by_scene.png are split by drop_rule (hang / fall); the per-scene error charts and wide.csv still pool both.",
   "- Menu after a done order (#109, menu_after_done.csv): up to layout \"033\" the Basic/Mixed result card told the trainee to choose the next lesson in the Menu from the correct confirm on (menu_cue text); from \"034\" the next Menu item is highlighted once the order box departs (menu_cue highlight). time_to_menu_after_done_s includes the 4 s start delay and the storage-box exit in both groups, but the cue itself comes later in \"034\"; compare within one menu_cue only. #111 (layout \"034\": box signs on the inner back wall, one note on Complex's opened carton, Basic/Complex storage cartons rearranged with the same counts and names) changes no logged field; Basic/Complex grab order and time to first grab may shift slightly, so read picking-scene grab and phase times within one layout.",
+  "- One text rule (#155, decision 041, layout \"039\"): no event or field changes. Basic/Mixed/Complex step cards say one sentence and the goal cards lost their \"So ...\" sentence, so read_s, time_to_first_grab_s and the time to the first press are not comparable with \"038\"-or-older (card_text long / short; split in first_attempt_by_item.png, time_by_phase.png, time_to_correct_by_scene.png when a set mixes them; visits and wide.csv still pool: filter by layout_version). The removed \"work out how many\" prompts and the pointer to the Complex worked example may also make the first attempt slightly harder: that is why item charts are split too. No removed sentence was help for a rated skill (skill_scaffolds.csv unchanged). ConceptScene: card 1 is gone and the tour bar opens by itself 2 s (game time) after the scene starts, not on the first grab; concept_tour_open.csv reads the opening from the first logged tour_step (tour_opens auto_2s) and grab_before_leaving_material shows who left step material without holding a carton. Concept time_to_first_grab_s changes meaning (no longer the gate to the tour). Complex position_1: question and A/B/C in one cluster near the hands (quiz_layout book), its own chart group.",
   "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).",
   "- WelcomeScene in two steps (#121/#124, decision 038, layout \"036\"): the learning objectives come first and the practice box, red button and Menu appear only after „Zu den Aufgaben\" (objectives_read_s = active seconds to that press; NA for older layouts, never 0). Welcome active_s and the times before the first welcome_practice_done of \"036\" are not comparable with \"035\"-or-older logs. objectives_read_s is time on the panel, not proof it was read.")
 # The pilot set (decision 023) is a try-out of the course and of this

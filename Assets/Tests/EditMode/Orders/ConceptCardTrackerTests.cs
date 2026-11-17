@@ -115,5 +115,32 @@ namespace XRPick.Orders.Tests
             Assert.IsFalse(tracker.TourAdvanced());
             Assert.AreEqual(ConceptCard.None, tracker.Current);
         }
+
+        // #155, decision 041 (6): two step cards, the tour opens by itself.
+        [Test]
+        public void NoLabelCard_StartsAtWms_GrabChangesNothing()
+        {
+            var tracker = new ConceptCardTracker(1, hasLabelCard: false);
+
+            Assert.AreEqual(ConceptCard.Wms, tracker.Current);
+            Assert.IsFalse(tracker.PackageGrabbed("stecker_c"));
+            Assert.IsFalse(tracker.LabelDone);
+            Assert.AreEqual(ConceptCard.Wms, tracker.Current);
+            Assert.IsFalse(tracker.TourAdvanced());
+        }
+
+        [Test]
+        public void NoLabelCard_QuizOpened_WmsDone_MovesToQuiz_ThenAllOff()
+        {
+            var tracker = new ConceptCardTracker(1, hasLabelCard: false);
+
+            Assert.IsTrue(tracker.QuizOpened());
+            Assert.IsTrue(tracker.WmsDone);
+            Assert.AreEqual(ConceptCard.Quiz, tracker.Current);
+
+            Assert.IsTrue(tracker.QuizCompleted());
+            Assert.IsTrue(tracker.QuizDone);
+            Assert.AreEqual(ConceptCard.None, tracker.Current);
+        }
     }
 }

@@ -124,8 +124,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627350
-    m_Localized: "<b>Sie lernen, Kartons nach EKZ einzulegen.</b>\nSo kommt die Ware
-      unbesch\xE4digt an."
+    m_Localized: <b>Sie lernen, Kartons nach EKZ einzulegen.</b>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627351
@@ -133,9 +132,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627352
-    m_Localized: "Lesen Sie im LVS ab: Materialnummer (<nobr>Mat.-Nr</nobr>), Sollmenge
-      (Soll), VPE (<nobr>Verp.-Einh.</nobr>), EKZ (<nobr>Empf Kz</nobr>). Rest: So
-      viele St\xFCck bleiben nach dem Auftrag im Lagerbeh\xE4lter."
+    m_Localized: 'Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
+      und <nobr>Empf Kz</nobr>.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627353
@@ -143,8 +141,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627354
-    m_Localized: "Rechnen Sie aus, wie viele Kartons Sie brauchen. Legen Sie sie
-      so in den Auftragsbeh\xE4lter, wie es das <nobr>Empf Kz</nobr> verlangt."
+    m_Localized: "Legen Sie die n\xF6tigen Kartons so in den Auftragsbeh\xE4lter,
+      wie es das <nobr>Empf Kz</nobr> verlangt."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627355
@@ -152,8 +150,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627356
-    m_Localized: "Pr\xFCfen Sie im LVS, ob Ist und Soll gleich sind. Dr\xFCcken Sie
-      dann den roten Knopf (F6)."
+    m_Localized: "Pr\xFCfen Sie im LVS, ob Ist und Soll gleich sind, und dr\xFCcken
+      Sie den roten Knopf (F6)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627357
@@ -234,37 +232,25 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
-    m_Localized: '<b>Sie lernen, die Angaben im LVS abzulesen und mit dem Etikett
+    m_Localized: <b>Sie lernen, die Angaben im LVS abzulesen und mit dem Etikett
       zu vergleichen.</b>
-
-      So nehmen Sie bei jedem Auftrag das richtige Material
-      in der richtigen Menge.'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627374
-    m_Localized: 1. Etikett lesen
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627375
-    m_Localized: "Nehmen Sie einen Karton aus dem Lagerbeh\xE4lter und lesen Sie
-      das Etikett."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627376
-    m_Localized: 2. LVS kennenlernen
+    m_Localized: 1. LVS kennenlernen
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627377
-    m_Localized: "Lesen Sie die Erkl\xE4rung neben dem Feld. Dr\xFCcken Sie \u201EWeiter\u201C."
+    m_Localized: "Lesen Sie die Erkl\xE4rung neben jedem Feld und dr\xFCcken Sie
+      \u201EWeiter\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627378
-    m_Localized: 3. Fragen beantworten
+    m_Localized: 2. Fragen beantworten
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627379
-    m_Localized: "Dr\xFCcken Sie nach der Erkl\xE4rung zum LVS \u201EZu den Fragen\u201C.
-      Dr\xFCcken Sie dann A, B oder C."
+    m_Localized: "Dr\xFCcken Sie nach dem letzten Schritt \u201EZu den Fragen\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627381
@@ -415,15 +401,8 @@ MonoBehaviour:
     m_Localized: Ungeordnet einlegen ist erlaubt
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627423
-    m_Localized: "Lesen Sie im LVS ab: Materialnummer (Mat.-Nr), Sollmenge (Soll),
-      VPE (Verp.-Einh.), EKZ (Empf Kz). Rest: So viele St\xFCck bleiben nach dem
-      Auftrag im Lagerbeh\xE4lter."
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627424
-    m_Localized: "<b>Sie lernen, in der VR mit den H\xE4nden zu arbeiten.</b>\nSo
-      k\xF6nnen Sie sich sp\xE4ter ganz auf den Auftrag konzentrieren."
+    m_Localized: "<b>Sie lernen, in der VR mit den H\xE4nden zu arbeiten.</b>"
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627425
@@ -440,8 +419,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627428
-    m_Localized: "Dr\xFCcken Sie mit der Fingerspitze den roten Knopf. Sp\xE4ter
-      best\xE4tigen Sie damit den Auftrag."
+    m_Localized: "Dr\xFCcken Sie mit der Fingerspitze den roten Knopf."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627429
@@ -469,11 +447,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627436
-    m_Localized: '<b>Sie lernen, mehrere Auftragspositionen nacheinander zu kommissionieren.</b>
-
-      So
-      stimmen bei jeder Position Material und Menge, auch wenn Verpackung und EKZ
-      wechseln.'
+    m_Localized: <b>Sie lernen, mehrere Auftragspositionen nacheinander zu kommissionieren.</b>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627437
@@ -486,21 +460,18 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627439
-    m_Localized: "Rechnen Sie aus, wie viele Verpackungen Sie brauchen. Legen Sie
-      sie so in den Auftragsbeh\xE4lter, wie es das <nobr>Empf Kz</nobr> verlangt."
+    m_Localized: "Legen Sie die n\xF6tigen Verpackungen so ein, wie es das <nobr>Empf
+      Kz</nobr> verlangt."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627440
-    m_Localized: "Pr\xFCfen Sie, ob Ist und Soll gleich sind. Dr\xFCcken Sie dann
+    m_Localized: "Pr\xFCfen Sie, ob Ist und Soll gleich sind, und dr\xFCcken Sie
       den roten Knopf (F6)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627441
-    m_Localized: '<b>Sie lernen auszurechnen, wie viele volle Kartons und lose Teile
+    m_Localized: <b>Sie lernen auszurechnen, wie viele volle Kartons und lose Teile
       Sie brauchen.</b>
-
-      So stimmt die Menge auch dann, wenn sie nicht in volle
-      Kartons passt.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627442
@@ -509,13 +480,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627443
-    m_Localized: "Rechnen Sie aus, wie viele Sie brauchen. Legen Sie zuerst die vollen
-      Kartons, dann die losen Teile in den Auftragsbeh\xE4lter."
+    m_Localized: "Legen Sie zuerst die vollen Kartons, dann die losen Teile in den
+      Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627444
-    m_Localized: "Z\xE4hlen Sie Kartons und lose Teile nach und pr\xFCfen Sie, ob
-      Ist und Soll gleich sind. Dr\xFCcken Sie dann den roten Knopf (F6)."
+    m_Localized: "Z\xE4hlen Sie nach, ob Ist und Soll gleich sind, und dr\xFCcken
+      Sie den roten Knopf (F6)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627445
@@ -609,15 +580,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465
-    m_Localized: "Legen Sie zuerst die vollen Kartons, dann die losen Teile aus dem
-      angebrochenen Karton in den Auftragsbeh\xE4lter."
+    m_Localized: "Legen Sie zuerst die vollen Kartons, dann die losen Teile in den
+      Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627466
-    m_Localized: "Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
-      und <nobr>Empf Kz</nobr>. Beantworten Sie dann die Fragen rechts neben dem
-      Bildschirm \u2013 das \u201EBeispiel\u201C links neben dem Bildschirm hilft
-      beim Rechnen."
+    m_Localized: Lesen Sie Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>
+      im LVS ab und beantworten Sie die Fragen.
     m_Metadata:
       m_Items: []
   - m_Id: 15832974233600
@@ -694,7 +663,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 336383051698176
-    m_Localized: Beantworten Sie zuerst die Fragen rechts neben dem Bildschirm.
+    m_Localized: Beantworten Sie zuerst die Fragen.
     m_Metadata:
       m_Items: []
   - m_Id: 340851944198144
@@ -707,10 +676,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 340852011307009
     m_Localized: "Die Fragen kommen nach der Erkl\xE4rung zum LVS."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 340852011307010
-    m_Localized: "Dr\xFCcken Sie A, B oder C, um zu antworten."
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307011
@@ -789,13 +754,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 346260058804224
-    m_Localized: "Pr\xFCfen Sie, ob Ist und Soll gleich sind. Dr\xFCcken Sie dann
+    m_Localized: "Pr\xFCfen Sie, ob Ist und Soll gleich sind, und dr\xFCcken Sie
       den roten Knopf (F6)."
     m_Metadata:
       m_Items: []
   - m_Id: 346260226576384
-    m_Localized: "Z\xE4hlen Sie Kartons und lose Teile nach und pr\xFCfen Sie, ob
-      Ist und Soll gleich sind. Dr\xFCcken Sie dann den roten Knopf (F6)."
+    m_Localized: "Z\xE4hlen Sie nach, ob Ist und Soll gleich sind, und dr\xFCcken
+      Sie den roten Knopf (F6)."
     m_Metadata:
       m_Items: []
   - m_Id: 350226641457152
@@ -816,10 +781,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 663146990538753
     m_Localized: "Auftragsbeh\xE4lter"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 668799050059776
-    m_Localized: "Dr\xFCcken Sie A, B oder C, um zu antworten."
     m_Metadata:
       m_Items: []
   - m_Id: 727156674924544
@@ -858,13 +819,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810630
-    m_Localized: "Vergleichen Sie die beiden Beispiele links neben dem Bildschirm.
-      Sehen Sie danach rechts die EKZ-\xDCbersicht an."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 727156758810631
-    m_Localized: "Sehen Sie sich links neben dem Bildschirm das Beispiel \u201EEmpf
-      Kz 000\u201C an."
+    m_Localized: "Sehen Sie sich rechts die EKZ-\xDCbersicht mit allen Werten an."
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632
@@ -887,8 +842,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 770818612006912
     m_Localized: "<b>{cartons} Kartons + {pieces} St\xFCck, ungeordnet erlaubt</b>\nLegen
-      Sie zuerst die vollen Kartons, dann die losen Teile aus dem angebrochenen Karton
-      in den Auftragsbeh\xE4lter."
+      Sie zuerst die vollen Kartons, dann die losen Teile in den Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 773084278558720

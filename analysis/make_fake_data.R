@@ -21,9 +21,12 @@
 # („Zu den Aufgaben", reading time of the learning objectives) before the two
 # welcome_practice_done; older layouts never write it. P819 runs layout
 # "037" (#129/#130, decision 040): same events as "036", other panel layout
-# in ConceptScene and Complex position 1. P820 runs the current layout "038"
+# in ConceptScene and Complex position 1. P820 runs layout "038"
 # (#157): same events; Mixed position 1 outlines its EKZ places from the
 # start, packages let go in the air fall (container_enter after grab_end).
+# P821 runs layout "039" (#155, decision 041): same events; the Concept tour
+# opens by itself a few seconds after scene enter (first tour_step before any
+# grab), short shelf cards, Complex quiz in one cluster near the hands.
 # Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
@@ -38,7 +41,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P820, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P821, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -1208,7 +1211,10 @@ run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
   }
   run_hint("before")
   for (i in if (is.null(tour_script)) seq_along(tour_steps) else integer(0)) {
-    advance(s, runif(1, 5, 15))  # read the step, press "Weiter"
+    # From layout "039" (#155) the bar opens by itself 2 s (game time) after
+    # the scene starts; the long first frames make it 2.5-6 s of log time.
+    # Up to "038": read the step, press "Weiter".
+    advance(s, if (i == 1 && layout_at_least(s$layout, 39)) runif(1, 2.5, 6) else runif(1, 5, 15))
     show_step(i)
     # Back presses draw from the side stream, so the rest of the fake data
     # (and the fixed values in selftest.R) stay the same. Mostly one step back;
@@ -1972,6 +1978,24 @@ run_full_course(p820, "fff6666", "2026-11-18T09:00:00Z", language = "EN", layout
                                  "2" = list(fixed_press(3, list()))))))
 assign(".Random.seed", rng_before_p820, envir = globalenv())
 
+# P821 (#155, decision 041): layout "039", the build of the study freeze. No
+# event or field changes. ConceptScene: no shelf card 1, the tour bar opens
+# by itself 2 s (game time) after the scene starts, so the first tour_step
+# comes a few seconds after scene_enter and before the first carton grab
+# (at step material, p820_hints). Basic/Mixed/Complex: one-sentence step
+# cards, no "So ..." on the goal cards; Complex position 1: question and
+# A/B/C in one cluster near the hands (quiz_layout "book"). R must split
+# ConceptScene from "038" (decision 024), give Complex position_1 the group
+# ekz_question+book+fall, split every picking position and scene by
+# card_text (long "038" / short "039") and read the tour opening from the
+# logged tour_step (concept_tour_open.csv). Own random stream, restored.
+rng_before_p821 <- .Random.seed
+set.seed(821)
+p821 <- new_person("P821")
+run_full_course(p821, "ggg7777", "2026-11-19T09:00:00Z", language = "EN", layout = "039",
+                special = list(ConceptScene = list(hints = p820_hints)))
+assign(".Random.seed", rng_before_p821, envir = globalenv())
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -2024,7 +2048,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P820  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P821  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -2094,7 +2118,8 @@ paper_rows <- list(
   paper_row("P817"),
   paper_row("P818"),
   paper_row("P819"),
-  paper_row("P820"))
+  paper_row("P820"),
+  paper_row("P821"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

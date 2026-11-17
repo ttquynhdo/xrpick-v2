@@ -19,8 +19,10 @@ public static class ResearchEventData
     // touch near (decision 040, #129/#130: Concept step text, action line and quiz question at the screen, buttons and
     // A/B/C lower near the hands; Complex worked example and question at the screen); "038" = #157: Mixed EKZ place
     // outlines from the start (#152), cartons leave snap places cleanly and snap when let go above a free place (#140),
-    // packages let go in the air drop straight down or return to where they were grabbed (#153). R tells logs apart by it.
-    public const string LayoutVersion = "038";
+    // packages let go in the air drop straight down or return to where they were grabbed (#153); "039" = one text rule
+    // (decision 041, #155): shorter shelf cards, Concept with 2 step cards and the tour opening by itself after 2 s,
+    // Concept and Complex questions on the A/B/C cluster near the hands, tour step 8 without action line. R tells logs apart by it.
+    public const string LayoutVersion = "039";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
     public static readonly string[] EventGroups = { "session", "outcome", "interaction" };

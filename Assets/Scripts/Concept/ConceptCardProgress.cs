@@ -8,20 +8,23 @@ using UnityEngine;
 /// gets the Welcome check mark (#39) once its task is done (card 1: a package of every material grabbed, card 2: the
 /// tour reached its last step, card 3: all questions right), and the current card gets the blue frame of the picking
 /// scenes (#40) while the other step cards are dimmed. Decided by the pure ConceptCardTracker; no log events.
+/// #155, decision 041 (6): the label card is optional. Without it (labelCard and labelCheck empty) the shelf has two
+/// step cards, the first grab no longer opens the tour (it opens by itself, WmsFieldTour.autoOpenSeconds).
 /// </summary>
 public class ConceptCardProgress : MonoBehaviour
 {
     [Header("Cards (InstructionShelf/Panel/Cards)")]
-    [Tooltip("Card „1. Etikett lesen“.")]
+    [Tooltip("Card „1. Etikett lesen“; empty since #155 (decision 041): two step cards, the tour opens by itself.")]
     [SerializeField] private RectTransform labelCard;
 
-    [Tooltip("Card „2. LVS kennenlernen“.")]
+    [Tooltip("Card „LVS kennenlernen“ (step 1 since #155).")]
     [SerializeField] private RectTransform wmsCard;
 
-    [Tooltip("Card „3. Fragen beantworten“.")]
+    [Tooltip("Card „Fragen beantworten“ (step 2 since #155).")]
     [SerializeField] private RectTransform quizCard;
 
     [Header("Check marks (inactive in the scene)")]
+    [Tooltip("Empty when labelCard is empty.")]
     [SerializeField] private GameObject labelCheck;
     [SerializeField] private GameObject wmsCheck;
     [SerializeField] private GameObject quizCheck;
@@ -61,7 +64,7 @@ public class ConceptCardProgress : MonoBehaviour
             }
         }
 
-        tracker = new ConceptCardTracker(materials.Count);
+        tracker = new ConceptCardTracker(materials.Count, HasLabelCard);
     }
 
     private void OnEnable()
@@ -103,10 +106,9 @@ public class ConceptCardProgress : MonoBehaviour
 
     private void Start()
     {
-        bool missing = RequiredReference.IsMissing(labelCard, nameof(labelCard), this)
+        bool missing = (HasLabelCard && RequiredReference.IsMissing(labelCheck, nameof(labelCheck), this))
                        | RequiredReference.IsMissing(wmsCard, nameof(wmsCard), this)
                        | RequiredReference.IsMissing(quizCard, nameof(quizCard), this)
-                       | RequiredReference.IsMissing(labelCheck, nameof(labelCheck), this)
                        | RequiredReference.IsMissing(wmsCheck, nameof(wmsCheck), this)
                        | RequiredReference.IsMissing(quizCheck, nameof(quizCheck), this)
                        | RequiredReference.IsMissing(tour, nameof(tour), this)
@@ -114,12 +116,15 @@ public class ConceptCardProgress : MonoBehaviour
         if (missing)
             return;
 
-        label = new InstructionCardLook(labelCard, frameOutset);
+        if (HasLabelCard)
+        {
+            label = new InstructionCardLook(labelCard, frameOutset);
+            labelCheck.transform.SetAsLastSibling();
+        }
         wms = new InstructionCardLook(wmsCard, frameOutset);
         quizLook = new InstructionCardLook(quizCard, frameOutset);
 
         // The frames are added as the cards' last children; the check marks must still draw on top of them.
-        labelCheck.transform.SetAsLastSibling();
         wmsCheck.transform.SetAsLastSibling();
         quizCheck.transform.SetAsLastSibling();
 
@@ -170,21 +175,26 @@ public class ConceptCardProgress : MonoBehaviour
         }
     }
 
+    private bool HasLabelCard => labelCard != null;
+
     private void Apply()
     {
         // Not built yet (before Start or missing references).
-        if (label == null)
+        if (wms == null)
             return;
 
         ConceptCard current = tracker.Current;
         bool allDone = current == ConceptCard.None;
 
-        Show(label, current == ConceptCard.Label, allDone);
+        if (label != null)
+        {
+            Show(label, current == ConceptCard.Label, allDone);
+        }
         Show(wms, current == ConceptCard.Wms, allDone);
         Show(quizLook, current == ConceptCard.Quiz, allDone);
 
         // Marks only turn on (decision 024: "Von vorn" and "Zurück" keep them).
-        if (tracker.LabelDone)
+        if (tracker.LabelDone && labelCheck != null)
         {
             labelCheck.SetActive(true);
         }

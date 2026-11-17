@@ -55,6 +55,11 @@ public class WmsFieldTour : MonoBehaviour
         // #104, decision 036 (3): the step waits for something to happen (the lane demo) before its second text.
         [Tooltip("Shows .body/.action first and .body_after/.action_after after ShowFollowUp(); while the questions are offered, the right button stays hidden until then.")]
         public bool hasFollowUp;
+
+        // #155, decision 041 (4): a step whose caption and markers already say what to do has no action line; the hand
+        // icon + line (actionRow) is then hidden, never shown empty.
+        [Tooltip("No action line at this step (decision 041): the action row is hidden and no .action key is read.")]
+        public bool noAction;
     }
 
     [SerializeField] private Step[] steps;
@@ -81,8 +86,8 @@ public class WmsFieldTour : MonoBehaviour
 
     [SerializeField] private TMP_Text progressText;
 
-    [Tooltip("The tour opens by itself after this many seconds if card 1 is not done yet; 0 = never.")]
-    [SerializeField] private float autoOpenSeconds = 60f;
+    [Tooltip("The tour opens by itself after this many seconds (#155, decision 041: 2 s, fixed per layout_version; R reads it as a constant); 0 = never.")]
+    [SerializeField] private float autoOpenSeconds = 2f;
 
     [Header("Next control")]
     [SerializeField] private Toggle nextToggle;
@@ -252,7 +257,7 @@ public class WmsFieldTour : MonoBehaviour
 
         textsShown = visible;
         PanelFade.SetVisible(barRoot, visible);
-        PanelFade.SetVisible(actionRow.gameObject, visible);
+        PanelFade.SetVisible(actionRow.gameObject, visible && HasAction(steps[current]));
         if (!HasCaption(steps[current]))
         {
             // #156: the quiz's question caption takes this spot when the bar hides, so leave at once (no overlap).
@@ -365,6 +370,8 @@ public class WmsFieldTour : MonoBehaviour
 
     private static bool HasCaption(Step step) => step.captionTitle != null && step.captionBody != null;
 
+    private static bool HasAction(Step step) => !step.noAction;
+
     // #129: the action line sits under the step's own caption (the marker that holds captionTitle), or in stepCaption.
     private void PlaceActionRow()
     {
@@ -403,7 +410,7 @@ public class WmsFieldTour : MonoBehaviour
             actionRow.sizeDelta = new Vector2(0f, height);
         }
 
-        actionRow.gameObject.SetActive(textsShown);
+        actionRow.gameObject.SetActive(textsShown && HasAction(step));
         LayoutRebuilder.MarkLayoutForRebuild(host);
     }
 
@@ -427,6 +434,12 @@ public class WmsFieldTour : MonoBehaviour
             return;
 
         Step step = steps[current];
+        if (!HasAction(step))
+        {
+            actionText.text = string.Empty;
+            return;
+        }
+
         if (questionsDone && IsLastStep)
         {
             actionText.text = Loc.Get(StepKeyPrefix + step.id + ".action_done");

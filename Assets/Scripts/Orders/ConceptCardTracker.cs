@@ -17,18 +17,23 @@ public enum ConceptCard
 /// its last step (the questions open), card 3 when all questions are right. The current card moves forward only:
 /// card 1 at the start, card 2 when the tour bar opens (#89) or card 1 is done, card 3 when the questions open,
 /// none when they are all right. Done marks never go away. Pure C#, covered by ConceptCardTrackerTests.
+/// #155, decision 041 (6): without the label card the shelf has two step cards (Wms, Quiz); the tracker then starts
+/// at Wms and grabs change nothing.
 /// </summary>
 public sealed class ConceptCardTracker
 {
     private readonly int materialsNeeded;
+    private readonly bool hasLabelCard;
     private readonly HashSet<string> grabbedMaterials = new();
 
-    public ConceptCardTracker(int materialsNeeded)
+    public ConceptCardTracker(int materialsNeeded, bool hasLabelCard = true)
     {
         this.materialsNeeded = materialsNeeded;
+        this.hasLabelCard = hasLabelCard;
+        Current = hasLabelCard ? ConceptCard.Label : ConceptCard.Wms;
     }
 
-    public ConceptCard Current { get; private set; } = ConceptCard.Label;
+    public ConceptCard Current { get; private set; }
 
     public bool LabelDone { get; private set; }
 
@@ -39,7 +44,7 @@ public sealed class ConceptCardTracker
     // Each method returns true when Current or a done mark changed.
     public bool PackageGrabbed(string materialKey)
     {
-        if (LabelDone || string.IsNullOrEmpty(materialKey) || !grabbedMaterials.Add(materialKey))
+        if (!hasLabelCard || LabelDone || string.IsNullOrEmpty(materialKey) || !grabbedMaterials.Add(materialKey))
             return false;
 
         if (grabbedMaterials.Count < materialsNeeded)

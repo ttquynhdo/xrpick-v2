@@ -123,10 +123,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627350
-    m_Localized: '<b>You learn to place cartons according to the EKZ.</b>
-
-      That
-      way the goods arrive undamaged.'
+    m_Localized: <b>You learn to place cartons according to the EKZ.</b>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627351
@@ -134,9 +131,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627352
-    m_Localized: 'Read in the WMS: material number (<nobr>Mat.-Nr</nobr>), target
-      quantity (Soll), VPE (<nobr>Verp.-Einh.</nobr>), EKZ (<nobr>Empf Kz</nobr>).
-      Rest: this many pieces stay in the storage container after the order.'
+    m_Localized: 'Read in the WMS: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
+      and <nobr>Empf Kz</nobr>.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627353
@@ -144,8 +140,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627354
-    m_Localized: Work out how many cartons you need. Put them into the order container
-      the way the <nobr>Empf Kz</nobr> requires.
+    m_Localized: Put the cartons you need into the order container as the <nobr>Empf
+      Kz</nobr> requires.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627355
@@ -153,7 +149,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627356
-    m_Localized: Check in the WMS that Ist equals Soll. Then press the red button
+    m_Localized: Check in the WMS that Ist equals Soll, then press the red button
       (F6).
     m_Metadata:
       m_Items: []
@@ -237,36 +233,24 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
-    m_Localized: '<b>You learn to read the data in the WMS and compare it with the
+    m_Localized: <b>You learn to read the data in the WMS and compare it with the
       label.</b>
-
-      That way you take the right material in the right quantity
-      in every order.'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627374
-    m_Localized: 1. Read the label
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7615942627375
-    m_Localized: Take a carton out of the storage container and read its label.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627376
-    m_Localized: 2. Get to know the WMS
+    m_Localized: 1. Get to know the WMS
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627377
-    m_Localized: Read the explanation next to the field. Press "Next".
+    m_Localized: Read the explanation next to each field and press "Next".
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627378
-    m_Localized: 3. Answer the questions
+    m_Localized: 2. Answer the questions
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627379
-    m_Localized: After the WMS explanation, press "To the questions". Then press
-      A, B or C.
+    m_Localized: After the last step, press "To the questions".
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627381
@@ -415,17 +399,8 @@ MonoBehaviour:
     m_Localized: Putting them in unordered is allowed
     m_Metadata:
       m_Items: []
-  - m_Id: 7615942627423
-    m_Localized: 'Read in the LVS: material number (Mat.-Nr), target quantity (Soll),
-      VPE (Verp.-Einh.), EKZ (Empf Kz). Rest: this many pieces stay in the storage
-      container after the order.'
-    m_Metadata:
-      m_Items: []
   - m_Id: 7615942627424
-    m_Localized: '<b>You learn to work with your hands in VR.</b>
-
-      That way
-      you can focus fully on the order later.'
+    m_Localized: <b>You learn to work with your hands in VR.</b>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627425
@@ -441,8 +416,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627428
-    m_Localized: Press the red button with your fingertip. Later you confirm the
-      order with it.
+    m_Localized: Press the red button with your fingertip.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627429
@@ -470,11 +444,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627436
-    m_Localized: '<b>You learn to pick several order lines one after another.</b>
-
-      That
-      way material and quantity are right for every order line, even when packaging
-      and EKZ change.'
+    m_Localized: <b>You learn to pick several order lines one after another.</b>
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627437
@@ -487,20 +457,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627439
-    m_Localized: Work out how many packages you need. Put them into the order container
-      as the <nobr>Empf Kz</nobr> requires.
+    m_Localized: Put in the packages you need as the <nobr>Empf Kz</nobr> requires.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627440
-    m_Localized: Check that Ist equals Soll. Then press the red button (F6).
+    m_Localized: Check that Ist equals Soll, then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627441
-    m_Localized: '<b>You learn to work out how many full cartons and loose pieces
+    m_Localized: <b>You learn to work out how many full cartons and loose pieces
       you need.</b>
-
-      That way the quantity is right even when it doesn''t fit
-      into full cartons.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627442
@@ -509,13 +475,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627443
-    m_Localized: Work out how many you need. Put the full cartons into the order
-      container first, then the loose pieces.
+    m_Localized: Put the full cartons into the order container first, then the loose
+      pieces.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627444
-    m_Localized: Count the cartons and loose pieces and check that Ist equals Soll.
-      Then press the red button (F6).
+    m_Localized: Count to check that Ist equals Soll, then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627445
@@ -616,13 +581,12 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627465
     m_Localized: Put the full cartons into the order container first, then the loose
-      pieces from the opened carton.
+      pieces.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627466
-    m_Localized: "Read in the WMS: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr>
-      and <nobr>Empf Kz</nobr>. Then answer the questions to the right of the screen
-      \u2013 the \"Example\" to the left of the screen helps with the maths."
+    m_Localized: Read Soll, <nobr>Verp.-Einh.</nobr> and <nobr>Empf Kz</nobr> in
+      the WMS and answer the questions.
     m_Metadata:
       m_Items: []
   - m_Id: 15832974233600
@@ -699,7 +663,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 336383051698176
-    m_Localized: First answer the questions to the right of the screen.
+    m_Localized: First answer the questions.
     m_Metadata:
       m_Items: []
   - m_Id: 340851944198144
@@ -712,10 +676,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 340852011307009
     m_Localized: The questions come after the WMS explanation.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 340852011307010
-    m_Localized: Press A, B or C to answer.
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307011
@@ -794,12 +754,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 346260058804224
-    m_Localized: Check that Ist equals Soll. Then press the red button (F6).
+    m_Localized: Check that Ist equals Soll, then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 346260226576384
-    m_Localized: Count the cartons and loose pieces and check that Ist equals Soll.
-      Then press the red button (F6).
+    m_Localized: Count to check that Ist equals Soll, then press the red button (F6).
     m_Metadata:
       m_Items: []
   - m_Id: 350226641457152
@@ -820,10 +779,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 663146990538753
     m_Localized: Order container
-    m_Metadata:
-      m_Items: []
-  - m_Id: 668799050059776
-    m_Localized: Press A, B or C to answer.
     m_Metadata:
       m_Items: []
   - m_Id: 727156674924544
@@ -861,13 +816,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810630
-    m_Localized: Compare the two examples to the left of the screen. Then look at
-      the EKZ overview on the right.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 727156758810631
-    m_Localized: "Look at the example \u201EEmpf Kz 000\u201C to the left of the
-      screen."
+    m_Localized: On the right, look at the EKZ overview with all values.
     m_Metadata:
       m_Items: []
   - m_Id: 727156758810632
@@ -891,8 +840,7 @@ MonoBehaviour:
     m_Localized: '<b>{cartons} cartons + {pieces} pieces, unordered allowed</b>
 
       Put
-      the full cartons into the order container first, then the loose pieces from
-      the opened carton.'
+      the full cartons into the order container first, then the loose pieces.'
     m_Metadata:
       m_Items: []
   - m_Id: 773084278558720

@@ -21,9 +21,9 @@ using UnityEngine.UI;
 /// #123, docs/decisions/039: a third question („Frage 3 von 3“) asks how the goods go into the order container; its
 /// body never names the Empf Kz value, so the trainee has to read it in the LVS. The storage box comes only after
 /// all three answers are right.
-/// #130, docs/decisions/040 (read far, touch near): the question, „Frage n von 3“ and the worked example are captions at
-/// the screen's depth (WMS_Monitor/Head/Screen/Screen Captions); only the A/B/C row and its feedback line stay low near
-/// the hands. All of them fade out together (PanelFade).
+/// #130/#155 (decisions 040, 041): the worked example is a caption at the screen's depth (Screen Captions/Caption
+/// example); the question and „Frage n von 3“ stand on the cluster's block right above the A/B/C row near the hands
+/// (book layout), the feedback line under the buttons stays empty until an answer is touched. All fade out together.
 /// </summary>
 public class RemainderQuizController : MonoBehaviour
 {
@@ -42,7 +42,6 @@ public class RemainderQuizController : MonoBehaviour
     private const string NextQuestionKey = "complex.quiz.next";
     private const string ThirdQuestionKey = "complex.quiz.next_third";
     private const string DoneKey = "complex.quiz.done";
-    private const string HowToKey = "complex.quiz.how_to";
     private const string ProgressKey = "concept.quiz.progress";
     private const string ResultCardKey = "complex.card.step2_body_answered";   // {cartons}, {pieces}
     private const string SelectedMark = "» ";
@@ -166,7 +165,8 @@ public class RemainderQuizController : MonoBehaviour
         }
 
         ShowQuestion(0);
-        feedbackText.text = Loc.Get(HowToKey);
+        // #155, decision 041 (5): the line under the buttons stays empty until an answer is touched.
+        feedbackText.text = string.Empty;
     }
 
     private bool HasMissingReferences()
@@ -311,7 +311,8 @@ public class RemainderQuizController : MonoBehaviour
         switching = false;
         SetTogglesInteractable(true);
         ShowQuestion(next);
-        feedbackText.text = Loc.Get(HowToKey);
+        // #155, decision 041 (5): the line under the buttons stays empty until an answer is touched.
+        feedbackText.text = string.Empty;
     }
 
     private void SetTogglesInteractable(bool interactable)

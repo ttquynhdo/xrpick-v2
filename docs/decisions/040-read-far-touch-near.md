@@ -1,7 +1,7 @@
 # Quyết định 040: Bảng vừa đọc vừa bấm: chữ cần đọc ra xa, cạnh LVS (≥ 1 m); gần tay (≤ 0,46 m) chỉ còn nút; Menu và bàn phím giữ chỗ, có ghi lý do
 
 - **Backlog:** #129, #130, #134 (từ #125, góp ý C19)
-- **Trạng thái:** accepted
+- **Trạng thái:** accepted (mục 2–3: câu hỏi ở mặt phẳng xa bị thay bởi 041, 2026-11-18: câu hỏi ngay trên A/B/C trong một cụm gần tay)
 - **Ngày:** 2026-11-17
 - **Ý kiến đã xét:** unity-reviewer, instructional-design-reviewer, data-analyst, xr-ux-reviewer (proposal mode, độc lập); decision-synthesizer. Không hỏi requirements-analyst và german-reviewer vì không đổi luật nghiệp vụ, không thêm chữ mới.
 - **Lựa chọn của người dùng (2026-11-17):**

@@ -15,16 +15,15 @@ using UnityEngine.UI;
 /// own „Zurück“ brings the bar back at the same step; bar and cluster are never shown together. After the last correct
 /// answer „Richtig!“ stays CorrectHoldSeconds, then the bar comes back with „Von vorn“ and the cluster stays hidden.
 /// Logs quiz_unlocked, quiz_answer and task_completed (#28, decision 021); switching bar ↔ cluster logs nothing.
-/// #129, decision 040: the question and „Frage n von 4“ are read at the screen's depth (<see cref="questionRoot"/>,
-/// in place of the tour's step text); the cluster near the hands keeps A/B/C, the feedback line under them and
-/// „Zurück“. Both fade in and out together (<see cref="PanelFade"/>).
+/// #155, decision 041 (book layout): the question and „Frage n von 4“ stand on the cluster's own block right above
+/// A/B/C (<see cref="questionRoot"/>), the feedback line under the buttons stays empty until an answer is touched.
+/// Cluster and block fade in and out together (<see cref="PanelFade"/>).
 /// </summary>
 public class PackageQuizController : MonoBehaviour, ILessonCompletion
 {
     // Loc table UI (#11, #54). The rich text (colour, bold) is part of the table entries.
     private const string ProgressKey = "concept.quiz.progress";
     private const string LockedKey = "concept.quiz.locked";
-    private const string HowToKey = "concept.quiz.how_to";
     private const string CorrectKey = "concept.quiz.correct";
     private const string NextQuestionKey = "concept.quiz.next_question";
     private const string WrongKey = "concept.quiz.wrong";
@@ -91,7 +90,7 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     [Tooltip("#78, decision 024: the whole cluster; #93: shown only after „Zu den Fragen“ on the tour bar.")]
     [SerializeField] private GameObject clusterRoot;
 
-    [Tooltip("#129, decision 040: caption at the screen with „Frage n von 4“ and the question; shown with the cluster.")]
+    [Tooltip("#155, decision 041: block on the cluster right above A/B/C with „Frage n von 4“ and the question.")]
     [SerializeField] private GameObject questionRoot;
 
     [Header("Back to the tour (#93)")]
@@ -291,7 +290,8 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
             progressText.gameObject.SetActive(true);
         }
         ShowQuestion(current);
-        feedbackText.text = Loc.Get(HowToKey);
+        // #155, decision 041 (5): the line under the buttons stays empty until an answer is touched.
+        feedbackText.text = string.Empty;
         tour.OffersQuestions = true;
         ResearchLogger.LogQuizUnlocked();
         Unlocked?.Invoke();
@@ -310,8 +310,8 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     private void ShowTour()
     {
         PanelFade.SetVisible(clusterRoot, false);
-        // #156: the tour's step caption comes back at this spot: leave at once so the two never overlap.
-        PanelFade.HideNow(questionRoot);
+        // #155: the question block (questionRoot) is a child of the cluster since decision 041 and fades out with it;
+        // fading it too would multiply the two alphas. #156 hid it at once only because it shared the step caption's spot.
         tour.SetBarVisible(true);
     }
 
@@ -423,7 +423,8 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
         switching = false;
         SetTogglesInteractable(true);
         ShowQuestion(index);
-        feedbackText.text = Loc.Get(HowToKey);
+        // #155, decision 041 (5): the line under the buttons stays empty until an answer is touched.
+        feedbackText.text = string.Empty;
     }
 
     private void SetTogglesInteractable(bool interactable)

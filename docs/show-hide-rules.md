@@ -7,7 +7,7 @@ Backlog #156 (root C). One table per scene: every object whose visibility change
 1. **Decide before you activate.** A script never switches an object on and then decides to hide it in a later `Update` (it can be drawn for one frame). A marker that may refuse to show implements `IStepMarkerGate`; `WmsFieldTour` asks `MayShow` before it activates it.
 2. **Set each object once per change.** A step change works out the final set and toggles only what differs. A marker shared by the old and the new step stays on (no `OnDisable`/`OnEnable`, so `MarkerBob` doesn't jump).
 3. **One owner per object.** If two scripts must touch the same object, the second one only acts when the owner left it in a known state (see `LaneFlowDemo` below).
-4. **Two panels at one spot swap at once.** When one panel takes another's place (`Caption step` ↔ `Caption question`), the leaving one hides at once (`PanelFade.HideNow`), the coming one fades in.
+4. **Two panels at one spot swap at once.** When one panel takes another's place (`Caption step` hides at once when the quiz cluster takes the bar's place; until #155 the question caption shared its spot), the leaving one hides at once (`PanelFade.HideNow`), the coming one fades in.
 5. **Group hides list every member.** A step that hides a group hides all objects that only make sense with it (the `Welcome` banner belongs to the objectives).
 6. **Test in the same frame.** MCP cases read `activeInHierarchy` in the same call as the press (testing.md C10).
 
@@ -53,13 +53,13 @@ All switched only by `WmsFieldTour.ShowMarkersOf`: every marker off in `Start`, 
 | Object | Shown by | Hidden by | When |
 |---|---|---|---|
 | `PlasticBox_Storage/Box Sign`, `PlasticBox_Order/Box Sign` | scene (active, #156) | never by script; ride with their box | always, like Basic/Mixed/Complex |
-| `Tour Nav Bar` | `WmsFieldTour.Open` / `SetBarVisible(true)`; `LaneFlowDemo.ShowViewBlockers` | `WmsFieldTour.Start`; `SetBarVisible(false)`; `LaneFlowDemo.HideViewBlockers` | card 1 done or 60 s; quiz open; lane ride |
+| `Tour Nav Bar` | `WmsFieldTour.Open` / `SetBarVisible(true)`; `LaneFlowDemo.ShowViewBlockers` | `WmsFieldTour.Start`; `SetBarVisible(false)`; `LaneFlowDemo.HideViewBlockers` | 2 s after the scene starts (#155, decision 041); quiz open; lane ride |
 | `NextButton` | `WmsFieldTour.ShowNextLabel` | same | hidden at step 11 before the follow-up |
 | `BackButton` (alpha 0.5) | `WmsFieldTour.ShowStep` | same | step 1 |
 | `Caption step` | `ShowTexts` / `SetBarVisible(true)` (fade) | `ShowTexts`; `SetBarVisible(false)` (at once, #156) | steps without own caption; quiz takes its place |
-| `Action Row` | `PlaceActionRow` / `SetBarVisible` | same | every step; quiz |
+| `Action Row` | `PlaceActionRow` / `SetBarVisible` | same | every step except steps with `noAction` (step 8, #155); quiz |
 | `AnswerOption` | `PackageQuizController.ShowQuestions`; `LaneFlowDemo.ShowViewBlockers` | `PackageQuizController.Start` / `ShowTour`; `LaneFlowDemo.HideViewBlockers` | „Zu den Fragen“ / „Zurück“ / after the 4th right answer; ride |
-| `Tour Markers/Caption question` | `ShowQuestions` (fade) | `ShowLocked`; `ShowTour` (at once, #156) | with the cluster |
+| `AnswerOption/Unity Canvas/Question` (question + „Frage n von 4“; was `Tour Markers/Caption question` until #155) | `ShowQuestions` (fade, inside the cluster) | `ShowLocked`; `ShowTour` (no own call since #155: it fades with its parent cluster) | with the cluster |
 | Quiz Scroll View, progress, Toggle C | `PackageQuizController.Unlock` / `ShowQuestion` | `ShowLocked` / `ShowQuestion` | step 11 reached; 2-answer questions |
 | Menu `Next Lesson Highlight` | `PackageQuizController` | never | 4th right answer |
 | Card `Done Check` ×3, `Step Frame` | `ConceptCardProgress` | frames move forward only | grab / quiz open / quiz done |
