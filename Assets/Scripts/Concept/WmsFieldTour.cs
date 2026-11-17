@@ -19,6 +19,10 @@ using UnityEngine.UI;
 /// #93, decision 026 (4): while <see cref="OffersQuestions"/> is set, the right button of the last step reads
 /// „Zu den Fragen“ and raises <see cref="QuestionsRequested"/> instead of starting over; the quiz then hides the bar
 /// through <see cref="SetBarVisible"/> and shows it again at the same step (no step change, no tour_step).
+/// #129, decision 040: everything to read is at the depth of the screen. The step text of a step without its own caption
+/// goes into <see cref="stepCaption"/> right of the screen; the hand icon + action line (<see cref="actionRow"/>) moves
+/// into the current step's caption (or <see cref="stepCaption"/>). The bar near the hands only holds the buttons and
+/// „Schritt n von 11“ and fades in and out (<see cref="PanelFade"/>).
 /// </summary>
 public class WmsFieldTour : MonoBehaviour
 {
@@ -42,7 +46,7 @@ public class WmsFieldTour : MonoBehaviour
         public GameObject[] markers;
 
         // #78, decision 024: a caption next to the field (one of the markers). Empty = the text goes on the bar.
-        [Tooltip("Caption title next to the field; leave empty to show the step text on the bar.")]
+        [Tooltip("Caption title next to the field; leave empty to show the step text in stepCaption right of the screen.")]
         public TMP_Text captionTitle;
 
         public TMP_Text captionBody;
@@ -54,15 +58,25 @@ public class WmsFieldTour : MonoBehaviour
 
     [SerializeField] private Step[] steps;
 
-    [Header("Bar (#89, decision 026)")]
+    [Header("Bar (#89, decision 026; #129: buttons only)")]
     [Tooltip("Interactables/Tour Nav Bar; hidden until the tour opens.")]
     [SerializeField] private GameObject barRoot;
 
-    [Tooltip("Step text of the steps without a caption (intro, cartons, not_used, material_flow).")]
-    [SerializeField] private TMP_Text barText;
+    [Header("Texts at the screen's depth (#129, decision 040)")]
+    [Tooltip("Caption right of the screen for the steps without their own caption (intro, not_used, material_flow).")]
+    [SerializeField] private GameObject stepCaption;
 
-    [Tooltip("The \"what to do\" line next to the hand icon.")]
+    [SerializeField] private TMP_Text stepCaptionTitle;
+    [SerializeField] private TMP_Text stepCaptionBody;
+
+    [Tooltip("Hand icon + action line; moved under the current step's caption.")]
+    [SerializeField] private RectTransform actionRow;
+
+    [Tooltip("The \"what to do\" line next to the hand icon (inside actionRow).")]
     [SerializeField] private TMP_Text actionText;
+
+    [Tooltip("Gap in caption units between a caption without a layout group (cartons) and the action row below it.")]
+    [SerializeField] private float actionRowGap = 8f;
 
     [SerializeField] private TMP_Text progressText;
 
@@ -88,6 +102,9 @@ public class WmsFieldTour : MonoBehaviour
     private bool offersQuestions;
     private bool questionsDone;
     private bool followUpShown;
+    // #129: false while the quiz has taken the bar's place; the texts at the screen hide with the bar.
+    private bool textsShown = true;
+    private float actionRowHeight;
 
     // Step id of the step just shown, raised on every step change incl. the first (#73: the quiz unlocks at a step).
     public event Action<string> StepShown;
@@ -145,7 +162,10 @@ public class WmsFieldTour : MonoBehaviour
     private void Start()
     {
         if (RequiredReference.IsMissing(barRoot, nameof(barRoot), this)
-            | RequiredReference.IsMissing(barText, nameof(barText), this)
+            | RequiredReference.IsMissing(stepCaption, nameof(stepCaption), this)
+            | RequiredReference.IsMissing(stepCaptionTitle, nameof(stepCaptionTitle), this)
+            | RequiredReference.IsMissing(stepCaptionBody, nameof(stepCaptionBody), this)
+            | RequiredReference.IsMissing(actionRow, nameof(actionRow), this)
             | RequiredReference.IsMissing(actionText, nameof(actionText), this)
             | RequiredReference.IsMissing(nextToggle, nameof(nextToggle), this)
             | RequiredReference.IsMissing(backToggle, nameof(backToggle), this))
@@ -167,12 +187,15 @@ public class WmsFieldTour : MonoBehaviour
             SetMarkers(step, false);
         }
 
+        actionRowHeight = actionRow.rect.height;
+        stepCaption.SetActive(false);
+        actionRow.gameObject.SetActive(false);
         ready = true;
 
         // Open() may already have run (card 1 done before this Start).
         if (IsOpen)
         {
-            barRoot.SetActive(true);
+            PanelFade.SetVisible(barRoot, true);
             ShowStep(0);
             return;
         }
@@ -194,7 +217,7 @@ public class WmsFieldTour : MonoBehaviour
         if (!ready)
             return;
 
-        barRoot.SetActive(true);
+        PanelFade.SetVisible(barRoot, true);
         ShowStep(0);
     }
 
@@ -222,11 +245,18 @@ public class WmsFieldTour : MonoBehaviour
     }
 
     // #93: the quiz takes the bar's place while it is shown. Does nothing before the bar is open.
+    // #129: the step texts at the screen go with the bar (the question takes their place); both fade.
     public void SetBarVisible(bool visible)
     {
-        if (IsOpen && ready)
+        if (!IsOpen || !ready)
+            return;
+
+        textsShown = visible;
+        PanelFade.SetVisible(barRoot, visible);
+        PanelFade.SetVisible(actionRow.gameObject, visible);
+        if (!HasCaption(steps[current]))
         {
-            barRoot.SetActive(visible);
+            PanelFade.SetVisible(stepCaption, visible);
         }
     }
 
@@ -292,6 +322,7 @@ public class WmsFieldTour : MonoBehaviour
         Step step = steps[index];
         ShowTexts();
         ShowAction();
+        PlaceActionRow();
 
         if (progressText != null)
         {
@@ -316,17 +347,62 @@ public class WmsFieldTour : MonoBehaviour
         Step step = steps[current];
         string title = Loc.Get(StepKeyPrefix + step.id + ".title");
         string body = Loc.Get(StepKeyPrefix + step.id + (followUpShown ? ".body_after" : ".body"));
-        bool hasCaption = step.captionTitle != null && step.captionBody != null;
-        if (hasCaption)
+        if (HasCaption(step))
         {
             step.captionTitle.text = title;
             step.captionBody.text = body;
-            barText.text = string.Empty;
+            stepCaption.SetActive(false);
         }
         else
         {
-            barText.text = $"<b>{title}:</b> {body}";
+            stepCaptionTitle.text = title;
+            stepCaptionBody.text = body;
+            stepCaption.SetActive(textsShown);
         }
+    }
+
+    private static bool HasCaption(Step step) => step.captionTitle != null && step.captionBody != null;
+
+    // #129: the action line sits under the step's own caption (the marker that holds captionTitle), or in stepCaption.
+    private void PlaceActionRow()
+    {
+        Step step = steps[current];
+        RectTransform host = null;
+        if (HasCaption(step) && step.markers != null)
+        {
+            foreach (GameObject marker in step.markers)
+            {
+                if (marker != null && step.captionTitle.transform.IsChildOf(marker.transform))
+                {
+                    host = marker.transform as RectTransform;
+                    break;
+                }
+            }
+        }
+
+        if (host == null)
+        {
+            host = (RectTransform)stepCaption.transform;
+        }
+
+        actionRow.SetParent(host, false);
+        actionRow.SetAsLastSibling();
+        if (host.GetComponent<LayoutGroup>() == null)
+        {
+            // A caption laid out by hand (cartons): the row hangs below it, as wide as the caption.
+            actionRow.anchorMin = new Vector2(0f, 0f);
+            actionRow.anchorMax = new Vector2(1f, 0f);
+            actionRow.pivot = new Vector2(0.5f, 1f);
+            actionRow.anchoredPosition3D = new Vector3(0f, -actionRowGap, 0f);
+            actionRow.sizeDelta = new Vector2(0f, actionRowHeight);
+            // Lay the row out at the caption's width, then make it as high as its text.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(actionRow);
+            float height = Mathf.Max(actionRowHeight, LayoutUtility.GetPreferredHeight(actionRow));
+            actionRow.sizeDelta = new Vector2(0f, height);
+        }
+
+        actionRow.gameObject.SetActive(textsShown);
+        LayoutRebuilder.MarkLayoutForRebuild(host);
     }
 
     private void ShowNextLabel()

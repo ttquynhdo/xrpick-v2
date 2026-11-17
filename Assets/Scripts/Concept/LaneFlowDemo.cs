@@ -311,10 +311,11 @@ public class LaneFlowDemo : MonoBehaviour
 
         foreach (GameObject blocker in hideWhileRiding)
         {
-            if (blocker != null && blocker.activeSelf)
+            if (blocker != null && PanelFade.IsShown(blocker))
             {
                 hidden.Add(blocker);
-                blocker.SetActive(false);
+                // #129, decision 040: fade, never pop out.
+                PanelFade.SetVisible(blocker, false);
             }
         }
     }
@@ -325,7 +326,7 @@ public class LaneFlowDemo : MonoBehaviour
         {
             if (blocker != null)
             {
-                blocker.SetActive(true);
+                PanelFade.SetVisible(blocker, true);
             }
         }
 

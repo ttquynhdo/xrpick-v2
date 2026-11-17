@@ -15,6 +15,9 @@ using UnityEngine.UI;
 /// own „Zurück“ brings the bar back at the same step; bar and cluster are never shown together. After the last correct
 /// answer „Richtig!“ stays CorrectHoldSeconds, then the bar comes back with „Von vorn“ and the cluster stays hidden.
 /// Logs quiz_unlocked, quiz_answer and task_completed (#28, decision 021); switching bar ↔ cluster logs nothing.
+/// #129, decision 040: the question and „Frage n von 4“ are read at the screen's depth (<see cref="questionRoot"/>,
+/// in place of the tour's step text); the cluster near the hands keeps A/B/C, the feedback line under them and
+/// „Zurück“. Both fade in and out together (<see cref="PanelFade"/>).
 /// </summary>
 public class PackageQuizController : MonoBehaviour, ILessonCompletion
 {
@@ -87,6 +90,9 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
 
     [Tooltip("#78, decision 024: the whole cluster; #93: shown only after „Zu den Fragen“ on the tour bar.")]
     [SerializeField] private GameObject clusterRoot;
+
+    [Tooltip("#129, decision 040: caption at the screen with „Frage n von 4“ and the question; shown with the cluster.")]
+    [SerializeField] private GameObject questionRoot;
 
     [Header("Back to the tour (#93)")]
     [Tooltip("Push button in the cluster that brings the tour bar back at its last step.")]
@@ -216,6 +222,7 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
             | RequiredReference.IsMissing(tour, nameof(tour), this)
             | RequiredReference.IsMissing(answerArea, nameof(answerArea), this)
             | RequiredReference.IsMissing(clusterRoot, nameof(clusterRoot), this)
+            | RequiredReference.IsMissing(questionRoot, nameof(questionRoot), this)
             | RequiredReference.IsMissing(backToggle, nameof(backToggle), this)
             | RequiredReference.IsMissing(nextLessonHighlight, nameof(nextLessonHighlight), this);
 
@@ -264,6 +271,7 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     private void ShowLocked()
     {
         clusterRoot.SetActive(false);
+        questionRoot.SetActive(false);
         answerArea.SetActive(false);
         if (progressText != null)
         {
@@ -295,12 +303,14 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
             return;
 
         tour.SetBarVisible(false);
-        clusterRoot.SetActive(true);
+        PanelFade.SetVisible(clusterRoot, true);
+        PanelFade.SetVisible(questionRoot, true);
     }
 
     private void ShowTour()
     {
-        clusterRoot.SetActive(false);
+        PanelFade.SetVisible(clusterRoot, false);
+        PanelFade.SetVisible(questionRoot, false);
         tour.SetBarVisible(true);
     }
 

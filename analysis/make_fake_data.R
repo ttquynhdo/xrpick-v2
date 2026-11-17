@@ -16,10 +16,12 @@
 # outlines, Menu highlight; fixed Basic/Mixed presses, no format change).
 # P817 ran a "033" build with the old snap-place grab logger (#114): a carton
 # let go into a Basic/Mixed snap place gets a grab_end and, 0.013 s later, a
-# new grab_start (like the real P802, build 727eee1). P818 runs the current
+# new grab_start (like the real P802, build 727eee1). P818 runs
 # layout "036" (#121, decision 038): WelcomeScene writes welcome_tasks_opened
 # („Zu den Aufgaben", reading time of the learning objectives) before the two
-# welcome_practice_done; older layouts never write it.
+# welcome_practice_done; older layouts never write it. P819 runs the current
+# layout "037" (#129/#130, decision 040): same events as "036", other panel
+# layout in ConceptScene and Complex position 1.
 # Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
@@ -34,7 +36,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P818, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P819, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -1899,6 +1901,19 @@ run_full_course(p818, "ddd4444", "2026-11-16T09:00:00Z", language = "EN", layout
                                                    quiz_first_before = "ekz")))
 assign(".Random.seed", rng_before_p818, envir = globalenv())
 
+# P819 (#129/#130, decision 040): layout "037", "read far, touch near". No
+# event or field changes: the logs read like "036" (objectives first, third
+# Complex question ekz, 8 s lane demo, 4 s station wait, Menu highlight).
+# R must split ConceptScene from "036" (decision 024) and keep Complex
+# position_1 times apart from P818 (quiz_layout read_far). P819 answers ekz
+# right at once. Own random stream, restored, like P818.
+rng_before_p819 <- .Random.seed
+set.seed(819)
+p819 <- new_person("P819")
+run_full_course(p819, "eee5555", "2026-11-17T09:00:00Z", language = "EN", layout = "037",
+                special = list(ConceptScene = list(hints = p814_hints)))
+assign(".Random.seed", rng_before_p819, envir = globalenv())
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -1951,7 +1966,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P818  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P819  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -2019,7 +2034,8 @@ paper_rows <- list(
   paper_row("P815"),
   paper_row("P816"),
   paper_row("P817"),
-  paper_row("P818"))
+  paper_row("P818"),
+  paper_row("P819"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

@@ -1679,17 +1679,34 @@ complex_p1_scaffold <- function(layout_version) {
             TRUE ~ "quiz_visible")
 }
 complex_p1_levels <- c("quiz_visible", "result_on_card", "ekz_question")
-p1_levels <- complex_p1_scaffold(session_layout$layout_version)
+# From "037" (#130, decision 040 "read far, touch near") the Worked Example
+# board and the quiz question sit at the depth of the screen and only the
+# A/B/C row stays near the hands. Same items and same scaffold_level, but
+# another reading layout, so position_1 times (complex_quiz.csv,
+# time_by_phase) of "036" and "037" are not pooled: quiz_layout "near_panel"
+# (question, answers and board together below the screen, up to "036") or
+# "read_far" ("037" on).
+complex_p1_quiz_layout <- function(layout_version) {
+  lay <- suppressWarnings(as.integer(layout_version))
+  if_else(coalesce(lay >= 37L, FALSE), "read_far", "near_panel")
+}
+# Chart group = scaffold level, plus the reading layout from "037" on.
+complex_p1_group <- function(layout_version) {
+  sc <- complex_p1_scaffold(layout_version)
+  if_else(complex_p1_quiz_layout(layout_version) == "read_far", paste0(sc, "+read_far"), sc)
+}
+complex_p1_groups <- c(complex_p1_levels, paste0(complex_p1_levels, "+read_far"))
+p1_levels <- complex_p1_group(session_layout$layout_version)
 mixed_p1_scaffold <- n_distinct(p1_levels) > 1
-# Chart label per level = the layouts of the set with that level, e.g. "019/025".
-p1_level_label <- map_chr(set_names(complex_p1_levels), function(l)
+# Chart label per group = the layouts of the set with that group, e.g. "019/025".
+p1_level_label <- map_chr(set_names(complex_p1_groups), function(l)
   paste(sort(unique(layout_label(session_layout$layout_version[p1_levels == l]))), collapse = "/"))
 if (mixed_p1_scaffold) {
-  present <- intersect(complex_p1_levels, p1_levels)
-  warn("set mixes Complex position_1 scaffold (layout ",
-       paste(p1_level_label[present], "=", present, collapse = ", "), "; #93, #123): ComplexScene position_1 in ",
+  present <- intersect(complex_p1_groups, p1_levels)
+  warn("set mixes Complex position_1 scaffold or quiz layout (layout ",
+       paste(p1_level_label[present], "=", present, collapse = ", "), "; #93, #123, #130): ComplexScene position_1 in ",
        "first_attempt_by_item.png and time_by_phase.png is split, never pooled; items.csv, ",
-       "process_by_position.csv and complex_quiz.csv carry scaffold_level")
+       "process_by_position.csv and complex_quiz.csv carry scaffold_level (complex_quiz.csv also quiz_layout)")
 }
 # Mixed position 1 (#94, decision 028): builds before #94 had Empf Kz 000
 # there (cartons put in any way, never rated), from #94 Empf Kz 003 (3 snap
@@ -1769,7 +1786,10 @@ p1_scaffold_level <- function(scene, item, session_id) {
 # Complex in a set that mixes the two levels, "position_1 [Empf Kz 000]" /
 # "[Empf Kz 003]" for Mixed in a set that mixes them (#94), else the item.
 chart_item <- function(scene, item, session_id) {
-  lev <- p1_scaffold_level(scene, item, session_id)
+  # Chart group (scaffold level + quiz layout, #130), not only scaffold_level.
+  lev <- if_else(as.character(scene) == "ComplexScene" & item == "position_1",
+                 complex_p1_group(sessions$layout_version[match(session_id, sessions$session_id)]),
+                 NA_character_)
   m1 <- if_else(as.character(scene) == "MixedPickingScene" & item == "position_1",
                 mixed_p1_session$empf_kz[match(session_id, mixed_p1_session$session_id)],
                 NA_character_)
@@ -1821,6 +1841,8 @@ complex_quiz <- enters %>% filter(scene == "ComplexScene") %>%
   ungroup() %>%
   mutate(layout_version = sessions$layout_version[match(session_id, sessions$session_id)],
          scaffold_level = complex_p1_scaffold(layout_version),
+         # Reading layout of the quiz (#130, "037" on read_far): never pool quiz_s across it.
+         quiz_layout = complex_p1_quiz_layout(layout_version),
          # Not asked before "036": NA (not measured), never FALSE.
          ekz_right_before_box = if_else(scaffold_level == "ekz_question", ekz_right_before_box, NA),
          quiz_s = active_between_t(session_id, enter_t, box1_t),
@@ -1832,7 +1854,7 @@ for (i in seq_len(nrow(cq_bad))) {
        cq_bad$layout_version[i], " but storage box 1 started without a right quiz_answer ekz before it (#123)")
 }
 write_csv(complex_quiz %>% select(participant_id, session_id, scene_visit, counting, repeat_visit, layout_version,
-                                  scaffold_level, quiz_questions, quiz_touches, ekz_right_before_box,
+                                  scaffold_level, quiz_layout, quiz_questions, quiz_touches, ekz_right_before_box,
                                   quiz_s, first_confirm_p1_s) %>%
             arrange(participant_id, session_id, scene_visit),
           file.path(output_dir, "complex_quiz.csv"), na = "")
@@ -3760,7 +3782,7 @@ validity_limits <- c(
   "- ConceptScene tour (tour_steps.csv): Back presses are derived from step_index (-1 = Zurück) and exist only for layout_version \"025\" on; \"019\" logs and headers without layout_version have NA, not 0. A Zurück < 2 s after Weiter is read as a likely mis-press, not proven. Step time ends at the next step or the first quiz answer: time spent looking elsewhere (label board, packages) is in it.",
   "- Layout versions (decision 024): ConceptScene data of different layout_version (e.g. pilot P811 on \"019\") are never pooled; in a set with more than one layout the Concept figures and tables are split by layout_version (data_quality.csv mixed_layout).",
   "- Mixed position_1 (#94, decision 028): builds before #94 had Empf Kz 000 there (placement never rated), from #94 (line.empf_kz logged, layout \"029\") Empf Kz 003 (3 snap places, EKZ_PLACEMENT possible); an earlier \"029\" build without the field counts as 000. In a set with both, position_1 is split ([Empf Kz 000] / [Empf Kz 003]) in first_attempt_by_item.png and time_by_phase.png; the per-scene Mixed numbers (error_rate_MixedPickingScene, time_to_correct, error codes) still pool both and an Empf Kz 003 visit can have more presses (EKZ retries). The ekz_placement rate counts only presses with the right quantity at an Empf Kz 003 position (EKZ opportunities): its n is small and a wrong-quantity press is no EKZ attempt.",
-  "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card); from \"036\" (#123) the quiz has a third question (ekz, how the goods go into the order container) before storage box 1 (ekz_question). In a set with more than one level position_1 is split in first_attempt_by_item.png and time_by_phase.png, and complex_quiz.csv gives quiz_s (scene enter -> storage box 1) and first_confirm_p1_s per visit with scaffold_level; the per-scene Complex numbers (time_to_correct_by_scene.png, time_to_first_confirm_s, error_codes_by_scene.png) still pool the levels, and from \"036\" they contain a longer quiz. The ekz question is the only Complex test of ekz_placement (D3) and sits in items.csv / objectives_summary.csv, not in the skill-rate charts (Complex presses never test placement).",
+  "- Complex position_1 (#93): up to layout \"025\" the remainder quiz and Worked Example stay visible for the whole position (scaffold_level quiz_visible); from \"029\" they hide after both answers are right and shelf card 2 shows the trainee's result (result_on_card); from \"036\" (#123) the quiz has a third question (ekz, how the goods go into the order container) before storage box 1 (ekz_question); from \"037\" (#130, decision 040) the question and the Worked Example sit at the depth of the screen and only the A/B/C row near the hands (same ekz_question, quiz_layout read_far, split from \"036\" like a level). In a set with more than one level position_1 is split in first_attempt_by_item.png and time_by_phase.png, and complex_quiz.csv gives quiz_s (scene enter -> storage box 1) and first_confirm_p1_s per visit with scaffold_level; the per-scene Complex numbers (time_to_correct_by_scene.png, time_to_first_confirm_s, error_codes_by_scene.png) still pool the levels, and from \"036\" they contain a longer quiz. The ekz question is the only Complex test of ekz_placement (D3) and sits in items.csv / objectives_summary.csv, not in the skill-rate charts (Complex presses never test placement).",
   "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts 4 s (layout up to \"034\") or 8 s (\"035\" on, #118) after the step; older layouts have NA, not 0.",
   "- Station start delay (decision 033, station_waits.csv): from layout \"033\" the boxes wait 4 s after a correct confirm before they ride (Complex box 1 after the remainder quiz: 0.6 s), before \"033\" 0.6 s. wait_s, wait_after_done_s and the per-scene active_s include this wait, so they are never pooled across station_wait_group; time_to_correct_by_scene.png uses time_to_correct_s minus wait_s for the picking scenes (wide.csv keeps the logged time_to_correct_s). wait_after_done_s starts at the first ride, not at task_completed, so it leaves out the start delay after the last confirm.",
   "- EKZ place help (#108, decision 037, layout \"034\", skill_scaffolds.csv): Basic position 1 outlines its 6 snap places from the start, Mixed position 1 its 3 places after the first EKZ_PLACEMENT of the visit; from \"034\" each place takes one carton, a carton released in the box lies flat, and a placement error marks the loose cartons. A press x skill pair with the outlines visible is left out of the ekz_placement rate and of P2 (numerator and denominator), so from \"034\" Basic gives no ekz_placement measure and Mixed only up to its first EKZ_PLACEMENT (P2 = the first EKZ opportunity of Mixed position 1, always made without outlines). Basic calculate_quantity stays measured although the 6 outlines equal the 6 cartons the order needs: read Basic TOO_FEW/TOO_MANY of \"034\" as a lower bound of calculation errors. position_1 of Basic and Mixed is never pooled across ekz_places levels (hidden / always / after_error; items.csv, process_by_position.csv; split charts when a set mixes them), and P802's (\"033\") placement data are not pooled with \"034\".",

@@ -26,7 +26,7 @@ public static class TextComfortAudit
     public static readonly Vector3 Eye = new(0f, 1.6f, 0f);
 
     // Checklist thresholds (docs/text-comfort-checklist.md).
-    public const float TouchMax = 0.46f;            // T2: touch range up to 46 cm
+    public const float TouchMax = 0.46f;            // T2: touch reach up to 46 cm, horizontal (decision 040 addendum)
     public const float MiddleMin = 0.5f;            // T1/T2: avoid 0.5-0.8 m
     public const float MiddleMax = 0.8f;
     public const float ReadMin = 1.0f;              // T1: read-only text at 1 m or more
@@ -59,6 +59,9 @@ public static class TextComfortAudit
         ("Box Hints/Hint Tag", "T1 T2 T5 T6 T7", "placed by code at runtime; check in Play"),
         ("Carton Count Demo/Total", "T1 T2 T5 T6 T7", "placed by code at runtime; check in Play"),
         ("Layout Slots/EKZ Sample", "T7", "cartons tilted on purpose, decision 036"),
+        ("Menu/CurvedUnityCanvas", "T2", "Menu stays, used once per lesson, decision 040"),
+        ("Participant Entry/", "T2", "keypad stays, pressed by the facilitator, decision 040"),
+        ("Tour Nav Bar/Progress", "T1", "step counter beside the buttons, decision 040"),
     };
 
     // Labels on packages are read up close when the package is held; only their size from the standing spot counts.
@@ -212,13 +215,11 @@ public static class TextComfortAudit
         bool middle = d >= MiddleMin && d < MiddleMax;
         if (row.OnPokeCanvas)
         {
-            if (!Exempted("T2"))
-            {
-                if (middle)
-                    row.Fails.Add($"T2 poke panel at {d:0.00} m, in the 0.5-0.8 m middle zone");
-                else if (d > TouchMax && d < MiddleMin)
-                    row.Warnings.Add($"T2 poke panel at {d:0.00} m, beyond 0.46 m touch range");
-            }
+            // Decision 040 addendum: a panel near the hands holds buttons only and is rated by horizontal reach
+            // (the 0.5-0.8 m rule is about touch/ray handoff; the app has no ray). Reading text stays rated by T1.
+            float reach = new Vector2(row.Centre.x - Eye.x, row.Centre.z - Eye.z).magnitude;
+            if (!Exempted("T2") && reach > TouchMax)
+                row.Fails.Add($"T2 poke panel {reach:0.00} m away horizontally, beyond 0.46 m touch reach");
         }
         else if (!Exempted("T1"))
         {
@@ -491,7 +492,10 @@ public static class TextComfortAudit
                 // The curved Menu pokes a PointableCanvasMesh that renders a flat canvas onto a cylinder.
                 bool curved = element != null && element.GetType().Name.Contains("CanvasMesh");
                 PointableCanvas pointable = element as PointableCanvas ?? FindPointableCanvas(element);
-                if (pointable == null || pointable.Canvas == null || !canvases.Add(pointable.Canvas))
+                // A canvas without buttons (a read-only board that happens to carry poke components) is no poke panel.
+                if (pointable == null || pointable.Canvas == null
+                    || pointable.Canvas.GetComponentInChildren<Selectable>(true) == null
+                    || !canvases.Add(pointable.Canvas))
                     continue;
 
                 MeasureButtons(scene.name, pointable.Canvas, curved, rows);

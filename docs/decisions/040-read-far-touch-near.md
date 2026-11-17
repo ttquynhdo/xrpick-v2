@@ -88,6 +88,21 @@ Vị trí chính xác đo trong lúc làm, bằng `TextComfortAudit`.
 
 Ghi vào `docs/backlog.md`, các mục #129, #130, #134. Thêm ràng buộc của data-analyst mà bản tổng hợp chưa ghi: dải nút và hàng A/B/C không nằm trên đường tay đi khi nhặt hàng, vì mỗi lần chạm A/B/C là một lần trả lời được chấm.
 
+## Bổ sung 2026-11-17: chỗ đặt dải nút (đo khi làm #129, người dùng chọn)
+
+Đo trong ConceptScene (dải nút rộng 0,34 m; hàng A/B/C rộng 0,42 m; mắt cao 1,45 / 1,6 / 1,75 m):
+- **Không có chỗ nào cách mắt ≤ 0,46 m mà không che thùng hoặc LVS.**
+  - Chỗ che ít nhất nằm sát cằm (0,05; 1,18; 0,16), cúi −68°, tay khó với, và với người thấp vẫn che 12 % thùng kho.
+  - Chỗ cúi −30° thì che 20–37 % dialog LVS.
+- **Luật „tránh 0,5–0,8 m“ của Meta nằm trong phần chuyển qua lại giữa chạm và tia.** App không có tia, và sau quyết định này dải nút không còn chữ cần đọc. Vì vậy với dải nút, khoảng 42–46 cm được hiểu là **tầm với ngang** (khoảng cách nằm ngang từ mắt tới dải).
+
+**Người dùng chọn:** dải nút và hàng A/B/C hạ thấp, khoảng (0,05; 1,01; 0,40):
+- tầm với ngang khoảng 0,40 m;
+- cách mắt khoảng 0,72 m, cúi khoảng −56°;
+- che thùng/LVS ≤ 5 % (hàng A/B/C), ≤ 2 % (dải nút tour). Hiện nay là 15 % và 8 %.
+
+Mục 1–3 và *Done when* đổi „cách mắt ≤ 0,46 m“ thành „tầm với ngang ≤ 0,46 m, che thùng kho, thùng đơn và dialog ≤ 5 % từ tầm mắt 1,45–1,75 m“. Chữ cần đọc vẫn phải ≥ 1,0 m.
+
 ## Làm gì nếu giả định sai
 
 - **Phần Concept không kịp trước freeze:** ship trong **một** build "037" phương án thay thế: thanh Concept giữ chỗ, chỉ thêm mờ dần, ghi lý do giữ 0,6 D; Complex làm như mục 3. Không đổi layout hai lần, không làm kiểu „kéo thanh vào gần“.
