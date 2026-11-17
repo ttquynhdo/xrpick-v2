@@ -30,6 +30,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
   4. **#133** (kệ thẻ, 5 scene) cần `solution-decision` riêng; không chạy song song với #129/#130/#134 vì cùng scene.
   5. **#132** (cỡ chữ cố định, Concept + Complex) sau #129 và #130 (cỡ chữ tính theo khoảng cách mới).
   6. Một build, một buổi test kính chung: hỏi người thử *đang nhìn chữ nào* lúc thấy khó chịu.
+  - **Cập nhật 2026-11-17:** #135, #129, #130, #131 (bỏ dấu vàng carton lỏng, thẻ báo Concept dán phẳng), #132 (cỡ chữ cố định ≥ 0,8°, hàng A/B/C rộng hơn; ghi chú carton đã mở là ngoại lệ) đều `verified-mcp` trên `main`, chưa push. Còn: #134 (chỉ ghi ngoại lệ + kiểm trên kính), #133 (cần `solution-decision`), rồi push, một build "037" (#129–#132) và buổi test kính: #129 N9, #130 M8, #131 K1–K2, #132 K1–K2, #134, cùng các case cũ còn ⏳ (#116–#118, #120–#124, #126 H1).
 
 **ĐỢT CUỐI (người dùng chốt 2026-11-06: gộp mọi việc còn lại vào một đợt; 2026-11-07 chốt build cuối để demo).** Khối này thay mọi thứ tự cũ bên dưới (các khối cũ chỉ còn là lịch sử). Không thêm feature mới trước demo.
 - **A. Trước build (đổi app, Claude làm, không cần kính):**
