@@ -88,7 +88,7 @@ Mỗi vật và mỗi chữ trong scene phải gắn với một dòng của b�
 
 ### Biển tên thùng
 - Biển „Lagerbehälter“ và „Auftragsbehälter“ (key có sẵn `concept.lane.*`) là con của hai thùng, nên ở bước 11 chạy cùng thùng.
-- Chỉ hiện ở bước 5, 6 và 11.
+- ~~Chỉ hiện ở bước 5, 6 và 11.~~ **Sửa đổi #156 (2026-11-17, R7):** luôn hiện từ lúc vào scene, ở mọi bước, như Basic/Mixed/Complex; không còn là marker của tour.
 - Ở bước 11 hai biển này thay biển tên thùng trên mái che và mép bàn sau. „Mittlere Bahn“ giữ nguyên.
 - Mỗi biển một từ. Biển không được chồng lên thẻ gợi ý của #100.
 

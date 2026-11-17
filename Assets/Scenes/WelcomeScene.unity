@@ -6214,6 +6214,7 @@ MonoBehaviour:
   - {fileID: 183485740}
   - {fileID: 1306512255}
   objectiveRoots:
+  - {fileID: 1410884544}
   - {fileID: 183485740}
   - {fileID: 1306512255}
   taskRoots:

@@ -42,6 +42,26 @@ public class PanelFade : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// #156: hides the panel at once (stops a running fade). For a panel whose place another panel takes in the same
+    /// moment, so the two never stand on top of each other while one fades.
+    /// </summary>
+    public static void HideNow(GameObject panel)
+    {
+        if (panel == null)
+            return;
+
+        PanelFade fade = panel.GetComponent<PanelFade>();
+        if (fade != null)
+        {
+            fade.Restart(null);
+            fade.IsFadingOut = false;
+            fade.Group.alpha = 1f;
+        }
+
+        panel.SetActive(false);
+    }
+
     /// <summary>Shown and not on its way out.</summary>
     public static bool IsShown(GameObject panel)
     {
@@ -108,6 +128,9 @@ public class PanelFade : MonoBehaviour
             StopCoroutine(running);
             running = null;
         }
+
+        if (fade == null)
+            return;
 
         if (isActiveAndEnabled)
         {

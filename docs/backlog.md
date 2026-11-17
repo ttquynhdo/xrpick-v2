@@ -2576,7 +2576,8 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Công:** M
 - **Test trên kính:** nhanh (đi tour Concept, mở bước việc ở Welcome)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl156.md
+- **Status:** verified-mcp (19/19 MCP + 2 code ✅, chờ test tay H1–H3; nhánh `feat/156-show-hide-rules`, chưa commit)
 
 ### #157 [P0] Gốc D: một cơ chế duy nhất quyết định kiện nằm đâu khi thả (chỗ đặt → thùng → mặt bàn)
 - **Type:** bug

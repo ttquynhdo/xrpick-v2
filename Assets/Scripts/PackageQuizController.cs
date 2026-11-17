@@ -310,7 +310,8 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
     private void ShowTour()
     {
         PanelFade.SetVisible(clusterRoot, false);
-        PanelFade.SetVisible(questionRoot, false);
+        // #156: the tour's step caption comes back at this spot: leave at once so the two never overlap.
+        PanelFade.HideNow(questionRoot);
         tour.SetBarVisible(true);
     }
 

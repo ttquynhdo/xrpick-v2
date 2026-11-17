@@ -20751,8 +20751,6 @@ MonoBehaviour:
     - {fileID: 1152504464}
     - {fileID: 1243818454}
     - {fileID: 1062688695}
-    - {fileID: 1766893706}
-    - {fileID: 2008951128}
     captionTitle: {fileID: 2082765882}
     captionBody: {fileID: 1808399132}
     hasFollowUp: 0
@@ -20760,8 +20758,6 @@ MonoBehaviour:
     markers:
     - {fileID: 1869403295}
     - {fileID: 1376889647}
-    - {fileID: 1766893706}
-    - {fileID: 2008951128}
     captionTitle: {fileID: 23285088}
     captionBody: {fileID: 644304441}
     hasFollowUp: 0
@@ -20802,8 +20798,6 @@ MonoBehaviour:
     markers:
     - {fileID: 457490579}
     - {fileID: 1099480853}
-    - {fileID: 1766893706}
-    - {fileID: 2008951128}
     captionTitle: {fileID: 0}
     captionBody: {fileID: 0}
     hasFollowUp: 1
@@ -68741,7 +68735,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1766893707
 RectTransform:
   m_ObjectHideFlags: 0
@@ -78362,7 +78356,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2008951129
 RectTransform:
   m_ObjectHideFlags: 0
