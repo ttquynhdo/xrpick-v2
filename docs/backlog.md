@@ -2234,7 +2234,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** bắt buộc (đọc, với tay, cúi đầu)
 - **Depends on:** #135 ; cùng build "037" với #129
 - **Decision:** docs/decisions/040-read-far-touch-near.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl130.md
+- **Status:** verified-mcp (16/17 ✅ MCP/code, chờ test tay M8 trên kính; cùng build "037" với #129)
 
 ### #131 [P2] Thẻ báo, nhãn tổng và dấu vàng không xoay theo mỗi cử động đầu
 - **Type:** bug
