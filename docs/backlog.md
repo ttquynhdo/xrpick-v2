@@ -26,7 +26,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **ĐỢT CHỮ (thêm 2026-11-17, từ #125 / C19, checklist `docs/text-comfort-checklist.md`; sau Festo review 18/11):**
   1. **#135** trước (tool đo, không đổi app, không cần kính): đo lại rẻ sau mỗi thay đổi, đo thêm T11/T12.
   2. **#131** (chỉ code ở 3 script, không sửa scene) song song với bước 3.
-  3. **Decision 040 (2026-11-17, accepted):** chữ cần đọc ra xa cạnh LVS, nút ở gần; Menu/bàn phím giữ chỗ. Làm ngay, trước freeze 19/11: #129 (Concept) ∥ #130 (Complex), ra **một** build `layout_version` "037" (spec + R cùng thay đổi, `data-analyst` duyệt; build "037" phải có cả #131, spec đã ghi); nếu Concept không kịp thì ship phương án thay thế của 040 trong cùng build. #134 chỉ còn ghi ngoại lệ + kiểm trên kính.
+  3. **Decision 040 (2026-11-17, accepted):** chữ cần đọc ra xa cạnh LVS, nút ở gần; Menu/bàn phím giữ chỗ. Làm ngay, trước freeze 19/11: #129 (Concept) ∥ #130 (Complex), ra **một** build `layout_version` "037" (spec + R cùng thay đổi, `data-analyst` duyệt; build "037" phải có cả #131 và #132, spec đã ghi); nếu Concept không kịp thì ship phương án thay thế của 040 trong cùng build. #134 chỉ còn ghi ngoại lệ + kiểm trên kính.
   4. **#133** (kệ thẻ, 5 scene) cần `solution-decision` riêng; không chạy song song với #129/#130/#134 vì cùng scene.
   5. **#132** (cỡ chữ cố định, Concept + Complex) sau #129 và #130 (cỡ chữ tính theo khoảng cách mới).
   6. Một build, một buổi test kính chung: hỏi người thử *đang nhìn chữ nào* lúc thấy khó chịu.
@@ -2256,12 +2256,13 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Scene(s):** ConceptScene, ComplexScene
 - **Files:** ConceptScene (`Tour Nav Bar/Step Panel/TXT_Step`, `TXT_Action`, `Tour Nav Bar/Progress/TXT_Progress`, A/B/C `Title` trong `AnswerOption`, `Tour Markers/Caption *`, `EKZ Overview`), ComplexScene (A/B/C `Title` trong `Remainder Quiz`, `Worked Example/Unity Canvas/TXT_Description`, `PlasticBox_Storage*/Opened Carton Note/TXT_Note`)
 - **Problem:** (checklist T4/T10) Dòng bước và dòng hành động trên thanh tour, số bước, chữ A/B/C và bảng ví dụ tự co cỡ theo độ dài câu, nên cỡ chữ đổi giữa các bước và câu hỏi. Nhiều chữ người học phải đọc nhỏ hơn 0,8°: chú thích tour 0,68°, bảng EKZ 0,62°, câu hỏi 0,60–0,64°, ghi chú carton đã mở 0,54° (nhìn chéo 54°).
-- **Done when:** (code) Không TMP nào trong các object kể trên bật `enableAutoSizing`; cỡ chữ cố định theo câu dài nhất DE/EN. Chuyển qua mọi bước tour và mọi câu hỏi, cả DE và EN: cỡ chữ số bước và A/B/C không đổi, không chữ nào tràn khung. Tool #135 báo chữ của các object kể trên ≥ 0,8° (em) từ chỗ đứng. Ghi chú carton đã mở đọc được từ chỗ đứng, góc nhìn chéo ≤ 45°. Ô LVS không đổi (giống bản thật, decision 008).
+- **Done when:** (code) Không TMP nào trong các object kể trên bật `enableAutoSizing`; cỡ chữ cố định theo câu dài nhất DE/EN. Chuyển qua mọi bước tour và mọi câu hỏi, cả DE và EN: cỡ chữ số bước và A/B/C không đổi, không chữ nào tràn khung. Tool #135 báo chữ của các object kể trên ≥ 0,8° (em) từ chỗ đứng. Ghi chú carton đã mở: giữ chỗ và cỡ cũ, ghi là ngoại lệ trong `docs/text-comfort-checklist.md` (người dùng chọn 2026-11-17: cỡ 0,8° không vừa mặt carton). Ô LVS không đổi (giống bản thật, decision 008).
 - **Inspector work expected:** yes (cỡ chữ, khung; chạy lại `InstructionShelfLayout` nếu thẻ đổi)
 - **Công:** S–M
 - **Test trên kính:** nhanh (đọc chú thích, câu hỏi, ghi chú carton)
 - **Depends on:** #129, #130 (cỡ tính theo khoảng cách mới), #135
-- **Status:** todo
+- **Test report:** docs/test-reports/bl132.md
+- **Status:** verified-mcp (14/16 ✅ MCP/code, chờ test tay K1 (đọc và chạm trên kính) và K2 (ghi chú carton, ngoại lệ); cùng build "037"; người dùng chọn: nới rộng hàng A/B/C)
 
 ### #133 [Feature] Kệ thẻ hướng dẫn: một vị trí cho cả 5 scene, không quay đầu quá 45°, chữ thẻ ≥ 0,8°
 - **Type:** feature

@@ -640,7 +640,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182467
-    m_Localized: ' that is the number of pieces in one carton. Divide Soll by Verp.-Einh.'
+    m_Localized: "25 ist die VPE (im LVS: Verp.-Einh.), also die St\xFCckzahl in
+      einem Karton. Teilen Sie Soll durch Verp.-Einh."
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473

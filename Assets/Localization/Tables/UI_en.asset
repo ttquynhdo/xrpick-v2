@@ -646,7 +646,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182467
-    m_Localized: '25 is the VPE (in the WMS: Verp.-Einh.)'
+    m_Localized: '25 is the VPE (in the WMS: Verp.-Einh.), that is the number of
+      pieces in one carton. Divide Soll by Verp.-Einh.'
     m_Metadata:
       m_Items: []
   - m_Id: 33687669182473

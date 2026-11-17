@@ -104,6 +104,14 @@ What only the headset can judge: T3, T4 for wearers of reading glasses or varifo
 - No text is closer than 0.5 m.
 - Within one picking step in Basic, Mixed and Complex, the shelf, LVS, labels and result card stay within about 0.4 D.
 
+**Fixed since (tool rerun 2026-11-17):**
+- #131 (T8): the Concept hint tag lies flat on the container's front wall; the total tags turn about the vertical axis only when placed; the loose-carton marks were removed.
+- #132 (T4, T10): Concept and Complex texts to read are fixed sizes ≥ 0.8° (captions body 34 / title 38, A/B/C 21 on wider buttons 214 × 90, quiz feedback 21, `EKZ Overview` 17–18, EKZ sample reason 25); no `enableAutoSizing` left on them (`TXT_Progress`, `Sign Middle` fixed at their sizes). Texts under 0.8° in the whole project: 186 → 147. Measurements: `TestEvidence/bl132/before_texts.tsv`, `after_texts.tsv`.
+
+**Accepted exceptions:**
+- Complex `Opened Carton Note` (T4 0.54°, T7 54°): kept where it is (user, 2026-11-17, #132). 0.8° needs font 29, which does not fit on the opened carton's front face (17.8 cm); the line is read once and sits above the 0.5° floor. Check on the headset.
+- LVS fields (T4, T10): kept as the real WMS (decision 008).
+
 **Note on T2:**
 - Meta gives "distance from the user" without saying from where.
 - The tour bar is 0.48 m in front of the eye horizontally, but 0.71 m away along the line of sight because it sits about 0.5 m lower.
