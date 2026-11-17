@@ -22,7 +22,14 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **ĐỢT FESTO (thêm 2026-11-16, từ review nhóm 2026-11-09, `docs/review-notes-team-2026-11-09.md`; Festo review 18/11, design freeze 19/11).** Khối này đứng trước khối ĐỢT CUỐI; việc còn lại của ĐỢT CUỐI (build, buổi P803, gửi file duyệt, học R #102) vẫn giữ.
 - **A. „Sửa ngay“, trước 18/11 (chỉ chữ + chỉnh nhỏ, không cần decision):** #119 (chỉ CSV) → #116 (Welcome) → #117 (Welcome + Concept, sau #116) ∥ #118 (Concept; không chạy cùng lúc với #117 vì cùng ConceptScene) → #120 (Complex, sau #116). Cuối nhóm: `german-reviewer` duyệt mọi chữ mới một lần, `ImportCsv`, chạy lại `InstructionShelfLayout` ở scene có thẻ đổi chữ, hỏi `data-analyst` có cần đổi `layout_version` không (#118 đổi tour Concept, decision 024: dữ liệu Concept trước/sau không gộp), một build.
 - **B. Cần `solution-decision`, sau Festo review (18/11), trước hoặc sau freeze tuỳ phản hồi:** #121 (Welcome theo chuỗi), #122 (ví dụ Complex, sau #119), #123 (Empf Kz 000 ở Complex), #124 (Menu). Có thể chạy một `solution-decision` chung cho #121 + #124 (cùng câu hỏi „làm sao người học thấy bước/bài tiếp theo“). **Cập nhật 2026-11-16:** decision 038 (#121 + #124, làm chung) và 039 (#123) đã accepted; #122 không cần decision (chỉ chữ, đi thẳng `localize-strings` + `unity-safe-change`); thêm #128 (tên bài 4).
-- **C. Chờ các bạn tả lại:** #125 (chữ nào gần/xa). #126 verified-mcp 2026-11-16 (ScrollRect huỷ click khi ngón trượt; tool `PokeButtonFixer`), chờ test kính H1. **Vòng sau:** #127 audio.
+- **C. Chờ các bạn tả lại:** #125 đã rà xong 2026-11-17, thay bằng #129–#135 (khối ĐỢT CHỮ ngay dưới). #126 verified-mcp 2026-11-16 (ScrollRect huỷ click khi ngón trượt; tool `PokeButtonFixer`), chờ test kính H1. **Vòng sau:** #127 audio.
+- **ĐỢT CHỮ (thêm 2026-11-17, từ #125 / C19, checklist `docs/text-comfort-checklist.md`; sau Festo review 18/11):**
+  1. **#135** trước (tool đo, không đổi app, không cần kính): đo lại rẻ sau mỗi thay đổi, đo thêm T11/T12.
+  2. **#131** (chỉ code ở 3 script, không sửa scene) song song với bước 3.
+  3. **Một `solution-decision` chung cho #129 + #130 + #134** (câu hỏi chung: bảng vừa chạm vừa đọc đặt ở đâu khi Meta khuyên chạm 42–46 cm, đọc ≥ 1 m, tránh 0,5–0,8 m). Rồi #129 (Concept) ∥ #130 (Complex) (khác scene); #134 sau (Menu ở cả 5 scene).
+  4. **#133** (kệ thẻ, 5 scene) cần `solution-decision` riêng; không chạy song song với #129/#130/#134 vì cùng scene.
+  5. **#132** (cỡ chữ cố định, Concept + Complex) sau #129 và #130 (cỡ chữ tính theo khoảng cách mới).
+  6. Một build, một buổi test kính chung: hỏi người thử *đang nhìn chữ nào* lúc thấy khó chịu.
 
 **ĐỢT CUỐI (người dùng chốt 2026-11-06: gộp mọi việc còn lại vào một đợt; 2026-11-07 chốt build cuối để demo).** Khối này thay mọi thứ tự cũ bên dưới (các khối cũ chỉ còn là lịch sử). Không thêm feature mới trước demo.
 - **A. Trước build (đổi app, Claude làm, không cần kính):**
@@ -2162,7 +2169,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S
 - **Test trên kính:** bắt buộc (cảm giác chóng mặt)
 - **Depends on:** —
-- **Status:** blocked (cần các bạn chỉ chữ nào, ở scene nào)
+- **Status:** thay bằng #129–#135 (2026-11-17: đo mọi chữ ở 5 scene và đối chiếu với `docs/text-comfort-checklist.md`, số đo `TestEvidence/bl125/texts.tsv`; nghi vấn chính cho C19 ở Concept: thanh tour 0,69 m rồi chú thích/LVS 1,1–1,2 m ở mỗi bước, #129)
 
 ### #126 [P0] Nút bấm không ăn
 - **Type:** bug
@@ -2201,3 +2208,87 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl128.md
 - **Status:** done (commit 74dda18, test 7/7 ✅; chỉ đổi chữ, không cần kính)
+
+### #129 [Feature] ConceptScene: thanh tour và câu hỏi không ở vùng 0,5–0,8 m, mắt bớt đổi tiêu cự ở mỗi bước tour
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene (`Interactables/Tour Nav Bar`, `Interactables/AnswerOption`, `Layout Slots/Nav Bar`, `Layout Slots/Quiz`), `Assets/Scripts/Concept/LaneFlowDemo.cs` (`hideWhileRiding`), `Assets/Scripts/Concept/PackageQuizController.cs` (cụm thế chỗ thanh tour), `Assets/Scripts/Concept/WmsFieldTour.cs` (`SetBarVisible`)
+- **Problem:** (C19, checklist T1/T2/T3/T6/T10) Mỗi bước tour người học đọc dòng hành động trên thanh tour ở 0,69 m (cúi −42°), rồi nhìn chú thích ở 1,23 m và ô LVS ở 1,10–1,20 m (cao hơn ~30°, lệch ~37°): mắt đổi tiêu cự ~0,6 diop, 11 lần. Thanh tour (0,68–0,71 m) và cụm câu hỏi (0,66 m) nằm trong vùng 0,5–0,8 m mà Meta khuyên tránh. Thanh và cụm câu hỏi tắt/bật đột ngột (lúc thùng chạy, lúc „Zu den Fragen“).
+- **Done when:** Từ chỗ đứng (mắt (0, 1,6, 0)), chữ trên thanh tour và cụm câu hỏi cách mắt ngoài khoảng 0,5–0,8 m (theo decision: ≤ 0,46 m để chạm hoặc ≥ 1,0 m), đo bằng tool #135. Ở mỗi bước tour, chênh tiêu cự giữa dòng hành động và chú thích/ô LVS của bước đó < 0,5 diop, hoặc decision ghi lý do giữ. Từ tầm mắt 1,45–1,75 m thanh và cụm không che dialog LVS (quy tắc #84). Đứng tại chỗ (không bước tới), ngón tay bấm được „Zurück“, „Weiter“, „Zu den Fragen“ và A/B/C. Khi thùng bắt đầu chạy ở bước 11, thanh mờ dần chứ không tắt phụt. Khi bấm „Zu den Fragen“, cụm câu hỏi mờ dần vào chỗ thanh.
+- **Inspector work expected:** yes (vị trí thanh, cụm câu hỏi, `Layout Slots`; chạy lại `PokeButtonFixer`)
+- **Công:** M
+- **Test trên kính:** bắt buộc (đọc từng bước tour, cảm giác đổi tiêu cự, với tay bấm)
+- **Depends on:** `solution-decision` chung với #130, #134; #135 (tool đo)
+- **Status:** todo
+
+### #130 [Feature] ComplexScene vị trí 1: cụm câu hỏi và bảng ví dụ không ở vùng 0,5–0,8 m, bớt cúi đầu
+- **Type:** feature
+- **Scene(s):** ComplexScene
+- **Files:** ComplexScene (`Remainder Quiz`, `Worked Example`), `Assets/Scripts/Complex/RemainderQuizController.cs`
+- **Problem:** (checklist T1/T3/T6) Cụm câu hỏi ở 0,62 m (1,61 diop); bảng ví dụ ở 0,64–0,66 m, cúi −54°; ô LVS 1,15 m; thẻ kệ 1,53 m (0,65 diop). Như vậy mắt đổi tiêu cự ~1 diop trong một bước, và đây là chỗ cúi sâu nhất khoá. Bảng ví dụ chỉ để đọc mà lại nằm trong vùng 0,5–0,8 m.
+- **Done when:** Từ chỗ đứng, chữ cụm câu hỏi và bảng ví dụ cách mắt ngoài 0,5–0,8 m (theo decision chung với #129), đo bằng tool #135. Bảng ví dụ không thấp hơn −35° so với tầm mắt. Chênh tiêu cự giữa câu hỏi, bảng ví dụ và ô LVS < 0,5 diop, hoặc decision ghi lý do. Đứng tại chỗ, ngón tay bấm được A/B/C. Từ tầm mắt 1,45–1,75 m cụm và bảng không che dialog LVS. Khi trả lời đúng cả 3 câu, cụm và bảng vẫn ẩn sau 1,5 s như #93.
+- **Inspector work expected:** yes (vị trí `Remainder Quiz`, `Worked Example`; chạy lại `PokeButtonFixer`)
+- **Công:** M
+- **Test trên kính:** bắt buộc (đọc, với tay, cúi đầu)
+- **Depends on:** `solution-decision` chung với #129, #134; #135
+- **Status:** todo
+
+### #131 [P2] Thẻ báo, nhãn tổng và dấu vàng không xoay theo mỗi cử động đầu
+- **Type:** bug
+- **Scene(s):** ConceptScene, BasicPickingScene, MixedPickingScene
+- **Files:** `Assets/Scripts/Concept/ConceptBoxHints.cs:239` (`LateUpdate` → `PlaceOnFrontWall`), `Assets/Scripts/Concept/CartonCountDemo.cs:76` (`LateUpdate` → `ShowTotal`), `Assets/Scripts/EkzPlacementCheck.cs:165` (`LateUpdate`, dấu `MarkLoose`), `Assets/Scripts/Concept/TagPlacement.cs`
+- **Problem:** (checklist T8) Ba loại chữ/dấu gọi `Quaternion.LookRotation(vị trí − đầu)` ở mọi khung hình, nên nghiêng và xoay theo mọi cử động nhỏ của đầu (cả khi cúi). Người học có thể thấy chữ „bơi“. Meta khuyên không dùng chữ bám theo đầu; billboard chỉ nên quay theo trục đứng hoặc được làm mượt.
+- **Done when:** Thẻ báo `Box Hints/Hint Tag` đang hiện trên thành thùng: di camera (đầu) sang trái/phải 20 cm, rồi cúi/ngẩng, thẻ không đổi hướng. Thẻ chỉ đổi hướng khi được đặt lại (có kiện khác được đặt, hoặc kiện di chuyển). Nhãn tổng `Total 1–3`: như trên. Dấu vàng carton lỏng ở Basic và Mixed: như trên, và vẫn đi theo carton khi carton được nhấc lên. (code) Hướng chỉ quay quanh trục đứng (không nghiêng theo pitch) và được tính một lần lúc đặt. Hồi quy: Concept C8 (thẻ báo đúng chỗ), bước `cartons`, lỗi Empf Kz 003 ở Basic/Mixed.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** bắt buộc (cảm giác khi nhìn quanh thẻ)
+- **Depends on:** —
+- **Status:** todo
+
+### #132 [P2] Concept, Complex: cỡ chữ cố định (không autoSize) và chữ cần đọc ≥ 0,8°
+- **Type:** feature
+- **Scene(s):** ConceptScene, ComplexScene
+- **Files:** ConceptScene (`Tour Nav Bar/Progress/TXT_Progress`, A/B/C `Title` trong `AnswerOption`, `Tour Markers/Caption *`, `EKZ Overview`), ComplexScene (A/B/C `Title` trong `Remainder Quiz`, `Worked Example/Unity Canvas/TXT_Description`, `PlasticBox_Storage*/Opened Carton Note/TXT_Note`)
+- **Problem:** (checklist T4/T10) Số bước, chữ A/B/C và bảng ví dụ tự co cỡ theo độ dài câu, nên cỡ chữ đổi giữa các bước và câu hỏi. Nhiều chữ người học phải đọc nhỏ hơn 0,8°: chú thích tour 0,68°, bảng EKZ 0,62°, câu hỏi 0,60–0,64°, ghi chú carton đã mở 0,54° (nhìn chéo 54°).
+- **Done when:** (code) Không TMP nào trong các object kể trên bật `enableAutoSizing`; cỡ chữ cố định theo câu dài nhất DE/EN. Chuyển qua mọi bước tour và mọi câu hỏi, cả DE và EN: cỡ chữ số bước và A/B/C không đổi, không chữ nào tràn khung. Tool #135 báo chữ của các object kể trên ≥ 0,8° (em) từ chỗ đứng. Ghi chú carton đã mở đọc được từ chỗ đứng, góc nhìn chéo ≤ 45°. Ô LVS không đổi (giống bản thật, decision 008).
+- **Inspector work expected:** yes (cỡ chữ, khung; chạy lại `InstructionShelfLayout` nếu thẻ đổi)
+- **Công:** S–M
+- **Test trên kính:** nhanh (đọc chú thích, câu hỏi, ghi chú carton)
+- **Depends on:** #129, #130 (cỡ tính theo khoảng cách mới), #135
+- **Status:** todo
+
+### #133 [Feature] Kệ thẻ hướng dẫn: một vị trí cho cả 5 scene, không quay đầu quá 45°, chữ thẻ ≥ 0,8°
+- **Type:** feature
+- **Scene(s):** WelcomeScene, ConceptScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** `Assets/Prefabs/InstructionShelf.prefab` (instance ở 5 scene), `Assets/Scripts/Editor/InstructionShelfLayout.cs`
+- **Problem:** (checklist T4/T5/T9) Cùng một kệ thẻ nhưng ở Welcome cách 1,36 m, lệch −39°; ở Concept 1,37 m, lệch −60°; ở Basic/Mixed/Complex 1,52–1,59 m, lệch −58°. Microsoft khuyên nội dung chính không lệch quá 45° sang bên. Tiêu đề và thân thẻ chỉ 0,64° ở ba scene picking.
+- **Done when:** Từ chỗ đứng, tâm các thẻ ở cả 5 scene cùng khoảng cách (± 5 cm) và cùng góc lệch (± 5°), góc lệch ≤ 45°, đo bằng tool #135. Chữ thân thẻ ≥ 0,8°. Từ chỗ đứng, kệ không đứng trên làn trái, không che thùng kho, thùng kho thứ hai (Mixed, Complex), dialog LVS hay `Info Panel`/`EKZ Overview` (Concept). Thẻ 3 ở Complex vẫn nằm trên thùng kho vị trí 2. Đã chạy lại `InstructionShelfLayout` ở cả 5 scene.
+- **Inspector work expected:** yes (vị trí kệ trong 5 scene, cỡ thẻ)
+- **Công:** M–L
+- **Test trên kính:** bắt buộc (đọc thẻ, quay đầu)
+- **Depends on:** `solution-decision` (chỗ đặt kệ khi bàn, làn trái và LVS đã chiếm chỗ), #135
+- **Status:** todo
+
+### #134 [Feature] Menu và bàn phím nhập mã: ngoài vùng 0,5–0,8 m
+- **Type:** feature
+- **Scene(s):** cả 5 scene (Menu), WelcomeScene (`Participant Entry`)
+- **Files:** `Menu` (canvas (0,52, 1,15, 0,27)) ở 5 scene, WelcomeScene `Participant Entry` (0, 1,22, 0,40)
+- **Problem:** (checklist T2/T5/T6) Menu cách mắt 0,74–0,76 m, lệch 44–62°, cúi −45°. Bàn phím và các bảng xác nhận/tiếp tục/cảnh báo cách 0,55–0,57 m, cúi tới −57°. Cả hai nằm trong vùng Meta khuyên tránh (chạm thì 42–46 cm, đọc thì ≥ 1 m).
+- **Done when:** (theo decision chung với #129) Từ chỗ đứng, chữ Menu và bàn phím cách mắt ngoài 0,5–0,8 m, đo bằng tool #135. Menu như nhau ở cả 5 scene. Đứng tại chỗ, ngón tay bấm được mọi bài trong Menu và mọi phím. Từ chỗ đứng, Menu không che thùng đơn hay thẻ kết quả. Người điều phối vẫn nhập mã được khi người học đội kính.
+- **Inspector work expected:** yes (vị trí Menu ở 5 scene, `Participant Entry`; chạy lại `PokeButtonFixer`)
+- **Công:** M
+- **Test trên kính:** bắt buộc (với tay, đọc)
+- **Depends on:** `solution-decision` chung với #129, #130; #135
+- **Status:** todo
+
+### #135 [P2] Tool Editor đo chữ theo checklist (khoảng cách, góc, cỡ, tương phản, nút bấm)
+- **Type:** refactor
+- **Scene(s):** cả 5 scene (chỉ đọc)
+- **Files:** mới `Assets/Scripts/Editor/TextComfortAudit.cs`; `docs/text-comfort-checklist.md`
+- **Problem:** Số đo của #125 đến từ một đoạn `execute_code` chỉ dùng một lần. Các mục #129–#134 cần đo lại nhanh sau mỗi thay đổi. T11 (tương phản) và T12 (vùng chạm nút ≥ 22 mm, ≥ 2,5–3°, cách nhau ≥ 12 mm) chưa đo.
+- **Done when:** Menu `XRPick/Text Comfort/…` hoặc `TextComfortAudit.Check()` qua MCP mở lần lượt 5 scene (không lưu) và ghi `TestEvidence/text-comfort/texts.tsv`, cùng các cột như `TestEvidence/bl125/texts.tsv`. Chạy trên `main` hiện tại, kết quả khớp `TestEvidence/bl125/texts.tsv` (cùng số dòng, khoảng cách lệch ≤ 1 cm). Tool liệt kê mọi chữ vi phạm T1, T2, T4, T5, T6, T7, T10 theo ngưỡng của checklist, bỏ qua sticker ẩn (`SM_box_1/Cube/Text`) và ghi rõ các TMP 3D không đo được cỡ. Tool đo được độ tương phản chữ/nền (T11), cỡ vùng chạm và khoảng cách giữa các nút poke (T12). Checklist ghi cách chạy tool.
+- **Inspector work expected:** no
+- **Công:** S–M
+- **Test trên kính:** không
+- **Depends on:** —
+- **Status:** todo
