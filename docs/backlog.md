@@ -2248,8 +2248,8 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 ### #132 [P2] Concept, Complex: cỡ chữ cố định (không autoSize) và chữ cần đọc ≥ 0,8°
 - **Type:** feature
 - **Scene(s):** ConceptScene, ComplexScene
-- **Files:** ConceptScene (`Tour Nav Bar/Progress/TXT_Progress`, A/B/C `Title` trong `AnswerOption`, `Tour Markers/Caption *`, `EKZ Overview`), ComplexScene (A/B/C `Title` trong `Remainder Quiz`, `Worked Example/Unity Canvas/TXT_Description`, `PlasticBox_Storage*/Opened Carton Note/TXT_Note`)
-- **Problem:** (checklist T4/T10) Số bước, chữ A/B/C và bảng ví dụ tự co cỡ theo độ dài câu, nên cỡ chữ đổi giữa các bước và câu hỏi. Nhiều chữ người học phải đọc nhỏ hơn 0,8°: chú thích tour 0,68°, bảng EKZ 0,62°, câu hỏi 0,60–0,64°, ghi chú carton đã mở 0,54° (nhìn chéo 54°).
+- **Files:** ConceptScene (`Tour Nav Bar/Step Panel/TXT_Step`, `TXT_Action`, `Tour Nav Bar/Progress/TXT_Progress`, A/B/C `Title` trong `AnswerOption`, `Tour Markers/Caption *`, `EKZ Overview`), ComplexScene (A/B/C `Title` trong `Remainder Quiz`, `Worked Example/Unity Canvas/TXT_Description`, `PlasticBox_Storage*/Opened Carton Note/TXT_Note`)
+- **Problem:** (checklist T4/T10) Dòng bước và dòng hành động trên thanh tour, số bước, chữ A/B/C và bảng ví dụ tự co cỡ theo độ dài câu, nên cỡ chữ đổi giữa các bước và câu hỏi. Nhiều chữ người học phải đọc nhỏ hơn 0,8°: chú thích tour 0,68°, bảng EKZ 0,62°, câu hỏi 0,60–0,64°, ghi chú carton đã mở 0,54° (nhìn chéo 54°).
 - **Done when:** (code) Không TMP nào trong các object kể trên bật `enableAutoSizing`; cỡ chữ cố định theo câu dài nhất DE/EN. Chuyển qua mọi bước tour và mọi câu hỏi, cả DE và EN: cỡ chữ số bước và A/B/C không đổi, không chữ nào tràn khung. Tool #135 báo chữ của các object kể trên ≥ 0,8° (em) từ chỗ đứng. Ghi chú carton đã mở đọc được từ chỗ đứng, góc nhìn chéo ≤ 45°. Ô LVS không đổi (giống bản thật, decision 008).
 - **Inspector work expected:** yes (cỡ chữ, khung; chạy lại `InstructionShelfLayout` nếu thẻ đổi)
 - **Công:** S–M
@@ -2291,4 +2291,5 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Công:** S–M
 - **Test trên kính:** không
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl135.md
+- **Status:** verified-mcp (7/7 ✅ MCP/code, nhánh `feat/135-text-comfort-audit`; không có case tay, chỉ tool Editor)

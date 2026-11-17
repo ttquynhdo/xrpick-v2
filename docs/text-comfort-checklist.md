@@ -16,10 +16,28 @@ The numbers come from sources of different strength. Each threshold says where i
   - This works for UI `TextMeshProUGUI` only. The 3D `TextMeshPro` on package labels, `F6` and `Storage Label` uses another size unit, so judge those in the headset.
 - **Yaw and pitch:** angle of the text centre from straight ahead. Negative pitch means below eye height.
 - **Facing:** angle between the text's normal and the line from the eye. 0° means the text faces the eye.
-- **Tool:**
-  - The MCP `execute_code` snippet that wrote `TestEvidence/bl125/texts.tsv` lists every TMP in all 5 scenes (active and inactive) with these columns.
-  - Rerun it after layout changes.
-  - The curved `Menu` renders a flat source canvas onto a cylinder, so its rows are approximate.
+- **Tool (#135):** `Assets/Scripts/Editor/TextComfortAudit.cs`.
+  - Run it from the menu `XRPick/Text Comfort/Audit all build scenes`, or via MCP `execute_code`: `return TextComfortAudit.Check();`.
+  - The open scene must be saved first. The tool opens each build scene in turn without saving, runs a layout pass, measures, then reopens the scene you had open.
+  - It writes to `TestEvidence/text-comfort/` (git-ignored):
+    - `texts.tsv`: one row per TMP in all 5 scenes, active and inactive. The first 18 columns are the same as `TestEvidence/bl125/texts.tsv`. Then `hidden`, `is3D`, `capMm`, `poke`, `contrast`, `contrastNote`, `fails`, `warnings`, `exempt`, `fullPath`.
+    - `pokes.tsv`: one row per button on a poke canvas: hit size in mm and degrees, spacing to the nearest button shown at the same time.
+    - `report.md`: violations grouped by check, scene and panel.
+  - Rerun it after any layout change and compare with the last run.
+  - **What the tool checks:** T1, T2, T4, T5, T6, T7, T9 (same hierarchy path across scenes), T10, T11 and T12.
+  - **What it leaves out:**
+    - T3: which texts are read one after another is a design question.
+    - T8: scripts that turn texts at runtime.
+    - Runtime poses. The hint tag and the 40/80/120 totals are measured where they wait, so check those in Play.
+  - **Exemptions** (with the reason in the `exempt` column):
+    - LVS dialog: T4 and T11 (copy of the real WMS, decision 008).
+    - Facilitator end control: not a learner surface.
+    - Texts placed by code at runtime.
+    - Tilted EKZ sample cartons: T7.
+    - Labels on packages: T1, T5, T6, T7. They are read up close when held; their size from the standing spot is still rated.
+  - **Measurement limits:**
+    - The curved `Menu` is measured on its flat source canvas, so its rows are approximate.
+    - Contrast reads `Image` colour × button `ColorTint` normal colour × the Meta rounded-panel fill (`_FillColorA/B`) × the sprite's centre pixel, and the TMP colour × face colour. An unknown backdrop counts as mid grey (noted in `contrastNote`).
 
 ## Checks
 
@@ -40,7 +58,7 @@ The numbers come from sources of different strength. Each threshold says where i
 
 What only the headset can judge: T3, T4 for wearers of reading glasses or varifocals, T8 (does a turning tag feel like swimming), T10. Ask testers *where* they were looking when it felt uncomfortable.
 
-## Status on 2026-11-17 (main `f6dc0df`, static scene poses)
+## Status on 2026-11-17 (main `f6dc0df`, static scene poses; T10–T12 from the first `TextComfortAudit` run)
 
 **Fails or doubtful:**
 
@@ -71,10 +89,15 @@ What only the headset can judge: T3, T4 for wearers of reading glasses or varifo
 | T8 | `EkzPlacementCheck` loose-carton marks (Basic, Mixed) | full `LookRotation` to the head every `LateUpdate` |
 | T9 | Instruction shelf | Welcome 1.36 m / −39°, Concept 1.37 m / −60°, Basic/Mixed/Complex 1.52–1.59 m / −58° |
 | T9 | Course objectives | Welcome `Info Panel` 1.11–1.17 m, Complex `Congratulations` 0.95–0.97 m |
-| T10 | `enableAutoSizing` | Concept `Tour Nav Bar/Progress/TXT_Progress`, A/B/C answer titles (Concept, Complex), Complex `Worked Example` body |
+| T10 | `enableAutoSizing` (tool run of #135) | Concept `Tour Nav Bar` `TXT_Step`, `TXT_Action`, `TXT_Progress`; A/B/C answer titles (Concept, Complex); Complex `Worked Example` body; Concept `Lane Signs/Sign Middle`, `Sample Description`, `Ablauf Overview` lanes; the LVS fields in 4 scenes |
 | T10 | Concept `LaneFlowDemo.hideWhileRiding` | bar and quiz switch off and on at 0.7 m |
 | T10 | Concept quiz | takes the bar's place without a fade |
-| T11, T12 | — | not measured yet |
+| T11 | Concept „Zurück“ (tour bar and quiz) | 3.6:1, under 4.5:1 |
+| T11 | Welcome keypad `OK` | 1.8:1 |
+| T11 | Welcome `Info Panel` inactive yellow lines | 3.2:1 (backdrop partly unknown) |
+| T12 | Menu items (all scenes) | hit 2.4°, just under 2.5°; the items' hit areas abut on purpose (#126) |
+| T12 | Welcome keypad, language, confirm and resume buttons | 6 mm apart, under 12 mm |
+| T2 | Complex `Worked Example` | sits on a poke canvas, although it is only read |
 
 **Passes:**
 - LVS dialog, red button, Menu and result card have the same pose in every scene that has them.
