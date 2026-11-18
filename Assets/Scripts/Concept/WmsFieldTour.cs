@@ -398,7 +398,8 @@ public class WmsFieldTour : MonoBehaviour
         actionRow.SetAsLastSibling();
         if (host.GetComponent<LayoutGroup>() == null)
         {
-            // A caption laid out by hand (cartons): the row hangs below it, as wide as the caption.
+            // A caption without a layout group: the row hangs below it, as wide as the caption. Since #154 every caption
+            // has a layout group (Caption cartons keeps its hand-laid division in a fixed block), so the row sits inside.
             actionRow.anchorMin = new Vector2(0f, 0f);
             actionRow.anchorMax = new Vector2(1f, 0f);
             actionRow.pivot = new Vector2(0.5f, 1f);

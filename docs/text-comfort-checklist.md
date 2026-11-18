@@ -24,7 +24,13 @@ The numbers come from sources of different strength. Each threshold says where i
     - `pokes.tsv`: one row per button on a poke canvas: hit size in mm and degrees, spacing to the nearest button shown at the same time.
     - `report.md`: violations grouped by check, scene and panel.
   - Rerun it after any layout change and compare with the last run.
-  - **What the tool checks:** T1, T2, T4, T5, T6, T7, T9 (same hierarchy path across scenes), T10, T11 and T12.
+  - **What the tool checks:** T1, T2, T4, T5, T6, T7, T9 (same hierarchy path across scenes), T10, T11, T12, and since #154 T13–T15.
+  - **T13–T15, how (#154):**
+    - Each text is measured in German and English: a text with a `LocalizeStringEvent` with both table entries, a text a `PositionTexts` writes with every key of that component, other texts with their stored text. Texts on the same canvas are switched to the same language, so a card's title and body are laid out together.
+    - Panels hidden at scene start are switched on for the measurement (the scene is never saved). A text switched off by its own flag counts as unused and is skipped.
+    - The layout is rebuilt from the root canvas and from every parent with a layout group or fitter.
+    - T15 is the box width divided by the mean advance of the text's own characters, so one long German compound does not count as a narrow box. Lines ended by a written line break (a red „Nicht richtig“ title line) are not wrapping.
+  - **Texts that scripts write while the course runs** (tour captions, action line, quiz feedback): use `TextComfortAudit.CheckShown(label)` in Play mode via MCP. It checks T13–T15 for every text shown right now and appends the problems to `TestEvidence/text-comfort/shown.tsv`. Walk the tour steps and quiz answers in both languages (switch with `LocalizationSettings.SelectedLocale`) and call it after each step. The #154 test report has the walk.
   - **What it leaves out:**
     - T3: which texts are read one after another is a design question.
     - T8: scripts that turn texts at runtime.
@@ -35,6 +41,9 @@ The numbers come from sources of different strength. Each threshold says where i
     - Texts placed by code at runtime.
     - Tilted EKZ sample cartons: T7.
     - Labels on packages: T1, T5, T6, T7. They are read up close when held; their size from the standing spot is still rated.
+    - Concept `Ablauf Overview` and `Sample Description/Unity Canvas`: T13–T15 (never shown since #80 / #89, objects kept inactive).
+    - Complex `Opened Carton Note`: T15 (same reason as its T4 exception below).
+    - Instruction shelf card titles (`Cards/*/Primary Text`): T15. Every card is 200 wide in every scene (decision 041), so a long German title („2. Kartons kommissionieren“) takes 2 lines; `InstructionShelfLayout` gives the card the height.
   - **Measurement limits:**
     - The curved `Menu` is measured on its flat source canvas, so its rows are approximate.
     - Contrast reads `Image` colour × button `ColorTint` normal colour × the Meta rounded-panel fill (`_FillColorA/B`) × the sprite's centre pixel, and the TMP colour × face colour. An unknown backdrop counts as mid grey (noted in `contrastNote`).
@@ -55,6 +64,16 @@ The numbers come from sources of different strength. Each threshold says where i
 | T10 | Text does not change size or pop in and out at the reading spot | No `enableAutoSizing` on texts whose content changes. Panels near the reading spot fade in and out (no sudden swap) | [MS] *Comfort*: content moving in depth and pop-ups are fatiguing. Fade length: no sourced number |
 | T11 | Readable contrast and weight | Body contrast ≥ 4.5:1, headlines ≥ 3:1; no Light or Thin weights | [META] *Typography* (weights). Contrast numbers to be confirmed on the Meta accessibility page |
 | T12 | Poke targets are easy to hit | Hit area ≥ about 22 mm (48 dp), ≥ 2.5–3° visual angle, ≥ 12 mm between targets | [META] *Hands UI best practices* |
+| T13 | Text stays inside its box (#154) | No glyph outside the text's own rect or outside the panel, plate or tag it sits on (tolerance 2 canvas units) | *Project rule* (R6: action line below the `cartons` caption; R9: „In the exercise“ wider than its tag) |
+| T14 | Text is never cut off (#154) | No glyph outside a parent `Mask`/`RectMask2D`; no `overflowMode` other than Overflow that cuts the text | *Project rule* (R11: quiz feedback line cut by the cluster's mask) |
+| T15 | A box that wraps text is wide enough (#154) | Box width ≥ 25 average characters of its own font per line (floor); target ≥ 33. Rated only when the text really wraps | [PR] Dyson & Kipping 1998 (Visible Language 32(2)): of 25–100 characters per line on screen, 25 was read slowest; Dyson 2004 review: readers prefer 45–72. [GREY] Brown University VR wiki *Reading in VR*: preferred text box width in VR 40 ± 6.5 characters, so the target 33 = mean − 1 SD |
+
+**Layout rule for fixed-size texts (#154).** #132 fixed the font sizes in Concept and Complex; the boxes must follow the text, never the other way round:
+1. Every box with text to read grows with its text: a layout group + `ContentSizeFitter` on the panel (tour captions, quiz cluster blocks, EKZ tags), or an Editor tool that measures the longest DE and EN text and sets the size (`InstructionShelfLayout` for the shelf cards). No hand-laid height that only fits today's text. Hand-laid content (the `cartons` division) goes into a fixed block inside a panel that grows.
+2. Even inner margins: the same padding on both sides of a text (tags 8 units each side, captions 14).
+3. Minimum width by characters per line (T15), not by a fixed number of units, because the font size differs per panel.
+4. When a text gets longer, widen or grow the box; never shrink the font (T4, T10).
+5. Run `TextComfortAudit.Check()` (static, all scenes, DE + EN) and, for texts written by scripts, the `CheckShown` walk in Play. An exception needs a reason in the tool's exemption list and in this file.
 
 What only the headset can judge: T3, T4 for wearers of reading glasses or varifocals, T8 (does a turning tag feel like swimming), T10. Ask testers *where* they were looking when it felt uncomfortable.
 
@@ -108,6 +127,14 @@ What only the headset can judge: T3, T4 for wearers of reading glasses or varifo
 - #131 (T8): the Concept hint tag lies flat on the container's front wall; the total tags turn about the vertical axis only when placed; the loose-carton marks were removed.
 - #132 (T4, T10): Concept and Complex texts to read are fixed sizes ≥ 0.8° (captions body 34 / title 38, A/B/C 21 on wider buttons 214 × 90, quiz feedback 21, `EKZ Overview` 17–18, EKZ sample reason 25); no `enableAutoSizing` left on them (`TXT_Progress`, `Sign Middle` fixed at their sizes). Texts under 0.8° in the whole project: 186 → 147. Measurements: `TestEvidence/bl132/before_texts.tsv`, `after_texts.tsv`.
 
+- #154 (T13–T15, tool rerun 2026-11-18, all 5 scenes, DE + EN): no T13 or T14 fail, no T15 fail.
+  - Concept: the captions right of the screen (`Caption rest`, `Caption step`) are 640 wide like the left ones (left edge kept, so the leaders still meet them; right edge at 41° yaw, clear of the `EKZ Overview`), about 30 characters per line instead of 13–19.
+  - Concept `Caption cartons` is 640 wide and grows with a layout group: the division (Soll : Verp.-Einh.) sits in a fixed block `Division` on its right, the action line inside the blue panel below it.
+  - Concept `EKZ Overview` tags „In der Übung“ / „In the exercise“ grow with their text (8 units each side).
+  - LVS dialog: `Label Rest` 8 units wider, so „Rest:“ no longer runs into its field (all 4 scenes).
+  - Concept tour walk in Play (11 steps × DE/EN) and the longest quiz feedback lines in Concept and Complex (DE/EN): 0 problems (`TestEvidence/bl154/`).
+  - T15 warnings left (box 29–31 characters, under the target 33): the bold goal card body in 5 scenes and Basic's result card (both 200 / 180 wide by decision 041 / #109).
+
 **Accepted exceptions:**
 - Complex `Opened Carton Note` (T4 0.54°, T7 54°): kept where it is (user, 2026-11-17, #132). 0.8° needs font 29, which does not fit on the opened carton's front face (17.8 cm); the line is read once and sits above the 0.5° floor. Check on the headset.
 - LVS fields (T4, T10): kept as the real WMS (decision 008).
@@ -130,6 +157,9 @@ What only the headset can judge: T3, T4 for wearers of reading glasses or varifo
 - Microsoft, *Billboarding and tag-along*, https://learn.microsoft.com/en-us/windows/mixed-reality/design/billboarding-and-tag-along
 
 **Studies**
+- Dyson & Kipping (1998), The effects of line length and method of movement on patterns of reading from screen, Visible Language 32(2), https://journals.uc.edu/index.php/vl/article/view/5671 (T15; seen through the abstract and secondary summaries, opened 2026-11-18)
+- Dyson (2004), How physical text layout affects reading from screen, Behaviour & Information Technology 23(6) (T15; review, through secondary summaries)
+- Brown University VR wiki, *Reading in VR — text colors and fonts*, https://www.vrwiki.cs.brown.edu/applications-of-vr/reading-in-vr/text-colors-and-fonts (T15, [GREY]: text box width 40 ± 6.5 characters)
 - Penumudi, Kuppam, Kim & Hwang (2020), Applied Ergonomics 84, 103010, doi:10.1016/j.apergo.2019.103010
 - Kilpeläinen & Häkkinen (2023), Frontiers in Virtual Reality 4, doi:10.3389/frvir.2023.1243387
 - Büttner, Grünvogel & Fuhrmann (2020), IEEE VRW, doi:10.1109/VRW50115.2020.00182 (abstract only)

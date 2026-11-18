@@ -45,6 +45,9 @@ public static class TextComfortAudit
     public const float HitMinMm = 22f;              // T12
     public const float HitMinDeg = 2.5f;
     public const float SpacingMinMm = 12f;
+    public const float CharsPerLineMin = 25f;       // T15 (#154): wrapped reading text, floor
+    public const float CharsPerLineTarget = 33f;    // T15: target
+    private const float OverflowTolerance = 2f;     // T13/T14: canvas units a glyph may stick out (anti-aliasing, outline)
 
     // Cap height of LiberationSans / Roboto is about 0.7 em; used to compare 3D labels with UI text.
     private const float CapPerEm = 0.7f;
@@ -62,6 +65,11 @@ public static class TextComfortAudit
         ("Menu/CurvedUnityCanvas", "T2", "Menu stays, used once per lesson, decision 040"),
         ("Participant Entry/", "T2", "keypad stays, pressed by the facilitator, decision 040"),
         ("Tour Nav Bar/Progress", "T1", "step counter beside the buttons, decision 040"),
+        ("Ablauf Overview", "T13 T14 T15", "never shown since #80, object kept inactive"),
+        ("Sample Description/Unity Canvas", "T13 T14 T15", "never shown since #89, object kept inactive"),
+        ("Opened Carton Note", "T15", "fits the opened carton's front face, accepted with T4 in #132"),
+        ("Cards/Info Canvas/Primary Text", "T15", "card title: card width 200 in every scene (decision 041), a long German title takes 2 lines"),
+        ("Cards/Confirm/Primary Text", "T15", "card title: card width 200 in every scene (decision 041), a long German title takes 2 lines"),
     };
 
     // Labels on packages are read up close when the package is held; only their size from the standing spot counts.
@@ -108,7 +116,7 @@ public static class TextComfortAudit
         File.WriteAllText(Path.Combine(folder, "report.md"), Report(texts, pokes, sameRole), new UTF8Encoding(false));
 
         var summary = new StringBuilder($"TextComfortAudit: {texts.Count} texts, {pokes.Count} poke buttons in {scenePaths.Length} scenes -> {OutputFolder}/\n");
-        foreach (string check in new[] { "T1", "T2", "T4", "T5", "T6", "T7", "T9", "T10", "T11", "T12" })
+        foreach (string check in new[] { "T1", "T2", "T4", "T5", "T6", "T7", "T9", "T10", "T11", "T12", "T13", "T14", "T15" })
         {
             int fails = texts.Count(t => t.Fails.Any(f => f.StartsWith(check + " ")))
                 + pokes.Count(p => p.Fails.Any(f => f.StartsWith(check + " ")));
@@ -136,6 +144,7 @@ public static class TextComfortAudit
 
     private static void MeasureTexts(Scene scene, HashSet<Canvas> pokeCanvases, List<TextRow> rows)
     {
+        var layoutPending = new List<(TMP_Text, TextRow)>();
         foreach (GameObject root in scene.GetRootGameObjects())
         {
             foreach (TMP_Text text in root.GetComponentsInChildren<TMP_Text>(true))
@@ -184,8 +193,14 @@ public static class TextComfortAudit
 
                 Rate(row);
                 rows.Add(row);
+                if (!row.Hidden)
+                    layoutPending.Add((text, row));
             }
         }
+
+        // After all other checks: switching hidden panels on to lay them out must not change what T4 measured.
+        foreach ((TMP_Text text, TextRow row) in layoutPending)
+            RateLayout(text, row);
     }
 
     private static void Rate(TextRow row)
@@ -193,23 +208,7 @@ public static class TextComfortAudit
         if (row.Hidden)
             return;
 
-        bool Exempted(string check)
-        {
-            if (row.OnPackage && PackageLabelChecks.Split(' ').Contains(check))
-            {
-                row.Exempt.Add($"{check} (label on a package, read when held)");
-                return true;
-            }
-            foreach ((string part, string checks, string reason) in Exemptions)
-            {
-                if (row.FullPath.Contains(part) && checks.Split(' ').Contains(check))
-                {
-                    row.Exempt.Add($"{check} ({reason})");
-                    return true;
-                }
-            }
-            return false;
-        }
+        bool Exempted(string check) => IsExempt(row, check);
 
         float d = row.Distance;
         bool middle = d >= MiddleMin && d < MiddleMax;
@@ -269,6 +268,376 @@ public static class TextComfortAudit
             if (row.Contrast < needed)
                 row.Fails.Add($"T11 contrast {row.Contrast:0.0}:1 under {needed:0.0}:1");
         }
+    }
+
+    private static bool IsExempt(TextRow row, string check)
+    {
+        if (row.OnPackage && PackageLabelChecks.Split(' ').Contains(check))
+        {
+            row.Exempt.Add($"{check} (label on a package, read when held)");
+            return true;
+        }
+        foreach ((string part, string checks, string reason) in Exemptions)
+        {
+            if (row.FullPath.Contains(part) && checks.Split(' ').Contains(check))
+            {
+                row.Exempt.Add($"{check} ({reason})");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ---------- layout of the text in its box (#154: T13 overflow, T14 clipped, T15 characters per line) ----------
+
+    // T13/T14/T15 for the text as stored and, for a text bound to a key, for its German and English entries.
+    private static void RateLayout(TMP_Text text, TextRow row)
+    {
+        string stored = text.text;
+        // A text bound to a key shows the table entry at runtime, so its stored scene text (often outdated) is skipped.
+        var variants = new List<(string label, string value)>();
+        var locales = new List<string>();
+        foreach ((string locale, string value) in LocalizedValues(text))
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                variants.Add((locale.ToUpperInvariant() + " ", value));
+                locales.Add(locale);
+            }
+        }
+        if (variants.Count == 0 && !string.IsNullOrEmpty(stored))
+            variants.Add(("", stored));
+        // A text switched off by its own flag is not used (Meta template subtitles, lines kept for their keys); one
+        // hidden by a parent panel is shown later and is measured.
+        if (variants.Count == 0 || !text.gameObject.activeSelf)
+            return;
+
+        // TMP lays out only active texts: switch on what hides it at scene start (the scene is never saved).
+        var switchedOn = new List<GameObject>();
+        for (Transform t = text.transform; t != null; t = t.parent)
+        {
+            if (!t.gameObject.activeSelf)
+            {
+                t.gameObject.SetActive(true);
+                switchedOn.Add(t.gameObject);
+            }
+        }
+        if (switchedOn.Count > 0)
+            RebuildCanvasOf(text);
+
+        // Texts beside it on the same canvas share its layout (a card's title and body): show them in the same language.
+        Canvas rootCanvas = text.GetComponentsInParent<Canvas>(true).LastOrDefault();
+        var neighbours = new List<(TMP_Text text, string stored, Dictionary<string, string> values)>();
+        if (rootCanvas != null && locales.Count > 0)
+        {
+            foreach (TMP_Text other in rootCanvas.GetComponentsInChildren<TMP_Text>(true))
+            {
+                if (other == text)
+                    continue;
+                var values = LocalizedValues(other).Where(v => !string.IsNullOrEmpty(v.value))
+                    .GroupBy(v => v.locale).ToDictionary(g => g.Key, g => g.First().value);
+                if (values.Count > 0)
+                    neighbours.Add((other, other.text, values));
+            }
+        }
+
+        try
+        {
+            for (int i = 0; i < variants.Count; i++)
+            {
+                (string label, string value) = variants[i];
+                foreach ((TMP_Text other, string _, Dictionary<string, string> values) in neighbours)
+                {
+                    if (i < locales.Count && values.TryGetValue(locales[i], out string otherValue))
+                        other.text = otherValue;
+                }
+                text.text = value;
+                RebuildCanvasOf(text);
+                foreach (string issue in LayoutIssues(text))
+                {
+                    bool warning = IsWarning(issue);
+                    string check = issue.Substring(0, 3);
+                    string line = $"{check} {label}{issue.Substring(issue.IndexOf(' ') + 1)}";
+                    List<string> list = warning ? row.Warnings : row.Fails;
+                    if (!IsExempt(row, check) && !list.Contains(line))
+                        list.Add(line);
+                }
+            }
+        }
+        finally
+        {
+            foreach ((TMP_Text other, string otherStored, Dictionary<string, string> _) in neighbours)
+                other.text = otherStored;
+            text.text = stored;
+            RebuildCanvasOf(text);
+            for (int i = switchedOn.Count - 1; i >= 0; i--)
+                switchedOn[i].SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// #154: checks every text shown right now (Play mode) for T13 overflow, T14 clipping and T15 characters per line,
+    /// so texts that scripts write (tour captions, quiz feedback) can be checked per step and per language. Returns one
+    /// line per problem, prefixed with <paramref name="label"/>, and appends them to TestEvidence/text-comfort/shown.tsv.
+    /// </summary>
+    public static string CheckShown(string label, bool includeWarnings = false)
+    {
+        var lines = new List<string>();
+        int count = 0;
+        // Lay out what scripts changed this frame before measuring (layout groups normally update at frame end).
+        foreach (Canvas canvas in Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None).Where(c => c.isRootCanvas))
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)canvas.transform);
+        Canvas.ForceUpdateCanvases();
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            if (!scene.isLoaded)
+                continue;
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                foreach (TMP_Text text in root.GetComponentsInChildren<TMP_Text>(false))
+                {
+                    if (IsHidden(text) || string.IsNullOrEmpty(text.text) || !text.gameObject.activeInHierarchy)
+                        continue;
+                    count++;
+                    var row = new TextRow { FullPath = PathOf(text.transform), OnPackage = text.GetComponentInParent<PackageData>(true) != null };
+                    foreach (string issue in LayoutIssues(text))
+                    {
+                        if (!IsExempt(row, issue.Substring(0, 3)) && (includeWarnings || !IsWarning(issue)))
+                            lines.Add($"{label}\t{scene.name}\t{row.FullPath}\t{issue}\t{Clean(text.text, 60)}");
+                    }
+                }
+            }
+        }
+
+        string folder = Path.Combine(Path.GetDirectoryName(Application.dataPath) ?? ".", OutputFolder);
+        Directory.CreateDirectory(folder);
+        string file = Path.Combine(folder, "shown.tsv");
+        if (!File.Exists(file))
+            File.WriteAllText(file, "label\tscene\tpath\tissue\ttext\n", new UTF8Encoding(false));
+        File.AppendAllText(file, string.Concat(lines.Select(l => l + "\n")), new UTF8Encoding(false));
+        return $"{label}: {count} texts shown, {lines.Count} problems" + (lines.Count > 0 ? "\n" + string.Join("\n", lines) : "");
+    }
+
+    // The problems of one text with its current content; each starts with the check ("T13 ...").
+    private static List<string> LayoutIssues(TMP_Text text)
+    {
+        var issues = new List<string>();
+        RectTransform rect = text.rectTransform;
+        text.ForceMeshUpdate(true);
+        TMP_TextInfo info = text.textInfo;
+        if (info.characterCount == 0 || !TryGlyphBounds(text, out Vector3 min, out Vector3 max))
+            return issues;
+
+        // T13: the glyphs leave the text's own rect (a wrapped text runs out at the bottom, an unwrapped one at the sides).
+        bool wraps = text.textWrappingMode != TextWrappingModes.NoWrap && text.textWrappingMode != TextWrappingModes.PreserveWhitespaceNoWrap;
+        string outsideOwn = Outside(text, min, max, rect);
+        if (outsideOwn != null)
+            issues.Add($"T13 sticks out of its rect {rect.rect.width:0} x {rect.rect.height:0} ({outsideOwn})");
+
+        // T13: glyphs outside the panel or plate the text sits on (nearest parent graphic that paints a surface).
+        Graphic backdrop = Backdrop(text);
+        if (backdrop != null)
+        {
+            string outside = Outside(text, min, max, backdrop.rectTransform);
+            if (outside != null)
+                issues.Add($"T13 sticks out of its backdrop `{backdrop.name}` ({outside})");
+        }
+
+        // T14: cut off by the text's own overflow mode or by a mask above it.
+        if (text.overflowMode != TextOverflowModes.Overflow && text.isTextOverflowing)
+            issues.Add($"T14 cut by overflow mode {text.overflowMode}");
+        for (Transform parent = rect.parent; parent != null; parent = parent.parent)
+        {
+            bool masks = (parent.TryGetComponent(out RectMask2D rectMask) && rectMask.enabled)
+                || (parent.TryGetComponent(out Mask mask) && mask.enabled);
+            if (!masks)
+                continue;
+            string outside = Outside(text, min, max, (RectTransform)parent);
+            if (outside != null)
+                issues.Add($"T14 cut by the mask on `{parent.name}` ({outside})");
+        }
+
+        // T15: the box is too narrow for its font: it holds too few average characters per line. Rated only when the
+        // text really wraps (a line ends because the next word did not fit, not at a written line break), and measured
+        // as box width / mean advance of the text's own characters, so one long German compound does not count.
+        if (wraps && WrapsByWidth(info))
+        {
+            float capacity = CharactersPerLine(text);
+            if (capacity < CharsPerLineMin)
+                issues.Add($"T15 box holds {capacity:0} characters per line, under {CharsPerLineMin:0}");
+            else if (capacity < CharsPerLineTarget)
+                issues.Add($"T15w box holds {capacity:0} characters per line, under the target {CharsPerLineTarget:0}");
+        }
+        return issues;
+    }
+
+    private static bool WrapsByWidth(TMP_TextInfo info)
+    {
+        for (int line = 0; line < info.lineCount - 1; line++)
+        {
+            TMP_LineInfo lineInfo = info.lineInfo[line];
+            if (lineInfo.characterCount > 0 && info.characterInfo[lineInfo.lastCharacterIndex].character != '\n')
+                return true;
+        }
+        return false;
+    }
+
+    // Width of the text area divided by the mean advance of the characters it shows (spaces included).
+    private static float CharactersPerLine(TMP_Text text)
+    {
+        TMP_TextInfo info = text.textInfo;
+        float advance = 0f;
+        int count = 0;
+        for (int i = 0; i < info.characterCount; i++)
+        {
+            TMP_CharacterInfo character = info.characterInfo[i];
+            if (character.character == '\n' || character.character == '\r')
+                continue;
+            advance += character.xAdvance - character.origin;
+            count++;
+        }
+        if (count == 0 || advance <= 0f)
+            return float.PositiveInfinity;
+        float width = text.rectTransform.rect.width - text.margin.x - text.margin.z;
+        return width / (advance / count);
+    }
+
+    // "T15w ..." marks a T15 line under the target but above the floor.
+    private static bool IsWarning(string issue) => issue.StartsWith("T15w ");
+
+    // Bounds of the visible glyphs in the text's local space (glyph boxes, so accents and descenders count).
+    private static bool TryGlyphBounds(TMP_Text text, out Vector3 min, out Vector3 max)
+    {
+        min = new Vector3(float.MaxValue, float.MaxValue);
+        max = new Vector3(float.MinValue, float.MinValue);
+        TMP_TextInfo info = text.textInfo;
+        bool any = false;
+        for (int i = 0; i < info.characterCount; i++)
+        {
+            TMP_CharacterInfo character = info.characterInfo[i];
+            if (!character.isVisible)
+                continue;
+            min = Vector3.Min(min, new Vector3(character.bottomLeft.x, Mathf.Min(character.bottomLeft.y, character.baseLine)));
+            max = Vector3.Max(max, new Vector3(character.topRight.x, character.topRight.y));
+            any = true;
+        }
+        return any;
+    }
+
+    // Which edges of the glyph box lie outside the area, in that area's units; null when it fits.
+    private static string Outside(TMP_Text text, Vector3 min, Vector3 max, RectTransform area)
+    {
+        Rect box = area.rect;
+        var points = new[] { new Vector3(min.x, min.y), new Vector3(min.x, max.y), new Vector3(max.x, min.y), new Vector3(max.x, max.y) };
+        float left = 0f, right = 0f, bottom = 0f, top = 0f;
+        foreach (Vector3 point in points)
+        {
+            Vector3 local = area.InverseTransformPoint(text.transform.TransformPoint(point));
+            left = Mathf.Max(left, box.xMin - local.x);
+            right = Mathf.Max(right, local.x - box.xMax);
+            bottom = Mathf.Max(bottom, box.yMin - local.y);
+            top = Mathf.Max(top, local.y - box.yMax);
+        }
+
+        var edges = new List<string>();
+        if (left > OverflowTolerance) edges.Add($"left {left:0}");
+        if (right > OverflowTolerance) edges.Add($"right {right:0}");
+        if (bottom > OverflowTolerance) edges.Add($"bottom {bottom:0}");
+        if (top > OverflowTolerance) edges.Add($"top {top:0}");
+        return edges.Count == 0 ? null : string.Join(", ", edges);
+    }
+
+    // The nearest parent (or the root canvas) that paints a filled surface behind the text: an enabled, visible Image
+    // that is not a thin stroke. Frames, icons and leader lines are left out by size.
+    private static Graphic Backdrop(TMP_Text text)
+    {
+        if (!(text is TextMeshProUGUI))
+            return null;
+        for (Transform parent = text.transform.parent; parent != null; parent = parent.parent)
+        {
+            if (parent.TryGetComponent(out Image image) && image.enabled && image.color.a >= 0.05f
+                && !(parent.TryGetComponent(out Mask mask) && mask.enabled && !mask.showMaskGraphic))
+            {
+                Rect area = image.rectTransform.rect;
+                if (Mathf.Min(area.width, area.height) >= 12f)
+                    return image;
+            }
+            if (parent.TryGetComponent(out Canvas canvas) && canvas.isRootCanvas)
+                return null;
+        }
+        return null;
+    }
+
+    // German and English entries of the key a text is bound to, or of every key a PositionTexts writes into it; none
+    // for other texts. A locale appears once per key, so a PositionTexts target yields several entries per locale.
+    private static IEnumerable<(string locale, string value)> LocalizedValues(TMP_Text text)
+    {
+        foreach (string key in PositionTextKeys(text))
+        {
+            var table = UnityEditor.Localization.LocalizationEditorSettings.GetStringTableCollection("UI");
+            if (table == null)
+                yield break;
+            foreach (var localeTable in table.StringTables)
+            {
+                var entry = localeTable.GetEntry(key);
+                if (entry != null)
+                    yield return (localeTable.LocaleIdentifier.Code, entry.Value?.Replace("\\n", "\n"));
+            }
+        }
+
+        if (!text.TryGetComponent(out LocalizeStringEvent localize))
+            yield break;
+
+        var collection = UnityEditor.Localization.LocalizationEditorSettings.GetStringTableCollection(localize.StringReference.TableReference);
+        if (collection == null)
+            yield break;
+
+        var entryReference = localize.StringReference.TableEntryReference;
+        long id = !string.IsNullOrEmpty(entryReference.Key) ? collection.SharedData.GetId(entryReference.Key) : entryReference.KeyId;
+        foreach (var table in collection.StringTables)
+        {
+            var entry = table.GetEntry(id);
+            if (entry != null)
+                yield return (table.LocaleIdentifier.Code, entry.Value?.Replace("\\n", "\n"));
+        }
+    }
+
+    // Keys a PositionTexts in the text's scene writes into it (one per order line).
+    private static IEnumerable<string> PositionTextKeys(TMP_Text text)
+    {
+        foreach (GameObject root in text.gameObject.scene.GetRootGameObjects())
+        {
+            foreach (PositionTexts writer in root.GetComponentsInChildren<PositionTexts>(true))
+            {
+                var serialized = new SerializedObject(writer);
+                if (serialized.FindProperty("target")?.objectReferenceValue != text)
+                    continue;
+                SerializedProperty keys = serialized.FindProperty("keyPerPosition");
+                for (int i = 0; keys != null && i < keys.arraySize; i++)
+                    yield return keys.GetArrayElementAtIndex(i).stringValue;
+            }
+        }
+    }
+
+    private static void RebuildCanvasOf(TMP_Text text)
+    {
+        text.ForceMeshUpdate(true);
+        // TMP caches its canvas while inactive, so look the root canvas up instead of using text.canvas.
+        Canvas root = text.GetComponentsInParent<Canvas>(true).LastOrDefault();
+        if (root == null)
+            return;
+        // A rebuild from the root stops at children without a layout group, so also rebuild every parent of the text
+        // that lays itself or its children out (a tag with a ContentSizeFitter inside a hand-laid row).
+        List<RectTransform> controlled = text.GetComponentsInParent<RectTransform>(true)
+            .Where(rect => rect.GetComponent<ILayoutController>() != null).Reverse().ToList();
+        for (int pass = 0; pass < 2; pass++)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)root.transform);
+            foreach (RectTransform rect in controlled)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+        }
+        text.ForceMeshUpdate(true);
     }
 
     // Never seen: the component or renderer is off, or a 3D text sits on a surface whose renderer is off (the hidden
@@ -687,7 +1056,7 @@ public static class TextComfortAudit
         sb.AppendLine("Exemptions (with reasons) are in the `exempt` column of texts.tsv.");
         sb.AppendLine();
 
-        foreach (string check in new[] { "T1", "T2", "T4", "T5", "T6", "T7", "T10", "T11" })
+        foreach (string check in new[] { "T1", "T2", "T4", "T5", "T6", "T7", "T10", "T11", "T13", "T14", "T15" })
         {
             var hits = texts.Where(t => t.Fails.Concat(t.Warnings).Any(f => f.StartsWith(check + " "))).ToList();
             sb.AppendLine($"## {check} ({hits.Count} texts)");

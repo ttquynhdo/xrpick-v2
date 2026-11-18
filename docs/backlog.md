@@ -20,7 +20,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
 **ĐỢT CHECKLIST 2026-11-17 (thêm 2026-11-17, từ `docs/review-notes-checklist-2026-11-17.md` R1–R16 + F2b; gộp theo gốc lỗi cùng ngày; đứng trước mọi khối cũ).** Mục #1–#135 còn mở đã `closed` (người dùng 2026-11-17). Không hai mục cùng sửa một `.unity` một lúc.
-- **Đang mở:** 4 mục gốc #154 (A: bố cục chữ cố định), #155 (B: luật chữ, decision chung), #156 (C: hiện/ẩn theo bước), #157 (D: đặt kiện khi thả, P0); mục lẻ #141 (canvas cong hai lớp), #143 (EN theo glossary), #151 (mặt bàn); quy trình #158; #137–#139 chờ test tay H1. Mục #136, #140, #142, #144–#150, #152, #153 đã gộp vào mục gốc (nội dung giữ làm case test).
+- **Đang mở:** 4 mục gốc #154 (A: bố cục chữ cố định; MCP xong 2026-11-18, chờ kính 5′), #155 (B: luật chữ, decision chung), #156 (C: hiện/ẩn theo bước), #157 (D: đặt kiện khi thả, P0); mục lẻ #141 (canvas cong hai lớp), #143 (EN theo glossary), #151 (mặt bàn); quy trình #158; #137–#139 chờ test tay H1. Mục #136, #140, #142, #144–#150, #152, #153 đã gộp vào mục gốc (nội dung giữ làm case test).
 - **1. Ngay:** **#157** (P0) bắt đầu bằng tái hiện chỗ đặt giữa ở Mixed (Simulator hoặc kính), rồi thiết kế „một cơ chế quyết định khi thả“; phần thả ngoài thùng (#153) có thể sau freeze 19/11. Song song (khác file): **#158** (chỉ skill/doc) và **#143** (chỉ CSV + glossary).
 - **2. Song song với #157 (khác scene):** **#156** (Welcome + Concept, không cần decision) → **#141** (layer canvas cong, 5 scene: chạy sau khi #156 xong Welcome/Concept và #157 xong Mixed, vì đụng mọi scene).
 - **3. Một `solution-decision` chung cho #155** (**xong 2026-11-18: decision 041, phương án B**; #155 in progress trên `feat/155-text-rule`, thứ tự CSV (#145, #144) → #147 → #146, một build "039"; phần câu hỏi của #154 làm sau #155) (chạy song song với bước 1–2, chỉ là phân tích): xong decision → #155 (5 scene) → phần câu hỏi của #154; phần còn lại của #154 (luật + tool + chú thích tour) làm được ngay sau #156 (cùng ConceptScene). Một lần đổi `layout_version` cho #155 (+ #157 nếu log đổi).
@@ -2555,7 +2555,8 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Công:** M–L
 - **Test trên kính:** nhanh (đọc các chú thích tour, bảng EKZ, phản hồi quiz)
 - **Depends on:** chỗ đặt câu hỏi Concept/Complex theo #155 (decision chung); phần không đụng câu hỏi làm được trước
-- **Status:** todo
+- **Status:** in progress (MCP 16/16 ✅ + 3 code ✅, chờ kính 5′ H1; nhánh `feat/151-desk-edges`, chưa commit; không đổi `layout_version`, đi chung build "039")
+- **Test report:** docs/test-reports/bl154.md
 
 ### #155 [Feature] Gốc B: một luật chữ cho cả khoá — chữ chỉ có khi nói điều cảnh không tự cho thấy; sửa các decision bắt buộc chữ
 - **Type:** feature
