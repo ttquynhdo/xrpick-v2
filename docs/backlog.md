@@ -2423,7 +2423,7 @@ Nguồn: `docs/review-notes-checklist-2026-11-17.md` (R1–R16, góp ý người
 - **Test trên kính:** không (ảnh MCP view `instructions`, `confirm` bản EN)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl143.md
-- **Status:** verified-mcp (9/9 MCP + 2 code ✅; nhánh `feat/156-show-hide-rules`; không cần test kính)
+- **Status:** done (commit ee65e9b, test 9/9 MCP + 2 code ✅, không cần test kính)
 
 ### #144 [P1] Concept bước 8–9: bỏ câu chỉ chỗ ví dụ, giữ câu dẫn sang bảng EKZ
 - **Type:** logic
@@ -2615,7 +2615,7 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Test trên kính:** không
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl158.md
-- **Status:** verified-mcp (5/5 ✅ code/MCP, không có case tay; skill local `.claude/skills/unity-safe-change/`, checklist tạo bằng `manual_checklist.py`)
+- **Status:** done (commit a8d5f18, test 5/5 ✅, không có case tay; skill local `.claude/skills/unity-safe-change/`, checklist tạo bằng `manual_checklist.py`)
 
 ### Log nghiên cứu sau buổi P811 (thêm 2026-11-18)
 
