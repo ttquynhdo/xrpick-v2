@@ -172,8 +172,14 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
             && placementCheck != null && !placementCheck.AllPlaced(container.CurrentPositionPackages);
         bool correct = result.Correct && !placementWrong;
 
+        // #160: the snap places of an Empf Kz 003 position, taken before the outlines change below.
+        PlacementInfo placement = EkzPlacementCheck.NeedsPlaces(container.CurrentLine) && placementCheck != null
+            ? placementCheck.Snapshot(container.CurrentPositionPackages)
+            : null;
+
         // #28, decision 021: logged before the position advances.
-        ResearchLogger.LogConfirmPressed(result, container.CurrentPosition, container.PositionCount, placementWrong);
+        ResearchLogger.LogConfirmPressed(result, container.CurrentPosition, container.PositionCount, placementWrong,
+            placement);
         if (correct)
         {
             ResearchLogger.LogPositionCompleted(container.CurrentPosition);

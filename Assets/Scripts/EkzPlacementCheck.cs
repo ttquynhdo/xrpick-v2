@@ -181,6 +181,50 @@ public class EkzPlacementCheck : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// #160: the places at a red-button press for confirm_pressed.placement. packagesInBox = the packages of the
+    /// current position the counter holds. A package a place still holds but the counter does not (e.g. the
+    /// #157 bug: a carton grabbed out of its place kept the place) is listed in places_held_by_other.
+    /// Take it before ShowPlaces, so places_shown is what the trainee saw when pressing.
+    /// </summary>
+    public PlacementInfo Snapshot(IEnumerable<PackageData> packagesInBox)
+    {
+        var inBox = new HashSet<PackageData>();
+        var placed = new List<string>();
+        var loose = new List<string>();
+        foreach (PackageData package in packagesInBox)
+        {
+            if (package == null || !package.isActiveAndEnabled || !inBox.Add(package))
+                continue;
+
+            (snapped.Contains(package) ? placed : loose).Add(ResearchObjectId.Of(package));
+        }
+
+        var heldByOther = new List<string>();
+        foreach (PackageData package in snapped)
+        {
+            if (package != null && package.isActiveAndEnabled && !inBox.Contains(package))
+            {
+                heldByOther.Add(ResearchObjectId.Of(package));
+            }
+        }
+
+        placed.Sort(StringComparer.Ordinal);
+        loose.Sort(StringComparer.Ordinal);
+        heldByOther.Sort(StringComparer.Ordinal);
+
+        int placeCount = 0;
+        foreach (SnapInteractable place in places)
+        {
+            if (place != null)
+            {
+                placeCount++;
+            }
+        }
+
+        return new PlacementInfo(placeCount, placed, loose, heldByOther, PlacesShown);
+    }
+
     private void HandleSnapped(IInteractorView interactor)
     {
         PackageData package = PackageOf(interactor);

@@ -67,6 +67,43 @@ namespace XRPick.Research.Tests
         }
 
         [Test]
+        public void ConfirmPressed_PlacementBetweenErrorCodesAndTime()
+        {
+            OrderResult result = OrderRule.Check(new[] { Connector }, Full("connector_a", 3), false);
+            var placement = new PlacementInfo(3,
+                new[] { "Interactables/GG_Package (4)", "Interactables/GG_Package (5)" },
+                new[] { "Interactables/GG_Package (1)" },
+                new[] { "Interactables/GG_Package (3)" }, false);
+            string json = OutcomeEvents.ConfirmPressed(2, 1, 2, 2, result,
+                OutcomeEvents.ConfirmErrors(result, true), 65.5, placement).ToJson();
+            StringAssert.Contains(
+                "\"error_codes\":[{\"code\":\"EKZ_PLACEMENT\",\"item\":null}]," +
+                "\"placement\":{\"places\":3," +
+                "\"placed\":[\"Interactables/GG_Package (4)\",\"Interactables/GG_Package (5)\"]," +
+                "\"loose\":[\"Interactables/GG_Package (1)\"]," +
+                "\"places_held_by_other\":[\"Interactables/GG_Package (3)\"]," +
+                "\"places_shown\":false}," +
+                "\"time_since_scene_enter_s\":65.5}", json);
+        }
+
+        [Test]
+        public void ConfirmPressed_NoPlacementMeansNoField()
+        {
+            OrderResult result = OrderRule.Check(new[] { Ring }, Full("ring_d", 2), true);
+            string json = OutcomeEvents.ConfirmPressed(1, 1, 2, 1, result,
+                OutcomeEvents.ConfirmErrors(result, false), 3).ToJson();
+            StringAssert.DoesNotContain("placement", json);
+        }
+
+        [Test]
+        public void Placement_NullListsBecomeEmptyArrays()
+        {
+            string json = new PlacementInfo(6, null, null, null, true).ToJson();
+            Assert.AreEqual("{\"places\":6,\"placed\":[],\"loose\":[],\"places_held_by_other\":[],\"places_shown\":true}",
+                json);
+        }
+
+        [Test]
         public void ConfirmPressed_EmptyIsAloneAndCorrectFollowsCodes()
         {
             OrderResult empty = OrderRule.Check(new[] { Connector }, new ContainerContents(), false);

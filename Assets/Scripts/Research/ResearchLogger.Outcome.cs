@@ -10,8 +10,10 @@ public sealed partial class ResearchLogger
 {
     /// <summary>One rated red-button press, written before the position advances.</summary>
     /// <param name="ekzPlacementWrong">Basic: the quantity is right but a carton lies outside the snap places.</param>
+    /// <param name="placement">#160: the snap places at an Empf Kz 003 position (Basic, Mixed position 1); null
+    /// elsewhere.</param>
     public static void LogConfirmPressed(OrderResult result, int position, int positionCount,
-        bool ekzPlacementWrong = false)
+        bool ekzPlacementWrong = false, PlacementInfo placement = null)
     {
         if (result == null)
         {
@@ -19,7 +21,8 @@ public sealed partial class ResearchLogger
         }
 
         LogOutcome("confirm_pressed",
-            o => o.Confirm(result, position, positionCount, ekzPlacementWrong, instance.SceneActiveSeconds()));
+            o => o.Confirm(result, position, positionCount, ekzPlacementWrong, instance.SceneActiveSeconds(),
+                placement));
     }
 
     /// <summary>A press that was not rated; reason is one of the OutcomeEvents.Ignored* values.</summary>

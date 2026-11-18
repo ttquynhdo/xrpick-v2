@@ -40,10 +40,12 @@ public static class OutcomeEvents
         return errors;
     }
 
+    /// <param name="placement">#160: the snap places at an Empf Kz 003 position; null elsewhere (no field).</param>
     public static JsonFields ConfirmPressed(int attemptNo, int position, int positionCount, int attemptInPosition,
-        OrderResult result, IReadOnlyList<OrderError> errors, double timeSinceSceneEnterS)
+        OrderResult result, IReadOnlyList<OrderError> errors, double timeSinceSceneEnterS,
+        PlacementInfo placement = null)
     {
-        return new JsonFields()
+        var fields = new JsonFields()
             .Add("attempt_no", attemptNo)
             .Add("position", position)
             .Add("position_count", positionCount)
@@ -51,8 +53,13 @@ public static class OutcomeEvents
             .AddRaw("line", LineJson(result))
             .AddRaw("foreign", ForeignJson(result.Foreign))
             .Add("correct", errors.Count == 0)
-            .AddRaw("error_codes", ErrorCodesJson(errors))
-            .Add("time_since_scene_enter_s", Round(timeSinceSceneEnterS));
+            .AddRaw("error_codes", ErrorCodesJson(errors));
+        if (placement != null)
+        {
+            fields.AddRaw("placement", placement.ToJson());
+        }
+
+        return fields.Add("time_since_scene_enter_s", Round(timeSinceSceneEnterS));
     }
 
     public static JsonFields ConfirmIgnored(string reason, int position, double timeSinceSceneEnterS)

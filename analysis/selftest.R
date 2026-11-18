@@ -938,6 +938,46 @@ local({
             !any(grepl("snap-place grab restart was open", c(p_warn, warn_lines), fixed = TRUE)),
             pw8("snap_grab_artifacts", "P817") == 9)
 
+  # 8y2. confirm_pressed.placement (#160). make_fake_data.R writes it on every
+  #      Empf Kz 003 press of a "029"-or-newer build (Basic, Mixed position 1)
+  #      and nowhere else; R reads it into presses, checks it and counts
+  #      presses with a place held by another carton per person. P816's Basic
+  #      TOO_FEW press has the #157 bug (the carton just taken out keeps its place).
+  pp <- pilot_set$presses %>% filter(event == "confirm_pressed") %>%
+    mutate(lay = as.integer(layout_version))
+  want_placement <- pp$empf_kz %in% "003" & pp$lay >= 29L
+  stopifnot(any(want_placement), identical(pp$has_placement, want_placement),
+            all(is.na(pp$placement_n_loose[!pp$has_placement])), all(is.na(pp$placement_shown[!pp$has_placement])))
+  ppl <- pp %>% filter(has_placement)
+  ekz_rows <- map_lgl(ppl$codes, ~ "EKZ_PLACEMENT" %in% .x)
+  stopifnot(all(ppl$placement_places == if_else(ppl$scene == "BasicPickingScene", 6L, 3L)),
+            # EKZ_PLACEMENT <=> quantity right and something loose (the validator's AllPlaced).
+            all(ppl$placement_n_loose[ekz_rows] > 0),
+            all(ppl$placement_n_loose[ppl$correct] == 0), all(ppl$placement_n_held[ppl$correct] == 0),
+            all(ppl$placement_n_placed[ppl$correct] == ppl$required_full[ppl$correct]),
+            all(ppl$placement_n_placed + ppl$placement_n_loose == ppl$placed_full))
+  # places_shown follows skill_scaffolds.csv: Basic from "034"; Mixed from
+  # "038", in "034"-"037" after the first EKZ_PLACEMENT (P816: off, on, on).
+  stopifnot(all(ppl$placement_shown[ppl$scene == "BasicPickingScene"] == (ppl$lay[ppl$scene == "BasicPickingScene"] >= 34L)),
+            identical(ppl$placement_shown[ppl$participant_id == "P816" & ppl$scene == "MixedPickingScene"],
+                      c(FALSE, TRUE, TRUE)),
+            all(ppl$placement_shown[ppl$scene == "MixedPickingScene" & ppl$lay >= 38L]),
+            !any(ppl$placement_shown[ppl$lay < 34L]))
+  held816 <- ppl %>% filter(placement_n_held > 0)
+  stopifnot(nrow(held816) == 1, held816$participant_id == "P816", held816$scene == "BasicPickingScene",
+            identical(held816$codes[[1]], "TOO_FEW"), held816$placement_n_placed == 5)
+  # data_quality: 1 for P816, 0 for the other builds with the field, NA (not
+  # measured) for builds without it and for the whole study set ("025").
+  lay_of <- pilot_set$data_quality$layout_versions
+  stopifnot(pq("places_held_by_other_presses", "P816") == 1,
+            all(pilot_set$data_quality$places_held_by_other_presses[
+              !pilot_set$data_quality$participant_id %in% "P816" & as.integer(lay_of) >= 29L] == 0),
+            all(is.na(pilot_set$data_quality$places_held_by_other_presses[as.integer(lay_of) < 29L])),
+            all(is.na(data_quality$places_held_by_other_presses)))
+  stopifnot(sum(grepl("snap place held by a carton outside the order container", p_warn, fixed = TRUE)) == 1,
+            any(grepl("P816 BasicPickingScene visit 1 position 1", p_warn, fixed = TRUE)),
+            !any(grepl("confirm_pressed.placement:", c(p_warn, warn_lines), fixed = TRUE)))
+
   # 8z. WelcomeScene learning objectives (#121/#124, decision 038). P818 ran
   #     the current layout "036": welcome_tasks_opened before both
   #     welcome_practice_done, with a 25 s headset-off pause while reading.
@@ -1326,6 +1366,49 @@ local({
   stopifnot(nrow(excl_base$excluded_press_rows) == 0, all(excl_base$data_quality$excluded_presses == 0),
             all(is.na(excl_base$data_quality$exclusions)))
   unlink(c(excl_dir, output_dir), recursive = TRUE)
+  exclusions_file <- file.path(tempdir(), "selftest_no_exclusions.csv")
+
+  # 8z7. Broken and missing placement (#160), on a copy of the pilot logs:
+  #      P816's first Basic press (EKZ_PLACEMENT) loses its loose carton ->
+  #      warned as a contract break; P820's presses lose the whole field (a
+  #      build before #160) -> places_held_by_other_presses NA, no warning.
+  plc_dir <- file.path(tempdir(), "selftest_placement")
+  unlink(plc_dir, recursive = TRUE)
+  dir.create(file.path(plc_dir, "research"), recursive = TRUE)
+  file.copy("analysis/data/fake/research/pilot", file.path(plc_dir, "research"), recursive = TRUE)
+  edit_events <- function(pid, edit) {
+    path <- list.files(file.path(plc_dir, "research", "pilot"), pattern = paste0("^", pid, "_.*_events\\.jsonl$"),
+                       full.names = TRUE)
+    stopifnot(length(path) == 1)
+    lines <- readLines(path, encoding = "UTF-8")
+    lines <- edit(lines)
+    con <- file(path, open = "wb")
+    writeLines(enc2utf8(lines), con, sep = "\n", useBytes = TRUE)
+    close(con)
+  }
+  edit_events("P816", function(lines) {
+    hit <- which(grepl("\"scene\":\"BasicPickingScene\"", lines, fixed = TRUE) &
+                   grepl("\"code\":\"EKZ_PLACEMENT\"", lines, fixed = TRUE))[1]
+    stopifnot(!is.na(hit), grepl("\"loose\":[\"", lines[hit], fixed = TRUE))
+    lines[hit] <- sub("\"loose\":\\[[^]]*\\]", "\"loose\":[]", lines[hit])
+    lines
+  })
+  edit_events("P820", function(lines) {
+    stopifnot(any(grepl("\"placement\":", lines, fixed = TRUE)))
+    gsub(",\"placement\":\\{[^}]*\\}", "", lines)
+  })
+  data_dir <- plc_dir
+  output_dir <- file.path(tempdir(), "selftest_placement_out")
+  source("analysis/analyse.R", local = TRUE)
+  plc_warn <- readLines(file.path(output_dir, "pilot", "warnings.txt"), encoding = "UTF-8")
+  broken <- plc_warn[grepl("confirm_pressed.placement:", plc_warn, fixed = TRUE)]
+  stopifnot(length(broken) == 1,
+            grepl("EKZ_PLACEMENT but placement.loose and places_held_by_other are empty", broken, fixed = TRUE),
+            grepl("P816 BasicPickingScene visit 1 position 1 attempt 1", broken, fixed = TRUE),
+            is.na(pilot_set$data_quality$places_held_by_other_presses[pilot_set$data_quality$participant_id == "P820"]),
+            pilot_set$data_quality$places_held_by_other_presses[pilot_set$data_quality$participant_id == "P816"] == 1,
+            !any(pilot_set$presses$has_placement[pilot_set$presses$participant_id == "P820"]))
+  unlink(c(plc_dir, output_dir), recursive = TRUE)
 
   # 9. Without allow_fake, analyse.R must refuse the fake folder.
   # (parent = globalenv(), so it can't see allow_fake from this environment)

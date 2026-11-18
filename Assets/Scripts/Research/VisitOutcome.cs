@@ -38,7 +38,7 @@ public sealed class VisitOutcome
     public bool TaskCompleted => attemptsToCorrect.HasValue;
 
     public JsonFields Confirm(OrderResult result, int position, int positionCount, bool ekzPlacementWrong,
-        double timeSinceSceneEnterS)
+        double timeSinceSceneEnterS, PlacementInfo placement = null)
     {
         if (position != currentPosition)
         {
@@ -55,7 +55,7 @@ public sealed class VisitOutcome
         }
 
         return OutcomeEvents.ConfirmPressed(confirmNo, position, positionCount, attemptsInPosition, result, errors,
-            timeSinceSceneEnterS);
+            timeSinceSceneEnterS, placement);
     }
 
     public JsonFields Ignored(string reason, int position, double timeSinceSceneEnterS)

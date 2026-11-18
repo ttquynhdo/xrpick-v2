@@ -101,8 +101,13 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
         // Quantity errors come first; the placement is checked only once the quantity is right (decision 003, D6).
         bool placementWrong = result.Correct && placementCheck != null && !placementCheck.AllPlaced(calc.PackagesInside);
 
+        // #160: the snap places (Basic's line is Empf Kz 003).
+        PlacementInfo placement = EkzPlacementCheck.NeedsPlaces(calc.OrderLine) && placementCheck != null
+            ? placementCheck.Snapshot(calc.PackagesInside)
+            : null;
+
         // #28, decision 021: Basic is one position; EKZ_PLACEMENT follows the OrderRule codes.
-        ResearchLogger.LogConfirmPressed(result, 1, 1, placementWrong);
+        ResearchLogger.LogConfirmPressed(result, 1, 1, placementWrong, placement);
 
         if (!result.Correct)
         {

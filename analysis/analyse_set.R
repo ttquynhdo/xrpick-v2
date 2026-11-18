@@ -831,6 +831,16 @@ presses <- v2_events %>% filter(event %in% c("confirm_pressed", "quiz_answer")) 
                                                           function(f) as_chr(f$item)), collapse = ";")),
             correct = map_lgl(data, ~ as_lgl(.x$correct)),
             codes = map(data, ~ map_chr(.x$error_codes %||% list(), function(e) as_chr(e$code))),
+            # #160: the snap places at an Empf Kz 003 press (Basic, Mixed position 1).
+            # No key = not logged (other positions, quiz touches, builds before
+            # #160): the counts are NA then, never 0.
+            has_placement = map_lgl(data, ~ !is.null(.x$placement)),
+            placement_places = map_int(data, ~ as_int(.x$placement$places)),
+            placement_n_placed = map_int(data, ~ if (is.null(.x$placement)) NA_integer_ else length(.x$placement$placed)),
+            placement_n_loose = map_int(data, ~ if (is.null(.x$placement)) NA_integer_ else length(.x$placement$loose)),
+            placement_n_held = map_int(data, ~ if (is.null(.x$placement)) NA_integer_
+                                       else length(.x$placement$places_held_by_other)),
+            placement_shown = map_lgl(data, ~ as_lgl(.x$placement$places_shown)),
             time_since_scene_enter_s = map_dbl(data, ~ as_num(.x$time_since_scene_enter_s))) %>%
   mutate(n_codes = lengths(codes),
          press_id = row_number(),
@@ -945,6 +955,42 @@ for (i in seq_len(nrow(ekz_misplaced))) {
        " visit ", r$scene_visit, " position ", r$position, " (Empf Kz ", coalesce(r$empf_kz, "NA"),
        ", codes ", paste(r$codes[[1]], collapse = ";"), "): not counted in the ekz_placement rate")
 }
+
+# confirm_pressed.placement checks (#160, spec 4.2). The validator gives
+# EKZ_PLACEMENT exactly when a counted package lies in no snap place, so such
+# a press needs a non-empty loose (or a place held by another carton); a
+# correct press has nothing loose; placement only exists at Empf Kz "003".
+# Presses without the field (older builds) are skipped, not warned.
+placement_presses <- presses %>% filter(event == "confirm_pressed", has_placement)
+placement_breaks <- bind_rows(
+  placement_presses %>%
+    filter(map_lgl(codes, ~ "EKZ_PLACEMENT" %in% .x), placement_n_loose == 0, placement_n_held == 0) %>%
+    mutate(problem = "EKZ_PLACEMENT but placement.loose and places_held_by_other are empty"),
+  placement_presses %>% filter(correct %in% TRUE, placement_n_loose > 0) %>%
+    mutate(problem = "correct press with a non-empty placement.loose"),
+  placement_presses %>% filter(!empf_kz %in% "003") %>%
+    mutate(problem = "placement at a position that is not Empf Kz 003"))
+for (r in split(placement_breaks, seq_len(nrow(placement_breaks)))) {
+  warn("confirm_pressed.placement: ", r$problem, ": ", r$participant_id, " ", r$scene, " visit ",
+       r$scene_visit, " position ", r$position, " attempt ", r$attempt_no, " (codes ",
+       paste(r$codes[[1]], collapse = ";"), ")")
+}
+# A snap place held by a carton the order container does not hold is the
+# #157 app bug (#159): the trainee could not use that place. Counted per
+# person in data_quality.csv; whether the press is excluded is decided by
+# hand in data_exclusions.csv.
+held_place_positions <- placement_presses %>% filter(placement_n_held > 0) %>%
+  count(participant_id, session_id, scene, scene_visit, position)
+for (r in split(held_place_positions, seq_len(nrow(held_place_positions)))) {
+  warn("snap place held by a carton outside the order container (app bug #157) on ", r$n, " press(es): ",
+       r$participant_id, " ", r$scene, " visit ", r$scene_visit, " position ", r$position, " (session ",
+       r$session_id, "): check data_exclusions.csv (data_quality.csv places_held_by_other_presses)")
+}
+# Per person: NA = no press of the person logged placement (not measured).
+placement_by_person <- presses %>% filter(event == "confirm_pressed") %>%
+  group_by(participant_id) %>%
+  summarise(places_held_by_other_presses = if (any(has_placement)) sum(placement_n_held > 0, na.rm = TRUE)
+                                           else NA_integer_, .groups = "drop")
 
 # Every attempt needs its item (position / question_id), and attempt_in_position
 # / attempt_in_question must count 1, 2, 3 ... per item within a visit.
@@ -2320,6 +2366,7 @@ data_quality <- sessions %>%
                         facilitator_tail_s = if (any(!is.na(facilitator_tail_s))) sum(facilitator_tail_s, na.rm = TRUE) else NA_real_,
                         .groups = "drop"),
             by = "participant_id") %>%
+  left_join(placement_by_person, by = "participant_id") %>%
   left_join(invariant_breaks %>% count(participant_id, name = "invariant_breaks"), by = "participant_id") %>%
   left_join(unknown_codes %>% count(participant_id, name = "unknown_codes"), by = "participant_id") %>%
   left_join(summary_mismatches %>% count(participant_id, name = "summary_mismatches"), by = "participant_id") %>%
@@ -2335,8 +2382,8 @@ data_quality <- sessions %>%
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, excluded_presses, exclusions, interaction_logged,
-         end_control_opens, menu_blocked, open_grabs, snap_grab_artifacts, facilitator_tail_s, invariant_breaks,
-         unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
+         end_control_opens, menu_blocked, open_grabs, snap_grab_artifacts, places_held_by_other_presses,
+         facilitator_tail_s, invariant_breaks, unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
          first_start_utc) %>%
   arrange(participant_id)
 
@@ -2372,6 +2419,8 @@ dq_long <- data_quality %>%
             end_ctrl_opens = coalesce(as.character(end_control_opens), ""),
             # #114: orange = a log from before the snap fix (restarts dropped from grabs).
             snap_restarts = coalesce(as.character(snap_grab_artifacts), ""),
+            # #160: orange = a snap place was held by a carton outside the box (app bug #157); empty = not logged.
+            held_place = coalesce(as.character(places_held_by_other_presses), ""),
             invariant = as.character(invariant_breaks),
             unknown_code = as.character(unknown_codes),
             summary_diff = as.character(summary_mismatches),

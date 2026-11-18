@@ -731,15 +731,72 @@ complete_task <- function(s) {
 press_confirm <- function(s, pos_no, k, attempt, correct = length(attempt$codes) == 0) {
   at <- active_s(s)
   note_attempt(s, correct, attempt$codes, at)
-  emit(s, "confirm_pressed", json_obj(
+  data <- json_obj(
     attempt_no = s$v$attempts, position = pos_no,
     position_count = length(order_positions[[s$scene]]), attempt_in_position = k,
     line = line_obj(attempt$pos, attempt$placed_full, attempt$placed_loose,
                     empf_kz = if (layout_at_least(s$layout, 29))
                       position_empf_kz(s$scene, pos_no, s$layout) else NULL),
     foreign = json_arr(list()), correct = correct,
-    error_codes = codes_json(attempt$codes), time_since_scene_enter_s = at))
+    error_codes = codes_json(attempt$codes))
+  # #160: placement sits between error_codes and time_since_scene_enter_s and
+  # is left out (no key, not null) where the position has no snap places.
+  placement <- placement_obj(s, pos_no, attempt)
+  if (!is.null(placement)) data$placement <- placement
+  data$time_since_scene_enter_s <- at
+  emit(s, "confirm_pressed", data)
+  # Mixed "034"-"037" shows the place outlines from the first EKZ_PLACEMENT on.
+  if ("EKZ_PLACEMENT" %in% vapply(attempt$codes, function(e) e$code, character(1))) s$v$ekz_error_seen <- TRUE
   correct
+}
+
+# ---- confirm_pressed.placement (#160) ----
+# The snap places of the order container at an Empf Kz "003" press: Basic 6,
+# Mixed position 1 3. Written only where line.empf_kz is written too (layout
+# "029" on): the older fake builds stay without the field, so R's "not
+# logged" path (NA, no warning) is tested. (The real app has the field only
+# from #160 on, inside layout "039"; the fake "029"-"038" people get it
+# anyway so every place help level is covered.) No random draws: the other
+# fake values stay the same.
+snap_places <- c(BasicPickingScene = 6L, MixedPickingScene = 3L)
+
+# Outlines visible at the press (skill_scaffolds.csv, ekz_places): Basic from
+# "034"; Mixed position 1 from "038", and in "034"-"037" after the first
+# EKZ_PLACEMENT of the visit.
+places_shown_at <- function(s) {
+  if (s$scene == "BasicPickingScene") return(layout_at_least(s$layout, 34))
+  layout_at_least(s$layout, 38) || (layout_at_least(s$layout, 34) && isTRUE(s$v$ekz_error_seen))
+}
+
+placement_obj <- function(s, pos_no, attempt) {
+  if (!layout_at_least(s$layout, 29) || position_empf_kz(s$scene, pos_no, s$layout) != "003") return(NULL)
+  places <- snap_places[[s$scene]]
+  item <- order_positions[[s$scene]][[pos_no]]$item
+  # The cartons of this position in the order container, in the order they
+  # came in; ids as in grab_start (a run without interaction events has no
+  # box bookkeeping: then the first placed_full ids of the material).
+  box <- s$v$box
+  ids <- if (is.null(box)) character(0) else box$obj[box$pos == pos_no & box$form == "full"]
+  if (length(ids) != attempt$placed_full) {
+    ids <- vapply(seq_len(attempt$placed_full), function(n) object_id(s$scene, item, "full", n), character(1))
+  }
+  # #157 bug (fixed_press held_by_other): the carton taken out last still
+  # holds its place, so one place fewer is free.
+  held <- if (isTRUE(attempt$held_by_other) && !is.null(s$v$last_out)) s$v$last_out else character(0)
+  free <- places - length(held)
+  ekz <- "EKZ_PLACEMENT" %in% vapply(attempt$codes, function(e) e$code, character(1))
+  # More cartons than free places: the extra ones lie loose. EKZ_PLACEMENT
+  # (quantity right, so the cartons fit) means one of them lies beside the
+  # places: the validator's AllPlaced fails exactly when loose is non-empty.
+  n_loose <- min(length(ids), max(length(ids) - free, if (ekz) 1L else 0L))
+  loose <- utils::tail(ids, n_loose)
+  placed <- utils::head(ids, length(ids) - n_loose)
+  # Sorted ordinal (C# StringComparer.Ordinal = radix order in R).
+  json_obj(places = places,
+           placed = json_arr(sort(placed, method = "radix")),
+           loose = json_arr(sort(loose, method = "radix")),
+           places_held_by_other = json_arr(sort(held, method = "radix")),
+           places_shown = places_shown_at(s))
 }
 
 # A red-button press the validator ignores (early return): not an attempt,
@@ -902,6 +959,7 @@ take_out <- function(s, item, pos, form) {
   container_change(s, FALSE, obj, item, pos, form)
   advance(s, round(side_runif(0.5, 1.5), 3))
   grab_end(s, obj, item)
+  s$v$last_out <- obj  # #160: the carton a #157 bug place would still hold
 }
 
 # Picked up and put back where it was (hesitation, a re-grab): no container change.
@@ -1336,7 +1394,8 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
       if (k <= length(fixed)) {
         f <- fixed[[k]]
         attempt <- list(pos = positions[[pos_no]], placed_full = f$placed_full,
-                        placed_loose = f$placed_loose, codes = f$codes)
+                        placed_loose = f$placed_loose, codes = f$codes,
+                        held_by_other = f$held_by_other)
         place_to(s, pos_no, attempt$placed_full, attempt$placed_loose)
         pos_done <- press_confirm(s, pos_no, k, attempt, f$correct)
       } else {
@@ -1410,9 +1469,13 @@ run_full_course <- function(person, build, start_utc, special = list(), start_mo
   invisible(s)
 }
 
-# A fixed press for run_picking(forced = ...).
-fixed_press <- function(placed_full, codes, correct = length(codes) == 0, placed_loose = NULL) {
-  list(placed_full = placed_full, placed_loose = placed_loose, codes = codes, correct = correct)
+# A fixed press for run_picking(forced = ...). held_by_other (#160): the
+# carton taken out of the order container last still holds its snap place
+# at this press (the #157 app bug), see placement_obj.
+fixed_press <- function(placed_full, codes, correct = length(codes) == 0, placed_loose = NULL,
+                        held_by_other = FALSE) {
+  list(placed_full = placed_full, placed_loose = placed_loose, codes = codes, correct = correct,
+       held_by_other = held_by_other)
 }
 
 # ---- 7. The fake participants ----------------------------------------------
@@ -1877,12 +1940,15 @@ run_full_course(p815, "bbb2222", "2026-11-06T20:00:00Z", language = "EN", layout
 #     off: an ekz_placement test, wrong), EKZ_PLACEMENT again and correct
 #     (outlines on: not tested); position 2 correct.
 # Station start delay 4 s as in "033".
+# #160: at the Basic TOO_FEW press the carton just taken out still holds its
+# snap place (the #157 app bug of the real P811): placement.places_held_by_other
+# lists it, so data_quality.csv places_held_by_other_presses = 1 for P816.
 p816 <- new_person("P816")
 run_full_course(p816, "ccc3333", "2026-11-06T22:00:00Z", language = "EN", layout = "034",
                 special = list(ConceptScene = list(hints = p814_hints),
                                BasicPickingScene = list(forced = list("1" = list(
                                  fixed_press(6, list(err("EKZ_PLACEMENT"))),
-                                 fixed_press(5, list(err("TOO_FEW", "training_b"))),
+                                 fixed_press(5, list(err("TOO_FEW", "training_b")), held_by_other = TRUE),
                                  fixed_press(6, list())))),
                                MixedPickingScene = list(forced = list(
                                  "1" = list(fixed_press(3, list(err("EKZ_PLACEMENT"))),
