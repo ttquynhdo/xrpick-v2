@@ -214,7 +214,7 @@ public class PackageDropper : MonoBehaviour
         Physics.SyncTransforms();
         Vector3 pivotOffset = package.position - body.center;
 
-        Collider container = ContainerBelow(body.center);
+        Collider container = ContainerBelow(body);
         Vector3 centre = body.center;
         Vector3 half = body.extents;
         float landingY;
@@ -357,16 +357,31 @@ public class PackageDropper : MonoBehaviour
             ~ignoredLayers, QueryTriggerInteraction.Collide);
     }
 
-    // The container whose footprint holds the package's centre (its own collider, solid or the counter's trigger).
-    private Collider ContainerBelow(Vector3 point)
+    // The container below any part of the package's footprint (its own collider, solid or the counter's trigger); the
+    // one under most of it when it spans two. A package let go half over a container's wall goes in, never onto the rim:
+    // the container's collider spans the whole box, so a cast would stand the package on top of it.
+    private Collider ContainerBelow(Bounds body)
     {
-        foreach (Collider collider in Physics.OverlapBox(new Vector3(point.x, MinSurfaceY + CastDepth / 2f, point.z),
-                     new Vector3(0.001f, CastDepth / 2f, 0.001f), Quaternion.identity, ~ignoredLayers, QueryTriggerInteraction.Collide))
+        Collider best = null;
+        float bestArea = 0f;
+        foreach (Collider collider in Physics.OverlapBox(new Vector3(body.center.x, MinSurfaceY + CastDepth / 2f, body.center.z),
+                     new Vector3(body.extents.x, CastDepth / 2f, body.extents.z), Quaternion.identity, ~ignoredLayers,
+                     QueryTriggerInteraction.Collide))
         {
-            if (IsContainer(collider) && point.y > collider.bounds.min.y)
-                return collider;
+            if (!IsContainer(collider) || body.center.y <= collider.bounds.min.y)
+                continue;
+
+            Bounds box = collider.bounds;
+            float overlapX = Mathf.Min(body.max.x, box.max.x) - Mathf.Max(body.min.x, box.min.x);
+            float overlapZ = Mathf.Min(body.max.z, box.max.z) - Mathf.Max(body.min.z, box.min.z);
+            float area = Mathf.Max(0f, overlapX) * Mathf.Max(0f, overlapZ);
+            if (area > bestArea)
+            {
+                best = collider;
+                bestArea = area;
+            }
         }
-        return null;
+        return best;
     }
 
     private static bool IsContainer(Collider collider)
