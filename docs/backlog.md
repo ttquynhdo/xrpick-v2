@@ -2632,7 +2632,7 @@ Nguồn: kiểm 6 câu hỏi của lead trên 7 log thật `analysis/data/real` 
 - **Test trên kính:** không
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl159.md
-- **Status:** verified-mcp (9/9 R/code ✅, không có case tay; nhánh `fix/159-p811-exclusion`, chưa commit)
+- **Status:** done (commit c378a6f, test 9/9 ✅; nhánh `fix/159-p811-exclusion`)
 
 ### #160 [P2] Log: `confirm_pressed` ghi chi tiết chỗ đặt EKZ 003 (carton nào nằm đâu, chỗ nào bị giữ)
 - **Type:** feature
