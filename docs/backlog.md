@@ -2668,7 +2668,8 @@ Nguồn: kiểm 6 câu hỏi của lead trên 7 log thật `analysis/data/real` 
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl162.md
+- **Status:** verified-mcp (8/9 ✅, chờ test tay D2b: header log của một build Development có `-dirty`; nhánh `fix/162-clean-build-guard`, commit a5a36ae)
 
 ### #163 [P3] Log: bỏ hai trường `hand` / `input` luôn `null` trong `grab_start` / `grab_end`
 - **Type:** cleanup
