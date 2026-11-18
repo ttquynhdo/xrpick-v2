@@ -2645,7 +2645,7 @@ Nguồn: kiểm 6 câu hỏi của lead trên 7 log thật `analysis/data/real` 
 - **Test trên kính:** không (MCP đặt carton bằng code, đọc file log)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl160.md
-- **Status:** verified-mcp (11/11 MCP/code/R ✅, không có case tay; nhánh `feat/160-ekz-placement-log`, chưa commit)
+- **Status:** done (commit 3175010, test 11/11 ✅; nhánh `feat/160-ekz-placement-log`)
 
 ### #161 [P2] Log: `confirm_pressed` ghi key câu phản hồi người học thấy
 - **Type:** feature
