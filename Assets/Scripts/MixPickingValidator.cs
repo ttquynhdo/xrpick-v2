@@ -177,9 +177,17 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
             ? placementCheck.Snapshot(container.CurrentPositionPackages)
             : null;
 
+        // #161: the key of the sentence the card shows below, in the same branch order.
+        bool emptyLaterPosition = !result.Correct && container.CurrentPosition > 1
+            && result.Errors[0].Code == OrderErrorCode.Empty;
+        string feedbackKey = placementWrong ? OrderFeedback.Ekz3PlacementKey
+            : !result.Correct ? OrderFeedback.WrongKey(result, emptyLaterPosition)
+            : container.IsLastPosition ? CorrectKey
+            : PositionDoneKey;
+
         // #28, decision 021: logged before the position advances.
         ResearchLogger.LogConfirmPressed(result, container.CurrentPosition, container.PositionCount, placementWrong,
-            placement);
+            placement, feedbackKey);
         if (correct)
         {
             ResearchLogger.LogPositionCompleted(container.CurrentPosition);
@@ -214,7 +222,6 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
             return;
         }
 
-        bool emptyLaterPosition = container.CurrentPosition > 1 && result.Errors[0].Code == OrderErrorCode.Empty;
         string reason = emptyLaterPosition
             ? OrderFeedback.ExplainEmptyPosition(container.CurrentLine)
             : OrderFeedback.Explain(result);

@@ -30,6 +30,7 @@ namespace XRPick.Research.Tests
                 "\"foreign\":[]," +
                 "\"correct\":false," +
                 "\"error_codes\":[{\"code\":\"TOO_FEW\",\"item\":\"connector_a\"}]," +
+                "\"feedback_key\":null," +
                 "\"time_since_scene_enter_s\":41.2}", json);
         }
 
@@ -75,7 +76,7 @@ namespace XRPick.Research.Tests
                 new[] { "Interactables/GG_Package (1)" },
                 new[] { "Interactables/GG_Package (3)" }, false);
             string json = OutcomeEvents.ConfirmPressed(2, 1, 2, 2, result,
-                OutcomeEvents.ConfirmErrors(result, true), 65.5, placement).ToJson();
+                OutcomeEvents.ConfirmErrors(result, true), 65.5, placement, "order.feedback.ekz3_loose").ToJson();
             StringAssert.Contains(
                 "\"error_codes\":[{\"code\":\"EKZ_PLACEMENT\",\"item\":null}]," +
                 "\"placement\":{\"places\":3," +
@@ -83,7 +84,24 @@ namespace XRPick.Research.Tests
                 "\"loose\":[\"Interactables/GG_Package (1)\"]," +
                 "\"places_held_by_other\":[\"Interactables/GG_Package (3)\"]," +
                 "\"places_shown\":false}," +
+                "\"feedback_key\":\"order.feedback.ekz3_loose\"," +
                 "\"time_since_scene_enter_s\":65.5}", json);
+        }
+
+        [Test]
+        public void ConfirmPressed_FeedbackKeyWithoutPlacement()
+        {
+            ContainerContents c = Full("ring_d", 2);
+            for (int i = 0; i < 5; i++)
+            {
+                c.AddLoose("ring_d");
+            }
+            OrderResult result = OrderRule.Check(new[] { Ring }, c, true);
+            Assert.IsTrue(result.Correct);
+            string json = OutcomeEvents.ConfirmPressed(3, 2, 2, 1, result,
+                OutcomeEvents.ConfirmErrors(result, false), 7, null, "complex.feedback.correct").ToJson();
+            StringAssert.Contains(
+                "\"error_codes\":[],\"feedback_key\":\"complex.feedback.correct\",\"time_since_scene_enter_s\":7}", json);
         }
 
         [Test]

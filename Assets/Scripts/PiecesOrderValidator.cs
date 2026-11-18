@@ -145,8 +145,16 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         // #6: one rule decides right/wrong (docs/decisions/005, 006); #19: only the current position.
         OrderResult result = containerCounter.CheckOrder();
 
+        // #161: the key of the sentence the card shows below, in the same branch order.
+        bool emptyLaterPosition = !result.Correct && containerCounter.CurrentPosition > 1
+            && result.Errors[0].Code == OrderErrorCode.Empty;
+        string feedbackKey = !result.Correct ? OrderFeedback.WrongKey(result, emptyLaterPosition)
+            : containerCounter.IsLastPosition ? CorrectKey
+            : PositionDoneKey;
+
         // #28, decision 021: logged before the position advances.
-        ResearchLogger.LogConfirmPressed(result, containerCounter.CurrentPosition, containerCounter.PositionCount);
+        ResearchLogger.LogConfirmPressed(result, containerCounter.CurrentPosition, containerCounter.PositionCount,
+            feedbackKey: feedbackKey);
         if (result.Correct)
         {
             ResearchLogger.LogPositionCompleted(containerCounter.CurrentPosition);
@@ -187,7 +195,6 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
         }
 
         // #14: the instruction stays visible; the feedback names the first error, never the target numbers.
-        bool emptyLaterPosition = containerCounter.CurrentPosition > 1 && result.Errors[0].Code == OrderErrorCode.Empty;
         string reason = emptyLaterPosition
             ? OrderFeedback.ExplainEmptyPosition(containerCounter.CurrentLine)
             : OrderFeedback.Explain(result);

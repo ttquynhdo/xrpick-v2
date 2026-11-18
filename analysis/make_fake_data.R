@@ -743,6 +743,11 @@ press_confirm <- function(s, pos_no, k, attempt, correct = length(attempt$codes)
   # is left out (no key, not null) where the position has no snap places.
   placement <- placement_obj(s, pos_no, attempt)
   if (!is.null(placement)) data$placement <- placement
+  # #161: feedback_key after placement, before time_since_scene_enter_s.
+  if (writes_feedback_key(s)) {
+    data$feedback_key <- feedback_key_for(s$scene, pos_no, length(order_positions[[s$scene]]),
+                                          vapply(attempt$codes, function(e) e$code, character(1)))
+  }
   data$time_since_scene_enter_s <- at
   emit(s, "confirm_pressed", data)
   # Mixed "034"-"037" shows the place outlines from the first EKZ_PLACEMENT on.
@@ -797,6 +802,42 @@ placement_obj <- function(s, pos_no, attempt) {
            loose = json_arr(sort(loose, method = "radix")),
            places_held_by_other = json_arr(sort(held, method = "radix")),
            places_shown = places_shown_at(s))
+}
+
+# ---- confirm_pressed.feedback_key (#161) ----
+# The Loc key of the result-card sentence a press shows (spec 4.2). The real
+# app writes it from the #161 build on, inside layout "039"; the field does
+# not change layout_version. Fake rule: the study set (research/, the build
+# the real study will run) and the pilot people of layout "034" on (P816,
+# P818-P821) get it; the older fake pilot builds (P801-P803, P811-P815, P817)
+# stay without it, so R's "not logged" path (NA, no warning) is tested.
+# Covered: P109 FOO_BAR (no sentence -> more_errors), P113 EMPTY at Mixed
+# position 2 (-> too_few), P816 EKZ_PLACEMENT in Basic and Mixed, random
+# multi-code presses ("more errors" line, not in the key).
+writes_feedback_key <- function(s) {
+  s$schema == 2 && (identical(s$folder, fake_research) || layout_at_least(s$layout, 34))
+}
+
+# Same branch order as the validators: no code -> the correct sentence of the
+# scene (position_done before the last position); EKZ_PLACEMENT (only ever
+# alone) -> ekz3_loose; EMPTY after position 1 -> too_few (ExplainEmptyPosition);
+# else the sentence of the first code, more_errors for a code without one.
+# Decided from the codes, as in the app (correct and codes come from one
+# result), so P110's broken "correct" flag does not change the key.
+feedback_sentence_keys <- c(EMPTY = "order.feedback.empty", WRONG_MATERIAL = "order.feedback.wrong_material",
+                            TOO_FEW = "order.feedback.too_few", TOO_MANY = "order.feedback.too_many",
+                            MISSING_LOOSE = "order.feedback.missing_loose",
+                            EXTRA_LOOSE = "order.feedback.extra_loose")
+feedback_key_for <- function(scene, pos_no, n_positions, codes) {
+  if (length(codes) == 0) {
+    if (scene == "BasicPickingScene") return("basic.result.correct.text")
+    prefix <- if (scene == "MixedPickingScene") "mixed" else "complex"
+    return(paste0(prefix, if (pos_no < n_positions) ".feedback.position_done" else ".feedback.correct"))
+  }
+  first <- codes[1]
+  if (first == "EKZ_PLACEMENT") return("order.feedback.ekz3_loose")
+  if (first == "EMPTY" && pos_no > 1) return("order.feedback.too_few")
+  if (first %in% names(feedback_sentence_keys)) feedback_sentence_keys[[first]] else "order.feedback.more_errors"
 }
 
 # A red-button press the validator ignores (early return): not an attempt,
@@ -2055,11 +2096,18 @@ assign(".Random.seed", rng_before_p820, envir = globalenv())
 # ekz_question+book+fall, split every picking position and scene by
 # card_text (long "038" / short "039") and read the tour opening from the
 # logged tour_step (concept_tour_open.csv). Own random stream, restored.
+# #161: Complex position 2 starts with a two-code press (TOO_FEW, then
+# MISSING_LOOSE): feedback_key is the TOO_FEW sentence, the "more errors"
+# line under it is not in the key.
 rng_before_p821 <- .Random.seed
 set.seed(821)
 p821 <- new_person("P821")
 run_full_course(p821, "ggg7777", "2026-11-19T09:00:00Z", language = "EN", layout = "039",
-                special = list(ConceptScene = list(hints = p820_hints)))
+                special = list(ConceptScene = list(hints = p820_hints),
+                               ComplexScene = list(forced = list("2" = list(
+                                 fixed_press(2, list(err("TOO_FEW", "training_b"), err("MISSING_LOOSE", "training_b")),
+                                             placed_loose = 4),
+                                 fixed_press(3, list(), placed_loose = 6))))))
 assign(".Random.seed", rng_before_p821, envir = globalenv())
 
 # ---- 8. Write the files ----------------------------------------------------

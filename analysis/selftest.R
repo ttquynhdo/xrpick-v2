@@ -978,6 +978,44 @@ local({
             any(grepl("P816 BasicPickingScene visit 1 position 1", p_warn, fixed = TRUE)),
             !any(grepl("confirm_pressed.placement:", c(p_warn, warn_lines), fixed = TRUE)))
 
+  # 8y3. confirm_pressed.feedback_key (#161). make_fake_data.R writes it on
+  #      every press of the study set and of the pilot builds from "034"
+  #      (P816, P818-P821), never on quiz touches; the older pilot builds stay
+  #      without it (NA, not guessed, no warning). The key follows the
+  #      validators' branch order: P113 EMPTY at Mixed position 2 -> too_few,
+  #      P109 FOO_BAR (no sentence) -> more_errors, P816 EKZ_PLACEMENT ->
+  #      ekz3_loose; "more errors" is never in the key of a multi-code press.
+  #      prev_feedback_key = key of the previous press at the same visit and position.
+  for (ps in list(presses, pilot_set$presses)) {
+    stopifnot(all(c("feedback_key", "prev_feedback_key", "has_feedback_key") %in% names(ps)),
+              !any(ps$has_feedback_key[ps$event == "quiz_answer"]),
+              all(is.na(ps$feedback_key[!ps$has_feedback_key])),
+              identical(ps$feedback_key[ps$has_feedback_key], ps$feedback_key_expected[ps$has_feedback_key]))
+  }
+  fk <- presses %>% filter(event == "confirm_pressed")
+  fk113 <- fk %>% filter(participant_id == "P113", scene == "MixedPickingScene")
+  stopifnot(all(fk$has_feedback_key),
+            identical(fk113$feedback_key,
+                      c("mixed.feedback.position_done", "order.feedback.too_few", "mixed.feedback.correct")),
+            identical(fk113$codes[[2]], "EMPTY"),
+            identical(fk113$prev_feedback_key, c(NA, NA, "order.feedback.too_few")),
+            "order.feedback.more_errors" %in% fk$feedback_key[fk$participant_id == "P109"],
+            all(fk$feedback_key[fk$scene == "BasicPickingScene" & fk$n_codes == 0] == "basic.result.correct.text"))
+  pk <- pilot_set$presses %>% filter(event == "confirm_pressed")
+  pk816 <- pk %>% filter(participant_id == "P816", scene == "MixedPickingScene")
+  stopifnot(identical(sort(unique(pk$participant_id[pk$has_feedback_key])), c("P816", "P818", "P819", "P820", "P821")),
+            all(is.na(pk$feedback_key[pk$participant_id %in% c("P801", "P811", "P815", "P817")])),
+            identical(pk816$feedback_key, c("order.feedback.ekz3_loose", "order.feedback.ekz3_loose",
+                                            "mixed.feedback.position_done", "mixed.feedback.correct")),
+            identical(pk816$prev_feedback_key, c(NA, "order.feedback.ekz3_loose", "order.feedback.ekz3_loose", NA)),
+            # P821 Complex position 2: TOO_FEW + MISSING_LOOSE -> the TOO_FEW key, then the last-position key.
+            identical(pk$feedback_key[pk$participant_id == "P821" & pk$scene == "ComplexScene" & pk$position %in% 2L],
+                      c("order.feedback.too_few", "complex.feedback.correct")),
+            identical(pk$n_codes[pk$participant_id == "P821" & pk$scene == "ComplexScene" & pk$position %in% 2L],
+                      c(2L, 0L)),
+            !any(pk$feedback_key[pk$n_codes > 1] %in% "order.feedback.more_errors"),
+            !any(grepl("confirm_pressed.feedback_key", c(p_warn, warn_lines), fixed = TRUE)))
+
   # 8z. WelcomeScene learning objectives (#121/#124, decision 038). P818 ran
   #     the current layout "036": welcome_tasks_opened before both
   #     welcome_practice_done, with a 25 s headset-off pause while reading.
@@ -1397,6 +1435,22 @@ local({
     stopifnot(any(grepl("\"placement\":", lines, fixed = TRUE)))
     gsub(",\"placement\":\\{[^}]*\\}", "", lines)
   })
+  # #161 on the same copy: P821's first Basic press gets a key the rules
+  # don't give (warned once); P819 loses the key on its last press only (a
+  # session with the field on some presses: warned, the missing one is NA).
+  edit_events("P821", function(lines) {
+    hit <- which(grepl("\"scene\":\"BasicPickingScene\"", lines, fixed = TRUE) &
+                   grepl("\"event\":\"confirm_pressed\"", lines, fixed = TRUE))[1]
+    stopifnot(!is.na(hit), grepl("\"feedback_key\":\"", lines[hit], fixed = TRUE))
+    lines[hit] <- sub("\"feedback_key\":\"[^\"]*\"", "\"feedback_key\":\"order.feedback.wrong_title\"", lines[hit])
+    lines
+  })
+  edit_events("P819", function(lines) {
+    hit <- tail(which(grepl("\"event\":\"confirm_pressed\"", lines, fixed = TRUE)), 1)
+    stopifnot(grepl("\"feedback_key\":\"", lines[hit], fixed = TRUE))
+    lines[hit] <- sub(",\"feedback_key\":\"[^\"]*\"", "", lines[hit])
+    lines
+  })
   data_dir <- plc_dir
   output_dir <- file.path(tempdir(), "selftest_placement_out")
   source("analysis/analyse.R", local = TRUE)
@@ -1408,6 +1462,13 @@ local({
             is.na(pilot_set$data_quality$places_held_by_other_presses[pilot_set$data_quality$participant_id == "P820"]),
             pilot_set$data_quality$places_held_by_other_presses[pilot_set$data_quality$participant_id == "P816"] == 1,
             !any(pilot_set$presses$has_placement[pilot_set$presses$participant_id == "P820"]))
+  fk_warn <- plc_warn[grepl("confirm_pressed.feedback_key", plc_warn, fixed = TRUE)]
+  stopifnot(length(fk_warn) == 2,
+            sum(grepl("feedback_key order.feedback.wrong_title but the rules give", fk_warn, fixed = TRUE) &
+                  grepl("P821 BasicPickingScene visit 1 position 1 attempt 1", fk_warn, fixed = TRUE)) == 1,
+            sum(grepl("feedback_key on only", fk_warn, fixed = TRUE) & grepl("P819", fk_warn, fixed = TRUE)) == 1,
+            sum(is.na(pilot_set$presses$feedback_key[pilot_set$presses$participant_id == "P819" &
+                                                       pilot_set$presses$event == "confirm_pressed"])) == 1)
   unlink(c(plc_dir, output_dir), recursive = TRUE)
 
   # 9. Without allow_fake, analyse.R must refuse the fake folder.

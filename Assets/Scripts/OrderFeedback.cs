@@ -21,7 +21,7 @@ public static class OrderFeedback
 
     private const string MoreErrorsKey = "order.feedback.more_errors";
     // #41, decision 003: quantity is right but a carton lies loose (EKZ 3). No count, no place.
-    private const string Ekz3PlacementKey = "order.feedback.ekz3_loose";
+    public const string Ekz3PlacementKey = "order.feedback.ekz3_loose";
     private const string WrongTitleKey = "order.feedback.wrong_title";
     // #59: first line of the result card after a correct confirm.
     private const string CorrectTitleKey = "order.feedback.correct_title";
@@ -66,6 +66,22 @@ public static class OrderFeedback
     }
 
     public static string ExplainEkz3Placement() => Loc.Get(Ekz3PlacementKey);
+
+    /// <summary>
+    /// #161: the key of the sentence a wrong press shows (confirm_pressed.feedback_key): the one of
+    /// ExplainEmptyPosition when emptyLaterPosition, else the one of Explain (first error; the generic
+    /// "more errors" line for a code without a sentence). The extra "more errors" line is not part of the key.
+    /// </summary>
+    public static string WrongKey(OrderResult result, bool emptyLaterPosition)
+    {
+        if (emptyLaterPosition)
+            return Keys[OrderErrorCode.TooFew];
+
+        if (result.Correct)
+            return null;
+
+        return Keys.TryGetValue(result.Errors[0].Code, out string key) ? key : MoreErrorsKey;
+    }
 
     private static bool NamesMaterial(OrderErrorCode code) =>
         code != OrderErrorCode.Empty && code != OrderErrorCode.WrongMaterial;

@@ -841,6 +841,10 @@ presses <- v2_events %>% filter(event %in% c("confirm_pressed", "quiz_answer")) 
             placement_n_held = map_int(data, ~ if (is.null(.x$placement)) NA_integer_
                                        else length(.x$placement$places_held_by_other)),
             placement_shown = map_lgl(data, ~ as_lgl(.x$placement$places_shown)),
+            # #161: Loc key of the result-card sentence this press showed; NA =
+            # not logged (quiz touches, builds before #161), never guessed.
+            has_feedback_key = map_lgl(data, ~ "feedback_key" %in% names(.x)),
+            feedback_key = map_chr(data, ~ as_chr(.x$feedback_key)),
             time_since_scene_enter_s = map_dbl(data, ~ as_num(.x$time_since_scene_enter_s))) %>%
   mutate(n_codes = lengths(codes),
          press_id = row_number(),
@@ -991,6 +995,56 @@ placement_by_person <- presses %>% filter(event == "confirm_pressed") %>%
   group_by(participant_id) %>%
   summarise(places_held_by_other_presses = if (any(has_placement)) sum(placement_n_held > 0, na.rm = TRUE)
                                            else NA_integer_, .groups = "drop")
+
+# confirm_pressed.feedback_key checks (#161, spec 4.2). The validator picks
+# the card sentence from the same result it logs, so R can predict the key
+# from error_codes, position and position_count; a mismatch means C# and the
+# spec drifted apart. Presses without the field (older builds) are skipped.
+# The "more errors" line under the first sentence is not in the key: it is
+# length(codes) > 1. prev_feedback_key = the sentence shown before this press
+# (previous press of the same visit and position), for joining a retry's
+# errors to the feedback the trainee had; NA for the first press of a position.
+feedback_sentence_keys <- c(EMPTY = "order.feedback.empty", WRONG_MATERIAL = "order.feedback.wrong_material",
+                            TOO_FEW = "order.feedback.too_few", TOO_MANY = "order.feedback.too_many",
+                            MISSING_LOOSE = "order.feedback.missing_loose",
+                            EXTRA_LOOSE = "order.feedback.extra_loose")
+expected_feedback_key <- function(scene, position, position_count, codes) {
+  scene <- as.character(scene)
+  first <- map_chr(codes, ~ if (length(.x) == 0) NA_character_ else .x[1])
+  prefix <- case_when(scene == "MixedPickingScene" ~ "mixed", scene == "ComplexScene" ~ "complex")
+  case_when(is.na(first) & scene == "BasicPickingScene" ~ "basic.result.correct.text",
+            is.na(first) & position < position_count ~ paste0(prefix, ".feedback.position_done"),
+            is.na(first) ~ paste0(prefix, ".feedback.correct"),
+            first == "EKZ_PLACEMENT" ~ "order.feedback.ekz3_loose",
+            first == "EMPTY" & position > 1 ~ "order.feedback.too_few",
+            first %in% names(feedback_sentence_keys) ~ unname(feedback_sentence_keys[first]),
+            TRUE ~ "order.feedback.more_errors")
+}
+presses <- presses %>%
+  mutate(feedback_key_expected = if_else(event == "confirm_pressed",
+                                         expected_feedback_key(scene, position, position_count, codes),
+                                         NA_character_)) %>%
+  arrange(session_id, scene, scene_visit, position, t, line) %>%
+  group_by(session_id, scene, scene_visit, event, position) %>%
+  mutate(prev_feedback_key = if_else(event == "confirm_pressed", lag(feedback_key), NA_character_)) %>%
+  ungroup() %>%
+  arrange(press_id)
+feedback_breaks <- presses %>%
+  filter(event == "confirm_pressed", has_feedback_key,
+         is.na(feedback_key) | is.na(feedback_key_expected) | feedback_key != feedback_key_expected)
+for (r in split(feedback_breaks, seq_len(nrow(feedback_breaks)))) {
+  warn("confirm_pressed.feedback_key ", coalesce(r$feedback_key, "null"), " but the rules give ",
+       coalesce(r$feedback_key_expected, "NA"), ": ", r$participant_id, " ", r$scene, " visit ", r$scene_visit,
+       " position ", r$position, " attempt ", r$attempt_no, " (codes ", paste(r$codes[[1]], collapse = ";"), ")")
+}
+feedback_key_sessions <- presses %>% filter(event == "confirm_pressed") %>%
+  group_by(participant_id, session_id) %>%
+  summarise(n_with = sum(has_feedback_key), n = n(), .groups = "drop") %>%
+  filter(n_with > 0, n_with < n)
+for (r in split(feedback_key_sessions, seq_len(nrow(feedback_key_sessions)))) {
+  warn("confirm_pressed.feedback_key on only ", r$n_with, " of ", r$n, " presses: ", r$participant_id,
+       " session ", r$session_id, " (the missing ones are NA)")
+}
 
 # Every attempt needs its item (position / question_id), and attempt_in_position
 # / attempt_in_question must count 1, 2, 3 ... per item within a visit.

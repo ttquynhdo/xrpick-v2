@@ -41,9 +41,11 @@ public static class OutcomeEvents
     }
 
     /// <param name="placement">#160: the snap places at an Empf Kz 003 position; null elsewhere (no field).</param>
+    /// <param name="feedbackKey">#161: Loc key of the result-card sentence the press shows; always written
+    /// (null when the caller has none).</param>
     public static JsonFields ConfirmPressed(int attemptNo, int position, int positionCount, int attemptInPosition,
         OrderResult result, IReadOnlyList<OrderError> errors, double timeSinceSceneEnterS,
-        PlacementInfo placement = null)
+        PlacementInfo placement = null, string feedbackKey = null)
     {
         var fields = new JsonFields()
             .Add("attempt_no", attemptNo)
@@ -59,7 +61,9 @@ public static class OutcomeEvents
             fields.AddRaw("placement", placement.ToJson());
         }
 
-        return fields.Add("time_since_scene_enter_s", Round(timeSinceSceneEnterS));
+        return fields
+            .Add("feedback_key", feedbackKey)
+            .Add("time_since_scene_enter_s", Round(timeSinceSceneEnterS));
     }
 
     public static JsonFields ConfirmIgnored(string reason, int position, double timeSinceSceneEnterS)

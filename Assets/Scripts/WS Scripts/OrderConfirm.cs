@@ -9,6 +9,9 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
 
     public event Action OrderCompleted;
 
+    // #161: key of the Correct card's body (bound in the scene by a LocalizeStringEvent), for feedback_key.
+    private const string CorrectTextKey = "basic.result.correct.text";
+
     public CalcForWMS calc;
     [SerializeField]
     private GameObject correct;
@@ -107,7 +110,12 @@ public class OrderConfirm : MonoBehaviour, IOrderCompletion
             : null;
 
         // #28, decision 021: Basic is one position; EKZ_PLACEMENT follows the OrderRule codes.
-        ResearchLogger.LogConfirmPressed(result, 1, 1, placementWrong, placement);
+        // #161: the key of the sentence the card shows below (Basic has one position, so never "empty later").
+        string feedbackKey = !result.Correct ? OrderFeedback.WrongKey(result, false)
+            : placementWrong ? OrderFeedback.Ekz3PlacementKey
+            : CorrectTextKey;
+
+        ResearchLogger.LogConfirmPressed(result, 1, 1, placementWrong, placement, feedbackKey);
 
         if (!result.Correct)
         {

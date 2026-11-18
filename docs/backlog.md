@@ -2657,7 +2657,8 @@ Nguồn: kiểm 6 câu hỏi của lead trên 7 log thật `analysis/data/real` 
 - **Công:** S–M
 - **Test trên kính:** không
 - **Depends on:** #160 (cùng `OutcomeEvents` và hai validator; làm nối tiếp, chung một build)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl161.md
+- **Status:** verified-mcp (14/14 MCP/code/R ✅, không có case tay; nhánh `feat/161-feedback-key`, chưa commit)
 
 ### #162 [P2] Build nghiên cứu phải từ commit sạch: chặn hoặc hỏi khi `git` báo `-dirty`
 - **Type:** feature

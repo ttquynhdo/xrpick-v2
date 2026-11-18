@@ -12,8 +12,9 @@ public sealed partial class ResearchLogger
     /// <param name="ekzPlacementWrong">Basic: the quantity is right but a carton lies outside the snap places.</param>
     /// <param name="placement">#160: the snap places at an Empf Kz 003 position (Basic, Mixed position 1); null
     /// elsewhere.</param>
+    /// <param name="feedbackKey">#161: Loc key of the result-card sentence this press shows.</param>
     public static void LogConfirmPressed(OrderResult result, int position, int positionCount,
-        bool ekzPlacementWrong = false, PlacementInfo placement = null)
+        bool ekzPlacementWrong = false, PlacementInfo placement = null, string feedbackKey = null)
     {
         if (result == null)
         {
@@ -22,7 +23,7 @@ public sealed partial class ResearchLogger
 
         LogOutcome("confirm_pressed",
             o => o.Confirm(result, position, positionCount, ekzPlacementWrong, instance.SceneActiveSeconds(),
-                placement));
+                placement, feedbackKey));
     }
 
     /// <summary>A press that was not rated; reason is one of the OutcomeEvents.Ignored* values.</summary>
