@@ -192,13 +192,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627365
-    m_Localized: 'Zu wenig Material {name}. Rechnen Sie nach: Sollmenge geteilt durch
-      VPE.'
+    m_Localized: 'Zu wenig Material {name}. Rechnen Sie nach: Soll geteilt durch
+      Verp.-Einh.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627366
-    m_Localized: 'Zu viel Material {name}. Rechnen Sie nach: Sollmenge geteilt durch
-      VPE.'
+    m_Localized: 'Zu viel Material {name}. Rechnen Sie nach: Soll geteilt durch Verp.-Einh.'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627367
@@ -347,8 +346,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: "Hier steht, wie Sie die Teile einlegen: 000 ist EKZ 0, also d\xFCrfen
-      die Kartons ungeordnet liegen wie im Beispiel."
+    m_Localized: "Hier steht, wie Sie die Ware einlegen: 000 ist EKZ 0, also d\xFCrfen
+      die Kartons ungeordnet liegen, wie im Beispiel."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627404
@@ -841,7 +840,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 770818612006912
-    m_Localized: "<b>{cartons} Kartons + {pieces} St\xFCck, ungeordnet erlaubt</b>\nLegen
+    m_Localized: "<b>{cartons} Kartons + {pieces} lose Teile, ungeordnet erlaubt</b>\nLegen
       Sie zuerst die vollen Kartons, dann die losen Teile in den Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []

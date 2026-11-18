@@ -346,7 +346,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627403
-    m_Localized: 'Here it says how you put the parts in: 000 is EKZ 0, so the cartons
+    m_Localized: 'Here it says how you put the goods in: 000 is EKZ 0, so the cartons
       may lie unordered, like in the example.'
     m_Metadata:
       m_Items: []
