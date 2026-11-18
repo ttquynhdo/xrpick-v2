@@ -19,6 +19,11 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
+**ĐỢT LOG P811 (thêm 2026-11-18, từ 6 câu hỏi của lead về log P811; mục #159–#163 ở cuối file).** Không đụng scene, chỉ script + spec + R, nên chạy song song với các mục scene đang mở; `data-analyst` duyệt mọi thay đổi log.
+- **1. Ngay (không cần build):** **#159** (chỉ `analysis/`: loại Mixed vị trí 1 của P811 khỏi kết quả) ∥ **#162** (chặn build dirty; commit hoặc trả lại `TimeManager.asset` trước build "039").
+- **2. Trước build "039" nếu kịp, nối tiếp nhau:** **#160** (chi tiết chỗ đặt EKZ) → **#161** (key câu phản hồi). Chỉ thêm trường, `schema_version` vẫn 2, không đổi `layout_version`; vào chung build "039", làm trên nhánh mới tách từ `feat/151-desk-edges` (đang chứa #151, #154, #155, chưa gộp vào `main`) để build đi từ một nhánh.
+- **3. Để sau:** **#163** (bỏ `hand`/`input`, tăng `schema_version` 3) chỉ làm khi có lần tăng schema khác hoặc giữa hai đợt thu dữ liệu.
+
 **ĐỢT CHECKLIST 2026-11-17 (thêm 2026-11-17, từ `docs/review-notes-checklist-2026-11-17.md` R1–R16 + F2b; gộp theo gốc lỗi cùng ngày; đứng trước mọi khối cũ).** Mục #1–#135 còn mở đã `closed` (người dùng 2026-11-17). Không hai mục cùng sửa một `.unity` một lúc.
 - **Đang mở:** 4 mục gốc #154 (A: bố cục chữ cố định; MCP xong 2026-11-18, chờ kính 5′), #155 (B: luật chữ, decision chung), #156 (C: hiện/ẩn theo bước), #157 (D: đặt kiện khi thả, P0); mục lẻ #141 (canvas cong hai lớp), #143 (EN theo glossary), #151 (mặt bàn); quy trình #158; #137–#139 chờ test tay H1. Mục #136, #140, #142, #144–#150, #152, #153 đã gộp vào mục gốc (nội dung giữ làm case test).
 - **1. Ngay:** **#157** (P0) bắt đầu bằng tái hiện chỗ đặt giữa ở Mixed (Simulator hoặc kính), rồi thiết kế „một cơ chế quyết định khi thả“; phần thả ngoài thùng (#153) có thể sau freeze 19/11. Song song (khác file): **#158** (chỉ skill/doc) và **#143** (chỉ CSV + glossary).
@@ -2611,3 +2616,68 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl158.md
 - **Status:** verified-mcp (5/5 ✅ code/MCP, không có case tay; skill local `.claude/skills/unity-safe-change/`, checklist tạo bằng `manual_checklist.py`)
+
+### Log nghiên cứu sau buổi P811 (thêm 2026-11-18)
+
+Nguồn: kiểm 6 câu hỏi của lead trên 7 log thật `analysis/data/real` (P802–P811) và code ở commit 225eed8; báo cáo đầy đủ ở trang artifact gửi lead (2026-11-18). Ba điểm không thành mục: (4b) thùng kho ở bài picking không có `container_*` — đúng spec mục 4.4 („`storage` only in ConceptScene“), R suy ra từ `grab_start`; (6) log khi thoát giữa bài — P811 ghi đủ `scene_exit` + `session_end` `quit`, mỗi dòng ghi xong là tới hệ điều hành, `crash_recovered` lo phần bị kill; (4a) `order_box` không có `station_move_arrived` ở Basic — người học bấm Menu 9–18 s sau khi thùng chạy (đi hết ~23 s), cảnh mới dừng coroutine; R đã kết thúc chuyến mở ở sự kiện cuối của lượt vào (`analyse_set.R:1087-1109`), chỉ thiếu một câu trong spec (gộp vào #160). Thêm trường vào sự kiện không cần tăng `schema_version` (spec dòng 13: chỉ đổi tên/xoá mới tăng), nhưng vẫn sửa spec + `make_fake_data.R` + `analyse_set.R` cùng lúc, `data-analyst` duyệt.
+
+### #159 [P1] R: đánh dấu Mixed vị trí 1 của P811 là lỗi app (#157), không tính vào kết quả người học
+- **Type:** logic
+- **Scene(s):** — (chỉ `analysis/`)
+- **Files:** `analysis/analyse_set.R`, file mới `analysis/data_exclusions.csv` (session_id, scene, position, reason), `analysis/selftest.R`, `analysis/README.md`
+- **Problem:** Ở build `bdf77d0-dirty` ("037"), carton Mixed thiếu `Grabbable._transferOnSecondSelection`: carton bị cầm ra vẫn giữ chỗ đặt, carton thứ 3 không còn chỗ, nên P811 bấm 7 lần (lần 2–8) đều `EKZ_PLACEMENT` dù đủ 3 carton rồi bỏ bài. Số lần thử, thời gian và tỉ lệ sai lần đầu của Mixed vị trí 1 lúc này đo lỗi app, không đo người học; R đang tính chúng như dữ liệu thật.
+- **Done when:** `analysis/data_exclusions.csv` có dòng P811 / `65cb2190-…` / MixedPickingScene / vị trí 1 / lý do „#157 snap place held by grabbed carton“. Chạy `analyse.R` trên dữ liệu thật → `items.csv`, `first_attempt_by_item.png` và `wide.csv` không tính các lần bấm của dòng đó, và `data_quality` ghi số dòng bị loại kèm lý do. Chạy `selftest.R` → xanh, có một case: một dòng exclusion trên dữ liệu giả làm giảm đúng số lần bấm được tính.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl159.md
+- **Status:** verified-mcp (9/9 R/code ✅, không có case tay; nhánh `fix/159-p811-exclusion`, chưa commit)
+
+### #160 [P2] Log: `confirm_pressed` ghi chi tiết chỗ đặt EKZ 003 (carton nào nằm đâu, chỗ nào bị giữ)
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene
+- **Files:** `Assets/Scripts/EkzPlacementCheck.cs:170-213` (thêm ảnh chụp trạng thái chỗ đặt), `Assets/Scripts/Research/OutcomeEvents.cs:32-56`, `Assets/Scripts/Research/ResearchLogger.Outcome.cs:13-23`, `Assets/Scripts/MixPickingValidator.cs:171-176`, `Assets/Scripts/WS Scripts/OrderConfirm.cs:105`; `docs/research-logging-spec.md`, `analysis/make_fake_data.R`, `analysis/analyse_set.R`
+- **Problem:** `EKZ_PLACEMENT` ghi `"item": null` và không gì khác, nên không biết carton nào nằm ngoài chỗ, hay chỗ đặt bị một carton khác giữ (đúng lỗi của P811, #159). Snap vào/ra chỗ đặt cũng không có sự kiện (`PackageGrabLogger` bỏ qua `SnapInteractor`).
+- **Done when:** Basic: đủ 6 carton, 1 carton nằm ngoài chỗ, bấm nút đỏ → `confirm_pressed` có `placement` {`places`: 6, `placed`: 5 `object_id`, `loose`: đúng `object_id` của carton đó, `places_held_by_other`: rỗng, `places_shown`: true}. Mixed vị trí 1: 3 carton đúng chỗ, bấm → `placement.loose` rỗng, `correct` true. Mixed vị trí 1: một carton đang nằm trong chỗ đặt nhưng không ở trong thùng đơn (đặt bằng code) → `places_held_by_other` có `object_id` của nó. Mixed vị trí 2 (Empf Kz 000) và Complex: `confirm_pressed` không có trường `placement`. (code) `schema_version` vẫn là 2; spec mục 4.2 mô tả `placement`, và ghi thêm rằng `order_box` có thể không có `station_move_arrived` khi người học rời cảnh trước khi thùng tới (Basic P805/P807/P811). Chạy `selftest.R` → xanh; `make_fake_data.R` sinh `placement` cho mọi lần bấm Empf Kz 003.
+- **Inspector work expected:** no
+- **Công:** M
+- **Test trên kính:** không (MCP đặt carton bằng code, đọc file log)
+- **Depends on:** —
+- **Status:** todo
+
+### #161 [P2] Log: `confirm_pressed` ghi key câu phản hồi người học thấy
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** `Assets/Scripts/OrderFeedback.cs` (trả key cùng với câu), `Assets/Scripts/WS Scripts/OrderConfirm.cs`, `Assets/Scripts/MixPickingValidator.cs:182-216`, `Assets/Scripts/PiecesOrderValidator.cs:149`, `Assets/Scripts/Research/OutcomeEvents.cs`; spec + `make_fake_data.R` + `analyse_set.R`
+- **Problem:** Sau một lần bấm sai, người học đọc một câu trên thẻ kết quả (chỉ lỗi đầu tiên, `OrderFeedback.Explain`), nhưng log không ghi câu nào. Thường suy được từ `error_codes[0]`, trừ câu „vị trí sau còn trống“ (`ExplainEmptyPosition`, `MixPickingValidator.cs:211`) và câu „còn lỗi khác“; R muốn nối lỗi lần sau với câu đã đọc.
+- **Done when:** Basic: thùng có 5 carton, bấm → `confirm_pressed.feedback_key` = key câu `TOO_FEW` đang hiện trên thẻ `Incorrect`. Mixed vị trí 2: thùng trống, bấm → `feedback_key` = key của `ExplainEmptyPosition`, không phải key của `EMPTY`. Bấm đúng → `feedback_key` = key câu đúng đang hiện (`mixed.feedback.position_done`, `mixed.feedback.correct`, `basic.result.correct.text`, `complex.feedback.*`). Complex bấm khi chưa trả lời câu hỏi → vẫn chỉ `confirm_ignored` `quiz_first`, không có `confirm_pressed`. (code) `schema_version` vẫn là 2; spec, `make_fake_data.R`, `analyse_set.R` cập nhật cùng commit, `selftest.R` xanh.
+- **Inspector work expected:** no
+- **Công:** S–M
+- **Test trên kính:** không
+- **Depends on:** #160 (cùng `OutcomeEvents` và hai validator; làm nối tiếp, chung một build)
+- **Status:** todo
+
+### #162 [P2] Build nghiên cứu phải từ commit sạch: chặn hoặc hỏi khi `git` báo `-dirty`
+- **Type:** feature
+- **Scene(s):** — (Editor build)
+- **Files:** `Assets/Scripts/Editor/ResearchBuildInfoWriter.cs:24-67`; `ProjectSettings/TimeManager.asset` (thay đổi chưa commit do Unity 6000.4 lưu lại `Fixed Timestep` dạng mới)
+- **Problem:** Build P811 là `bdf77d0-dirty`: log có đánh dấu, nhưng không biết file nào khác commit, nên không dựng lại được đúng app người học đã dùng. Hiện `TimeManager.asset` đang sửa sẵn, nên build tiếp theo cũng sẽ dirty.
+- **Done when:** Có một file đã sửa chưa commit, build Android không phải Development → build dừng, Console in danh sách file đã sửa (`git status --porcelain`) và câu hướng dẫn commit trước. Cùng tình huống, build Development → build chạy, Console cảnh báo kèm danh sách file, header log có `build` kết thúc bằng `-dirty`. Cây sạch → build chạy, `ResearchBuildInfo.txt` = hash 7 ký tự không có `-dirty`. `TimeManager.asset` đã commit (hoặc trả lại) nên `git status` sạch trước build "039".
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** —
+- **Status:** todo
+
+### #163 [P3] Log: bỏ hai trường `hand` / `input` luôn `null` trong `grab_start` / `grab_end`
+- **Type:** cleanup
+- **Scene(s):** — (mọi scene có kiện)
+- **Files:** `Assets/Scripts/Research/InteractionEvents.cs:65-72`, `docs/research-logging-spec.md` (dòng 123–124, 131), `analysis/make_fake_data.R`, `analysis/analyse_set.R`, `Assets/Tests/EditMode/Research/`
+- **Problem:** Decision 022 (#74 bỏ) giữ hai trường nhưng luôn ghi `null`; 102/102 sự kiện grab trong log thật đều `null`, làm người đọc log (lead) tưởng là lỗi. Xoá trường là đổi định dạng nên phải tăng `schema_version`.
+- **Done when:** `grab_start` / `grab_end` mới không còn `hand`, `input`; header `schema_version` = 3. `analyse.R` đọc được cả log cũ (v2, có trường null) lẫn log mới (v3) mà không cảnh báo thừa. (code) Spec ghi v3 = chỉ bỏ hai trường này; test EditMode `XRPick.Research.Tests` xanh; `selftest.R` xanh.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** làm chung với lần tăng `schema_version` khác nếu có; không làm giữa một đợt thu dữ liệu đang chạy
+- **Status:** todo

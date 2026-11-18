@@ -21,6 +21,10 @@ local({
   data_dir <- "analysis/data/fake"
   output_dir <- "analysis/output/selftest"
   allow_fake <- TRUE  # analyse.R refuses fake folders without this
+  # The real data_exclusions.csv names real sessions (#159): the fake runs
+  # read none (a file that does not exist = nothing excluded); 8z6 writes its own.
+  exclusions_file <- file.path(tempdir(), "selftest_no_exclusions.csv")
+  unlink(exclusions_file)
 
   # 1. Make fresh fake data (same seed every time), then run the analysis,
   #    both in this private environment (local = TRUE).
@@ -1145,6 +1149,9 @@ local({
   stopifnot(length(ekz_ok) == 1, ekz_ok < box1,
             any(qf > max(which(ev_qid %in% "loose")) & qf < min(which(ev_qid %in% "ekz"))))
 
+  # Pilot results of the main run, kept for 8z6 (later runs replace pilot_set).
+  excl_base <- pilot_set
+
   # 8h. Duplicate files: P101's partial copy in research/backup/ is dropped
   #     (events + summary), named with both paths, and P101 is flagged.
   stopifnot(data_quality$duplicate_files[data_quality$participant_id == "P101"] == 2)
@@ -1248,6 +1255,77 @@ local({
   stopifnot("P101" %in% wide$participant_id, !"P801" %in% wide$participant_id,
             "P801" %in% pilot_set$wide$participant_id, !"P101" %in% pilot_set$wide$participant_id)
   unlink(c(moved, output_dir), recursive = TRUE)
+
+  # 8z6. Data exclusions (#159), on a copy of the pilot logs: P813 Mixed
+  #      position 1 (fixed presses TOO_FEW, TOO_FEW, EKZ_PLACEMENT, correct =
+  #      4) and P812's whole BasicPickingScene are left out of the learner
+  #      measures; a row with an unknown session is warned. The counted
+  #      presses drop by exactly those presses, nothing else changes, and
+  #      summary.csv is still compared with every press (no mismatch).
+  excl_dir <- file.path(tempdir(), "selftest_exclusions")
+  unlink(excl_dir, recursive = TRUE)
+  dir.create(file.path(excl_dir, "research"), recursive = TRUE)
+  file.copy("analysis/data/fake/research/pilot", file.path(excl_dir, "research"), recursive = TRUE)
+  sid_of <- function(pid) excl_base$sessions$session_id[excl_base$sessions$participant_id == pid]
+  stopifnot(length(sid_of("P813")) == 1, length(sid_of("P812")) == 1)
+  base_p <- excl_base$presses
+  n813 <- sum(base_p$participant_id == "P813" & base_p$scene == "MixedPickingScene" &
+                base_p$event == "confirm_pressed" & base_p$position %in% 1L)
+  n812 <- sum(base_p$participant_id == "P812" & base_p$scene == "BasicPickingScene")
+  stopifnot(n813 == 4, n812 > 0)
+  exclusions_file <- file.path(excl_dir, "data_exclusions.csv")
+  writeLines(c("session_id,scene,position,reason",
+               paste0(sid_of("P813"), ",MixedPickingScene,1,selftest bug A"),
+               paste0(sid_of("P812"), ",BasicPickingScene,,selftest bug B"),
+               "00000000-0000-0000-0000-000000000000,ConceptScene,,selftest typo"), exclusions_file)
+  data_dir <- excl_dir
+  output_dir <- file.path(tempdir(), "selftest_exclusions_out")
+  source("analysis/analyse.R", local = TRUE)
+  ex <- pilot_set
+  # Exactly the expected presses are gone, from presses and from items.csv.
+  stopifnot(nrow(base_p) - nrow(ex$presses) == n813 + n812,
+            nrow(ex$excluded_press_rows) == n813 + n812,
+            nrow(ex$presses_all) == nrow(base_p))
+  key <- function(d) paste(d$participant_id, d$scene, d$item)
+  gone <- c("P813 MixedPickingScene position_1", key(excl_base$items)[excl_base$items$participant_id == "P812" &
+                                                                       excl_base$items$scene == "BasicPickingScene"])
+  stopifnot(setequal(setdiff(key(excl_base$items), key(ex$items)), gone),
+            all(key(ex$items) %in% key(excl_base$items)),
+            "P813 MixedPickingScene position_2" %in% key(ex$items),
+            sum(excl_base$items$attempts) - sum(ex$items$attempts) ==
+              sum(excl_base$items$attempts[key(excl_base$items) %in% gone]))
+  # data_quality: count and reason per person, 0 for everyone else.
+  dqx <- function(col, pid) ex$data_quality[[col]][ex$data_quality$participant_id == pid]
+  stopifnot(dqx("excluded_presses", "P813") == n813, dqx("excluded_presses", "P812") == n812,
+            all(ex$data_quality$excluded_presses[!ex$data_quality$participant_id %in% c("P812", "P813")] == 0),
+            grepl("MixedPickingScene p1: selftest bug A", dqx("exclusions", "P813"), fixed = TRUE),
+            grepl("BasicPickingScene all: selftest bug B", dqx("exclusions", "P812"), fixed = TRUE),
+            dqx("total_confirms", "P813") == excl_base$data_quality$total_confirms[excl_base$data_quality$participant_id == "P813"] - n813,
+            all(c("P812", "P813") %in% ex$flagged), all(ex$data_quality$summary_mismatches == 0))
+  # The excluded visits: outcome numbers NA (not 0), completed kept; other scenes untouched.
+  vx <- function(d, pid, sc) d[d$participant_id == pid & d$scene == sc, ]
+  m813 <- vx(ex$visits, "P813", "MixedPickingScene")
+  stopifnot(nrow(m813) == 1, is.na(m813$confirm_count), is.na(m813$error_rate), is.na(m813$first_attempt_correct),
+            identical(m813$completed, vx(excl_base$visits, "P813", "MixedPickingScene")$completed),
+            identical(vx(ex$visits, "P813", "BasicPickingScene")$confirm_count,
+                      vx(excl_base$visits, "P813", "BasicPickingScene")$confirm_count),
+            all(is.na(vx(ex$visits, "P812", "BasicPickingScene")$confirm_count)),
+            is.na(ex$wide$confirms_MixedPickingScene[ex$wide$participant_id == "P813"]),
+            !any(ex$skill_rates$participant_id == "P813" & ex$skill_rates$scene == "MixedPickingScene"))
+  # Position times: the excluded position and the whole excluded scene have no row.
+  stopifnot(!any(ex$process$participant_id == "P813" & ex$process$scene == "MixedPickingScene" & ex$process$position == 1),
+            any(ex$process$participant_id == "P813" & ex$process$scene == "MixedPickingScene" & ex$process$position == 2),
+            !any(ex$process$participant_id == "P812" & ex$process$scene == "BasicPickingScene"))
+  x_warn <- readLines(file.path(output_dir, "pilot", "warnings.txt"), encoding = "UTF-8")
+  stopifnot(any(grepl("P813 MixedPickingScene position 1 left out", x_warn, fixed = TRUE)),
+            any(grepl("P812 BasicPickingScene (all attempts) left out", x_warn, fixed = TRUE)),
+            any(grepl("00000000-0000-0000-0000-000000000000", x_warn) & grepl("is in no log", x_warn)),
+            any(startsWith(x_warn, "Data exclusions (data_exclusions.csv, #159): ")),
+            !any(grepl("disagrees|differs", x_warn)))
+  # The main run (no exclusions file) excluded nothing and said so.
+  stopifnot(nrow(excl_base$excluded_press_rows) == 0, all(excl_base$data_quality$excluded_presses == 0),
+            all(is.na(excl_base$data_quality$exclusions)))
+  unlink(c(excl_dir, output_dir), recursive = TRUE)
 
   # 9. Without allow_fake, analyse.R must refuse the fake folder.
   # (parent = globalenv(), so it can't see allow_fake from this environment)

@@ -25,12 +25,35 @@ change only with headset removals, pauses, an early end and active time.
 | `item_skills.csv` | `scene, item, skill, scaffolded`: the skill of each quiz question (`question_id`) and order position (`position_<n>`), and which items are scaffolded (Complex `position_1`). A position with an empty skill tests every skill of its scene. `objective_id` (#86): the objective the whole first attempt at the item tests (quiz questions; Mixed positions = P3); empty for Complex `position_1` / `position_2` (scaffold markers only; their codes reach P4a/P4b via `skill_map.csv`, position 1 never, it is scaffolded). |
 | `skill_scaffolds.csv` | `scene, item, skill, from_layout, shown, source` (#108, decision 037): help the app gives for ONE skill at an item while the item's other skills stay measured, one row per scene × item × skill. `from_layout` = first `layout_version` with the help; `shown` = `always` (Basic `position_1`: the 6 EKZ places are outlined from the start) or `after_error` (Mixed `position_1` from `"034"`: the 3 places appear after the first press of the visit with an error of that skill, `EKZ_PLACEMENT`). Several rows per scene × item × skill are allowed: a build uses the one with the highest `from_layout` ≤ its layout (Mixed `position_1`: `after_error` from `"034"`, `always` from `"038"`, #157). A press × skill pair with the help visible is left out of that skill's rate and its objective (P2), numerator and denominator; the press still counts for the other skills (Basic `calculate_quantity`). `item_skills.csv` can't hold this: it has one row per item and its `scaffolded` takes the whole press out. |
 | `objectives.csv` | `objective_id, knowledge_type, description, taught_scene, practised_scene, evidence, evidence_source` (#86, decision 034): the course objectives D1-D3 (declarative: "Sie kennen") and P0-P4b (procedural: "Sie können") and what the logs hold for each (`rated`, `observed`, `none`). `objective_id` is fixed ASCII; change `evidence` here when a measure is added. `from_layout` (empty = from the first build): an objective whose evidence changes with a build gets one more row with the first `layout_version` of the new evidence; a row covers sessions from its `from_layout` up to the next row's (P2: `rated` up to `"037"`, `observed` from `"038"`, #157). |
+| `data_exclusions.csv` | `session_id, scene, position, reason` (#159): presses that measure a known app bug, not the learner. See *Data exclusions*. |
 | `data/` | Copied logs. **Git-ignored, never commit.** |
 | `output/` | Charts and tables of the study set; `output/pilot/` the same for the pilot set. Git-ignored. |
 
 The study lead may edit the six config CSVs (`scenes`, `skill_map`, `scene_skills`,
 `item_skills`, `skill_scaffolds`, `objectives`) without touching code. The header of `paper_forms_template.csv` is a
 contract with `analyse_set.R` (the script stops if they differ): change both together.
+
+### Data exclusions (#159)
+
+`data_exclusions.csv` lists presses that measure the app, not the learner: one row
+per case, `session_id` (from the log file name), `scene` (as in `scenes.csv`),
+`position` (the order position, e.g. `1`; **empty = every rated attempt of that scene
+in that session**, all its visits, quiz touches included) and `reason` (the bug and
+its backlog item, e.g. `#157 snap place held by grabbed carton`). Add a row only when
+a bug is confirmed in the code (fixed in a later build) and it blocked the task in
+that session, e.g. P811 Mixed position 1 (build `bdf77d0-dirty`): a carton grabbed out
+of a snap place kept the place taken, so 7 presses with 3 right cartons got
+`EKZ_PLACEMENT`. Never add a row because a result looks bad. The presses stay in the
+log checks and the `summary.csv` comparison, but leave `items.csv`,
+`first_attempt_by_item.png`, the skill and objective rates, the error-code chart and
+`process_by_position.csv` (that position). The visit's per-visit outcome numbers
+(`confirm_count`, `error_rate`, `first_attempt_correct`, `attempts_to_correct`,
+`time_to_*`; in `wide.csv` `confirms_`, `errors_`, `error_rate_`, `first_correct_`,
+…) become empty (not measured), because they span all its positions; the other
+positions stay in `items.csv`. The participant and the other scenes stay in.
+`data_quality.csv` gets `excluded_presses` (0 = none) and `exclusions`
+(`<scene> p<n>: <reason>`, `all` = whole scene), `warnings.txt` names every row (and
+a row whose session is in no log). No file, or only the header row = nothing excluded.
 
 ## Setup (once)
 

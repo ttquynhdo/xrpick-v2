@@ -212,6 +212,54 @@ red_button_scenes <- c("BasicPickingScene", "MixedPickingScene", "ComplexScene")
 grab_scenes <- c("ConceptScene", red_button_scenes)
 container_scenes <- red_button_scenes
 
+# Data exclusions (#159): known app bugs that made some presses measure the
+# app, not the learner (e.g. #157: in build bdf77d0 a carton grabbed out of a
+# Mixed snap place kept the place taken, so P811 got EKZ_PLACEMENT 7 times
+# with 3 right cartons). One row per case: session_id, scene, position,
+# reason. position = the order position whose presses are left out; empty =
+# every rated attempt of that scene in that session (all its visits, quiz
+# touches included). The presses stay in the log checks (invariant, Empf Kz,
+# summary.csv comparison) but leave every learner measure: items.csv,
+# first_attempt_by_item.png, skill and objective rates, error codes,
+# process_by_position.csv (that position), and the per-visit outcome numbers
+# of the visit (confirm_count, error_rate, first_attempt_correct,
+# attempts_to_correct, time_to_*: NA = not measured, because they span all
+# positions of the visit). The participant and the other scenes stay in.
+# No file, or a file with only the header row = nothing excluded (same
+# results as before #159). selftest.R sets exclusions_file to its own file.
+if (!exists("exclusions_file")) exclusions_file <- file.path(analysis_folder, "data_exclusions.csv")
+data_exclusions <- tibble(session_id = character(), scene = character(), position = integer(),
+                          reason = character())
+if (file.exists(exclusions_file)) {
+  data_exclusions <- read_csv(exclusions_file, show_col_types = FALSE,
+                              col_types = cols(.default = col_character())) %>%
+    transmute(session_id = trimws(session_id), scene = trimws(scene),
+              position_text = trimws(coalesce(position, "")), reason = trimws(reason)) %>%
+    mutate(position = suppressWarnings(as.integer(na_if(position_text, ""))))
+  bad_exclusions <- data_exclusions %>%
+    filter(is.na(session_id) | session_id == "" | !scene %in% scene_levels |
+             (position_text != "" & (is.na(position) | position < 1L)) | is.na(reason) | reason == "")
+  if (nrow(bad_exclusions) > 0) {
+    stop(exclusions_file, ": every row needs a session_id, a scene from scenes.csv, an empty or ",
+         "whole-number position (1, 2, ...) and a reason; check row(s): ",
+         paste(bad_exclusions$session_id, bad_exclusions$scene, bad_exclusions$position_text, collapse = "; "))
+  }
+  data_exclusions <- data_exclusions %>% select(session_id, scene, position, reason) %>% distinct()
+}
+# Reason of the exclusion row a rated attempt falls under; NA = not excluded.
+# A row with a position matches red-button presses at that position; a row
+# without one matches every attempt of the scene in that session.
+exclusion_reason <- function(session_id, scene, position) {
+  out <- rep(NA_character_, length(session_id))
+  for (k in seq_len(nrow(data_exclusions))) {
+    r <- data_exclusions[k, ]
+    hit <- is.na(out) & session_id %in% r$session_id & as.character(scene) %in% r$scene &
+      (is.na(r$position) | position %in% r$position)
+    out[hit] <- r$reason
+  }
+  out
+}
+
 # ---- 3. Read every events file -----------------------------------------------
 
 # Find the files. Fake data are skipped unless data_dir points into fake/,
@@ -261,6 +309,9 @@ events_raw <- map(events_files, read_events_file) %>% list_rbind()
 # invalid IDs, so their warnings are written once, in the study run.
 pilot_ids_seen <- sort(unique(events_raw$participant_id[is_pilot_id(events_raw$participant_id)]))
 readable_paths <- unique(events_raw$path)
+# Every session under data_dir, both sets (#159: an exclusion row whose
+# session is in no log is warned).
+all_session_ids_seen <- unique(na.omit(events_raw$session_id))
 events_raw <- events_raw %>% filter(in_set(participant_id))
 # Unreadable lines: warned in the set that owns the file (a file with no
 # readable line at all belongs to the study run).
@@ -1064,6 +1115,57 @@ rated_counts <- v2_events %>%
            (!scene %in% red_button_scenes & event == "quiz_answer")) %>%
   count(session_id, scene, scene_visit, name = "ev_rated_presses")
 
+# Data exclusions (#159, data_exclusions.csv, section 2). Everything above
+# (log checks, press_visit for the summary.csv comparison) saw every press;
+# from here on `presses` and `press_codes` hold only the learner's presses, so
+# items, skill and objective rates, error codes and the position times leave
+# the excluded ones out. presses_all keeps them for the rare places that ask
+# about the log, not the learner.
+presses_all <- presses %>%
+  mutate(excluded_reason = exclusion_reason(session_id, scene, position))
+excluded_press_rows <- presses_all %>% filter(!is.na(excluded_reason))
+presses <- presses_all %>% filter(is.na(excluded_reason)) %>% select(-excluded_reason)
+press_codes <- press_codes %>% filter(press_id %in% presses$press_id)
+# Visits touched by an exclusion row (any visit of that scene in that
+# session): their per-visit outcome numbers become NA after the summary.csv
+# comparison (section 10), because they span every position of the visit.
+excluded_visits <- visit_events %>%
+  filter(event == "scene_enter") %>%
+  distinct(participant_id, session_id, scene, scene_visit) %>%
+  inner_join(data_exclusions %>% distinct(session_id, scene), by = c("session_id", "scene")) %>%
+  left_join(excluded_press_rows %>% group_by(session_id, scene, scene_visit) %>%
+              summarise(excluded_presses = n(), excluded_counted = sum(counted), .groups = "drop"),
+            by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(data_exclusions %>% group_by(session_id, scene) %>%
+              summarise(exclusion = paste0(if_else(is.na(position), "all", paste0("p", position)), ": ", reason,
+                                           collapse = "; "), .groups = "drop"),
+            by = c("session_id", "scene")) %>%
+  mutate(excluded_presses = coalesce(excluded_presses, 0L), excluded_counted = coalesce(excluded_counted, 0L)) %>%
+  # A position row touches only the visits where it left a press out; a row
+  # without a position the whole scene of that session.
+  filter(excluded_presses > 0 | paste(session_id, scene) %in%
+           paste(data_exclusions$session_id, data_exclusions$scene)[is.na(data_exclusions$position)])
+for (k in seq_len(nrow(data_exclusions))) {
+  r <- data_exclusions[k, ]
+  n_hit <- sum(excluded_press_rows$session_id == r$session_id & excluded_press_rows$scene == r$scene &
+                 excluded_press_rows$excluded_reason == r$reason &
+                 (is.na(r$position) | excluded_press_rows$position %in% r$position))
+  where <- paste0(r$scene, if (is.na(r$position)) " (all attempts)" else paste0(" position ", r$position))
+  if (!r$session_id %in% all_session_ids_seen) {
+    warn("data_exclusions.csv: session ", r$session_id, " (", where, ") is in no log under ", data_dir,
+         " (typo in the session_id?)")
+  } else if (r$session_id %in% sessions$session_id) {
+    pid <- sessions$participant_id[match(r$session_id, sessions$session_id)]
+    if (n_hit == 0) {
+      warn("data_exclusions.csv: ", pid, " session ", r$session_id, " ", where,
+           " has no rated attempt to leave out (check scene / position)")
+    } else {
+      warn("data_exclusions.csv: ", pid, " ", where, " left out of every learner measure (", n_hit,
+           " rated attempt(s); reason: ", r$reason, "); the visit's per-visit outcome numbers are NA")
+    }
+  }
+}
+
 # Red-button presses the validator ignored (station moving, order already
 # completed, Complex quiz not answered yet). Never an attempt, never in a
 # denominator; only counted.
@@ -1254,7 +1356,7 @@ session_outcome <- sessions %>%
             outcome_measured = case_when(
               schema_version %in% 1L ~ FALSE,
               groups_logged %in% TRUE ~ str_detect(coalesce(event_groups, ""), "(^|;)outcome(;|$)"),
-              TRUE ~ session_id %in% presses$session_id))
+              TRUE ~ session_id %in% presses_all$session_id))
 outcome_sessions <- session_outcome$session_id[session_outcome$outcome_measured]
 
 # ---- 7b. Interaction events (#29): grabs, order container, menu, end control --
@@ -2117,6 +2219,26 @@ if (nrow(summary_rows) > 0) {
 
 # ---- 10. Per participant: data-quality table -----------------------------------
 
+# Data exclusions (#159): now that summary.csv has been compared with every
+# press, the per-visit outcome numbers of a visit with excluded presses
+# become NA (not measured). They span all positions of the visit, so they
+# can't be cleaned position by position; the other positions stay in
+# items.csv and process_by_position.csv. `completed` stays (a fact, not a
+# rate). Empty exclusions file: nothing changes.
+visits <- visits %>%
+  left_join(excluded_visits %>% select(session_id, scene, scene_visit, excluded_presses, excluded_counted, exclusion) %>%
+              mutate(scene = factor(scene, levels = levels(visits$scene))),
+            by = c("session_id", "scene", "scene_visit")) %>%
+  mutate(visit_excluded = !is.na(exclusion),
+         excluded_presses = if_else(outcome_logged, coalesce(excluded_presses, 0L), NA_integer_),
+         # Rated attempts of the visit that are learner data (for total_confirms).
+         kept_confirms = confirm_count - coalesce(excluded_counted, 0L),
+         across(c(confirm_count, rated_presses, presses_with_error, attempts_to_correct),
+                ~ if_else(visit_excluded, NA_integer_, .x)),
+         across(c(error_rate, time_to_first_confirm_s, time_to_correct_s, time_to_correct_net_s),
+                ~ if_else(visit_excluded, NA_real_, .x)),
+         first_attempt_correct = if_else(visit_excluded, NA, first_attempt_correct))
+
 # Course finished = a correct confirm (task_completed) in ComplexScene in any
 # session, even when the session then ended as a crash (design section 6).
 finished_ids <- visits %>% filter(scene == "ComplexScene", completed %in% TRUE) %>%
@@ -2181,7 +2303,13 @@ data_quality <- sessions %>%
                         hmd_removed_count = sum(hmd_removed_count, na.rm = TRUE),
                         unity_errors = sum(unity_errors, na.rm = TRUE),
                         outcome_logged = any(outcome_logged),
-                        total_confirms = if (any(outcome_logged)) sum(confirm_count, na.rm = TRUE) else NA_integer_,
+                        # #159: without excluded presses (other positions of an excluded visit still count).
+                        total_confirms = if (any(outcome_logged)) sum(kept_confirms, na.rm = TRUE) else NA_integer_,
+                        # #159: rated attempts left out by data_exclusions.csv (0 = none), and why.
+                        excluded_presses = if (any(outcome_logged)) sum(excluded_presses, na.rm = TRUE) else NA_integer_,
+                        exclusions = if (any(visit_excluded)) paste(unique(paste0(scene[visit_excluded], " ",
+                                                                                 exclusion[visit_excluded])), collapse = " | ")
+                                     else NA_character_,
                         # #29: NA when no session of the person logged the interaction group.
                         interaction_logged = any(interaction_logged),
                         end_control_opens = if (any(interaction_logged)) sum(end_control_opened, na.rm = TRUE) else NA_integer_,
@@ -2206,7 +2334,7 @@ data_quality <- sessions %>%
          mixed_ekz_places, mixed_menu_cue, mixed_card_text, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
-         unity_errors, error_cap_reached, outcome_logged, total_confirms, interaction_logged,
+         unity_errors, error_cap_reached, outcome_logged, total_confirms, excluded_presses, exclusions, interaction_logged,
          end_control_opens, menu_blocked, open_grabs, snap_grab_artifacts, facilitator_tail_s, invariant_breaks,
          unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
          first_start_utc) %>%
@@ -2237,6 +2365,8 @@ dq_long <- data_quality %>%
             unity_err = as.character(unity_errors),
             error_cap = as.character(error_cap_reached),
             outcome = as.character(outcome_logged),
+            # #159: orange = presses left out by data_exclusions.csv (app bug).
+            excluded = coalesce(as.character(excluded_presses), ""),
             # Empty = not measured (build before #29).
             interaction = as.character(interaction_logged),
             end_ctrl_opens = coalesce(as.character(end_control_opens), ""),
@@ -2610,7 +2740,8 @@ ttc_scene <- function(scene, session_id) {
   }))
   factor(sc, levels = intersect(lv, unique(c(sc, chart_scene_levels[!chart_scene_levels %in% red_button_scenes]))))
 }
-ttc_people <- visits %>% filter(outcome_logged) %>%
+# A visit with excluded presses (#159) is neither "reached" nor "never".
+ttc_people <- visits %>% filter(outcome_logged, !visit_excluded) %>%
   mutate(scene = ttc_scene(scene, session_id)) %>%
   group_by(participant_id, scene) %>%
   summarise(has_counting = any(counting & confirm_count > 0, na.rm = TRUE),
@@ -2735,6 +2866,9 @@ process <- proc_positions %>%
          # Shelf card text (#155): long up to "038", short from "039"; never pool read_s across it.
          card_text = card_text(layout_version),
          scene = factor(scene, levels = levels(visits$scene))) %>%
+  # Data exclusions (#159): an excluded position (or a whole excluded scene)
+  # measures the app, not the learner: no row.
+  filter(is.na(exclusion_reason(session_id, scene, position))) %>%
   arrange(participant_id, scene, scene_visit, position)
 write_csv(process %>% select(participant_id, session_id, scene, scene_visit, counting, repeat_visit,
                              layout_version, drop_rule, card_text, position, scaffolded, scaffold_level, empf_kz, ekz_places, completed, presses,
@@ -3604,7 +3738,8 @@ observed_persons <- function(id, from_lay, to_lay) {
     concept_containers_by_visit %>% filter(containers_logged, in_period(session_lay(session_id), from_lay, to_lay)) %>%
       group_by(participant_id) %>% summarise(done = any(order_enters > 0), .groups = "drop")
   } else if (id == "P0") {
-    visits %>% filter(outcome_logged %in% TRUE, scene %in% red_button_scenes,
+    # A visit with excluded presses (#159, app bug) is no evidence either way.
+    visits %>% filter(outcome_logged %in% TRUE, !visit_excluded, scene %in% red_button_scenes,
                       in_period(session_lay(session_id), from_lay, to_lay)) %>%
       group_by(participant_id, scene) %>% summarise(done = any(completed %in% TRUE), .groups = "drop") %>%
       group_by(participant_id) %>% filter(n_distinct(scene) == length(red_button_scenes)) %>%
@@ -4114,6 +4249,11 @@ validity_limits <- c(
   "- One text rule (#155, decision 041, layout \"039\"): no event or field changes. Basic/Mixed/Complex step cards say one sentence and the goal cards lost their \"So ...\" sentence, so read_s, time_to_first_grab_s and the time to the first press are not comparable with \"038\"-or-older (card_text long / short; split in first_attempt_by_item.png, time_by_phase.png, time_to_correct_by_scene.png when a set mixes them; visits and wide.csv still pool: filter by layout_version). The removed \"work out how many\" prompts and the pointer to the Complex worked example may also make the first attempt slightly harder: that is why item charts are split too. No removed sentence was help for a rated skill (skill_scaffolds.csv unchanged). ConceptScene: card 1 is gone and the tour bar opens by itself 2 s (game time) after the scene starts, not on the first grab; concept_tour_open.csv reads the opening from the first logged tour_step (tour_opens auto_2s) and grab_before_leaving_material shows who left step material without holding a carton. Concept time_to_first_grab_s changes meaning (no longer the gate to the tour). Complex position_1: question and A/B/C in one cluster near the hands (quiz_layout book), its own chart group.",
   "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).",
   "- WelcomeScene in two steps (#121/#124, decision 038, layout \"036\"): the learning objectives come first and the practice box, red button and Menu appear only after „Zu den Aufgaben\" (objectives_read_s = active seconds to that press; NA for older layouts, never 0). Welcome active_s and the times before the first welcome_practice_done of \"036\" are not comparable with \"035\"-or-older logs. objectives_read_s is time on the panel, not proof it was read.")
+# Data exclusions (#159): said on every report of a set that has some.
+if (nrow(excluded_press_rows) > 0) {
+  validity_limits <- c(validity_limits,
+    "- Data exclusions (data_exclusions.csv, #159): rated attempts made while a known app bug blocked the task (e.g. #157, build bdf77d0: a carton grabbed out of a Mixed snap place kept it taken) are left out of items.csv, first_attempt_by_item.png, skill and objective rates, error codes and process_by_position.csv; that visit's per-visit outcome numbers (confirms, error_rate, first_correct, attempts_to_correct, time_to_*) are NA in visits and wide.csv, and it is neither 'reached' nor 'never' in time_to_correct_by_scene.png. The participant's other scenes and positions stay in. summary.csv is still compared with every press. What the trainee would have done without the bug is unknown: the exclusion removes a wrong measure, it does not replace it.")
+}
 # The pilot set (decision 023) is a try-out of the course and of this
 # analysis, not study data: say so on every pilot report.
 if (is_pilot_set) {
@@ -4126,7 +4266,7 @@ flagged <- data_quality %>%
            invariant_breaks > 0 | unknown_codes > 0 | summary_mismatches > 0 |
            exit_disagreements > 0 | duplicate_files > 0 | error_cap_reached |
            resume_declined %in% TRUE | ended_session_override %in% TRUE | language_not_de |
-           old_schema_log) %>%
+           old_schema_log | coalesce(excluded_presses > 0, FALSE)) %>%
   pull(participant_id)
 
 report_lines <- c(
@@ -4137,6 +4277,11 @@ report_lines <- c(
                             if (length(pilot_ids_seen) == 0) "none" else paste(pilot_ids_seen, collapse = ", ")),
   paste0("Participants to check in data_quality.csv: ",
          if (length(flagged) == 0) "none" else paste(flagged, collapse = ", ")),
+  paste0("Data exclusions (data_exclusions.csv, #159): ",
+         if (nrow(excluded_press_rows) == 0) "none" else
+           paste0(nrow(excluded_press_rows), " rated attempt(s) left out of the learner measures: ",
+                  paste(data_quality$participant_id[!is.na(data_quality$exclusions)], "-",
+                        data_quality$exclusions[!is.na(data_quality$exclusions)], collapse = "; "))),
   paste0("Paper forms to check (wide_with_paper.csv): ",
          if (length(paper_files) == 0) "no paper file"
          else if (length(paper_check_ids) == 0) "none" else paste(paper_check_ids, collapse = ", ")),
