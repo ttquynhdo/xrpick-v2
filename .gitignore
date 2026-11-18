@@ -89,6 +89,12 @@ crashlytics-build.properties
 # link.xml (+ .meta) copied in by every player build, deleted again on the next script reload
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/link.xml*
 
+# Written by package preprocessors at every player build and removed only after a successful
+# build, so a failed or blocked build (#162 clean-build guard) leaves them behind
+/[Aa]ssets/[Rr]esources/PerformanceTestRunInfo.json*
+/[Aa]ssets/[Rr]esources/PerformanceTestRunSettings.json*
+/[Aa]ssets/[Ss]treaming[Aa]ssets/RuntimeActionBindings.json*
+
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
