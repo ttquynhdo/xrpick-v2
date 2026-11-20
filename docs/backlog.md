@@ -19,6 +19,10 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
+**SAU STUDY – REVIEW CHUYÊN GIA FESTO (thêm 2026-11-20, từ `docs/review-notes-festo-2026-11-20.md`; mục #164–#166 ở cuối file).** Festo ghi cả ba là „for further development“, học kỳ sau; không làm trước study (tuần 2 và 4 năm 2027).
+- **Trước study, chưa thành mục:** phím xác nhận F12/Enter thay F6 và bỏ chữ „bàn đạp/Fuß“ (F1 trong file ghi chú). Chờ Festo trả lời `study design/XPick_Confirm_Key_Questions_2026-11-20.docx` (dialog nào, phím nào) rồi mới thêm mục và chọn: chỉ đổi phím (nhỏ) hay dựng dialog cũ (lớn, cần `solution-decision`).
+- **Sau study:** #165 (ảnh EKZ, chỉ ConceptScene, chờ Festo cho phép dùng ảnh) ∥ #166 (cần `solution-decision` trước) → #164 (nhiều Mat.-Nr; đụng Basic/Mixed/Complex, làm sau #166 nếu #166 đổi dòng đơn của Basic/Mixed). Mỗi mục đổi bài tập nên hỏi `data-analyst` về `layout_version`.
+
 **ĐỢT LOG P811 (thêm 2026-11-18, từ 6 câu hỏi của lead về log P811; mục #159–#163 ở cuối file).** Không đụng scene, chỉ script + spec + R, nên chạy song song với các mục scene đang mở; `data-analyst` duyệt mọi thay đổi log.
 - **1. Ngay (không cần build):** **#159** (chỉ `analysis/`: loại Mixed vị trí 1 của P811 khỏi kết quả) ∥ **#162** (chặn build dirty; commit hoặc trả lại `TimeManager.asset` trước build "039").
 - **2. Trước build "039" nếu kịp, nối tiếp nhau:** **#160** (chi tiết chỗ đặt EKZ) → **#161** (key câu phản hồi). Chỉ thêm trường, `schema_version` vẫn 2, không đổi `layout_version`; vào chung build "039", làm trên nhánh mới tách từ `feat/151-desk-edges` (đang chứa #151, #154, #155, chưa gộp vào `main`) để build đi từ một nhánh.
@@ -2684,3 +2688,43 @@ Nguồn: kiểm 6 câu hỏi của lead trên 7 log thật `analysis/data/real` 
 - **Test trên kính:** không
 - **Depends on:** làm chung với lần tăng `schema_version` khác nếu có; không làm giữa một đợt thu dữ liệu đang chạy
 - **Status:** todo
+
+## Review chuyên gia Festo 2026-11-20 (để sau study)
+
+Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho cả 10 câu hỏi; ba mục dưới đây họ ghi là „for further development“, không cần trước study.
+
+### #164 [P3] Thêm nhiều mã vật tư (Mat.-Nr) khác nhau trong các bài nhặt hàng
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** `orderLines` trên các counter (`CalcForWMS`, `MixedPickingContainer`, `PiecesContainerCounter`), `PackageData` + nhãn của kiện, `Assets/Scripts/Editor/PackageStandardizer.cs`, `docs/i18n/strings-todo.csv` (chữ có tên vật tư), `analysis/` nếu đổi bài tập
+- **Problem:** cả khoá chỉ có 5 vật tư giả, mỗi dòng đơn một vật tư, Basic và Complex dòng 2 cùng dùng SCHLAUCHSCHELLE B (`training_b`). Festo: ở trạm thật số mã vật tư đa dạng hơn nhiều, nên người học ít phải so Mat.-Nr thật sự.
+- **Done when:** (giả định: mỗi thùng kho vẫn một Mat.-Nr theo D12, đa dạng nằm ở các dòng đơn) Qua bài 3–5, người học gặp ít nhất 5 Mat.-Nr khác nhau và không dòng đơn nào lặp lại Mat.-Nr của một dòng trước. Mỗi Mat.-Nr mới có nhãn kiện (tên, Mat.-Nr, VPE) khớp với dòng LVS của nó. Đặt kiện của một Mat.-Nr khác dòng LVS vào thùng đơn rồi bấm nút đỏ → thẻ kết quả báo sai vật tư. (code) `PackageStandardizer.Check()` không báo lỗi ở 3 scene.
+- **Inspector work expected:** yes (kiện mới, nhãn, `orderLines`)
+- **Công:** L
+- **Test trên kính:** nhanh (đọc nhãn kiện mới từ chỗ đứng)
+- **Depends on:** #166 nếu #166 đổi dòng đơn của Basic/Mixed; Festo nói rõ „wider variances“ nghĩa là nhiều đơn hay nhiều Mat.-Nr trong một thùng kho (nếu là trong một thùng thì phải bỏ giả định D12, cần `solution-decision`)
+- **Status:** todo (sau study)
+
+### #165 [P3] Bảng EKZ-Übersicht: thêm ảnh ví dụ thật cho từng mã EKZ
+- **Type:** feature
+- **Scene(s):** ConceptScene
+- **Files:** ConceptScene `EKZ Overview` (các dòng EKZ 0, 2–6, 8, 9), ảnh mới trong `Assets/` (chỉ khi Festo cho phép), `Assets/Scripts/Editor/TextComfortAudit.cs` (chạy lại)
+- **Problem:** bảng EKZ chỉ có pictogram tự dựng (#57, decision 018). Bảng EKZ gốc của Festo có hàng „Beispiel“ với ảnh thật từng loại thùng; Festo đề nghị đưa ảnh thật lên bảng để người học nhận ra EKZ ở kho thật.
+- **Done when:** Ở bước 9 của tour, mỗi dòng EKZ trên bảng có một ảnh ví dụ thật bên cạnh pictogram. Từ chỗ đứng nhìn bảng, nhận ra được nội dung ảnh (rời / xếp lớp / tấm ngăn). Bảng vẫn không che màn LVS hay thanh tour. (code) `TextComfortAudit.Check()` không có lỗi mới ở ConceptScene.
+- **Inspector work expected:** yes (ảnh trên bảng)
+- **Công:** M
+- **Test trên kính:** nhanh (nhìn ảnh từ chỗ đứng)
+- **Depends on:** Festo cho phép dùng ảnh của bảng EKZ gốc (tài liệu nội bộ) hoặc gửi ảnh khác dùng được
+- **Status:** blocked (chờ Festo cho phép dùng ảnh; để sau study)
+
+### #166 [P3] Cân nhắc EKZ 6 thay EKZ 3 cho hàng có bao bì
+- **Type:** feature
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ConceptScene (tour, quiz, bảng EKZ), WelcomeScene/ComplexScene (chữ mục tiêu nếu đổi)
+- **Files:** `EkzPlacementCheck`, `BoxSnapper*` (Basic, Mixed), `Orders/OrderRule`, `docs/i18n/strings-todo.csv` (`concept.tour.empf_kz_*`, `concept.quiz.ekz_*`, mục tiêu „Kartons nach EKZ einlegen“), decision 003 và 028
+- **Problem:** ở Festo, hàng có bao bì thường là EKZ 6 (mỗi lớp có tấm ngăn giữa các chi tiết), còn app dạy EKZ 3 (từng thùng, xếp ngay ngắn). Festo nói EKZ 3 „perfectly fine for learning purposes“, nên đây là để làm khoá sát thực tế hơn.
+- **Done when:** (giả định: thêm một dòng đơn EKZ 006, EKZ 3 giữ nguyên) Dòng đơn có Empf Kz 006: LVS hiện 006, học viên phải đặt tấm ngăn giữa các lớp kiện trong thùng đơn. Bấm nút đỏ khi thiếu tấm ngăn → thẻ kết quả nói rõ cần tấm ngăn. Đủ tấm ngăn và đủ số lượng → „Richtig!“.
+- **Inspector work expected:** yes (tấm ngăn cầm được, chỗ đặt)
+- **Công:** L
+- **Test trên kính:** bắt buộc (cầm và đặt tấm ngăn bằng tay thật)
+- **Depends on:** `solution-decision` (giữ EKZ 3, thay bằng EKZ 6, hay thêm EKZ 6 thành bài/dòng riêng)
+- **Status:** blocked (cần `solution-decision`; để sau study)
