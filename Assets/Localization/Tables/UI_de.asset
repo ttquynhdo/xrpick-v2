@@ -225,7 +225,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
-    m_Localized: "Volle Kartons und loses Material stimmen mit dem Auftrag \xFCberein.\nDer
+    m_Localized: "Volle Verpackungen und loses Material stimmen mit dem Auftrag \xFCberein.\nDer
       Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg. Sehen
       Sie den Beh\xE4ltern auf der Rollenbahn zu."
     m_Metadata:
@@ -479,8 +479,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627443
-    m_Localized: "Legen Sie zuerst die vollen Kartons, dann die losen Teile in den
-      Auftragsbeh\xE4lter."
+    m_Localized: "Legen Sie zuerst die vollen Verpackungen, dann die losen Teile
+      in den Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627444
@@ -875,10 +875,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 970336150360069
     m_Localized: "Beispiel \u2013 nicht zum Greifen."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 970336154554368
-    m_Localized: Nehmen Sie nur die losen Teile heraus, der Karton bleibt hier.
     m_Metadata:
       m_Items: []
   - m_Id: 1017753042292736

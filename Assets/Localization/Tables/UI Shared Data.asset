@@ -807,10 +807,6 @@ MonoBehaviour:
     m_Key: concept.ekz.sample.not_grabbable
     m_Metadata:
       m_Items: []
-  - m_Id: 970336154554368
-    m_Key: complex.storage.opened_carton
-    m_Metadata:
-      m_Items: []
   - m_Id: 1017753042292736
     m_Key: welcome.panel.know
     m_Metadata:

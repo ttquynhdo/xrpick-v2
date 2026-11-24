@@ -42,7 +42,6 @@ The numbers come from sources of different strength. Each threshold says where i
     - Tilted EKZ sample cartons: T7.
     - Labels on packages: T1, T5, T6, T7. They are read up close when held; their size from the standing spot is still rated.
     - Concept `Ablauf Overview` and `Sample Description/Unity Canvas`: T13–T15 (never shown since #80 / #89, objects kept inactive).
-    - Complex `Opened Carton Note`: T15 (same reason as its T4 exception below).
     - Instruction shelf card titles (`Cards/*/Primary Text`): T15. Every card is 200 wide in every scene (decision 041), so a long German title („2. Kartons kommissionieren“) takes 2 lines; `InstructionShelfLayout` gives the card the height.
   - **Measurement limits:**
     - The curved `Menu` is measured on its flat source canvas, so its rows are approximate.
@@ -91,7 +90,7 @@ What only the headset can judge: T3, T4 for wearers of reading glasses or varifo
 | T3 | Concept tour: bar 0.69 m (1.45 D) → caption 1.23 m (0.81 D) and LVS 1.10–1.20 m | 0.6 D jump in each of 11 steps |
 | T3 | Complex position 1: quiz 0.62 m (1.61 D) → LVS 1.15 m → shelf 1.53 m (0.65 D) | about 1.0 D |
 | T4 | LVS smallest fields 0.49–0.50° | at the floor; kept as the real WMS (decision 008) |
-| T4 | Complex `Opened Carton Note` 0.54° | near the floor |
+| T4 | Complex `Opened Carton Note` 0.54° (removed in #174) | near the floor |
 | T4 | Shelf cards 0.64° (Basic/Mixed/Complex), 0.71–0.73° (Welcome/Concept); quiz texts 0.60–0.64°; Concept `EKZ Overview` 0.62°, `Tour Markers` captions 0.68° | below target |
 | T5 | Instruction shelf | Basic/Mixed/Complex −58°, Concept −60° |
 | T5 | Result card | 47° |
@@ -101,7 +100,7 @@ What only the headset can judge: T3, T4 for wearers of reading glasses or varifo
 | T6 | Complex `Worked Example` | −54° |
 | T6 | Concept tour bar | −47° |
 | T6 | Result card and Menu | about −44° |
-| T7 | Complex `Opened Carton Note` | 54° |
+| T7 | Complex `Opened Carton Note` (removed in #174) | 54° |
 | T7 | Result card | 34° |
 | T7 | `Box Sign` | 42° |
 | T8 | Concept `Box Hints/Hint Tag` and `Carton Count Demo/Total 1–3` | full `LookRotation` to the head every `LateUpdate` |
@@ -136,7 +135,7 @@ What only the headset can judge: T3, T4 for wearers of reading glasses or varifo
   - T15 warnings left (box 29–31 characters, under the target 33): the bold goal card body in 5 scenes and Basic's result card (both 200 / 180 wide by decision 041 / #109).
 
 **Accepted exceptions:**
-- Complex `Opened Carton Note` (T4 0.54°, T7 54°): kept where it is (user, 2026-11-17, #132). 0.8° needs font 29, which does not fit on the opened carton's front face (17.8 cm); the line is read once and sits above the 0.5° floor. Check on the headset.
+- (Gone since #174, decision 042: the opened cartons were replaced by storage trays.) Complex `Opened Carton Note` (T4 0.54°, T7 54°): kept where it is (user, 2026-11-17, #132). 0.8° needs font 29, which does not fit on the opened carton's front face (17.8 cm); the line is read once and sits above the 0.5° floor. Check on the headset.
 - LVS fields (T4, T10): kept as the real WMS (decision 008).
 
 **Note on T2:**

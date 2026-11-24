@@ -67,7 +67,6 @@ public static class TextComfortAudit
         ("Tour Nav Bar/Progress", "T1", "step counter beside the buttons, decision 040"),
         ("Ablauf Overview", "T13 T14 T15", "never shown since #80, object kept inactive"),
         ("Sample Description/Unity Canvas", "T13 T14 T15", "never shown since #89, object kept inactive"),
-        ("Opened Carton Note", "T15", "fits the opened carton's front face, accepted with T4 in #132"),
         ("Cards/Info Canvas/Primary Text", "T15", "card title: card width 200 in every scene (decision 041), a long German title takes 2 lines"),
         ("Cards/Confirm/Primary Text", "T15", "card title: card width 200 in every scene (decision 041), a long German title takes 2 lines"),
     };

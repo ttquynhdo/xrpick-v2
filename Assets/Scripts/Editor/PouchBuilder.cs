@@ -14,25 +14,37 @@ using UnityEngine.SceneManagement;
 /// clear material. ConvertOpenScene turns every PlasticBag02 package of the open scene into a pouch: same GameObject
 /// (Grabbable, Rigidbody, PackageData, hand-grab interactable kept), mesh and material swapped, scale 1, one solid
 /// BoxCollider = pouch bounds, goods as child "Contents", bottom left where the bag's bottom was.
-/// Labels are placed by PackageStandardizer afterwards (flat on the pouch top). #174 adds the RING D pouch here.
+/// Labels are placed by PackageStandardizer afterwards (flat on the pouch top).
+/// #174, decision 042 items 1-3: the RING D pouch (14 x 14 cm, 4 stacks of 6 low-poly rings inside) and the shallow
+/// storage tray („Modul“) for loose pieces; ConvertCartonsToPouches turns the RING D cartons of ComplexScene into
+/// pouches (front sticker with its collider removed, the rest as above).
 /// </summary>
 public static class PouchBuilder
 {
     private const string MeshFolder = "Assets/Meshes";
     private const string PouchMaterialPath = "Assets/Materials/PouchClear.mat";
-    private const string ContentsMaterialPath = "Assets/Materials/HoseClampSteel.mat";
+    private const string RingMaterialSource = "Assets/media/ring.obj";
+    private const string TrayMaterialPath = "Assets/Materials/Grey.mat";
+    private const string TrayMeshName = "StorageTray";
+    private const string CartonMeshName = "SM_box_1";
+    private const string CartonStickerName = "Cube";
     private const string OldBagMeshName = "PlasticBag02";
     private const string ContentsChildName = "Contents";
 
-    /// <summary>A pouch kind: its size and what lies inside.</summary>
+    private enum Goods { Screws, Rings }
+
+    /// <summary>A pouch kind: its size, its shape and what lies inside.</summary>
     private sealed class PouchSpec
     {
         public string MaterialKey;
         public string MeshName;        // must end with "Pouch" (PackageStandardizer finds pouches by that)
         public string ContentsMeshName;
         public Vector3 Size;           // width (x), thickness (y), depth (z)
+        public Goods Goods;
         public int Pieces;
         public int Seed;
+        public float SlopeWidth = 0.008f;   // welded seam -> full thickness
+        public float Dome = 0.03f;          // the top sinks this share towards the corners
     }
 
     // Mixed SCHRAUBE B: 12 x 10 cm, 3.5 cm thick, 20 screws (VPE 20). User choice 2026-11-24 (clear_pouch_*.png).
@@ -42,17 +54,31 @@ public static class PouchBuilder
         MeshName = "ScrewPouch",
         ContentsMeshName = "ScrewPouchScrews",
         Size = new Vector3(0.12f, 0.035f, 0.10f),
+        Goods = Goods.Screws,
         Pieces = 20,
         Seed = 173,
     };
 
-    private static readonly PouchSpec[] Specs = { ScrewPouch };
+    // Complex RING D (#174): 14 x 14 cm, 3.5 cm thick, 4 stacks (2 x 2) of 5 rings. A steeper edge than the screw
+    // pouch, because the ring stacks reach almost to the seam (outer ring edge 5.5 mm from it, 2.2 cm high there).
+    private static readonly PouchSpec RingPouch = new PouchSpec
+    {
+        MaterialKey = "ring_d",
+        MeshName = "RingPouch",
+        ContentsMeshName = "RingPouchRings",
+        Size = new Vector3(0.14f, 0.035f, 0.14f),
+        Goods = Goods.Rings,
+        Pieces = 20,
+        Seed = 174,
+        SlopeWidth = 0.004f,
+        Dome = 0f,
+    };
+
+    private static readonly PouchSpec[] Specs = { ScrewPouch, RingPouch };
 
     // Pouch shape: a thin welded seam all round, then the filled body rises to the full thickness.
     private const float SeamWidth = 0.003f;
     private const float SeamThickness = 0.002f;
-    private const float SlopeWidth = 0.008f;
-    private const float Dome = 0.03f;        // the top sinks 3 % towards the corners
     private const float GridStep = 0.005f;
 
     // Screw: flat head + shank, 8 sides.
@@ -61,6 +87,19 @@ public static class PouchBuilder
     private const float HeadRadius = 0.0045f;
     private const float HeadHeight = 0.0025f;
     private const int Sides = 8;
+
+    // Low-poly RING D for the pouch contents (the loose RingD mesh has 1,152 tris; 24 of those per pouch would cost
+    // the frame rate #171 won back): outer diameter 6.4 cm like RingD, 4 mm thick, 12 x 4 segments.
+    private const float RingOuterRadius = 0.032f;
+    private const float RingTube = 0.002f;
+    private const int RingSegments = 12;
+    private const int RingTubeSegments = 4;
+    private const float RingStackStep = 0.004f;   // = ring thickness: rings lie on each other, never cross
+
+    // Storage tray („Modul“, decision 042 item 3): a shallow open box, part of the storage container.
+    public static readonly Vector3 TraySize = new Vector3(0.17f, 0.03f, 0.15f);
+    private const float TrayWall = 0.004f;
+    private const float TrayFloor = 0.002f;
 
     [MenuItem("XRPick/Packages/Build pouch assets")]
     private static void BuildMenu() => Debug.Log(BuildAssets());
@@ -75,10 +114,14 @@ public static class PouchBuilder
         foreach (PouchSpec spec in Specs)
         {
             Mesh pouch = SaveMesh(BuildPouchMesh(spec), spec.MeshName);
-            Mesh contents = SaveMesh(BuildScrewsMesh(spec), spec.ContentsMeshName);
+            Mesh contents = SaveMesh(spec.Goods == Goods.Rings ? BuildRingsMesh(spec) : BuildScrewsMesh(spec),
+                spec.ContentsMeshName);
             report.Append($"\n- {pouch.name}: {pouch.triangles.Length / 3} tris, bounds {pouch.bounds.size.ToString("F3")}");
             report.Append($"\n- {contents.name}: {contents.triangles.Length / 3} tris, bounds {contents.bounds.size.ToString("F3")}");
         }
+
+        Mesh tray = SaveMesh(BuildTrayMesh(), TrayMeshName);
+        report.Append($"\n- {tray.name}: {tray.triangles.Length / 3} tris, bounds {tray.bounds.size.ToString("F3")}");
 
         Material material = PouchMaterial();
         report.Append($"\n- {material.name}: {material.shader.name}, queue {material.renderQueue}");
@@ -92,7 +135,6 @@ public static class PouchBuilder
         Scene scene = SceneManager.GetActiveScene();
         var report = new StringBuilder($"PouchBuilder {(dryRun ? "dry run" : "convert")}: {scene.name}");
         Material pouchMaterial = AssetDatabase.LoadAssetAtPath<Material>(PouchMaterialPath);
-        Material contentsMaterial = AssetDatabase.LoadAssetAtPath<Material>(ContentsMaterialPath);
 
         IEnumerable<MeshFilter> bags = scene.GetRootGameObjects()
             .SelectMany(root => root.GetComponentsInChildren<MeshFilter>(true))
@@ -113,16 +155,7 @@ public static class PouchBuilder
             if (dryRun)
                 continue;
 
-            Mesh pouch = AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshFolder}/{spec.MeshName}.asset");
-            Mesh contents = AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshFolder}/{spec.ContentsMeshName}.asset");
-            if (pouch == null || contents == null || pouchMaterial == null)
-            {
-                report.Append(" FAILED: run BuildAssets first");
-                continue;
-            }
-
-            if (!Convert(bag, pouch, contents, pouchMaterial, contentsMaterial))
-                report.Append(" SKIPPED: inside another prefab instance, unpack it by hand first");
+            report.Append(ConvertOne(bag, spec, pouchMaterial));
         }
 
         if (!dryRun)
@@ -131,16 +164,90 @@ public static class PouchBuilder
         return report.ToString();
     }
 
-    // Returns false (and changes nothing) when the bag sits inside a larger prefab instance, e.g. a storage box:
-    // unpacking that would unpack the whole box.
-    private static bool Convert(MeshFilter bag, Mesh pouch, Mesh contents, Material pouchMaterial, Material contentsMaterial)
+    /// <summary>
+    /// #174: turns the cartons (SM_box_1) of one material in the open scene into its pouch, e.g. "ring_d" in
+    /// ComplexScene. The carton's front sticker ("Cube", the carton's solid collider) is removed; Label Top stays and
+    /// PackageStandardizer lays it on the pouch top. Dry run only reports.
+    /// </summary>
+    public static string ConvertCartonsToPouches(string materialKey, bool dryRun)
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        var report = new StringBuilder($"PouchBuilder cartons -> pouches {(dryRun ? "dry run" : "convert")}: {scene.name}, {materialKey}");
+        PouchSpec spec = Specs.FirstOrDefault(s => s.MaterialKey == materialKey);
+        if (spec == null)
+            return report.Append(" FAILED: no pouch for this material").ToString();
+
+        Material pouchMaterial = AssetDatabase.LoadAssetAtPath<Material>(PouchMaterialPath);
+        List<MeshFilter> cartons = scene.GetRootGameObjects()
+            .SelectMany(root => root.GetComponentsInChildren<MeshFilter>(true))
+            .Where(f => f.sharedMesh != null && f.sharedMesh.name == CartonMeshName)
+            .Where(f => f.GetComponent<PackageData>() != null && f.GetComponent<PackageData>().MaterialKey == materialKey)
+            .ToList();
+
+        foreach (MeshFilter carton in cartons)
+        {
+            report.Append($"\n- {PathOf(carton.transform)} -> {spec.MeshName}");
+            if (dryRun)
+                continue;
+
+            Transform sticker = carton.transform.Find(CartonStickerName);
+            if (sticker != null && PrefabUtility.IsPartOfPrefabInstance(carton.gameObject)
+                && PrefabUtility.GetOutermostPrefabInstanceRoot(carton.gameObject) == carton.gameObject)
+            {
+                PrefabUtility.UnpackPrefabInstance(carton.gameObject, PrefabUnpackMode.Completely, InteractionMode.UserAction);
+                sticker = carton.transform.Find(CartonStickerName);
+            }
+
+            // Measure the bottom before the sticker goes; then the pouch keeps the carton's bottom.
+            report.Append(ConvertOne(carton, spec, pouchMaterial, () =>
+            {
+                if (sticker != null)
+                    Undo.DestroyObjectImmediate(sticker.gameObject);
+            }));
+        }
+
+        if (!dryRun)
+            EditorSceneManager.MarkSceneDirty(scene);
+
+        return report.ToString();
+    }
+
+    private static string ConvertOne(MeshFilter package, PouchSpec spec, Material pouchMaterial, System.Action beforeSwap = null)
+    {
+        Mesh pouch = AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshFolder}/{spec.MeshName}.asset");
+        Mesh contents = AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshFolder}/{spec.ContentsMeshName}.asset");
+        Material contentsMaterial = ContentsMaterial(spec);
+        if (pouch == null || contents == null || pouchMaterial == null || contentsMaterial == null)
+            return " FAILED: run BuildAssets first";
+
+        return Convert(package, pouch, contents, pouchMaterial, contentsMaterial, beforeSwap)
+            ? ""
+            : " SKIPPED: inside another prefab instance, unpack it by hand first";
+    }
+
+    private static Material ContentsMaterial(PouchSpec spec)
+    {
+        if (spec.Goods == Goods.Screws)
+            return AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/HoseClampSteel.mat");
+
+        return AssetDatabase.LoadAllAssetsAtPath(RingMaterialSource).OfType<Material>().FirstOrDefault();
+    }
+
+    /// <summary>#174: the storage tray mesh and its material, for the scene step that places a tray in a box.</summary>
+    public static Mesh TrayMesh() => AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshFolder}/{TrayMeshName}.asset");
+
+    public static Material TrayMaterial() => AssetDatabase.LoadAssetAtPath<Material>(TrayMaterialPath);
+
+    // Returns false (and changes nothing) when the package sits inside a larger prefab instance, e.g. a storage box:
+    // unpacking that would unpack the whole box. A package that is its own prefab instance is unpacked.
+    private static bool Convert(MeshFilter bag, Mesh pouch, Mesh contents, Material pouchMaterial, Material contentsMaterial,
+        System.Action beforeSwap = null)
     {
         GameObject go = bag.gameObject;
         if (PrefabUtility.IsPartOfPrefabInstance(go))
         {
             GameObject outermost = PrefabUtility.GetOutermostPrefabInstanceRoot(go);
-            GameObject source = PrefabUtility.GetCorrespondingObjectFromSource(outermost);
-            if (outermost != go || source == null || !AssetDatabase.GetAssetPath(source).EndsWith($"/{OldBagMeshName}.prefab"))
+            if (outermost != go)
                 return false;
 
             PrefabUtility.UnpackPrefabInstance(outermost, PrefabUnpackMode.Completely, InteractionMode.UserAction);
@@ -148,6 +255,7 @@ public static class PouchBuilder
 
         // The pouch's pivot is its bottom: keep the bottom where the bag's bottom was.
         float bottom = WorldBottom(bag);
+        beforeSwap?.Invoke();
         Transform t = go.transform;
 
         Undo.RecordObject(t, "Pouch transform");
@@ -276,9 +384,9 @@ public static class PouchBuilder
     {
         float halfX = spec.Size.x * 0.5f, halfZ = spec.Size.z * 0.5f;
         float edge = Mathf.Min(halfX - Mathf.Abs(x), halfZ - Mathf.Abs(z));
-        float rise = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(SeamWidth, SeamWidth + SlopeWidth, edge));
+        float rise = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(SeamWidth, SeamWidth + spec.SlopeWidth, edge));
         float u = x / halfX, v = z / halfZ;
-        float dome = 1f - Dome * (u * u + v * v) * 0.5f;
+        float dome = 1f - spec.Dome * (u * u + v * v) * 0.5f;
         return Mathf.Lerp(SeamThickness, spec.Size.y * dome, rise);
     }
 
@@ -287,8 +395,8 @@ public static class PouchBuilder
     private static Mesh BuildScrewsMesh(PouchSpec spec)
     {
         var random = new System.Random(spec.Seed);
-        float limitX = spec.Size.x * 0.5f - SeamWidth - SlopeWidth - HeadRadius * 0.5f;
-        float limitZ = spec.Size.z * 0.5f - SeamWidth - SlopeWidth - HeadRadius * 0.5f;
+        float limitX = spec.Size.x * 0.5f - SeamWidth - spec.SlopeWidth - HeadRadius * 0.5f;
+        float limitZ = spec.Size.z * 0.5f - SeamWidth - spec.SlopeWidth - HeadRadius * 0.5f;
         float[] layers = { HeadRadius + 0.001f, HeadRadius * 3f + 0.002f };
         var placed = new List<Vector3>();
         var combine = new List<CombineInstance>();
@@ -331,6 +439,127 @@ public static class PouchBuilder
         mesh.RecalculateBounds();
         Object.DestroyImmediate(screw);
         return mesh;
+    }
+
+    // ---- Contents: rings in 4 stacks (2 x 2), each ring a little off its neighbour ----
+
+    private static Mesh BuildRingsMesh(PouchSpec spec)
+    {
+        var random = new System.Random(spec.Seed);
+        float spacing = RingOuterRadius + 0.0005f;          // stacks touch, rings never cross each other
+        var combine = new List<CombineInstance>();
+        Mesh ring = BuildRing();
+        int perStack = Mathf.Max(1, spec.Pieces / 4);
+
+        for (int stack = 0; stack < 4; stack++)
+        {
+            float cx = (stack % 2 == 0 ? -1f : 1f) * spacing;
+            float cz = (stack < 2 ? -1f : 1f) * spacing;
+            for (int k = 0; k < perStack; k++)
+            {
+                float jitterX = ((float)random.NextDouble() - 0.5f) * 0.002f;
+                float jitterZ = ((float)random.NextDouble() - 0.5f) * 0.002f;
+                float tiltX = ((float)random.NextDouble() - 0.5f) * 3f;
+                float tiltZ = ((float)random.NextDouble() - 0.5f) * 3f;
+                var position = new Vector3(cx + jitterX, SeamThickness + RingTube + k * RingStackStep, cz + jitterZ);
+                combine.Add(new CombineInstance
+                {
+                    mesh = ring,
+                    transform = Matrix4x4.TRS(position, Quaternion.Euler(tiltX, 0f, tiltZ), Vector3.one),
+                });
+            }
+        }
+
+        var mesh = new Mesh { name = spec.ContentsMeshName };
+        mesh.CombineMeshes(combine.ToArray(), true, true);
+        mesh.RecalculateBounds();
+        Object.DestroyImmediate(ring);
+        return mesh;
+    }
+
+    // A flat ring (torus) lying in the xz plane, centred on the origin.
+    private static Mesh BuildRing()
+    {
+        float major = RingOuterRadius - RingTube;
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        for (int i = 0; i < RingSegments; i++)
+        {
+            float a = i * Mathf.PI * 2f / RingSegments;
+            var dir = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+            for (int j = 0; j < RingTubeSegments; j++)
+            {
+                float b = j * Mathf.PI * 2f / RingTubeSegments + Mathf.PI / RingTubeSegments;
+                vertices.Add(dir * (major + Mathf.Cos(b) * RingTube) + Vector3.up * (Mathf.Sin(b) * RingTube));
+            }
+        }
+
+        for (int i = 0; i < RingSegments; i++)
+        for (int j = 0; j < RingTubeSegments; j++)
+        {
+            int a = i * RingTubeSegments + j;
+            int b = ((i + 1) % RingSegments) * RingTubeSegments + j;
+            int c = i * RingTubeSegments + (j + 1) % RingTubeSegments;
+            int d = ((i + 1) % RingSegments) * RingTubeSegments + (j + 1) % RingTubeSegments;
+            triangles.AddRange(new[] { a, c, b, b, c, d });
+        }
+
+        var mesh = new Mesh();
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateNormals();
+        return mesh;
+    }
+
+    // ---- Storage tray: floor + 4 walls, pivot at the bottom centre ----
+
+    private static Mesh BuildTrayMesh()
+    {
+        Vector3 s = TraySize;
+        var parts = new (Vector3 centre, Vector3 size)[]
+        {
+            (new Vector3(0f, TrayFloor * 0.5f, 0f), new Vector3(s.x, TrayFloor, s.z)),
+            (new Vector3(0f, s.y * 0.5f, -(s.z - TrayWall) * 0.5f), new Vector3(s.x, s.y, TrayWall)),
+            (new Vector3(0f, s.y * 0.5f, (s.z - TrayWall) * 0.5f), new Vector3(s.x, s.y, TrayWall)),
+            (new Vector3(-(s.x - TrayWall) * 0.5f, s.y * 0.5f, 0f), new Vector3(TrayWall, s.y, s.z - 2f * TrayWall)),
+            (new Vector3((s.x - TrayWall) * 0.5f, s.y * 0.5f, 0f), new Vector3(TrayWall, s.y, s.z - 2f * TrayWall)),
+        };
+
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        foreach ((Vector3 centre, Vector3 size) in parts)
+            AddBox(vertices, triangles, centre, size);
+
+        var mesh = new Mesh { name = TrayMeshName };
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        return mesh;
+    }
+
+    // A box with its own vertices per face (hard edges), faces outward.
+    private static void AddBox(List<Vector3> vertices, List<int> triangles, Vector3 centre, Vector3 size)
+    {
+        Vector3 h = size * 0.5f;
+        Vector3[] normals = { Vector3.right, Vector3.left, Vector3.up, Vector3.down, Vector3.forward, Vector3.back };
+        foreach (Vector3 n in normals)
+        {
+            Vector3 u = Mathf.Abs(n.y) > 0.5f ? Vector3.right : Vector3.up;
+            Vector3 v = Vector3.Cross(n, u);
+            int start = vertices.Count;
+            vertices.Add(centre + Vector3.Scale(n - u - v, h));
+            vertices.Add(centre + Vector3.Scale(n + u - v, h));
+            vertices.Add(centre + Vector3.Scale(n + u + v, h));
+            vertices.Add(centre + Vector3.Scale(n - u + v, h));
+
+            // Unity's front face is clockwise seen from outside: the normal is cross(b - a, c - a).
+            Vector3 a = vertices[start], b = vertices[start + 1], c = vertices[start + 2];
+            if (Vector3.Dot(Vector3.Cross(b - a, c - a), n) > 0f)
+                triangles.AddRange(new[] { start, start + 1, start + 2, start, start + 2, start + 3 });
+            else
+                triangles.AddRange(new[] { start, start + 2, start + 1, start, start + 3, start + 2 });
+        }
     }
 
     // Axis along +x from the head top (x = 0) to the tip.

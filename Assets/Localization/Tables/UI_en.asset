@@ -225,7 +225,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
-    m_Localized: 'The full cartons and the loose material match the order.
+    m_Localized: 'The full packages and the loose material match the order.
 
       The
       order container moves onto the middle lane and leaves. Watch the containers
@@ -475,7 +475,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627443
-    m_Localized: Put the full cartons into the order container first, then the loose
+    m_Localized: Put the full packages into the order container first, then the loose
       pieces.
     m_Metadata:
       m_Items: []
@@ -874,10 +874,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 970336150360069
     m_Localized: "Example \u2013 not for picking up."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 970336154554368
-    m_Localized: Take out only the loose pieces; the carton stays here.
     m_Metadata:
       m_Items: []
   - m_Id: 1017753042292736

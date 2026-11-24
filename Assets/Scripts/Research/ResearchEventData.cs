@@ -24,7 +24,9 @@ public static class ResearchEventData
     // Concept and Complex questions on the A/B/C cluster near the hands, tour step 8 without action line; "040" = #168:
     // a package let go over a container lies on top only on a thin package or with >= 50 % of its base carried, else it
     // is pushed aside by the overlap; its top never above the rim; lifting a package lets those lying on it fall; and
-    // #173 (same build): Mixed SCHRAUBE B bags are flat clear pouches with the screws visible (no event changes).
+    // #173 (same build): Mixed SCHRAUBE B bags are flat clear pouches with the screws visible; #174 (same build):
+    // Complex position 1 = SCHLAUCHSCHELLE B 152/50, position 2 = RING D 53/25 in pouches, quiz with the new numbers,
+    // trays instead of opened cartons (no event changes).
     // R tells logs apart by it.
     public const string LayoutVersion = "040";
 
