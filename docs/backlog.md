@@ -2777,7 +2777,7 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Test trên kính:** bắt buộc (thả thật bằng tay, đủ hàng Complex hai vị trí và Mixed vị trí 2; Simulator trước)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl168.md
-- **Status:** in progress (MCP 15/15 ✅, chờ Simulator / kính; phần R của layout „040“ dồn vào #176)
+- **Status:** in progress (commit e0972db trên `fix/168-drop-placement`, MCP 15/15 ✅, chờ Simulator / kính; phần R của layout „040“ dồn vào #176)
 
 ### #169 [P1] Nút đỏ: lần ấn đầu không bị huỷ khi ngón tay trượt ngang
 - **Type:** bug
