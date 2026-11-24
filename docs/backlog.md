@@ -25,6 +25,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 - **2b.** **#173** (túi trong suốt ở Mixed) ngay sau #168 và #171, rồi **#174** (Complex đảo thứ tự, RING D thành túi, bớt hàng lẻ; decision 042) cùng #170; tất cả vào chung một build, một lần tăng `layout_version`.
 - **3. Một buổi kính** cho #168, #169, #171 (cầm/thả thật, FPS, bấm nút; Simulator trước cho #168).
 - **4. Sau buổi kính:** **#172** (`solution-decision` + hỏi Festo: có kiểm lại hàng vị trí trước không).
+- **5. Cuối đợt, trước khi phân tích dữ liệu thật của build mới:** **#176** (mọi phần R của đợt này, sửa một lần; người dùng 2026-11-24). Các mục app chỉ tăng `layout_version` + ghi spec, phần R ghi vào danh sách của #176.
 
 **SAU STUDY – REVIEW CHUYÊN GIA FESTO (thêm 2026-11-20, từ `docs/review-notes-festo-2026-11-20.md`; mục #164–#166 ở cuối file).** Festo ghi cả ba là „for further development“, học kỳ sau; không làm trước study (tuần 2 và 4 năm 2027).
 - **Trước study:** **#167** phím xác nhận F12/Enter thay F6, bỏ chữ „bàn đạp/Fuß“. Festo trả lời 2026-11-24 (`study design/XPick_Confirm_Key_Questions_2026-11-20.docx`): Picking 2 dùng dialog cũ, xác nhận luôn bằng F12/Enter; giữ dialog của app, chỉ đổi phím (không cần `solution-decision`).
@@ -2775,7 +2776,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Công:** M
 - **Test trên kính:** bắt buộc (thả thật bằng tay, đủ hàng Complex hai vị trí và Mixed vị trí 2; Simulator trước)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl168.md
+- **Status:** in progress (MCP 15/15 ✅, chờ Simulator / kính; phần R của layout „040“ dồn vào #176)
 
 ### #169 [P1] Nút đỏ: lần ấn đầu không bị huỷ khi ngón tay trượt ngang
 - **Type:** bug
@@ -2864,4 +2866,21 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Công:** M
 - **Test trên kính:** bắt buộc (cầm và xoay hộp, đo FPS bằng OVR Metrics nếu có)
 - **Depends on:** #168 (luật thả), #173 (mesh túi), #174 (khay + vòng)
+- **Status:** todo
+
+### #176 [P2] R: gom mọi thay đổi phần phân tích (`analysis/`) của đợt này, sửa một lần ở cuối
+- **Type:** refactor (analysis)
+- **Scene(s):** — (chỉ `analysis/`, `docs/research-logging-spec.md`)
+- **Quy tắc (người dùng 2026-11-24):** mọi việc R của các mục khác dồn vào đây. Mục làm app chỉ tăng `ResearchEventData.LayoutVersion` (hoặc `schema_version`) và ghi một mục vào `docs/research-logging-spec.md`; không sửa `make_fake_data.R`, `analyse_set.R`, `selftest.R`, `analysis/README.md`. Mỗi mục như vậy thêm một dòng vào danh sách bên dưới. Cho tới khi #176 xong, R đọc layout mới như layout gần nhất nó biết (có thể gộp sai), nên **không phân tích dữ liệu thật của build mới trước khi #176 xong**.
+- **Files:** `analysis/analyse_set.R`, `analysis/make_fake_data.R`, `analysis/selftest.R`, `analysis/README.md`, `analysis/skill_scaffolds.csv` / `item_skills.csv` / `scene_skills.csv` nếu cần, `docs/research-logging-spec.md`
+- **Danh sách việc R (thêm khi mục app xong):**
+  1. **#168, layout "040"** (danh sách của `data-analyst`, 2026-11-24, `docs/test-reports/bl168.md` mục Review): `drop_rule` thêm mức thứ ba `settle` (≥ 40; `hang` < 38, `fall` 38–39) ở `analyse_set.R:164-177` + hằng `drop_settle_from_layout`; ba chỗ `%in% "fall"` (`:909` ekz_places `+drop_snap`, `:1962` complex_p1_group với hậu tố đúng tên mức, `:3611` cửa sổ `concept_enter_link_s`) thành `%in% c("fall","settle")`; thêm `"+book+settle"` vào `complex_p1_groups` (`:1964-1965`); thêm "040" và `"settle"` vào `all_tags` (`:2838-2839`); kiểm câu cảnh báo `mixed_drop_rule_set` (`:2042-2055`). `make_fake_data.R`: người giả P822 (layout "040", build `hhh8888`, copy P821 `:2088-2110`, stream ngẫu nhiên riêng, một lần vào thùng Concept ~0,4 s sau `grab_end`), thêm vào chú thích `:27`, output `:44`/`:2165`, `paper_row("P822")` `:2236`. `selftest.R`: `:1086` → `drop_rule(c("037","038","040",NA)) == c("hang","fall","settle",NA)`; `complex_p1_group("040") == "ekz_question+book+settle"`; P822 có ekz_places `always+drop_snap`; nhãn `[drop settle, cards short]`; P822 vào `pilot_ids` `:467` và các danh sách ID `:581`, `:630`, `:843`. `analysis/README.md` `:376-400`: đoạn "040" và mức `settle`. Spec: thêm ghi chú `container_*` không kèm `grab_*` khi kiện rơi theo luật 6 (đã ghi trong mục "040").
+  2. **#173, #174, #175** (khi xong): những gì `data-analyst` báo cần sửa (ví dụ #174 đổi thứ tự dòng đơn Complex, Soll 152/53, câu hỏi vị trí 1 theo SCHLAUCHSCHELLE B → `item_skills.csv`, `complex_quiz.csv`, nhãn vị trí; #175 nếu món tập ở Welcome có `PackageData` thì có `grab_*` ở Welcome). Các mục này vào chung build với #168, nên dùng chung "040" nếu chưa build "040" nào được dùng cho dữ liệu thật; nếu đã có thì tăng tiếp.
+  3. **#163** (nếu làm trước): `analyse.R` đọc cả log v2 (có `hand`/`input` null) lẫn v3.
+  4. Sau buổi kính đầu tiên với build "040": chạy lại `analysis/usability_explore.R`, kiểm tỉ lệ „buông trong thùng nhưng kết thúc ngoài vùng đếm“ (build aaa7f7a: 36 %) về gần 0 và thời gian `grab_end` → `container_enter` khi kiện bị đẩy sang bên.
+- **Done when:** `"C:\Program Files\R\R-4.6.2\bin\Rscript.exe" analysis/make_fake_data.R`, rồi `analyse.R`, rồi `selftest.R` chạy hết, `selftest.R` xanh. Trong output, người giả P822 (layout "040") có `drop_rule` = `settle` ở `process_by_position.csv`, các vị trí của P822 không gộp với P821 ("039", `fall`) trong `first_attempt_by_item.png` / `time_by_phase.png`, và `data_quality.csv` cảnh báo bộ dữ liệu trộn luật thả. Mỗi dòng của danh sách việc R ở trên có một kiểm tra trong `selftest.R` hoặc một dòng trong báo cáo test. `data-analyst` duyệt diff, không còn điểm **chặn**. (code) Không file nào ngoài `analysis/` và `docs/research-logging-spec.md` bị sửa.
+- **Inspector work expected:** no
+- **Công:** M (tăng theo số mục dồn vào)
+- **Test trên kính:** không
+- **Depends on:** phần app của #168, #173, #174, #175 đã commit; trước khi phân tích dữ liệu thật của build mới (pilot/study)
 - **Status:** todo

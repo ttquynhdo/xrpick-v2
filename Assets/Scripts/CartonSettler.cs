@@ -11,15 +11,16 @@ using UnityEngine;
 /// sideways out of the container. #157: a carton let go above the rim (up to AboveRim) is laid into the container too,
 /// so nothing hangs over it; a carton let go over a free place snaps into it instead (the places' trigger zones reach
 /// above the rim). Bags (no SnapInteractor) are left alone. #153: everything else let go in the air is PackageDropper's
-/// (Covers tells it which cartons are this settler's).
+/// (Covers tells it which cartons are this settler's). #168: where it lies follows DropPlacementRule (via
+/// PackageDropper.PlanInSpace: on top only with half its base carried, else pushed aside; never above the rim) and it
+/// gets there in PackageDropper's short fall instead of a jump.
 /// </summary>
 public class CartonSettler : MonoBehaviour
 {
     // Time the SnapInteractor gets to take a released carton into a place before we look.
     private const float SnapWait = 0.3f;
-    // Clearance kept between the carton and the container walls, and the skin used for the downward cast.
+    // Clearance kept between the carton and the container walls.
     private const float WallMargin = 0.004f;
-    private const float CastSkin = 0.002f;
     // #157: how far above the container's rim a released carton is still laid into the container.
     private const float AboveRim = 0.25f;
 
@@ -115,6 +116,15 @@ public class CartonSettler : MonoBehaviour
     /// <summary>Lays the carton flat if it lies loose in the container; returns whether it moved. Public for tests.</summary>
     public bool TrySettle(Grabbable grabbable)
     {
+        return TrySettle(grabbable, null);
+    }
+
+    /// <summary>
+    /// #168: ignore = packages about to fall themselves (PackageDropper, when the package below them is lifted).
+    /// The carton lies where DropPlacementRule puts it and gets there in PackageDropper's short fall.
+    /// </summary>
+    public bool TrySettle(Grabbable grabbable, ICollection<Transform> ignore)
+    {
         if (grabbable == null || !grabbable.isActiveAndEnabled || HeldByHand(grabbable) > 0)
             return false;
         if (stationStock is IStationStock stock && stock.IsMoving)
@@ -144,34 +154,23 @@ public class CartonSettler : MonoBehaviour
         }
         Quaternion upright = Quaternion.LookRotation(forward.normalized, Vector3.up);
 
-        Vector3 halfSize = Vector3.Scale(body.size, carton.lossyScale) / 2f;
-        Vector3 centreOffset = Vector3.Scale(body.center, carton.lossyScale);
-
-        // Footprint of the upright carton, kept inside the container walls.
-        Vector3 worldCentre = body.bounds.center;
-        Vector3 extent = AxisExtent(upright, halfSize);
-        worldCentre.x = Mathf.Clamp(worldCentre.x, zone.min.x + extent.x + WallMargin, zone.max.x - extent.x - WallMargin);
-        worldCentre.z = Mathf.Clamp(worldCentre.z, zone.min.z + extent.z + WallMargin, zone.max.z - extent.z - WallMargin);
-
-        // Cast down from above the container onto the floor or the packages below.
-        float startY = zone.max.y + halfSize.y + 0.05f;
-        var start = new Vector3(worldCentre.x, startY, worldCentre.z);
-        float floorCentreY = floorY + extent.y;
-        float landingY = floorCentreY;
-        Vector3 castHalf = halfSize - Vector3.one * CastSkin;
-        // The carton body is a trigger collider (only the thin front sticker is solid), so triggers count, but only
-        // those of packages: the container zone and the snap places are triggers too.
-        foreach (RaycastHit hit in Physics.BoxCastAll(start, castHalf, Vector3.down, upright, startY - floorCentreY, ~0, QueryTriggerInteraction.Collide))
+        PackageDropper dropper = PackageDropper.Current;
+        if (dropper == null)
         {
-            if (hit.collider.transform.IsChildOf(carton) || hit.collider.GetComponentInParent<PackageData>() == null)
-                continue;
-
-            landingY = Mathf.Max(landingY, startY - hit.distance);
+            Debug.LogError("CartonSettler: no PackageDropper in this scene, carton left where it was.", this);
+            return false;
         }
 
-        // The collider centre lands there; the pivot follows from the collider's offset in the new rotation.
-        var newCentre = new Vector3(worldCentre.x, landingY, worldCentre.z);
-        carton.SetPositionAndRotation(newCentre - upright * centreOffset, upright);
+        // Upright about the collider centre, so the carton stays where the hand let it go; then DropPlacementRule
+        // inside the walls, from the snap places' floor up to the rim.
+        Vector3 bodyCentre = body.bounds.center;
+        Vector3 uprightPivot = bodyCentre + upright * Quaternion.Inverse(carton.rotation) * (carton.position - bodyCentre);
+        var space = new DropSpace(zone.min.x + WallMargin, zone.max.x - WallMargin, zone.min.z + WallMargin,
+            zone.max.z - WallMargin, floorY, zone.max.y);
+        if (!dropper.PlanInSpace(carton, uprightPivot, upright, space, ignore, out Vector3 placed))
+            return false;
+
+        dropper.MoveDown(grabbable, new Pose(placed, upright));
         SettledCount++;
         return true;
     }
@@ -213,17 +212,5 @@ public class CartonSettler : MonoBehaviour
         SnapInteractor snap = grabbable.GetComponentInChildren<SnapInteractor>();
         int snapSelects = snap != null && snap.HasSelectedInteractable ? 1 : 0;
         return Mathf.Max(0, grabbable.SelectingPointsCount - snapSelects);
-    }
-
-    // Half size of an oriented box along the world axes.
-    private static Vector3 AxisExtent(Quaternion rotation, Vector3 halfSize)
-    {
-        Vector3 right = rotation * Vector3.right * halfSize.x;
-        Vector3 up = rotation * Vector3.up * halfSize.y;
-        Vector3 forward = rotation * Vector3.forward * halfSize.z;
-        return new Vector3(
-            Mathf.Abs(right.x) + Mathf.Abs(up.x) + Mathf.Abs(forward.x),
-            Mathf.Abs(right.y) + Mathf.Abs(up.y) + Mathf.Abs(forward.y),
-            Mathf.Abs(right.z) + Mathf.Abs(up.z) + Mathf.Abs(forward.z));
     }
 }

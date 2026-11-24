@@ -21,8 +21,11 @@ public static class ResearchEventData
     // outlines from the start (#152), cartons leave snap places cleanly and snap when let go above a free place (#140),
     // packages let go in the air drop straight down or return to where they were grabbed (#153); "039" = one text rule
     // (decision 041, #155): shorter shelf cards, Concept with 2 step cards and the tour opening by itself after 2 s,
-    // Concept and Complex questions on the A/B/C cluster near the hands, tour step 8 without action line. R tells logs apart by it.
-    public const string LayoutVersion = "039";
+    // Concept and Complex questions on the A/B/C cluster near the hands, tour step 8 without action line; "040" = #168:
+    // a package let go over a container lies on top only on a thin package or with >= 50 % of its base carried, else it
+    // is pushed aside by the overlap; its top never above the rim; lifting a package lets those lying on it fall (no
+    // event changes). R tells logs apart by it.
+    public const string LayoutVersion = "040";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
     public static readonly string[] EventGroups = { "session", "outcome", "interaction" };

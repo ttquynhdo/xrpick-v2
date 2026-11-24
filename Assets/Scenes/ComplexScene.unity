@@ -1528,7 +1528,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 103782772}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &103782774
 BoxCollider:
@@ -3149,7 +3149,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 209446643}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &209446645
 BoxCollider:
@@ -4348,7 +4348,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 291156714}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &291156716
 BoxCollider:
@@ -6090,7 +6090,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 347322725}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &347322727
 BoxCollider:
@@ -6281,7 +6281,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 360718444}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!54 &360718444
 Rigidbody:
@@ -7378,7 +7378,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 419124854}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &419124856
 BoxCollider:
@@ -7840,7 +7840,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 437739416}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &437739418
 BoxCollider:
@@ -8334,7 +8334,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 466121291}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &466121293
 BoxCollider:
@@ -9586,7 +9586,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 549566060}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &549566062
 BoxCollider:
@@ -10218,7 +10218,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 591650950}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &591650952
 BoxCollider:
@@ -10686,7 +10686,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 619895607}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &619895609
 BoxCollider:
@@ -16065,7 +16065,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1046746565}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1046746567
 BoxCollider:
@@ -16298,7 +16298,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1076123322}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!54 &1076123322
 Rigidbody:
@@ -17175,7 +17175,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1116613379}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!54 &1116613379
 Rigidbody:
@@ -18982,7 +18982,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1198277809}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1198277811
 BoxCollider:
@@ -19348,7 +19348,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1227165020}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1227165022
 BoxCollider:
@@ -20158,7 +20158,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1257397475}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1257397477
 BoxCollider:
@@ -21830,7 +21830,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1386647177}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1386647179
 BoxCollider:
@@ -22475,7 +22475,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1456531668}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1456531670
 BoxCollider:
@@ -22715,7 +22715,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1472471402}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1472471404
 BoxCollider:
@@ -23312,7 +23312,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1486735981}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1486735983
 BoxCollider:
@@ -24872,7 +24872,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1559368196}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1559368198
 BoxCollider:
@@ -25286,7 +25286,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1619637991}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1619637993
 BoxCollider:
@@ -25840,7 +25840,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1654968356}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!54 &1654968356
 Rigidbody:
@@ -28652,7 +28652,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1800911293}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1800911295
 BoxCollider:
@@ -32274,7 +32274,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 1960988863}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &1960988865
 BoxCollider:
@@ -33529,7 +33529,7 @@ MonoBehaviour:
   _maxGrabPoints: -1
   _rigidbody: {fileID: 2020176502}
   _kinematicWhileSelected: 1
-  _throwWhenUnselected: 1
+  _throwWhenUnselected: 0
   _forceKinematicDisabled: 0
 --- !u!65 &2020176504
 BoxCollider:

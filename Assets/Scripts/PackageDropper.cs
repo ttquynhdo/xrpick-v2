@@ -15,6 +15,10 @@ using UnityEngine.SceneManagement;
 /// place, a carton over a Basic/Mixed order container to CartonSettler. Never touches a held package, one whose
 /// colliders are off (riding on a lane) or one another script moves meanwhile. Writes no log: the counters and
 /// ConceptBoxHints see the package arrive like any other move.
+/// #168: in a container it follows DropPlacementRule (on a thin package or one carrying half its base, else pushed
+/// aside by the overlap; top never above the rim; footprint from the package's real turn, not its world box). A
+/// package lifted more than 1 cm lets the packages lying on it fall the same way (layer by layer). Rising or sideways
+/// moves take MinMoveSeconds instead of jumping.
 /// </summary>
 public class PackageDropper : MonoBehaviour
 {
@@ -38,18 +42,35 @@ public class PackageDropper : MonoBehaviour
     private const float ReturnClearY = 1.2f;
     // Pose difference that means another script moved the package during the fall.
     private const float MovedTolerance = 0.0005f;
+    // #168: a move that rises or goes sideways takes at least this long (no jump).
+    private const float MinMoveSeconds = 0.3f;
+    private const float SidewaysMove = 0.01f;
+    // #168: a held package lifted this far lets the packages lying on it fall; checked this often while held.
+    private const float LiftDistance = 0.01f;
+    private const float LiftCheckSeconds = 0.1f;
+    // A package lies on another when its bottom is this close to the other's top and over part of it.
+    private const float RestingGap = 0.015f;
+    private const float RestingShare = 0.05f;
 
     private static PackageDropper current;
 
     private readonly List<(Grabbable grabbable, System.Action<PointerEvent> handler)> subscriptions = new();
     private readonly Dictionary<Grabbable, Coroutine> running = new();
     private readonly Dictionary<Grabbable, Pose> grabbedFrom = new();
+    private readonly Dictionary<Grabbable, Coroutine> lifts = new();
+    // Where packages on their way down will lie: others are planned around that, not around where they hang now.
+    private readonly Dictionary<Transform, Pose> landings = new();
+    // Root of every package (its Grabbable, or the PackageData object when it has none).
+    private readonly List<Transform> packages = new();
     private CartonSettler[] settlers;
     private int ignoredLayers;
 
     // For MCP tests: how many releases ended on a surface, in a container or back where the package was grabbed.
     public int DroppedCount { get; private set; }
     public int ReturnedCount { get; private set; }
+    // For MCP tests: packages that fell because the package below them was lifted, and the last container outcome.
+    public int FellAfterLiftCount { get; private set; }
+    public DropOutcome LastOutcome { get; private set; }
     public static PackageDropper Current => current;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -80,6 +101,16 @@ public class PackageDropper : MonoBehaviour
     {
         // Poke surfaces (Menu, red button, end control) and the player capsule lie on these layers.
         ignoredLayers = LayerMask.GetMask("Ignore Raycast", "Water", "UI");
+
+        foreach (PackageData data in FindObjectsByType<PackageData>(FindObjectsInactive.Include))
+        {
+            Grabbable owner = data.GetComponentInParent<Grabbable>(true);
+            Transform root = owner != null ? owner.transform : data.transform;
+            if (!packages.Contains(root))
+            {
+                packages.Add(root);
+            }
+        }
 
         foreach (Grabbable grabbable in FindObjectsByType<Grabbable>(FindObjectsInactive.Include))
         {
@@ -128,6 +159,10 @@ public class PackageDropper : MonoBehaviour
             {
                 grabbedFrom[grabbable] = new Pose(grabbable.transform.position, grabbable.transform.rotation);
             }
+            if (!lifts.ContainsKey(grabbable) && isActiveAndEnabled)
+            {
+                lifts[grabbable] = StartCoroutine(WatchLift(grabbable));
+            }
             return;
         }
 
@@ -141,6 +176,7 @@ public class PackageDropper : MonoBehaviour
 
     private void Stop(Grabbable grabbable)
     {
+        landings.Remove(grabbable.transform);
         if (running.TryGetValue(grabbable, out Coroutine routine))
         {
             if (routine != null)
@@ -159,7 +195,9 @@ public class PackageDropper : MonoBehaviour
 
         if (TryPlan(grabbable, start, haveStart, out Pose target, out bool returning))
         {
+            landings[grabbable.transform] = target;
             yield return Animate(grabbable.transform, target, returning);
+            landings.Remove(grabbable.transform);
         }
 
         grabbedFrom.Remove(grabbable);
@@ -168,6 +206,13 @@ public class PackageDropper : MonoBehaviour
 
     /// <summary>Decides where a released package goes; false when it stays where it is. Public for MCP tests.</summary>
     public bool TryPlan(Grabbable grabbable, Pose grabbedPose, bool haveGrabbedPose, out Pose target, out bool returning)
+    {
+        return TryPlan(grabbable, grabbedPose, haveGrabbedPose, null, out target, out returning);
+    }
+
+    // ignore: packages about to fall themselves (lying on a lifted one), so nothing lands on them.
+    private bool TryPlan(Grabbable grabbable, Pose grabbedPose, bool haveGrabbedPose, ICollection<Transform> ignore,
+        out Pose target, out bool returning)
     {
         target = default;
         returning = false;
@@ -221,20 +266,15 @@ public class PackageDropper : MonoBehaviour
 
         if (container != null)
         {
+            // #168: DropPlacementRule instead of the highest package below any part of it.
             Bounds box = container.bounds;
-            centre.x = Mathf.Clamp(centre.x, box.min.x + half.x + WallMargin, box.max.x - half.x - WallMargin);
-            centre.z = Mathf.Clamp(centre.z, box.min.z + half.z + WallMargin, box.max.z - half.z - WallMargin);
-            // From above the rim onto the floor or the packages lying in it.
-            float startY = Mathf.Max(centre.y, box.max.y + half.y + 0.02f);
-            landingY = box.min.y + ContainerFloor + half.y;
-            foreach (RaycastHit hit in Cast(new Vector3(centre.x, startY, centre.z), half, startY - landingY))
-            {
-                if (IsOwn(hit.collider, package) || !IsOtherPackage(hit.collider))
-                    continue;
+            var space = new DropSpace(box.min.x + WallMargin, box.max.x - WallMargin, box.min.z + WallMargin,
+                box.max.z - WallMargin, box.min.y + ContainerFloor, box.max.y);
+            if (!PlanInSpace(package, package.position, rotation, space, ignore, out Vector3 placed))
+                return false;
 
-                // The cast box is CastSkin smaller than the body on every side.
-                landingY = Mathf.Max(landingY, startY - hit.distance + CastSkin);
-            }
+            target = new Pose(placed, rotation);
+            return true;
         }
         else
         {
@@ -243,7 +283,7 @@ public class PackageDropper : MonoBehaviour
             float surfaceY = float.NegativeInfinity;
             foreach (RaycastHit hit in Cast(new Vector3(centre.x, startY, centre.z), half, CastDepth))
             {
-                if (IsOwn(hit.collider, package) || !IsSurface(hit.collider))
+                if (IsOwn(hit.collider, package) || !IsSurface(hit.collider) || IsIgnored(hit.collider, ignore))
                     continue;
 
                 surfaceY = Mathf.Max(surfaceY, startY - hit.distance - half.y + CastSkin);
@@ -267,12 +307,299 @@ public class PackageDropper : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// #168: where the package lies in the container when its root stands at position/rotation and is let down there
+    /// (DropPlacementRule). Also used by CartonSettler with the order container's own floor and walls.
+    /// </summary>
+    public bool PlanInSpace(Transform package, Vector3 position, Quaternion rotation, DropSpace space,
+        ICollection<Transform> ignore, out Vector3 placed)
+    {
+        placed = position;
+        if (!TryMeasure(package, position, rotation, out DropBody body))
+            return false;
+
+        var others = new List<DropBody>();
+        foreach (Transform other in packages)
+        {
+            if (other == package || other == null || !other.gameObject.activeInHierarchy
+                || (ignore != null && ignore.Contains(other)) || IsHeld(other))
+                continue;
+
+            // A package on its way down counts where it will lie, one still waiting to drop not at all.
+            if (!landings.TryGetValue(other, out Pose pose))
+            {
+                pose = new Pose(other.position, other.rotation);
+                Grabbable otherGrabbable = other.GetComponent<Grabbable>();
+                if (otherGrabbable != null && running.ContainsKey(otherGrabbable))
+                    continue;
+            }
+            if (!TryMeasure(other, pose.position, pose.rotation, out DropBody otherBody))
+                continue;
+
+            // Only what lies in this container (not what hangs above its rim).
+            if (otherBody.X < space.MinX - 0.02 || otherBody.X > space.MaxX + 0.02 || otherBody.Z < space.MinZ - 0.02
+                || otherBody.Z > space.MaxZ + 0.02 || otherBody.Bottom > space.Rim || otherBody.Top < space.Floor - 0.02)
+                continue;
+
+            others.Add(otherBody);
+        }
+
+        DropPlan plan = DropPlacementRule.Plan(body, space, others);
+        LastOutcome = plan.Outcome;
+        placed = position + new Vector3((float)(plan.X - body.X), (float)(plan.Bottom - body.Bottom), (float)(plan.Z - body.Z));
+        return true;
+    }
+
+    /// <summary>#168: lays a package down to target in a short fall (CartonSettler hands its cartons over here).</summary>
+    public void MoveDown(Grabbable grabbable, Pose target)
+    {
+        if (grabbable == null || !isActiveAndEnabled)
+            return;
+
+        Stop(grabbable);
+        // A release still waiting to drop is replaced by this move, so its grab pose must not outlive it.
+        grabbedFrom.Remove(grabbable);
+        running[grabbable] = StartCoroutine(MoveThenForget(grabbable, target));
+    }
+
+    private IEnumerator MoveThenForget(Grabbable grabbable, Pose target)
+    {
+        landings[grabbable.transform] = target;
+        yield return Animate(grabbable.transform, target, false);
+        landings.Remove(grabbable.transform);
+        running.Remove(grabbable);
+    }
+
+    // #168 rule 6: while the package is held, the first time it is lifted more than LiftDistance the packages lying on
+    // it (and on those) fall. Polled a few times a second, only while held.
+    private IEnumerator WatchLift(Grabbable grabbable)
+    {
+        Transform package = grabbable.transform;
+        Vector3 start = package.position;
+        List<Transform> resting = RestingOn(package);
+        var wait = new WaitForSeconds(LiftCheckSeconds);
+        yield return null;
+
+        while (resting.Count > 0 && CartonSettler.HeldByHand(grabbable) > 0)
+        {
+            // Lifted, not only touched or slid sideways.
+            if (package.position.y - start.y > LiftDistance)
+            {
+                DropResting(resting);
+                break;
+            }
+            yield return wait;
+        }
+        lifts.Remove(grabbable);
+    }
+
+    // Everything lying on the package, directly or on something lying on it.
+    private List<Transform> RestingOn(Transform package)
+    {
+        // Each package measured once for the whole search (this runs in the frame of the grab).
+        var bodies = new Dictionary<Transform, DropBody>();
+        foreach (Transform other in packages)
+        {
+            if (other != null && other.gameObject.activeInHierarchy
+                && TryMeasure(other, other.position, other.rotation, out DropBody measured))
+            {
+                bodies[other] = measured;
+            }
+        }
+
+        var resting = new List<Transform>();
+        var queue = new Queue<Transform>();
+        queue.Enqueue(package);
+        while (queue.Count > 0)
+        {
+            Transform below = queue.Dequeue();
+            if (!bodies.TryGetValue(below, out DropBody belowBody))
+                continue;
+
+            foreach (KeyValuePair<Transform, DropBody> entry in bodies)
+            {
+                Transform other = entry.Key;
+                DropBody body = entry.Value;
+                if (other == package || resting.Contains(other))
+                    continue;
+
+                if (body.Bottom < belowBody.Top - RestingGap || body.Bottom > belowBody.Top + RestingGap
+                    || DropPlacementRule.Support(body, new[] { belowBody }) < RestingShare)
+                    continue;
+
+                resting.Add(other);
+                queue.Enqueue(other);
+            }
+        }
+        return resting;
+    }
+
+    private void DropResting(List<Transform> resting)
+    {
+        // Lowest first; each is planned with those above it ignored and those below already where they will lie.
+        resting.Sort((a, b) => BottomOf(a).CompareTo(BottomOf(b)));
+        var waiting = new HashSet<Transform>(resting);
+        var moves = new List<(Grabbable grabbable, Pose from, Pose to)>();
+
+        foreach (Transform package in resting)
+        {
+            waiting.Remove(package);
+            Grabbable grabbable = package.GetComponent<Grabbable>();
+            if (grabbable == null || IsHeld(package) || !AnyEnabled(OwnColliders(package)))
+                continue;
+
+            SnapInteractor snap = grabbable.GetComponentInChildren<SnapInteractor>();
+            if (snap != null && snap.HasSelectedInteractable)
+                continue;
+
+            // The order container's settler lays its cartons; if it cannot now, the plan below decides.
+            CartonSettler settler = SettlerCovering(grabbable);
+            if (settler != null && settler.TrySettle(grabbable, waiting))
+            {
+                FellAfterLiftCount++;
+                continue;
+            }
+
+            if (!TryPlan(grabbable, default, false, waiting, out Pose target, out bool returning) || returning)
+                continue;
+
+            moves.Add((grabbable, new Pose(package.position, package.rotation), target));
+            package.SetPositionAndRotation(target.position, target.rotation);
+            Physics.SyncTransforms();
+        }
+
+        // Back to where they are now (no trigger saw the planning moves), then down in a short fall each.
+        foreach ((Grabbable grabbable, Pose from, Pose _) in moves)
+        {
+            grabbable.transform.SetPositionAndRotation(from.position, from.rotation);
+        }
+        Physics.SyncTransforms();
+        foreach ((Grabbable grabbable, Pose _, Pose to) in moves)
+        {
+            FellAfterLiftCount++;
+            MoveDown(grabbable, to);
+        }
+    }
+
+    private float BottomOf(Transform package)
+    {
+        return TryMeasure(package, package.position, package.rotation, out DropBody body) ? (float)body.Bottom : package.position.y;
+    }
+
+    private CartonSettler SettlerCovering(Grabbable grabbable)
+    {
+        if (settlers == null)
+            return null;
+
+        foreach (CartonSettler settler in settlers)
+        {
+            if (settler != null && settler.isActiveAndEnabled && settler.Covers(grabbable))
+                return settler;
+        }
+        return null;
+    }
+
+    // Held by a hand (a carton sitting in a snap place counts as lying, not held).
+    private static bool IsHeld(Transform package)
+    {
+        Grabbable grabbable = package.GetComponent<Grabbable>();
+        return grabbable != null && CartonSettler.HeldByHand(grabbable) > 0;
+    }
+
+    private static bool IsIgnored(Collider collider, ICollection<Transform> ignore)
+    {
+        if (ignore == null)
+            return false;
+
+        foreach (Transform package in ignore)
+        {
+            if (package != null && collider.transform.IsChildOf(package))
+                return true;
+        }
+        return false;
+    }
+
+    // #168 (N5): the package's outline in its own turn (yaw), from its colliders' local boxes as if its root stood at
+    // position/rotation, not its world-axis box; false when it has no enabled collider.
+    private static bool TryMeasure(Transform root, Vector3 position, Quaternion rotation, out DropBody body)
+    {
+        body = default;
+        Quaternion yaw = YawOf(rotation);
+        Quaternion toYaw = Quaternion.Inverse(yaw);
+        Quaternion turn = rotation * Quaternion.Inverse(root.rotation);
+        Vector3 min = Vector3.positiveInfinity;
+        Vector3 max = Vector3.negativeInfinity;
+        bool any = false;
+
+        foreach (Collider collider in root.GetComponentsInChildren<Collider>())
+        {
+            if (!collider.enabled || !TryLocalBox(collider, out Vector3 centre, out Vector3 size))
+                continue;
+
+            for (int corner = 0; corner < 8; corner++)
+            {
+                var sign = new Vector3((corner & 1) == 0 ? -0.5f : 0.5f, (corner & 2) == 0 ? -0.5f : 0.5f,
+                    (corner & 4) == 0 ? -0.5f : 0.5f);
+                Vector3 world = collider.transform.TransformPoint(centre + Vector3.Scale(size, sign));
+                // Yaw frame: x/z along the package's own sides, y stays the world height.
+                Vector3 local = toYaw * (position + turn * (world - root.position));
+                min = Vector3.Min(min, local);
+                max = Vector3.Max(max, local);
+                any = true;
+            }
+        }
+
+        if (!any)
+            return false;
+
+        Vector3 middle = yaw * new Vector3((min.x + max.x) / 2f, 0f, (min.z + max.z) / 2f);
+        body = new DropBody(middle.x, middle.z, (max.x - min.x) / 2f, (max.z - min.z) / 2f,
+            yaw.eulerAngles.y * Mathf.Deg2Rad, min.y, max.y);
+        return true;
+    }
+
+    private static bool TryLocalBox(Collider collider, out Vector3 centre, out Vector3 size)
+    {
+        switch (collider)
+        {
+            case BoxCollider box:
+                centre = box.center;
+                size = box.size;
+                return true;
+            case MeshCollider mesh when mesh.sharedMesh != null:
+                centre = mesh.sharedMesh.bounds.center;
+                size = mesh.sharedMesh.bounds.size;
+                return true;
+            case SphereCollider sphere:
+                centre = sphere.center;
+                size = Vector3.one * sphere.radius * 2f;
+                return true;
+            case CapsuleCollider capsule:
+                centre = capsule.center;
+                size = Vector3.one * capsule.radius * 2f;
+                size[capsule.direction] = Mathf.Max(capsule.height, capsule.radius * 2f);
+                return true;
+            default:
+                centre = Vector3.zero;
+                size = Vector3.zero;
+                return false;
+        }
+    }
+
     private IEnumerator Animate(Transform package, Pose target, bool returning)
     {
         Vector3 from = package.position;
         Quaternion fromRotation = package.rotation;
         float height = Mathf.Max(0f, from.y - target.position.y);
+        bool rising = target.position.y > from.y + MovedTolerance;
+        Vector3 sideways = target.position - from;
+        sideways.y = 0f;
         float duration = returning ? ReturnSeconds : Mathf.Min(MaxFallSeconds, Mathf.Sqrt(2f * height / Gravity));
+        if (!returning && (rising || sideways.magnitude > SidewaysMove))
+        {
+            // #168 (N3): pushed aside or onto a higher package: a short move, never a jump.
+            duration = Mathf.Max(duration, MinMoveSeconds);
+        }
         float clearY = Mathf.Max(ReturnClearY, from.y, target.position.y);
         List<Collider> colliders = OwnColliders(package);
         Vector3 written = from;
@@ -298,7 +625,7 @@ public class PackageDropper : MonoBehaviour
                 // Falling: horizontal and turn ease out, height accelerates like free fall.
                 turn = 1f - (1f - k) * (1f - k);
                 position = Vector3.Lerp(from, target.position, turn);
-                position.y = Mathf.Lerp(from.y, target.position.y, k * k);
+                position.y = Mathf.Lerp(from.y, target.position.y, rising ? Mathf.SmoothStep(0f, 1f, k) : k * k);
             }
             package.SetPositionAndRotation(position, Quaternion.Slerp(fromRotation, target.rotation, turn));
             written = package.position;
