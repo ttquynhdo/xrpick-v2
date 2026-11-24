@@ -2801,7 +2801,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Công:** S
 - **Test trên kính:** không
 - **Depends on:** #171 (cùng ComplexScene, commit #171 trước)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl170.md
+- **Status:** verified-mcp (7/7 ✅; không cần test tay, Done when không có case kính)
 
 ### #171 [P1] Complex: mesh nhẹ cho vòng RING D, kẹp SCHLAUCHSCHELLE B có hình kẹp ống
 - **Type:** feature

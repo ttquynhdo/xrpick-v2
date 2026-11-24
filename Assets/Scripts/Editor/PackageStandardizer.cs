@@ -148,6 +148,7 @@ public static class PackageStandardizer
                 errors.Add($"{path}: {visible.Count} visible labels, expected only Label Top");
 
             CheckLabels(errors, path, filter, visible, fontSize);
+            CheckLidLabel(errors, path, filter);
         }
 
         foreach (MeshFilter filter in Bags(scene))
@@ -377,16 +378,67 @@ public static class PackageStandardizer
 
         Bounds bounds = filter.sharedMesh.bounds;
         Vector3 scale = Abs(carton.lossyScale);
-        Vector3 worldSize = Vector3.Scale(bounds.size, scale);
-        var labelSize = new Vector2(worldSize.x * LidLabelShare, worldSize.z * LidLabelShare);
+        Vector2 labelSize = LidLabelSize(filter);
+
+        // #170: a carton turned 90° in the storage box keeps its label turned by the same quarter turn on the lid,
+        // so the text still faces the standing spot. The carton's scale is not uniform, so the label's local x
+        // then runs along the carton's z and must be divided by that axis' scale.
+        int quarterTurns = LidLabelQuarterTurns(label);
+        bool across = quarterTurns % 2 == 1;
 
         Undo.RecordObject(label, "Lid label");
         label.localPosition = new Vector3(bounds.center.x, bounds.max.y + LabelLift / scale.y, bounds.center.z);
-        label.localRotation = Quaternion.Euler(90f, 0f, 0f);
-        label.localScale = new Vector3(labelSize.x / scale.x, labelSize.y / scale.z, 0.001f / scale.y);
+        label.localRotation = Quaternion.Euler(90f, quarterTurns * 90f, 0f);
+        label.localScale = across
+            ? new Vector3(labelSize.x / scale.z, labelSize.y / scale.x, 0.001f / scale.y)
+            : new Vector3(labelSize.x / scale.x, labelSize.y / scale.z, 0.001f / scale.y);
         Record(label);
 
         SetLabelText(label, labelSize, fontSize);
+    }
+
+    // Standard lid label: 60 % of the lid's long side by 60 % of its short side (10.7 x 7.3 cm).
+    private static Vector2 LidLabelSize(MeshFilter filter)
+    {
+        Vector3 worldSize = Vector3.Scale(filter.sharedMesh.bounds.size, Abs(filter.transform.lossyScale));
+        return new Vector2(worldSize.x * LidLabelShare, worldSize.z * LidLabelShare);
+    }
+
+    // The label's turn about the lid normal (the carton's up axis), rounded to quarter turns (0-3).
+    private static int LidLabelQuarterTurns(Transform label)
+    {
+        // Euler(90, yaw, 0) lays the label flat, then turns it about the carton's up axis; its x axis shows the yaw.
+        Vector3 labelRight = label.localRotation * Vector3.right;
+        float yaw = Vector3.SignedAngle(Vector3.right, Vector3.ProjectOnPlane(labelRight, Vector3.up), Vector3.up);
+        return ((Mathf.RoundToInt(yaw / 90f) % 4) + 4) % 4;
+    }
+
+    // #170: the lid label's world size and the text's world scale, measured along their own axes.
+    private static void CheckLidLabel(List<string> errors, string path, MeshFilter filter)
+    {
+        Transform label = filter.transform.Find("Label Top");
+        if (label == null)
+            return;
+
+        Vector2 expected = LidLabelSize(filter);
+        float width = label.TransformVector(Vector3.right).magnitude;
+        float height = label.TransformVector(Vector3.up).magnitude;
+        if (Mathf.Abs(width - expected.x) > SizeTolerance || Mathf.Abs(height - expected.y) > SizeTolerance)
+            errors.Add($"{path}: lid label {width * 100f:F1} x {height * 100f:F1} cm, expected "
+                + $"{expected.x * 100f:F1} x {expected.y * 100f:F1} cm (turned label not rescaled?)");
+
+        Quaternion turn = label.localRotation * Quaternion.Inverse(Quaternion.Euler(90f, 0f, 0f));
+        if (Quaternion.Angle(turn, Quaternion.Euler(0f, LidLabelQuarterTurns(label) * 90f, 0f)) > 1f)
+            errors.Add($"{path}: lid label not flat on the lid or not turned by a quarter turn");
+
+        var text = label.GetComponentInChildren<TextMeshPro>(true);
+        if (text == null)
+            return;
+
+        float textX = text.transform.TransformVector(Vector3.right).magnitude;
+        float textY = text.transform.TransformVector(Vector3.up).magnitude;
+        if (Mathf.Abs(textX - TextWorldScale) > TextWorldScale * 0.02f || Mathf.Abs(textY - TextWorldScale) > TextWorldScale * 0.02f)
+            errors.Add($"{path}: lid label text scale {textX * 1000f:F2} x {textY * 1000f:F2}, expected 1 x 1 (stretched text)");
     }
 
     // The bag label sits on the bag's front (-z) surface, found by a ray against a temporary mesh collider.
