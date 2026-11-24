@@ -2789,7 +2789,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Công:** S
 - **Test trên kính:** bắt buộc (10 lần ấn mỗi tay ở Basic, đếm số lần trượt)
 - **Depends on:** —
-- **Status:** todo
+- **Test report:** docs/test-reports/bl169.md
+- **Status:** in progress (MCP 6/6 ✅, chờ kính: 10 lần ấn mỗi tay ở Basic, đếm số lần trượt)
 
 ### #170 [P2] Complex: tem của 3 carton xoay 90° bị kéo dài, thò ra ngoài nắp
 - **Type:** bug
