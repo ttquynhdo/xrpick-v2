@@ -20,7 +20,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
 **ĐỢT TEST KÍNH 2026-11-24 (thêm 2026-11-24, từ `docs/review-notes-2026-11-24.md` T1–T8; mục #168–#172 ở cuối file; đứng trước mọi khối cũ).** Người dùng đóng các mục #137–#167 còn mở (`closed`), trừ #163–#166.
-- **1. Ngay:** **#168** (P0, kiện chồng lên nhau khi thả; chỉ script `PackageDropper` + `CartonSettler`) ∥ **#171** (mesh vòng/kẹp ở ComplexScene, đã làm, chỉ còn commit + test tay). **#170** (tem 3 carton Complex) sửa ComplexScene nên chạy sau khi #171 đã commit.
+- **1. Ngay:** **#168** (P0, kiện chồng lên nhau khi thả; chỉ script `PackageDropper` + `CartonSettler`) ∥ **#171** (mesh vòng/kẹp ở ComplexScene, đã commit, MCP ✅, chỉ còn test tay). **#170** (tem 3 carton Complex) sửa ComplexScene nên chạy sau khi #171 đã commit.
 - **2.** **#169** (nút đỏ poke, 4 scene, cần kính). **#175** (Welcome: carton cỡ chuẩn, túi vít, khay vòng, rơi khi thả) sau #173 và #174, chỉ đụng WelcomeScene.
 - **2b.** **#173** (túi trong suốt ở Mixed) ngay sau #168 và #171, rồi **#174** (Complex đảo thứ tự, RING D thành túi, bớt hàng lẻ; decision 042) cùng #170; tất cả vào chung một build, một lần tăng `layout_version`.
 - **3. Một buổi kính** cho #168, #169, #171 (cầm/thả thật, FPS, bấm nút; Simulator trước cho #168).
@@ -2813,7 +2813,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Công:** S
 - **Test trên kính:** bắt buộc (cầm/thả kẹp bằng tay, FPS khi cầm)
 - **Depends on:** —
-- **Status:** in progress (commit 8e1d4a5; chờ test tay: cầm/thả kẹp, X7, FPS trên kính; ảnh `TestEvidence/ComplexScene/hoseclamp/`)
+- **Test report:** docs/test-reports/bl171.md
+- **Status:** in progress (MCP 6/6 ✅, chờ Simulator / kính 5′: cầm/thả kẹp bằng tay, kẹp khác vòng trên kính, FPS khi cầm)
 
 ### #172 [Feature] Complex/Mixed: đơn chỉ hoàn thành khi thùng đơn có đủ hàng của mọi vị trí?
 - **Type:** logic
