@@ -3,6 +3,7 @@
 - **Backlog:** #10 (tách: #10 = prefab + Basic + Complex; dọn dẹp sau #21 = #46; Mixed = #21; phần Complex của #33 gộp vào #10)
 - **Trạng thái:** accepted (phương án C, 2026-11-01); mục 4 phần chỉ báo thay bởi 009
 - **Ngày:** 2026-11-01
+- **Sửa đổi #167 (2026-11-24, theo Festo):** Picking 2 (nhóm tham gia study) dùng dialog cũ và luôn xác nhận bằng **F12 hoặc Enter** trên bàn phím, không có bàn đạp (`study design/XPick_Confirm_Key_Questions_2026-11-20.docx`, Q1–Q4). Giữ bố cục dialog mới của app; chỉ đổi nhãn: ô E49d ghi `F12 Bestätigen`, ô E48 ghi `F6 Aufkl. korr.`. Nút đỏ đóng vai phím F12/Enter (nhãn `F12`), không còn đóng vai bàn đạp. Mọi chỗ dưới đây nói „bàn đạp“ / „F6 Bestätigen“ đọc là „phím F12/Enter“ / „F12 Bestätigen“.
 - **Ý kiến đã xét:** requirements-analyst, unity-reviewer, instructional-design-reviewer, xr-ux-reviewer → decision-synthesizer
 - **Lựa chọn của người dùng (2026-11-01):** chấp nhận C; nút đỏ = bàn đạp (F6 trên màn hình không bấm được, chỉ nháy); Mixed làm cùng #21 (giữ panel đen tới lúc đó); kết quả Complex chuyển ra thẻ cạnh nút đỏ (phần Complex của #33) ngay trong #10.
 

@@ -47,7 +47,7 @@ public class WmsDialogView : MonoBehaviour
     [SerializeField] private TMP_Text gew;
 
     [Header("R6 Funktionstasten")]
-    [Tooltip("Background of the F6 Bestätigen key; flashes when the red button (foot pedal) is pressed.")]
+    [Tooltip("Background of the F12 Bestätigen key; flashes when the red button (the F12/Enter key, #167) is pressed.")]
     [SerializeField] private Image confirmKey;
 
     // #71, decision 019 (assumption D27): the LVS shows the next position once its storage container has stopped.
@@ -98,7 +98,7 @@ public class WmsDialogView : MonoBehaviour
             stock.Settled -= Refresh;
         }
 
-        // A disabled object stops its coroutines: don't leave F6 in the pressed colour.
+        // A disabled object stops its coroutines: don't leave F12 in the pressed colour.
         flash = null;
         if (confirmKey != null)
         {
@@ -117,7 +117,7 @@ public class WmsDialogView : MonoBehaviour
         }
     }
 
-    // Hooked to the red button: it stands for the foot pedal, which is F6 Bestätigen on screen (decision 008).
+    // Hooked to the red button: it stands for the F12/Enter key, F12 Bestätigen on screen (#167; decision 008 said foot pedal + F6).
     public void FlashConfirmKey()
     {
         if (confirmKey == null || !isActiveAndEnabled)

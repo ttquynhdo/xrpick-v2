@@ -164,7 +164,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627361
-    m_Key: common.button.f6
+    m_Key: common.button.confirm_key
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627362
@@ -868,7 +868,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5042288934653960
-    m_Key: complex.end.foot
+    m_Key: complex.end.station_confirm
     m_Metadata:
       m_Items: []
   - m_Id: 5054402919272448

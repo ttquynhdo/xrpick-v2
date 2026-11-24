@@ -2954,7 +2954,7 @@ GameObject:
   - component: {fileID: 90914708213305677}
   - component: {fileID: 3770155255852258312}
   m_Layer: 0
-  m_Name: "Key F6 Best\xE4tigen"
+  m_Name: "Key F12 Best\xE4tigen"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4820,7 +4820,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: F12 Aufkl. korr.
+  m_text: F6 Aufkl. korr.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7101,7 +7101,7 @@ GameObject:
   - component: {fileID: 7053504576212235584}
   - component: {fileID: 8427332944728270483}
   m_Layer: 0
-  m_Name: Key F12 Aufkl. korr.
+  m_Name: Key F6 Aufkl. korr.
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9239,7 +9239,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "F6 Best\xE4tigen"
+  m_text: "F12 Best\xE4tigen"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

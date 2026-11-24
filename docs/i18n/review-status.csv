@@ -20,14 +20,14 @@ welcome.panel.next,Wählen Sie danach im Menü die markierte Lektion.,proposed,g
 mixed.card.task_body,"<b>Sie lernen, mehrere Auftragspositionen nacheinander zu kommissionieren.</b>",proposed,,2026-11-18,#155 decision 041
 mixed.card.step1_body,"Lesen Sie für die aktuelle Position ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,german-reviewer (agent),2026-11-05,#87
 common.card.step2_pick_title,2. Material kommissionieren,proposed,german-reviewer (agent),2026-11-01,#25
-mixed.card.step3_body,"Prüfen Sie, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
+mixed.card.step3_body,"Prüfen Sie, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F12).",proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
 complex.card.task_body,"<b>Sie lernen auszurechnen, wie viele volle Kartons und lose Teile Sie brauchen.</b>",proposed,,2026-11-18,#155 decision 041
 complex.card.step1_body,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,german-reviewer (agent),2026-11-05,#87
 complex.card.step2_body,"Legen Sie zuerst die vollen Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,,2026-11-18,#155 decision 041
-complex.card.step3_body,"Zählen Sie nach, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
+complex.card.step3_body,"Zählen Sie nach, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F12).",proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
 complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
 complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
-basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
+basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F12).",proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
 mixed.feedback.position_done,Position {position} ist erledigt. Lassen Sie die Ware im Auftragsbehälter liegen.\nDer Lagerbehälter fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-17,#139 (F2): goods stay in the order container; reviewed in the fork session
 basic.step2.text,"Legen Sie die nötigen Kartons so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,,2026-11-18,#155 decision 041
 order.feedback.ekz3_loose,"Bei Empf Kz 003 liegt jeder Karton einzeln und geordnet, nie übereinander. Legen Sie jeden Karton auf einen eigenen Platz.",proposed,german-reviewer (agent),2026-11-17,"#131: no warning icon on loose cartons any more, sentence 2 rewritten; agent OK (optional: plural 'liegen die Kartons' in sentence 1). Earlier: agent proposal (#108, decision 037)"
@@ -60,7 +60,7 @@ basic.result.incorrect.title,Nicht richtig,proposed,german-reviewer (agent),2026
 basic.step1.text,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,,2026-11-18,#155 decision 041
 basic.step2.title,2. Kartons kommissionieren,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 basic.task.intro,"<b>Sie lernen, Kartons nach EKZ einzulegen.</b>",proposed,,2026-11-18,#155 decision 041
-common.button.f6,F6,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
+common.button.confirm_key,F12,proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
 common.card.step1_title,1. Angaben im LVS ablesen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 common.card.step3_title,3. Auftrag bestätigen,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 complex.end.next,Bitte nehmen Sie die VR-Brille ab und melden Sie sich bei der Kursleitung.,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
@@ -167,7 +167,7 @@ concept.flow.group_auto,In der Übung automatisch,proposed,german-reviewer (agen
 concept.flow.step2,Auftrag im LVS ablesen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step4_count,Teile zählen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step6,Teile in den Auftragsbehälter legen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-concept.flow.step9,Bestätigen (F6),proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
+concept.flow.step9,Bestätigen (F12),proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
 concept.flow.step1,Lagerbehälter von links heranziehen – am echten Platz von Hand,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step3,Leeren Auftragsbehälter von rechts heranziehen – am echten Platz von Hand,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step9_auto,"Lagerbehälter fährt weg, der nächste kommt von links",proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
@@ -176,8 +176,8 @@ concept.flow.step4_weigh,Teile wiegen,proposed,german-reviewer (agent),2026-11-0
 concept.flow.step5,Teile vorverpacken,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step7,Restmenge im Lagerbehälter sichern,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
 concept.flow.step8,Leere Kartons aus dem Lagerbehälter entfernen,proposed,german-reviewer (agent),2026-11-03,#73; reviewer fixes applied
-complex.card.step3_body_position1,"Zählen Sie nach, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
-mixed.card.step3_body_position1,"Prüfen Sie, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F6).",proposed,,2026-11-18,#155 decision 041
+complex.card.step3_body_position1,"Zählen Sie nach, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F12).",proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
+mixed.card.step3_body_position1,"Prüfen Sie, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F12).",proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
 order.feedback.correct_title,Richtig!,proposed,,2026-11-03,#59
 concept.lane.storage,Lagerbehälter,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
 concept.lane.middle,Mittlere Bahn,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#81)
@@ -218,4 +218,4 @@ complex.end.can.1,Angaben im LVS mit dem Etikett vergleichen,proposed,german-rev
 complex.end.can.2,Kartons nach EKZ einlegen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
 complex.end.can.3,mehrere Auftragspositionen kommissionieren,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
 complex.end.can.4,volle Kartons und lose Teile ausrechnen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
-complex.end.foot,Am echten Kommissionierplatz bestätigen Sie mit dem Fuß.,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.station_confirm,Am echten Kommissionierplatz bestätigen Sie mit F12 oder Enter.,proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)

@@ -150,7 +150,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627356
     m_Localized: Check in the WMS that Ist equals Soll, then press the red button
-      (F6).
+      (F12).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627357
@@ -173,7 +173,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627361
-    m_Localized: F6
+    m_Localized: F12
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627362
@@ -461,7 +461,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627440
-    m_Localized: Check that Ist equals Soll, then press the red button (F6).
+    m_Localized: Check that Ist equals Soll, then press the red button (F12).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627441
@@ -480,7 +480,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627444
-    m_Localized: Count to check that Ist equals Soll, then press the red button (F6).
+    m_Localized: Count to check that Ist equals Soll, then press the red button (F12).
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627445
@@ -715,7 +715,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307021
-    m_Localized: Confirm (F6)
+    m_Localized: Confirm (F12)
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307022
@@ -754,11 +754,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 346260058804224
-    m_Localized: Check that Ist equals Soll, then press the red button (F6).
+    m_Localized: Check that Ist equals Soll, then press the red button (F12).
     m_Metadata:
       m_Items: []
   - m_Id: 346260226576384
-    m_Localized: Count to check that Ist equals Soll, then press the red button (F6).
+    m_Localized: Count to check that Ist equals Soll, then press the red button (F12).
     m_Metadata:
       m_Items: []
   - m_Id: 350226641457152
@@ -937,7 +937,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5042288934653960
-    m_Localized: At the real picking station you confirm with your foot.
+    m_Localized: At the real picking station you confirm with F12 or Enter.
     m_Metadata:
       m_Items: []
   - m_Id: 5054402919272448

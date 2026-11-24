@@ -32,7 +32,7 @@ Behälterwaage,die,container scale,Scale used from 700 g.,no,requirements: Kommi
 Zählen,das,counting,Counting by hand (up to 7 pieces).,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator label.
 Tarieren,das,taring,Setting the scale to zero with the container on it.,no,requirements: Kommissionierung.pptx slide 6,proposed,Also a WMS indicator and F7 button.
 Label,das,label,Printed sticker (pick label) for a bag or position.,no,requirements,proposed,
-bestätigen,,to confirm,Confirming a pick or a message.,no,requirements: Kommissionierung.pptx slide 2/3,proposed,"Confirm key depends on the dialog: new dialog (TMA/CSC4) F6 Bestätigen or foot pedal, old dialog (KOM 1/2) F12 Bestätigen. In the new dialog F12 is Aufkl. korr. B8 (2026-11-01): the app uses the new dialog, F6 Bestätigen."
+bestätigen,,to confirm,Confirming a pick or a message.,no,requirements: Kommissionierung.pptx slide 2/3,proposed,"Confirm key depends on the dialog: new dialog (TMA/CSC4) F6 Bestätigen or foot pedal, old dialog (KOM 1/2) F12 Bestätigen. In the new dialog F12 is Aufkl. korr. #167 (Festo 2026-11-24): Picking 2 confirms with F12 oder Enter auf der Tastatur, kein Fußpedal; the app keeps the new dialog layout but labels the confirm key F12 Bestätigen."
 Teamleiter,der,team leader,Person to inform on deviations.,no,requirements: Kommissionierung.pptx slide 7,proposed,
 Materialnummer,die,material number,Identifier of a material.,no,requirements,proposed,WMS label Mat.-Nr:
 Bezeichnung,die,description,Material description text.,no,WMS screenshot,proposed,WMS label Bez.:
@@ -59,7 +59,7 @@ Auftragsposition,die,order line,"One line of an order (one material with its qua
 Lagerverwaltungssystem,das,warehouse management system (WMS),The warehouse software that shows the pick order. Abbreviation LVS; write it in full with (LVS) at first use on a screen.,no,requirements: Detail Description; Kommissionierung,proposed,"german-reviewer (#18): the German documents say LVS, not WMS. Exception: the Complex end panel (complex.end.*) uses the short form LVS (one line, after 5 lessons; #120)."
 LVS,das,WMS,Abbreviation of Lagerverwaltungssystem.,no,requirements: Detail Description,proposed,
 Knopf,der,button,The big red physical button in VR that confirms the order. Not 'Taste' (keyboard key) or 'Schalter'.,no,app (#18),proposed,
-F6 Bestätigen,,F6 Confirm,Confirm key of the new WMS dialog (B8). The red button shows only 'F6'.,yes,WMS spec (B8),proposed,In the new dialog F12 is Aufkl. korr.
+F12 Bestätigen,,F12 Confirm,Confirm key in the app's WMS dialog since #167 (E49d slot). The red button shows only 'F12'.,yes,Festo 2026-11-24 (#167),proposed,F6 is Aufkl. korr. (as in the old dialog KOM 1/2). Was F6 Bestätigen until #167.
 Etikett,das,label (on the carton),"Label printed by the supplier on a carton or bag (material name, Mat.-Nr, VPE). Not 'Label', which is the pick label printed in the warehouse (F5).",no,german-reviewer (#17),proposed,
 Mat.-Nr:,,Mat. no.:,WMS field label and carton label line for the material number. No dot after 'Nr'.,yes,WMS spec E29,proposed,Basic WMS shows 'Mat.-Nr:' since #17.
 Bez.:,,Descr.:,WMS field label for the material description (Bezeichnung).,yes,WMS spec E31,proposed,Basic WMS shows 'Bez.:' since #17.
@@ -106,3 +106,4 @@ Warnzeichen,das,warning sign,"The yellow warning icon the app shows above or bes
 Kundenauftrag,der,customer order,"An order from a customer; the sample order on the LVS in ConceptScene step 1 (#118). Several modules can belong to one Kundenauftrag.",no,"requirements: Kommissionierung 2 (Module … für einen Kundenauftrag)",proposed,Short form Auftrag after first mention.
 Angaben,die (Pl.),data (in the LVS),"The values the trainee reads in the LVS dialog (Mat.-Nr, Bez., Soll, Verp.-Einh., Empf Kz …); card title „1. Angaben im LVS ablesen“, Welcome goals, goal cards, end panel.",no,german-reviewer (batch #116-#120),proposed,
 EKZ-Übersicht,die,EKZ overview,"The board in ConceptScene that lists all EKZ levels (title concept.ekz.title), shown at tour steps 9-11.",no,german-reviewer (batch #116-#120),proposed,
+Enter,,Enter (key),Keyboard key; at Picking 2 an order is confirmed with F12 or Enter.,yes,Festo 2026-11-24 (#167),proposed,Do not translate as „Eingabetaste“; warehouse staff say „Enter“ (german-reviewer #167).

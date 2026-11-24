@@ -151,7 +151,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627356
     m_Localized: "Pr\xFCfen Sie im LVS, ob Ist und Soll gleich sind, und dr\xFCcken
-      Sie den roten Knopf (F6)."
+      Sie den roten Knopf (F12)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627357
@@ -174,7 +174,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627361
-    m_Localized: F6
+    m_Localized: F12
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627362
@@ -465,7 +465,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627440
     m_Localized: "Pr\xFCfen Sie, ob Ist und Soll gleich sind, und dr\xFCcken Sie
-      den roten Knopf (F6)."
+      den roten Knopf (F12)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627441
@@ -485,7 +485,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7615942627444
     m_Localized: "Z\xE4hlen Sie nach, ob Ist und Soll gleich sind, und dr\xFCcken
-      Sie den roten Knopf (F6)."
+      Sie den roten Knopf (F12)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627445
@@ -714,7 +714,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307021
-    m_Localized: "Best\xE4tigen (F6)"
+    m_Localized: "Best\xE4tigen (F12)"
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307022
@@ -754,12 +754,12 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 346260058804224
     m_Localized: "Pr\xFCfen Sie, ob Ist und Soll gleich sind, und dr\xFCcken Sie
-      den roten Knopf (F6)."
+      den roten Knopf (F12)."
     m_Metadata:
       m_Items: []
   - m_Id: 346260226576384
     m_Localized: "Z\xE4hlen Sie nach, ob Ist und Soll gleich sind, und dr\xFCcken
-      Sie den roten Knopf (F6)."
+      Sie den roten Knopf (F12)."
     m_Metadata:
       m_Items: []
   - m_Id: 350226641457152
@@ -938,7 +938,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5042288934653960
-    m_Localized: "Am echten Kommissionierplatz best\xE4tigen Sie mit dem Fu\xDF."
+    m_Localized: "Am echten Kommissionierplatz best\xE4tigen Sie mit F12 oder Enter."
     m_Metadata:
       m_Items: []
   - m_Id: 5054402919272448

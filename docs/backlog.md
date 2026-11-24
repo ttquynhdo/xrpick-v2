@@ -20,7 +20,7 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
 **SAU STUDY – REVIEW CHUYÊN GIA FESTO (thêm 2026-11-20, từ `docs/review-notes-festo-2026-11-20.md`; mục #164–#166 ở cuối file).** Festo ghi cả ba là „for further development“, học kỳ sau; không làm trước study (tuần 2 và 4 năm 2027).
-- **Trước study, chưa thành mục:** phím xác nhận F12/Enter thay F6 và bỏ chữ „bàn đạp/Fuß“ (F1 trong file ghi chú). Chờ Festo trả lời `study design/XPick_Confirm_Key_Questions_2026-11-20.docx` (dialog nào, phím nào) rồi mới thêm mục và chọn: chỉ đổi phím (nhỏ) hay dựng dialog cũ (lớn, cần `solution-decision`).
+- **Trước study:** **#167** phím xác nhận F12/Enter thay F6, bỏ chữ „bàn đạp/Fuß“. Festo trả lời 2026-11-24 (`study design/XPick_Confirm_Key_Questions_2026-11-20.docx`): Picking 2 dùng dialog cũ, xác nhận luôn bằng F12/Enter; giữ dialog của app, chỉ đổi phím (không cần `solution-decision`).
 - **Sau study:** #165 (ảnh EKZ, chỉ ConceptScene, chờ Festo cho phép dùng ảnh) ∥ #166 (cần `solution-decision` trước) → #164 (nhiều Mat.-Nr; đụng Basic/Mixed/Complex, làm sau #166 nếu #166 đổi dòng đơn của Basic/Mixed). Mỗi mục đổi bài tập nên hỏi `data-analyst` về `layout_version`.
 
 **ĐỢT LOG P811 (thêm 2026-11-18, từ 6 câu hỏi của lead về log P811; mục #159–#163 ở cuối file).** Không đụng scene, chỉ script + spec + R, nên chạy song song với các mục scene đang mở; `data-analyst` duyệt mọi thay đổi log.
@@ -2728,3 +2728,16 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Test trên kính:** bắt buộc (cầm và đặt tấm ngăn bằng tay thật)
 - **Depends on:** `solution-decision` (giữ EKZ 3, thay bằng EKZ 6, hay thêm EKZ 6 thành bài/dòng riêng)
 - **Status:** blocked (cần `solution-decision`; để sau study)
+
+### #167 [P1] Xác nhận đơn bằng F12 (hoặc Enter) như ở Picking 2, không phải F6/bàn đạp
+- **Type:** logic
+- **Scene(s):** BasicPickingScene, MixedPickingScene, ComplexScene, ConceptScene (bảng `Ablauf Overview` đang tắt), prefab `WMS_Kommissionierung`
+- **Files:** `Assets/Prefabs/WMS_Kommissionierung.prefab` (nút E48 `Key F12 Aufkl. korr.`, E49d `Key F6 Bestätigen`), `docs/i18n/strings-todo.csv` (`common.button.f6`, `basic.step3.text`, `mixed.card.step3_body*`, `complex.card.step3_body*`, `complex.end.foot`, `concept.flow.step9`), `Assets/Scripts/WmsDialogView.cs` (tooltip/chú thích), `Assets/Scripts/Complex/RemainderQuizController.cs` (chú thích), decision 008, CLAUDE.md
+- **Problem:** Festo trả lời `study design/XPick_Confirm_Key_Questions_2026-11-20.docx` (Q1–Q4): Picking 2 (nhóm tham gia study) dùng dialog cũ và luôn xác nhận bằng F12 hoặc Enter trên bàn phím, không có bàn đạp; app phải giữ dialog hiện tại nhưng xác nhận bằng F12/Enter. Hiện app ghi `F6 Bestätigen`, nút đỏ ghi `F6`, thẻ ghi „roten Knopf (F6)“ và bảng cuối Complex nói „bestätigen Sie mit dem Fuß“.
+- **Done when:** Ở Basic, Mixed và Complex, footer LVS ghi `F12 Bestätigen` ở chỗ nút xác nhận cũ (E49d) và `F6 Aufkl. korr.` ở chỗ E48; không còn `F6 Bestätigen` và `F12 Aufkl. korr.`. Bấm nút đỏ → nút `F12 Bestätigen` tối 0,3 s. Nút đỏ ở Basic, Mixed và Complex ghi `F12`. Thẻ 3 ở Basic, Mixed (cả hai vị trí) và Complex (cả hai vị trí) ghi „… den roten Knopf (F12).“ (DE) và „… (F12).“ (EN), vừa thẻ như trước. Bảng chúc mừng Complex: dòng cuối nói xác nhận bằng F12 hoặc Enter, không có „Fuß“/„foot“, một dòng. (code) Không còn chữ „F6“ chỉ việc xác nhận trong `strings-todo.csv`, script và CLAUDE.md.
+- **Inspector work expected:** no (prefab text + đổi tên key bảng chữ, làm bằng MCP)
+- **Công:** S
+- **Test trên kính:** nhanh (đọc nhãn nút đỏ và footer LVS từ chỗ đứng)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl167.md
+- **Status:** in progress (MCP/code 18/18 ✅, chờ kính 5′ F7; nhánh `fix/167-confirm-f12`)

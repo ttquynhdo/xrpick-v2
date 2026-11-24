@@ -10,7 +10,7 @@ using UnityEngine.UI;
 /// <summary>
 /// #19, docs/decisions/016: before position 1 of ComplexScene the trainee answers how many full cartons and
 /// how many loose pieces the order line needs. A/B/C toggles show the answers (decision 015 style) and are
-/// rated as soon as one is switched on; the red button stays F6 for the order. Both answers right → the
+/// rated as soon as one is switched on; the red button stays F12 for the order. Both answers right → the
 /// first storage box grows in. Answers come from the order line (RemainderQuiz), so the numbers live only
 /// in orderLines. Every rated touch is logged as quiz_answer (#28, decision 021). #85, decision 024 (5) as in
 /// ConceptScene: after the right first answer „Richtig!“ stays under question 1 for

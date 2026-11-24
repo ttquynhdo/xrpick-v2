@@ -9053,7 +9053,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: F6
+  m_text: F12
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9194,7 +9194,7 @@ MonoBehaviour:
       m_TableCollectionName: UI
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: common.button.f6
+      m_Key: common.button.confirm_key
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -20356,7 +20356,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Pr\xFCfen Sie den Auftrag. Dr\xFCcken Sie dann den roten Knopf (F6). Danach
+  m_text: "Pr\xFCfen Sie den Auftrag. Dr\xFCcken Sie dann den roten Knopf (F12). Danach
     zeigt das LVS die n\xE4chste Position an."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dda8d4d183f898241969906ee2a03d81, type: 2}
