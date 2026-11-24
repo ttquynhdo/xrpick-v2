@@ -9,12 +9,17 @@ using UnityEngine;
 /// #121/#124 (decision 038): the first step card not yet done has the blue frame of the picking scenes (decision 017):
 /// card 1 at the start, card 2 after the first grab, card 3 „Lektion wählen“ once both are done, in the same moment as
 /// the Menu highlight; the other step cards are dimmed.
+/// #175: the practice desk holds a standard carton, a screw pouch and loose rings in a tray; the first grab of any
+/// of them counts as the grab action (user, 2026-11-24).
 /// </summary>
 public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
 {
     [Header("Actions")]
-    [Tooltip("The practice carton; its first grab counts.")]
+    [Tooltip("The practice carton; the first grab of it or of any other practice item counts.")]
     [SerializeField] private Grabbable box;
+
+    [Tooltip("#175: the other practice items (pouch, loose rings); the first grab of any of them counts too.")]
+    [SerializeField] private Grabbable[] otherItems = Array.Empty<Grabbable>();
 
     [Header("Feedback")]
     [Tooltip("Check mark on card 1 (Karton greifen), inactive in the scene.")]
@@ -57,17 +62,29 @@ public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
 
     private void OnEnable()
     {
-        if (box != null)
+        foreach (Grabbable item in PracticeItems())
         {
-            box.WhenPointerEventRaised += HandleBoxPointerEvent;
+            item.WhenPointerEventRaised += HandleBoxPointerEvent;
         }
     }
 
     private void OnDisable()
     {
-        if (box != null)
+        foreach (Grabbable item in PracticeItems())
         {
-            box.WhenPointerEventRaised -= HandleBoxPointerEvent;
+            item.WhenPointerEventRaised -= HandleBoxPointerEvent;
+        }
+    }
+
+    private System.Collections.Generic.IEnumerable<Grabbable> PracticeItems()
+    {
+        if (box != null)
+            yield return box;
+
+        foreach (Grabbable item in otherItems)
+        {
+            if (item != null)
+                yield return item;
         }
     }
 

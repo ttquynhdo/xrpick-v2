@@ -107,3 +107,4 @@ Kundenauftrag,der,customer order,"An order from a customer; the sample order on 
 Angaben,die (Pl.),data (in the LVS),"The values the trainee reads in the LVS dialog (Mat.-Nr, Bez., Soll, Verp.-Einh., Empf Kz …); card title „1. Angaben im LVS ablesen“, Welcome goals, goal cards, end panel.",no,german-reviewer (batch #116-#120),proposed,
 EKZ-Übersicht,die,EKZ overview,"The board in ConceptScene that lists all EKZ levels (title concept.ekz.title), shown at tour steps 9-11.",no,german-reviewer (batch #116-#120),proposed,
 Enter,,Enter (key),Keyboard key; at Picking 2 an order is confirmed with F12 or Enter.,yes,Festo 2026-11-24 (#167),proposed,Do not translate as „Eingabetaste“; warehouse staff say „Enter“ (german-reviewer #167).
+Ring,der,ring,"One loose metal ring, e.g. a piece of RING D lying in a tray (the material name RING D stays as on the label).",no,app (#175),proposed,"Common noun; the material name RING D is not translated."

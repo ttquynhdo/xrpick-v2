@@ -5,8 +5,8 @@ end.confirm.cancel,Fortsetzen,proposed,german-reviewer (agent),2026-11-01,Agent 
 end.confirm.end,Beenden,proposed,german-reviewer (agent),2026-11-01,Agent: OK as written
 common.card.task_title,Darum geht es,proposed,german-reviewer (agent),2026-11-05,#87
 welcome.card.task_body,"<b>Sie lernen, in der VR mit den Händen zu arbeiten.</b>",proposed,,2026-11-18,#155 decision 041
-welcome.card.step1_title,1. Karton greifen,proposed,german-reviewer (agent),2026-11-01,#25
-welcome.card.step1_body,"Greifen Sie den Karton mit einer Hand, heben Sie ihn hoch und stellen Sie ihn wieder ab.",proposed,german-reviewer (agent),2026-11-16,#116: Agent OK
+welcome.card.step1_title,1. Ware greifen,proposed,,2026-11-25,#175 any practice item counts
+welcome.card.step1_body,"Greifen Sie Karton, Beutel oder einen Ring, heben Sie ihn hoch und legen Sie ihn ab.",proposed,,2026-11-25,#175 carton + pouch + rings; german-reviewer: einen Ring, Beutel kept (Tüte/Beutel open, glossary row 42)
 welcome.card.step2_title,2. Knopf drücken,proposed,german-reviewer (agent),2026-11-01,#25
 welcome.card.step2_body,Drücken Sie mit der Fingerspitze den roten Knopf.,proposed,,2026-11-18,#155 decision 041
 welcome.title,Willkommen bei XPick!,proposed,german-reviewer (agent),2026-11-01,#25

@@ -404,11 +404,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627425
-    m_Localized: 1. Grab the carton
+    m_Localized: 1. Grab an item
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627426
-    m_Localized: Grab the carton with one hand, lift it up and put it down again.
+    m_Localized: Grab the carton, the bag or a ring, lift it up and put it down again.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627427

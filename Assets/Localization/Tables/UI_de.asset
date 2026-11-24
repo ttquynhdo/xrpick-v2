@@ -405,12 +405,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627425
-    m_Localized: 1. Karton greifen
+    m_Localized: 1. Ware greifen
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627426
-    m_Localized: Greifen Sie den Karton mit einer Hand, heben Sie ihn hoch und stellen
-      Sie ihn wieder ab.
+    m_Localized: Greifen Sie Karton, Beutel oder einen Ring, heben Sie ihn hoch und
+      legen Sie ihn ab.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627427

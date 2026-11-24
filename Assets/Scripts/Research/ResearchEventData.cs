@@ -26,7 +26,8 @@ public static class ResearchEventData
     // is pushed aside by the overlap; its top never above the rim; lifting a package lets those lying on it fall; and
     // #173 (same build): Mixed SCHRAUBE B bags are flat clear pouches with the screws visible; #174 (same build):
     // Complex position 1 = SCHLAUCHSCHELLE B 152/50, position 2 = RING D 53/25 in pouches, quiz with the new numbers,
-    // trays instead of opened cartons (no event changes).
+    // trays instead of opened cartons; #175 (same build): Welcome practice carton, pouch and rings, not logged
+    // (no event changes).
     // R tells logs apart by it.
     public const string LayoutVersion = "040";
 

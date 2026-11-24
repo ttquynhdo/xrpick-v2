@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 /// inactive packages included. A grab starts with the first selecting pointer and ends when the last one
 /// releases (Unselect or Cancel), so two hands on one package give one grab. Events of a SnapInteractor
 /// (package held by a snap place) are ignored: before that, every snap logged a grab that never ended (pilot P802).
+/// #175: packages marked PracticeItem (WelcomeScene practice desk) are not logged.
 /// </summary>
 public class PackageGrabLogger : MonoBehaviour
 {
@@ -50,7 +51,8 @@ public class PackageGrabLogger : MonoBehaviour
         {
             PackageData package = grabbable.GetComponentInParent<PackageData>(true);
 
-            if (package == null)
+            // #175: the WelcomeScene practice items are packages for the dropper, not for the log.
+            if (package == null || package.GetComponentInParent<PracticeItem>(true) != null)
                 continue;
 
             // Taken now, before any ride can reparent the package.
