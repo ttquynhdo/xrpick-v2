@@ -19,6 +19,13 @@ Mức ưu tiên: **P0** lỗi khi chạy / đếm sai · **P1** logic huấn luy
 **Công** (ước lượng thô theo số script/scene phải đụng, chưa đo): **S** vài giờ · **M** khoảng 1 ngày · **L** nhiều ngày.
 **Test trên kính** (phần bạn phải tự đeo Quest test, MCP không làm được): **không** (MCP/Editor đủ) · **nhanh** (5–10 phút xem thấy/đọc được) · **bắt buộc** (tay thật, tầm với, độ thoải mái, FPS). Gom các mục "nhanh"/"bắt buộc" đã `verified-mcp` lại để test chung một buổi.
 
+**ĐỢT TEST KÍNH 2026-11-24 (thêm 2026-11-24, từ `docs/review-notes-2026-11-24.md` T1–T8; mục #168–#172 ở cuối file; đứng trước mọi khối cũ).** Người dùng đóng các mục #137–#167 còn mở (`closed`), trừ #163–#166.
+- **1. Ngay:** **#168** (P0, kiện chồng lên nhau khi thả; chỉ script `PackageDropper` + `CartonSettler`) ∥ **#171** (mesh vòng/kẹp ở ComplexScene, đã làm, chỉ còn commit + test tay). **#170** (tem 3 carton Complex) sửa ComplexScene nên chạy sau khi #171 đã commit.
+- **2.** **#169** (nút đỏ poke, 4 scene, cần kính). **#175** (Welcome: carton cỡ chuẩn, túi vít, khay vòng, rơi khi thả) sau #173 và #174, chỉ đụng WelcomeScene.
+- **2b.** **#173** (túi trong suốt ở Mixed) ngay sau #168 và #171, rồi **#174** (Complex đảo thứ tự, RING D thành túi, bớt hàng lẻ; decision 042) cùng #170; tất cả vào chung một build, một lần tăng `layout_version`.
+- **3. Một buổi kính** cho #168, #169, #171 (cầm/thả thật, FPS, bấm nút; Simulator trước cho #168).
+- **4. Sau buổi kính:** **#172** (`solution-decision` + hỏi Festo: có kiểm lại hàng vị trí trước không).
+
 **SAU STUDY – REVIEW CHUYÊN GIA FESTO (thêm 2026-11-20, từ `docs/review-notes-festo-2026-11-20.md`; mục #164–#166 ở cuối file).** Festo ghi cả ba là „for further development“, học kỳ sau; không làm trước study (tuần 2 và 4 năm 2027).
 - **Trước study:** **#167** phím xác nhận F12/Enter thay F6, bỏ chữ „bàn đạp/Fuß“. Festo trả lời 2026-11-24 (`study design/XPick_Confirm_Key_Questions_2026-11-20.docx`): Picking 2 dùng dialog cũ, xác nhận luôn bằng F12/Enter; giữ dialog của app, chỉ đổi phím (không cần `solution-decision`).
 - **Sau study:** #165 (ảnh EKZ, chỉ ConceptScene, chờ Festo cho phép dùng ảnh) ∥ #166 (cần `solution-decision` trước) → #164 (nhiều Mat.-Nr; đụng Basic/Mixed/Complex, làm sau #166 nếu #166 đổi dòng đơn của Basic/Mixed). Mỗi mục đổi bài tập nên hỏi `data-analyst` về `layout_version`.
@@ -2346,7 +2353,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Depends on:** —
 - **Decision:** người dùng chọn 2026-11-17 (hướng (a) của F3), thay phần „Concept mẫu 003“ của decision 028; không chạy `solution-decision`
 - **Test report:** docs/test-reports/bl137.md
-- **Status:** verified-mcp (6/6 ✅ MCP/code, chờ test tay H1)
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 
 ### #138 [P1] Concept: mũi tên cam đứng thẳng, chỉ xuống tâm thùng kho
 - **Type:** bug
@@ -2359,7 +2366,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Test trên kính:** nhanh (nhìn mũi tên ở bước 2)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl138.md
-- **Status:** verified-mcp (3/3 ✅ MCP/code, chờ test tay H1)
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 
 ### #139 [P1] Mixed/Complex: thẻ kết quả bảo để nguyên hàng của vị trí trước trong thùng đơn
 - **Type:** logic
@@ -2373,7 +2380,7 @@ Nguồn: `docs/review-notes-team-2026-11-09.md` (C1–C23, đã đối chiếu v
 - **Depends on:** —
 - **Decision:** người dùng chọn phương án A trong phiên fork, 2026-11-17 (không chạy `solution-decision`)
 - **Test report:** docs/test-reports/bl139.md
-- **Status:** verified-mcp (12/12 ✅ MCP/code, chờ test tay H1)
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 
 ## Test tay theo checklist 2026-11-17 (R1–R16 + F2b)
 
@@ -2402,7 +2409,7 @@ Nguồn: `docs/review-notes-checklist-2026-11-17.md` (R1–R16, góp ý người
 - **Test trên kính:** bắt buộc (lỗi có thể chỉ thấy trên Quest)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl141.md
-- **Status:** verified-mcp (4/4 MCP + 1 code ✅, chờ test kính H1–H2; nhánh `feat/156-show-hide-rules`)
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 
 ### #142 [P1] Chữ cỡ cố định bị tràn hoặc bị cắt: chú thích `cartons`, nhãn „In der Übung“, dòng phản hồi quiz
 - **Type:** bug
@@ -2524,7 +2531,7 @@ Nguồn: `docs/review-notes-checklist-2026-11-17.md` (R1–R16, góp ý người
 - **Test trên kính:** nhanh (nhìn hai mép bàn)
 - **Depends on:** — (không chạy song song với mục khác sửa cùng scene)
 - **Test report:** docs/test-reports/bl151.md
-- **Status:** verified-mcp (13/13 ✅ MCP/code, chờ test tay K1 trên kính; nhánh `feat/151-desk-edges`; mặt bàn x −1,021…0,728, thừa 5 cm ngoài mỗi ray ngoài)
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 
 ### #152 [Feature] Mixed: viền chỗ đặt EKZ 003 hiện ngay từ đầu vị trí 1
 - **Type:** feature
@@ -2564,7 +2571,7 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Công:** M–L
 - **Test trên kính:** nhanh (đọc các chú thích tour, bảng EKZ, phản hồi quiz)
 - **Depends on:** chỗ đặt câu hỏi Concept/Complex theo #155 (decision chung); phần không đụng câu hỏi làm được trước
-- **Status:** in progress (MCP 16/16 ✅ + 3 code ✅, chờ kính 5′ H1; nhánh `feat/151-desk-edges`, chưa commit; không đổi `layout_version`, đi chung build "039")
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 - **Test report:** docs/test-reports/bl154.md
 
 ### #155 [Feature] Gốc B: một luật chữ cho cả khoá — chữ chỉ có khi nói điều cảnh không tự cho thấy; sửa các decision bắt buộc chữ
@@ -2580,7 +2587,7 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Depends on:** #143 (chữ Mixed); làm trước phần câu hỏi của #154; A15 (Rest, không chặn)
 - **Decision:** docs/decisions/041-one-text-rule.md
 - **Test report:** docs/test-reports/bl155.md
-- **Status:** in progress (MCP/code 23/23 ✅, chờ kính 5′ K1 (đọc + chạm cụm câu hỏi) và K2 (đọc giá thẻ 5 bài); nhánh `feat/155-text-rule`, chưa commit; `layout_version` "039")
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 
 ### #156 [P1] Gốc C: bảng quy tắc hiện/ẩn theo bước; không vật nào nháy, mất hay bị bỏ lại ngoài ý muốn
 - **Type:** bug
@@ -2593,7 +2600,7 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Test trên kính:** nhanh (đi tour Concept, mở bước việc ở Welcome)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl156.md
-- **Status:** verified-mcp (19/19 MCP + 2 code ✅, chờ test tay H1–H3; nhánh `feat/156-show-hide-rules`, c843f13)
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 
 ### #157 [P0] Gốc D: một cơ chế duy nhất quyết định kiện nằm đâu khi thả (chỗ đặt → thùng → mặt bàn)
 - **Type:** bug
@@ -2606,7 +2613,7 @@ Rà lại #136, #140–#153: các mục quy về 4 gốc lỗi và 1 lỗ hổng
 - **Test trên kính:** bắt buộc (tay thật: đặt 3 chỗ ở Mixed, 6 chỗ ở Basic, thả trên bàn và ngoài bàn)
 - **Depends on:** bước đầu = tái hiện #140 (Simulator hoặc kính) trước khi thiết kế; phần #153 (thả ngoài thùng) cần `solution-decision` ngắn (unity-reviewer + data-analyst), có thể sau design freeze 19/11
 - **Test report:** docs/test-reports/bl157.md
-- **Status:** verified-mcp (nhánh `fix/157-package-drop-target`; #140 8/8, #152 + #153 14/14 MCP/code ✅ sau review; `layout_version` „038“, P2 = observed theo người dùng 2026-11-17, decision 037 sửa đổi #157; chờ test tay M5, H1, H2, H3)
+- **Status:** closed (thay bằng #168: test kính 2026-11-24 T3/T5/T7, kiện xếp chồng khi thả đè lên kiện khác; phần #140/#152/#153 vẫn giữ trong code)
 
 ### #158 [P2] Lỗ hổng test: thêm case khung-hình, Simulator cầm/thả và một lượt nhìn kính trước khi ghi `verified-mcp`
 - **Type:** refactor
@@ -2675,7 +2682,7 @@ Nguồn: kiểm 6 câu hỏi của lead trên 7 log thật `analysis/data/real` 
 - **Test trên kính:** không
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl162.md
-- **Status:** verified-mcp (8/9 ✅, chờ test tay D2b: header log của một build Development có `-dirty`; nhánh `fix/162-clean-build-guard`, commit a5a36ae)
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
 
 ### #163 [P3] Log: bỏ hai trường `hand` / `input` luôn `null` trong `grab_start` / `grab_end`
 - **Type:** cleanup
@@ -2740,4 +2747,121 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Test trên kính:** nhanh (đọc nhãn nút đỏ và footer LVS từ chỗ đứng)
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl167.md
-- **Status:** in progress (MCP/code 18/18 ✅, chờ kính 5′ F7; nhánh `fix/167-confirm-f12`)
+- **Status:** closed (người dùng 2026-11-24: đã test trên kính, không báo lỗi cho mục này; kết quả từng case tay không ghi riêng, xem `docs/review-notes-2026-11-24.md`)
+
+### #168 [P0] Kiện thả đè lên kiện khác phải tìm chỗ trống bên cạnh, không chồng lên trên
+- **Type:** bug
+- **Scene(s):** ComplexScene, MixedPickingScene, BasicPickingScene, ConceptScene
+- **Files:** `Assets/Scripts/PackageDropper.cs:222-237` (`TryPlan`, nhánh thùng), `Assets/Scripts/CartonSettler.cs:150-170` (`TrySettle`), `Grabbable._throwWhenUnselected` của mọi kiện
+- **Problem:** test kính 2026-11-24 (T3, T5, T7): kiện thả xuống thẳng đúng chỗ tay mở và nằm lên nóc bất kỳ kiện nào nằm dưới một phần của nó. Thùng 40 cm chỉ dư ~4 cm cho hai carton, nên tay thật hay thả đè vài cm → carton nằm chồng, nóc cao hơn miệng thùng, trông như bị nảy ra; ở Complex không xếp được hàng của cả hai vị trí vào một thùng, ở Mixed túi vị trí 2 không vừa. Tái hiện bằng MCP: `VPE_2` thả đè 9 cm lên `VPE_1` → nóc y 0,970 > miệng 0,968. Log thật (build aaa7f7a, P101/P222/P325; `analysis/output/usability-2026-11-24/report.md`): 90 / 253 lần buông trong thùng đơn (36 %) kết thúc ngoài vùng đếm, 0,32 s sau khi buông (= thời gian chờ của dropper); trước dropper (P802) 1 / 43; Basic 0.
+- **Phân tích nguyên nhân (2026-11-24, MCP ComplexScene + log thật):** Thùng có hàng như người học hay xếp (`VPE_1` dưới đáy, `VPE_2` đè nửa lên `VPE_1`, 3 vòng). Thử `PackageDropper.TryPlan` ở 27 điểm thả bên trong thùng cho một carton và một vòng: 18 / 36 lần kiện bị **nhấc lên** cao hơn chỗ tay thả, 4 / 36 kết thúc **ngoài vùng đếm** (vòng nằm ở y 0,969 > miệng 0,968; carton nằm sát miệng ở 0,967).
+  - **N1. Kiện nằm lên kiện cao nhất dưới bất kỳ phần nào của nó** (`PackageDropper.cs:230-237`): chỉ cần mép đè lên kiện khác 1 cm là cả kiện nằm lên nóc kiện đó, dù bên dưới phần còn lại là đáy trống. Không có trượt sang chỗ trống, nên chồng mọc lên nhanh và có những tầng treo lơ lửng một nửa (`VPE_2` treo nửa trên đáy trống).
+  - **N2. Luôn dò từ trên miệng thùng xuống** (`startY = max(centre.y, rim + half + 0,02)`): kiện tay đặt thấp vào một khe trống vẫn bị nhấc lên nóc kiện bên cạnh nếu khe hẹp hơn hình chiếu của kiện.
+  - **N3. Nhấc lên thì nhảy tức khắc** (`Animate`, `PackageDropper.cs:274-275`): khi chỗ đặt cao hơn chỗ thả, thời gian rơi = 0 nên kiện nhảy ngay lúc 0,3 s. Khớp log: kiện ra khỏi vùng đếm 0,319 s sau khi buông (10–90 %: 0,317–0,334 s).
+  - **N4. Không có giới hạn ở miệng thùng:** tầng thứ ba hoặc vòng trên tầng thứ hai nằm ở hoặc trên miệng thùng → bộ đếm không thấy nữa (Ist giảm) → người học thấy hàng „bật ra“ và cầm lại (log: 53 % trong 3 s).
+  - **N5. Hình chiếu dùng hộp bao theo trục thế giới** (`BoundsOf`, AABB): carton xoay theo tay có hình chiếu to hơn thật, nên càng hay đè lên kiện bên cạnh.
+  - Không phải nguyên nhân: ném khi thả (kiện kinematic), lớp vật lý, collider của thùng (đã kiểm). Thùng 40 × 40 × 20 cm đủ chỗ cho hàng Complex hai vị trí nếu xếp 2 tầng gọn.
+- **Hướng xử lý (bàn với người dùng 2026-11-24, thay hướng „dò lưới ±10 cm“; giữ kinematic, không bật trọng lực thật):** sáu luật, áp dụng cho `PackageDropper` và `CartonSettler`:
+  1. **Vật mỏng bên dưới** (dày ≤ 2 cm: vòng, kẹp): kiện mới luôn nằm lên trên nó, không bị đẩy ra.
+  2. **Carton/túi bên dưới đỡ ≥ 50 % đáy:** nằm lên trên.
+  3. **Đỡ < 50 % và bên cạnh còn chỗ:** đẩy ra **vừa đủ** (đúng bằng phần đè, về phía phần lớn của kiện), nằm xuống sát kiện kia; đi xuống + dịch trong ~0,3 s, không nhảy.
+  4. **Bị thành thùng chặn:** nằm lên trên nếu nóc vẫn dưới miệng thùng; nếu không thì nằm xuống, chấp nhận lồng một phần (phương án cuối).
+  5. **Luôn luôn:** kiện ở yên đúng chỗ tay đặt theo chiều ngang (trừ luật 3 và đẩy vào trong thành thùng); nóc không cao hơn miệng thùng; kiện thả trên thùng không bao giờ ra khỏi vùng đếm.
+  6. **Nhấc một kiện lên (> 1 cm) thì hàng đang nằm trên nó rơi theo** các luật trên (lan dần lên các tầng); không đụng kiện trong tay, carton trong chỗ đặt, kiện đang chạy trên băng. Chỉ tính khi có người cầm, không chạy mỗi khung hình.
+  - Hình chiếu tính theo hướng thật của kiện (yaw), không theo AABB. Tắt `_throwWhenUnselected`.
+  - Phương án đã loại: bật vật lý thật (văng, rung, tốn FPS, #153); đếm thêm vài cm trên miệng thùng (che lỗi); dò lưới tìm chỗ trống (kiện tự chạy xa, khó đoán); để mọi kiện xuyên nhau (trông giả, người học không thấy đã bỏ bao nhiêu).
+- **Done when:** Complex: thả lần lượt 2 carton + vòng (vị trí 1) rồi carton + kẹp (vị trí 2), mỗi món thả đè 3–9 cm lên món vừa thả → mọi món nằm trong thùng, nóc thấp hơn miệng thùng, Ist đúng ở cả hai vị trí. Thả carton đè 40 % lên carton khác, bên cạnh còn chỗ → carton mới dịch ra đúng bằng phần đè và nằm trên đáy sát carton kia. Thả carton đè ≥ 50 % lên carton khác → nằm lên trên. Đặt vòng xuống đáy rồi thả carton lên vòng → carton nằm trên vòng, không bị đẩy sang bên, vòng vẫn được đếm. Thả carton thấp vào khe trống rộng hơn carton → carton nằm trong khe, không bị nhấc lên. Hai carton chồng nhau, 5 vòng trên carton trên, nhấc carton trên ra → 5 vòng rơi xuống nóc carton dưới, Ist không đổi. Nhấc carton dưới cùng của thùng kho → carton tầng trên rơi xuống, không treo lơ lửng. Thùng thật sự đầy → kiện mới không cao hơn miệng thùng và vẫn được đếm. Basic: 6 carton vào 6 chỗ đặt như trước (B3 không đổi). (code) `_throwWhenUnselected` tắt ở mọi kiện.
+- **Inspector work expected:** no (tắt `_throwWhenUnselected` bằng code/MCP)
+- **Công:** M
+- **Test trên kính:** bắt buộc (thả thật bằng tay, đủ hàng Complex hai vị trí và Mixed vị trí 2; Simulator trước)
+- **Depends on:** —
+- **Status:** todo
+
+### #169 [P1] Nút đỏ: lần ấn đầu không bị huỷ khi ngón tay trượt ngang
+- **Type:** bug
+- **Scene(s):** WelcomeScene, BasicPickingScene, MixedPickingScene, ComplexScene
+- **Files:** `Interactables/BigRedButton/Button` (`PokeInteractable`: `_dragThresholds` DragNormal/DragTangent 0,01, `_minThresholds.MinNormal` 0,025, `_recoilAssist` tắt)
+- **Problem:** test kính 2026-11-24 (T2): thỉnh thoảng ấn nút đỏ bị „trượt qua“, ấn lại mới trúng và kêu. Với cài đặt hiện tại, ngón tay trượt ngang > 1 cm lúc ấn bị coi là kéo và lần ấn bị huỷ; ngón tay phải vào từ cao hơn 2,5 cm.
+- **Done when:** Ấn nút đỏ bằng ngón tay đi chéo từ phía trước (trượt ngang 2–3 cm) → nút kêu, phím F12 trên LVS tối, thẻ kết quả hiện ngay lần đầu. Ấn thẳng xuống → như trước. Chạm nhẹ mép nút rồi rút tay (không ấn xuống) → không có lần ấn nào. (code) Cả 4 scene dùng cùng giá trị.
+- **Inspector work expected:** no (đặt bằng MCP)
+- **Công:** S
+- **Test trên kính:** bắt buộc (10 lần ấn mỗi tay ở Basic, đếm số lần trượt)
+- **Depends on:** —
+- **Status:** todo
+
+### #170 [P2] Complex: tem của 3 carton xoay 90° bị kéo dài, thò ra ngoài nắp
+- **Type:** bug
+- **Scene(s):** ComplexScene
+- **Files:** ComplexScene `VPE_3`, `SB_Carton_3`, `SB_Carton_4` (`Label Top` localRot (90, 270, 0) dưới carton scale 0,3/0,3/0,4), `Assets/Scripts/Editor/PackageStandardizer.cs` (`Check()`)
+- **Problem:** test kính 2026-11-24 (T4): tem trên carton SCHLAUCHSCHELLE B nằm ngang qua nắp, thò ra hai bên. Carton scale không đều, tem xoay 270° bên trong carton nên bị kéo thành 14,3 × 5,5 cm (đúng: 10,7 × 7,3 cm). Chỉ 3 carton này ở Complex (#111 xoay chúng 90°); 3 scene kia không có.
+- **Done when:** Ba carton `VPE_3`, `SB_Carton_3`, `SB_Carton_4` có tem 10,7 × 7,3 cm nằm gọn trong nắp, chữ đọc được từ chỗ đứng như các carton khác. (code) `PackageStandardizer.Check()` báo lỗi khi tem xoay 90°/270° trong carton có scale không đều, và báo 0 lỗi ở cả 4 scene sau khi sửa.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** không
+- **Depends on:** #171 (cùng ComplexScene, commit #171 trước)
+- **Status:** todo
+
+### #171 [P1] Complex: mesh nhẹ cho vòng RING D, kẹp SCHLAUCHSCHELLE B có hình kẹp ống
+- **Type:** feature
+- **Scene(s):** ComplexScene
+- **Files:** `Assets/Meshes/RingD.asset`, `Assets/Meshes/HoseClamp.asset` (dựng bằng code 2026-11-24), ComplexScene (20 MeshFilter, 8 BoxCollider của `clamp*`)
+- **Problem:** test kính 2026-11-24 (T8): hai vị trí Complex đều là „carton + vòng“, kẹp chỉ khác màu vòng nên người học bối rối; (T1) mỗi mảnh lẻ có mesh 16.200 tam giác (20 mảnh ≈ 324.000), có thể gây giật khung hình.
+- **Done when:** 12 vòng RING D trông như trước, mesh 1.152 tam giác. 8 kẹp SCHLAUCHSCHELLE B có hình kẹp ống (đai + hộp vít), 352 tam giác, nhìn từ chỗ đứng khác hẳn vòng. Cầm một kẹp, thả vào thùng đơn → nằm phẳng trong thùng, Ist vị trí 2 tăng 1. X7 (3 carton + 6 kẹp → „Richtig!“) vẫn đúng. Trên kính: cầm và di chuyển vòng/kẹp không giật khung hình.
+- **Inspector work expected:** no (đã làm bằng MCP, chưa commit)
+- **Công:** S
+- **Test trên kính:** bắt buộc (cầm/thả kẹp bằng tay, FPS khi cầm)
+- **Depends on:** —
+- **Status:** in progress (commit 8e1d4a5; chờ test tay: cầm/thả kẹp, X7, FPS trên kính; ảnh `TestEvidence/ComplexScene/hoseclamp/`)
+
+### #172 [Feature] Complex/Mixed: đơn chỉ hoàn thành khi thùng đơn có đủ hàng của mọi vị trí?
+- **Type:** logic
+- **Scene(s):** ComplexScene, MixedPickingScene
+- **Files:** `Assets/Scripts/PiecesContainerCounter.cs:14-16` (`confirmedPackages`), `Assets/Scripts/MixPickingContainer.cs`, `Assets/Scripts/Orders/OrderSequence.cs`, decision 012, 016, #139
+- **Problem:** test kính 2026-11-24 (T6): người dùng muốn đơn chỉ hoàn thành khi thùng có đủ hàng cả hai vị trí. Hiện tại, đúng thiết kế, lần bấm cuối chỉ kiểm vị trí cuối; hàng vị trí trước có thể lấy ra mà vẫn „Richtig!“.
+- **Done when:** (sau decision) Lấy hết hàng vị trí 1 ra sau khi vị trí 1 đúng, làm đúng vị trí 2, bấm nút đỏ → thẻ kết quả báo thiếu hàng vị trí 1, đơn chưa hoàn thành (nếu decision chọn kiểm lại).
+- **Inspector work expected:** no
+- **Công:** M
+- **Test trên kính:** không
+- **Depends on:** `solution-decision`; câu hỏi cho Festo: ở Picking 2, trước khi xác nhận vị trí sau có ai kiểm lại hàng vị trí trước không; #168 trước
+- **Status:** blocked (cần `solution-decision` + câu trả lời Festo)
+
+### #173 [P1] Mixed: túi SCHRAUBE B thành túi nhựa trong suốt dẹt có vít bên trong
+- **Type:** feature
+- **Scene(s):** MixedPickingScene
+- **Files:** Mixed 4 túi `PlasticBag_*` (mesh `PlasticBag02` × 0,375, tem `Cube (1)`), mesh mới `Assets/Meshes/ScrewPouch.asset` + `Screw.asset` (dựng bằng code như `HoseClamp`), vật liệu trong suốt mới; `testing.md` M4–M6; CLAUDE.md; decision 029
+- **Problem:** test kính 2026-11-24 (T3) và đo trong Editor: túi hiện cao 18,6 cm, đáy ~16 × 17 cm, thùng cao 20 cm; 3 túi không nằm vừa phần trống (~20 × 37 cm) và không chồng được dưới miệng thùng. Người dùng muốn thùng đơn luôn dư chỗ, và ở Complex bớt hàng lẻ để người học không mất nhiều thời gian đếm tay. Hướng dẫn Festo 5.5/5.6 cho thấy túi thật là túi nilon trong, dẹt, tem dán phẳng.
+- **Thiết kế đã chọn (người dùng 2026-11-24, ảnh `TestEvidence/MixedPickingScene/bag-preview/clear_pouch_*.png`):** túi nhựa trong suốt dẹt 12 × 10 cm, dày 3,5 cm ở giữa, mép hàn mỏng; 20 con vít (VPE 20) nhìn thấy bên trong, chỉ để nhìn (cầm cả túi); tem nằm phẳng trên mặt túi, **cỡ chuẩn 10 × 6 cm** (#88), che khoảng nửa mặt túi; ~2.100 tam giác/túi. Túi đến từ thùng kho đã đóng sẵn (bước tự đóng túi của Festo 5.5/5.6 để sau study).
+- **Complex:** chuyển sang #174 (decision 042: đảo thứ tự, RING D thành túi, bớt hàng lẻ); mesh túi dựng ở đây được #174 dùng lại.
+- **Done when:** Mixed: 4 túi trong thùng kho là túi trong suốt có 20 vít nhìn thấy, tem 10 × 6 cm đọc được từ chỗ đứng. Thả 3 túi vào nửa phải thùng đơn, nằm cạnh nhau → cả 3 dưới miệng thùng, Ist 60. Thả 2 túi chồng nhau → túi trên vẫn dưới miệng thùng. Cầm một túi → cả túi (vít đi theo) di chuyển, không con vít nào rơi ra. M4–M6 vẫn đúng. (code) `PackageStandardizer.Check()` không báo lỗi ở Mixed.
+- **Inspector work expected:** no (làm bằng MCP)
+- **Công:** M
+- **Test trên kính:** bắt buộc (đọc tem túi, cầm/thả túi, xếp đủ hàng Mixed vị trí 2 và Complex)
+- **Depends on:** #168 (cùng chuyện xếp hàng vào thùng, vào chung một build và một lần tăng `layout_version`)
+- **Decision:** docs/decisions/042-complex-swap-lines-ring-bags.md (mục 2)
+- **Status:** todo (thiết kế túi đã chọn)
+
+### #174 [P1] Complex: đảo thứ tự hai dòng đơn, RING D thành túi trong suốt, bớt hàng lẻ
+- **Type:** feature
+- **Scene(s):** ComplexScene
+- **Files:** `PiecesContainerCounter.orderLines` (thứ tự + Soll), `PositionStockSwitcher` (thứ tự thùng kho, `hideFirstUntilRevealed`), `PositionTexts` (thẻ theo vị trí), `RemainderQuizController`/`Orders/RemainderQuiz` (hỏi dòng đơn vị trí 1, không đổi code nếu chỉ đổi dữ liệu), thùng kho 1/2 (`PlasticBox_Storage`, `_2`, carton, 12 vòng, 8 kẹp, `Storage Label`; bỏ `VPE_OpenedPackage`, `SB_OpenedPackage`, `Opened Carton Note`), khay nông mới trong mỗi thùng kho, túi RING D 14 × 14 × 3,5 cm (dùng lại kiểu túi của #173), `docs/i18n/strings-todo.csv` (`complex.feedback.correct`, `complex.storage.opened_carton`, thẻ vị trí, `complex.card.step2_body_answered`), `analysis/make_fake_data.R`, `analysis/analyse_set.R`, `analysis/item_skills.csv`, `testing.md` X-cases, CLAUDE.md
+- **Problem:** test kính 2026-11-24 (T8): hai dòng đơn Complex đều là „carton nâu + vòng“, người học bối rối. Người dùng chọn đảo thứ tự và cho RING D vào túi (decision 042); đồng thời bớt hàng lẻ để không phải đếm tay nhiều.
+- **Done when:** Vị trí 1 là SCHLAUCHSCHELLE B: LVS hiện Mat.-Nr 443890, Soll 152; thùng kho 1 có carton nâu + kẹp ống lẻ nằm phẳng trong một khay nông. Câu hỏi trước vị trí 1 hỏi bằng số của SCHLAUCHSCHELLE B (đáp án đúng 3 carton, 2 kẹp, câu 3 cách bỏ vào thùng như nay); thẻ 2 sau khi đúng ghi „3 Kartons + 2 Stück …“. 3 carton + 2 kẹp → „Richtig!“, thùng kho 2 chạy vào. Vị trí 2 là RING D: LVS Mat.-Nr 264857, Soll 53; thùng kho 2 có túi trong suốt 14 × 14 cm có vòng bên trong + vòng lẻ nằm phẳng trong khay nông. Không còn vật nào trông như kiện mà không cầm được (không biểu tượng bàn tay gạch chéo trong Complex); cầm khay → không cầm được, khay không di chuyển. 2 túi + 3 vòng → „Richtig!“, đơn hoàn thành. Thiếu một vòng → „Zu wenig loses Material RING D“. Câu kết thẻ kết quả cuối không còn nói riêng „Kartons“. Từ chỗ đứng, hai vị trí nhìn khác hẳn (carton nâu vs túi trong). (code) `layout_version` tăng; `make_fake_data.R`, `analyse_set.R`, `item_skills.csv` dùng thứ tự và đáp án mới, `selftest.R` xanh (`data-analyst`); chữ mới qua `german-reviewer`; `PackageStandardizer.Check()`, `InstructionShelfLayout`, `TextComfortAudit` chạy lại ở Complex.
+- **Inspector work expected:** no (làm bằng MCP)
+- **Công:** L
+- **Test trên kính:** bắt buộc (làm hết Complex hai vị trí bằng tay thật, đọc tem túi)
+- **Depends on:** #168, #171 (commit trước), #173 (mesh túi); #170 làm cùng lúc (carton xoay ở Complex thay đổi theo bố cục thùng kho mới)
+- **Decision:** docs/decisions/042-complex-swap-lines-ring-bags.md
+- **Status:** todo (số 152 / 53 người dùng duyệt 2026-11-24)
+
+### #175 [P1] Welcome: hộp tập cầm cỡ chuẩn, rơi khi thả; thêm túi vít và khay vòng để làm quen các loại hàng
+- **Type:** bug
+- **Scene(s):** WelcomeScene
+- **Bổ sung (người dùng 2026-11-24):** ngoài carton, đặt thêm trên bàn tập **một túi vít trong suốt** (kiểu #173) và **một khay nông có vài vòng** (kiểu #174), để người học làm quen cách cầm từng loại và biết khoá có nhiều loại hàng (carton, túi, hàng lẻ). Thẻ 1 („1. Karton greifen“ / `welcome.card.step1_*`) đổi thành cầm hàng (không chỉ carton); **✓ thẻ 1 khi cầm lần đầu bất kỳ món nào** (người dùng chọn 2026-11-24). Còn chọn khi làm: các món tập có `PackageData` hay không (có thì `PackageGrabLogger` ghi `grab_*` ở Welcome → hỏi `data-analyst`; `PackageDropper` hiện chỉ xử lý kiện có `PackageData`).
+- **Files:** WelcomeScene `Interactables Obj/Box` (BoxCollider trigger 59,4 × 30,4 × 30,4 cm, mesh `SM_box_1` 48 tam giác, `Rigidbody` kinematic, `Grabbable` không có transformer riêng, `ISDK_HandGrabInteraction`), `Assets/Scripts/PackageDropper.cs` (chỉ xử lý kiện có `PackageData`), `Assets/Scripts/Welcome/WelcomePracticeFeedback.cs`
+- **Problem:** người dùng 2026-11-24: cầm hộp ở Welcome bị giật/lag. Đo trong Editor: hộp dài 59 cm, dày 30 cm, gấp ~3,3 lần carton chuẩn của khoá (17,8 × 9,2 × 12,3 cm, #88); mesh chỉ 48 tam giác, cấu hình cầm giống hệt carton ở Basic, nên không phải do mesh nặng. Nguyên nhân khả dĩ: (1) hộp dài khuếch đại rung của hand tracking (tay xoay 1° → đầu hộp cách tay 30 cm lệch ~5 mm mỗi khung hình); (2) một bàn tay không ôm được khối dày 30 cm, lực nắm dao động nên hộp có thể nhả rồi bắt lại; (3) hộp không có `PackageData` nên `PackageDropper` bỏ qua: thả tay ra hộp treo lơ lửng giữa không trung, khác mọi kiện khác của khoá. FPS thật trên Quest chưa đo.
+- **Done when:** Trên bàn tập có carton chuẩn, một túi vít trong suốt và một khay nông có vài vòng; mọi món (trừ khay) cầm được, thả ra rơi xuống bàn hoặc khay. Thẻ 1 nói cầm hàng trên bàn (không chỉ carton). Cầm lần đầu bất kỳ món nào (carton, túi hoặc một vòng) → ✓ trên thẻ 1, khung xanh sang thẻ 2. Hộp ở Welcome có đúng cỡ và hình carton chuẩn (17,8 × 9,2 × 12,3 cm, tem như carton của khoá hoặc không tem), đứng chỗ cũ, không che thẻ trên giá. Cầm lần đầu → dấu ✓ trên thẻ 1 như trước (W4). Thả hộp giữa không trung → hộp rơi xuống bàn như kiện ở các bài khác. (code) Thả hộp không sinh `grab_start`/`grab_end` hay `container_*` mới trong log Welcome (hoặc `data-analyst` duyệt nếu có). Trên kính: cầm, xoay, đưa hộp trước mắt 10 giây → không thấy giật.
+- **Inspector work expected:** no (làm bằng MCP)
+- **Công:** M
+- **Test trên kính:** bắt buộc (cầm và xoay hộp, đo FPS bằng OVR Metrics nếu có)
+- **Depends on:** #168 (luật thả), #173 (mesh túi), #174 (khay + vòng)
+- **Status:** todo
