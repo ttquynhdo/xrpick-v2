@@ -23,8 +23,9 @@ public static class ResearchEventData
     // (decision 041, #155): shorter shelf cards, Concept with 2 step cards and the tour opening by itself after 2 s,
     // Concept and Complex questions on the A/B/C cluster near the hands, tour step 8 without action line; "040" = #168:
     // a package let go over a container lies on top only on a thin package or with >= 50 % of its base carried, else it
-    // is pushed aside by the overlap; its top never above the rim; lifting a package lets those lying on it fall (no
-    // event changes). R tells logs apart by it.
+    // is pushed aside by the overlap; its top never above the rim; lifting a package lets those lying on it fall; and
+    // #173 (same build): Mixed SCHRAUBE B bags are flat clear pouches with the screws visible (no event changes).
+    // R tells logs apart by it.
     public const string LayoutVersion = "040";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).

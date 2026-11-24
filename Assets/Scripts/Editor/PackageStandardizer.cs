@@ -11,8 +11,8 @@ using UnityEngine.SceneManagement;
 /// #88, decision 029: one size per package kind in every scene and one fixed-size label on each carton lid.
 /// Cartons: mesh SM_box_1 at the Basic carton size (Complex's CardboardBox06 cartons get the same mesh),
 /// one label on the lid, the front sticker hidden (its collider stays: it is the carton's solid collider).
-/// Bags: the Mixed bag 25 % larger, one label inside the bag outline facing the standing spot, and (#115) a grabbable
-/// bag's collider = one convex MeshCollider of the bag mesh.
+/// Bags (#173, decision 042): clear pouches built by PouchBuilder (mesh name ends with "Pouch", scale 1), one solid
+/// BoxCollider = the pouch bounds, one label lying flat on the pouch top, text towards the standing spot.
 /// Every label uses the same font size with no auto-size. Opened cartons and loose pieces are not touched.
 /// Check reports every deviation; StandardizeOpenScene fixes them in place (dry run only reports).
 /// Running it again changes nothing new. Re-run after a label text or package size changes.
@@ -21,23 +21,19 @@ public static class PackageStandardizer
 {
     private const string CartonMeshName = "SM_box_1";
     private const string OldCartonMeshName = "CardboardBox06";
-    private const string BagMeshName = "PlasticBag02";
+    private const string PouchMeshSuffix = "Pouch";
     private const string CartonPrefabPath = "Assets/GVOZDY/Cardboard Boxes with Tape/Prefabs/box_1_brownTape.prefab";
 
     // Scale of the SM_box_1 mesh in BasicPickingScene = the standard carton (17.8 x 9.2 x 12.3 cm).
     private static readonly Vector3 CartonMeshScale = new(0.3f, 0.3f, 0.4f);
-    // Standard bag = the Mixed bag (mesh scale 0.3) made 25 % larger, so a label with the carton font fits on it.
-    private const float BagMeshScale = 0.375f;
 
     private const float SizeTolerance = 0.002f;
     private const float LidLabelShare = 0.6f;      // label covers 60 % of the lid (user, 2026-11-04)
     private const float TextShare = 0.84f;         // 8 % margin on each side of the label
     private const float TextWorldScale = 0.001f;   // 1 text unit = 1 mm
-    // The bag is pear-shaped: its body is about 12.5 cm wide at mid height; lower down it bulges forward.
+    // Standard bag label (#88): 10 x 6 cm, flat on the pouch top (#173).
     private const float BagLabelWidth = 0.10f;
     private const float BagLabelHeight = 0.06f;
-    private const float BagLabelHeightShare = 0.45f;
-    private const float BagEdgeMargin = 0.005f;
     private const float LabelLift = 0.0015f;
     // #103: the hidden front sticker keeps a solid collider; it must lie on the carton's front face, or the hand
     // grabs the carton from that far away. Size as on the Basic/Mixed cartons: 90 % of the face width, 80 % of its height.
@@ -72,7 +68,8 @@ public static class PackageStandardizer
 
     public static Vector3 CartonSize => Vector3.Scale(CartonMesh().bounds.size, CartonMeshScale);
 
-    public static Vector3 BagSize(Mesh bagMesh) => bagMesh.bounds.size * BagMeshScale;
+    // A pouch mesh is built at its real size, so a bag's size is its mesh at scale 1.
+    public static Vector3 BagSize(Mesh bagMesh) => bagMesh.bounds.size;
 
     /// <summary>Fixes size and labels of every carton and bag in the open scene. Returns a report.</summary>
     public static string StandardizeOpenScene(bool dryRun)
@@ -157,13 +154,14 @@ public static class PackageStandardizer
             string path = PathOf(filter.transform);
             CheckSize(errors, path, filter, BagSize(filter.sharedMesh));
             if (!HasBagCollider(filter))
-                errors.Add($"{path}: grabbable bag without one convex MeshCollider of {BagMeshName} (#115)");
+                errors.Add($"{path}: grabbable bag without one solid BoxCollider = pouch bounds (#173)");
 
             List<TMP_Text> visible = VisibleLabels(filter.transform);
             if (visible.Count != 1)
                 errors.Add($"{path}: {visible.Count} visible labels, expected 1");
 
             CheckLabels(errors, path, filter, visible, fontSize);
+            CheckBagLabel(errors, path, filter);
         }
 
         var report = new StringBuilder($"PackageStandardizer check {scene.name}: {cartons} cartons, {bags} bags, {errors.Count} errors");
@@ -183,22 +181,24 @@ public static class PackageStandardizer
 
     private static IEnumerable<MeshFilter> Bags(Scene scene)
     {
-        return AllFilters(scene).Where(f => f.sharedMesh.name == BagMeshName);
+        return AllFilters(scene).Where(f => f.sharedMesh.name.EndsWith(PouchMeshSuffix));
     }
 
-    // #115: the Meta SDK measures the grab distance to the rigidbody's colliders, so a grabbable bag's own collider
-    // must follow the whole bag, neck included. The imported prefab had a 10 cm box over the bottom of the bag only.
+    // #115/#173: the Meta SDK measures the grab distance to the rigidbody's colliders, and PackageDropper measures a
+    // package's footprint from them, so a grabbable pouch's own collider is one solid box around the whole pouch.
     // A bag without a Rigidbody is not grabbable and keeps what it has. The label child keeps its own collider.
     private static bool HasBagCollider(MeshFilter filter)
     {
         if (filter.GetComponent<Rigidbody>() == null)
             return true;
 
+        Bounds bounds = filter.sharedMesh.bounds;
         Collider[] own = filter.GetComponents<Collider>();
         return own.Length == 1
-            && own[0] is MeshCollider mesh
-            && mesh.sharedMesh == filter.sharedMesh
-            && mesh.convex && !mesh.isTrigger && mesh.enabled;
+            && own[0] is BoxCollider box
+            && (box.center - bounds.center).magnitude < 0.0005f
+            && (box.size - bounds.size).magnitude < 0.0005f
+            && !box.isTrigger && box.enabled;
     }
 
     private static void FitBagCollider(MeshFilter filter)
@@ -209,20 +209,20 @@ public static class PackageStandardizer
 
         foreach (Collider other in bag.GetComponents<Collider>())
         {
-            if (!(other is MeshCollider))
+            if (!(other is BoxCollider))
                 Undo.DestroyObjectImmediate(other);
         }
 
-        MeshCollider mesh = bag.GetComponent<MeshCollider>();
-        if (mesh == null)
-            mesh = Undo.AddComponent<MeshCollider>(bag);
+        BoxCollider box = bag.GetComponent<BoxCollider>();
+        if (box == null)
+            box = Undo.AddComponent<BoxCollider>(bag);
 
-        Undo.RecordObject(mesh, "Bag collider");
-        mesh.sharedMesh = filter.sharedMesh;
-        mesh.convex = true;
-        mesh.isTrigger = false;
-        mesh.enabled = true;
-        Record(mesh);
+        Undo.RecordObject(box, "Bag collider");
+        box.center = filter.sharedMesh.bounds.center;
+        box.size = filter.sharedMesh.bounds.size;
+        box.isTrigger = false;
+        box.enabled = true;
+        Record(box);
     }
 
     private static IEnumerable<MeshFilter> AllFilters(Scene scene)
@@ -441,56 +441,55 @@ public static class PackageStandardizer
             errors.Add($"{path}: lid label text scale {textX * 1000f:F2} x {textY * 1000f:F2}, expected 1 x 1 (stretched text)");
     }
 
-    // The bag label sits on the bag's front (-z) surface, found by a ray against a temporary mesh collider.
+    // #173: the pouch label lies flat on the pouch top, text read from the standing spot like a carton lid.
     private static void PlaceBagLabel(MeshFilter filter, float fontSize)
     {
         Transform bag = filter.transform;
-        Transform label = bag.Cast<Transform>().FirstOrDefault(c => c.GetComponentInChildren<TMP_Text>(true) != null);
+        Transform label = BagLabel(bag);
         if (label == null)
         {
             Debug.LogError($"PackageStandardizer: {PathOf(bag)} has no label.", bag);
             return;
         }
 
-        // The label faces the trainee's standing spot (the rig origin), whatever way the bag lies.
-        Bounds world = WorldBounds(filter);
-        Vector3 toTrainee = Vector3.ProjectOnPlane(-world.center, Vector3.up);
-        Vector3 facing = toTrainee.sqrMagnitude > 1e-6f ? toTrainee.normalized : -bag.forward;
-        Vector3 side = Vector3.Cross(Vector3.up, facing);
-        var height = new Vector3(world.center.x, world.min.y + world.size.y * BagLabelHeightShare, world.center.z);
-        float halfWidth = BagLabelWidth * 0.5f + BagEdgeMargin;
-
-        var probe = new GameObject("Bag label probe");
-        probe.transform.SetPositionAndRotation(bag.position, bag.rotation);
-        probe.transform.localScale = bag.lossyScale;
-        var collider = probe.AddComponent<MeshCollider>();
-        collider.sharedMesh = filter.sharedMesh;
-        Physics.SyncTransforms();
-
-        bool Surface(float offset, out RaycastHit hit)
-        {
-            Vector3 from = height + side * offset + facing;
-            return collider.Raycast(new Ray(from, -facing), out hit, 2f);
-        }
-
-        bool centre = Surface(0f, out RaycastHit centreHit);
-        bool edges = Surface(-halfWidth, out _) && Surface(halfWidth, out _);
-        Object.DestroyImmediate(probe);
-
-        if (!centre || !edges)
-        {
-            Debug.LogError($"PackageStandardizer: no room for a {BagLabelWidth * 100f:F0} cm label on {PathOf(bag)}.", bag);
-            return;
-        }
+        Bounds bounds = filter.sharedMesh.bounds;
+        Vector3 scale = Abs(bag.lossyScale);
 
         Undo.RecordObject(label, "Bag label");
-        label.position = centreHit.point + centreHit.normal * LabelLift;
-        label.rotation = Quaternion.LookRotation(-centreHit.normal, Vector3.up);
-        Vector3 parentScale = Abs(bag.lossyScale);
-        label.localScale = new Vector3(BagLabelWidth / parentScale.x, BagLabelHeight / parentScale.y, 0.001f / parentScale.z);
+        label.localPosition = new Vector3(bounds.center.x, bounds.max.y + LabelLift / scale.y, bounds.center.z);
+        label.localRotation = Quaternion.Euler(90f, 0f, 0f);
+        label.localScale = new Vector3(BagLabelWidth / scale.x, BagLabelHeight / scale.z, 0.001f / scale.y);
         Record(label);
 
         SetLabelText(label, new Vector2(BagLabelWidth, BagLabelHeight), fontSize);
+    }
+
+    private static Transform BagLabel(Transform bag) =>
+        bag.Cast<Transform>().FirstOrDefault(c => c.GetComponentInChildren<TMP_Text>(true) != null);
+
+    // #173: the label is 10 x 6 cm, flat on the pouch top and inside its outline.
+    private static void CheckBagLabel(List<string> errors, string path, MeshFilter filter)
+    {
+        Transform label = BagLabel(filter.transform);
+        if (label == null)
+            return;
+
+        float width = label.TransformVector(Vector3.right).magnitude;
+        float height = label.TransformVector(Vector3.up).magnitude;
+        if (Mathf.Abs(width - BagLabelWidth) > SizeTolerance || Mathf.Abs(height - BagLabelHeight) > SizeTolerance)
+            errors.Add($"{path}: bag label {width * 100f:F1} x {height * 100f:F1} cm, expected "
+                + $"{BagLabelWidth * 100f:F0} x {BagLabelHeight * 100f:F0} cm");
+
+        if (Vector3.Angle(-label.forward, filter.transform.up) > 1f)
+            errors.Add($"{path}: bag label not flat on the pouch top");
+
+        Bounds bounds = filter.sharedMesh.bounds;
+        Vector3 local = filter.transform.InverseTransformPoint(label.position);
+        Vector3 half = Abs(filter.transform.InverseTransformVector(label.TransformVector(new Vector3(0.5f, 0.5f, 0f))));
+        if (Mathf.Abs(local.x) + half.x > bounds.extents.x + 0.0005f
+            || Mathf.Abs(local.z - bounds.center.z) + half.z > bounds.extents.z + 0.0005f
+            || local.y < bounds.max.y - SizeTolerance)
+            errors.Add($"{path}: bag label sticks out of the pouch top");
     }
 
     private static void SetLabelText(Transform label, Vector2 labelSize, float fontSize)
@@ -599,23 +598,6 @@ public static class PackageStandardizer
                 return plate == null || plate.enabled;
             })
             .ToList();
-    }
-
-    // Renderer bounds are empty on inactive objects (storage boxes of later positions), so use the mesh corners.
-    private static Bounds WorldBounds(MeshFilter filter)
-    {
-        Bounds local = filter.sharedMesh.bounds;
-        var world = new Bounds(filter.transform.TransformPoint(local.center), Vector3.zero);
-        for (int i = 0; i < 8; i++)
-        {
-            var corner = new Vector3(
-                (i & 1) == 0 ? local.min.x : local.max.x,
-                (i & 2) == 0 ? local.min.y : local.max.y,
-                (i & 4) == 0 ? local.min.z : local.max.z);
-            world.Encapsulate(filter.transform.TransformPoint(corner));
-        }
-
-        return world;
     }
 
     private static void Record(Object target)
