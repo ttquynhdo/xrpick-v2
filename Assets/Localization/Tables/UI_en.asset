@@ -199,13 +199,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627367
-    m_Localized: 'Not enough loose {name}. Calculate again: order quantity minus
-      the pieces in the full cartons.'
+    m_Localized: "Not enough loose {name}. Calculate again: Soll \u2013 (Verp.-Einh.
+      \xD7 full packages)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627368
-    m_Localized: 'Too much loose {name}. Calculate again: order quantity minus the
-      pieces in the full cartons.'
+    m_Localized: "Too much loose {name}. Calculate again: Soll \u2013 (Verp.-Einh.
+      \xD7 full packages)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627369

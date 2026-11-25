@@ -201,13 +201,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627367
-    m_Localized: "Zu wenig loses Material {name}. Rechnen Sie nach: Sollmenge minus
-      St\xFCckzahl der vollen Kartons."
+    m_Localized: "Zu wenig loses Material {name}. Rechnen Sie nach: Soll \u2013 (Verp.-Einh.
+      \xD7 volle Verpackungen)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627368
-    m_Localized: "Zu viel loses Material {name}. Rechnen Sie nach: Sollmenge minus
-      St\xFCckzahl der vollen Kartons."
+    m_Localized: "Zu viel loses Material {name}. Rechnen Sie nach: Soll \u2013 (Verp.-Einh.
+      \xD7 volle Verpackungen)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627369
@@ -718,22 +718,22 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307022
-    m_Localized: "Lagerbeh\xE4lter von links heranziehen \u2013 am echten Platz von
+    m_Localized: "Lagerbeh\xE4lter von links heranziehen \u2013 in der Praxis von
       Hand"
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307023
-    m_Localized: "Leeren Auftragsbeh\xE4lter von rechts heranziehen \u2013 am echten
-      Platz von Hand"
+    m_Localized: "Leeren Auftragsbeh\xE4lter von rechts heranziehen \u2013 in der
+      Praxis von Hand"
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307024
-    m_Localized: "Lagerbeh\xE4lter f\xE4hrt weg, der n\xE4chste kommt von links"
+    m_Localized: "Der Lagerbeh\xE4lter f\xE4hrt weg, der n\xE4chste kommt von links"
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307025
-    m_Localized: "Auftragsbeh\xE4lter auf die mittlere Bahn ziehen \u2013 am echten
-      Platz von Hand"
+    m_Localized: "Auftragsbeh\xE4lter auf die mittlere Bahn ziehen \u2013 in der
+      Praxis von Hand"
     m_Metadata:
       m_Items: []
   - m_Id: 340852011307026
@@ -874,7 +874,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 970336150360069
-    m_Localized: "Beispiel \u2013 nicht zum Greifen."
+    m_Localized: "Beispiel \u2013 nicht zum Anfassen."
     m_Metadata:
       m_Items: []
   - m_Id: 1017753042292736
@@ -971,8 +971,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5059301765681155
-    m_Localized: "<color=#EB5757><b>Nicht richtig.</b></color> Lesen Sie im LVS das
-      Feld Empf Kz: Es zeigt, wie Sie die Ware einlegen d\xFCrfen."
+    m_Localized: "<color=#EB5757><b>Nicht richtig.</b></color> Schauen Sie im LVS
+      auf das Feld Empf Kz: Es zeigt, wie Sie die Ware einlegen d\xFCrfen."
     m_Metadata:
       m_Items: []
   - m_Id: 5059301765681156

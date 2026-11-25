@@ -271,7 +271,7 @@ noch nicht geprüfte Texte (`proposed`) stehen jeweils oben.
 
 ## Was Sie prüfen
 
-1. **Fachbegriffe:** Sagt man das so im Lager? (z. B. Lagerbehälter, Auftragsbehälter, Karton, Tüte,
+1. **Fachbegriffe:** Sagt man das so im Lager? (z. B. Lagerbehälter, Auftragsbehälter, Karton, Beutel,
    lose Teile, kommissionieren)
 2. **Natürlich:** Klingt der Satz wie von einer Trainerin oder einem Trainer im Lager, nicht wie übersetzt?
 3. **Verständlich:** Versteht eine Lagermitarbeiterin oder ein Lagermitarbeiter ohne Vorwissen,
@@ -282,7 +282,7 @@ noch nicht geprüfte Texte (`proposed`) stehen jeweils oben.
 ## Bitte nicht ändern
 
 - **Bezeichnungen aus dem LVS** bleiben genau wie im echten System, auch wenn sie ungewöhnlich wirken:
-  `Mat.-Nr`, `Bez.`, `Verp.-Einh.`, `Soll`, `Ist`, `Rest`, `Empf Kz`, `F6 Bestätigen`, `ST`.
+  `Mat.-Nr`, `Bez.`, `Verp.-Einh.`, `Soll`, `Ist`, `Rest`, `Empf Kz`, `F12 Bestätigen`, `ST`.
 - **Platzhalter in geschweiften Klammern**, z. B. `{position}` oder `{cartons}`: Die App setzt dort eine
   Zahl ein. Sie dürfen sie im Satz verschieben, aber nicht löschen oder umbenennen.
 - **Zeichen in spitzen Klammern**, z. B. `<b>` … `</b>` (fett) oder `<nobr>` … `</nobr>`
