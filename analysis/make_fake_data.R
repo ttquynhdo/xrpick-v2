@@ -27,6 +27,11 @@
 # P821 runs layout "039" (#155, decision 041): same events; the Concept tour
 # opens by itself a few seconds after scene enter (first tour_step before any
 # grab), short shelf cards, Complex quiz in one cluster near the hands.
+# P822 runs layout "040" (#168 drop rule "settle", #173 Mixed pouches, #174
+# Complex order lines swapped, #175 Welcome practice items): same events; a
+# package let go lands about 0.4 s after grab_end (drop rule settle); Complex
+# position 1 is SCHLAUCHSCHELLE B 152/50, position 2 RING D 53/25 in pouches
+# (GGB/RingPouch_n), remainder quiz answers cartons 2/3/4, loose 2/48/152.
 # Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
@@ -41,7 +46,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P821, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P822, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -201,6 +206,15 @@ order_positions <- list(
                            make_position("screw_b", 60, 20)),
   ComplexScene      = list(make_position("ring_d", 55, 25, counts_loose = TRUE),
                            make_position("training_b", 156, 50, counts_loose = TRUE)))
+# Layout "040" (#174, decision 042): ComplexScene swaps its order lines:
+# position 1 SCHLAUCHSCHELLE B 152/50 (3 cartons + 2 clamps), position 2
+# RING D 53/25 (2 pouches + 3 rings). Every other scene keeps its order.
+complex_positions_040 <- list(make_position("training_b", 152, 50, counts_loose = TRUE),
+                              make_position("ring_d", 53, 25, counts_loose = TRUE))
+order_positions_for <- function(scene, layout) {
+  if (scene == "ComplexScene" && layout_at_least(layout, 40)) return(complex_positions_040)
+  order_positions[[scene]]
+}
 
 # Empf Kz of an order position (#94, decision 028): Basic "003" (6 snap
 # places); Mixed position 1 "003" from layout "029" on (3 snap places), "000"
@@ -301,8 +315,8 @@ err <- function(code, item = NULL) list(code = code, item = item)
 # press is wrong (for "gave up"/crash cases); force_right is the safety stop.
 # empf_kz: the position's Empf Kz; EKZ_PLACEMENT is possible only at "003".
 draw_attempt <- function(scene, pos_no, person, k, force_wrong = FALSE, force_right = FALSE,
-                         empf_kz = position_empf_kz(scene, pos_no, "025")) {
-  pos <- order_positions[[scene]][[pos_no]]
+                         empf_kz = position_empf_kz(scene, pos_no, "025"), layout = NULL) {
+  pos <- order_positions_for(scene, layout)[[pos_no]]
   full <- pos$required_full
   loose <- pos$required_loose  # NULL outside ComplexScene
   codes <- list()
@@ -733,7 +747,7 @@ press_confirm <- function(s, pos_no, k, attempt, correct = length(attempt$codes)
   note_attempt(s, correct, attempt$codes, at)
   data <- json_obj(
     attempt_no = s$v$attempts, position = pos_no,
-    position_count = length(order_positions[[s$scene]]), attempt_in_position = k,
+    position_count = length(order_positions_for(s$scene, s$layout)), attempt_in_position = k,
     line = line_obj(attempt$pos, attempt$placed_full, attempt$placed_loose,
                     empf_kz = if (layout_at_least(s$layout, 29))
                       position_empf_kz(s$scene, pos_no, s$layout) else NULL),
@@ -745,7 +759,7 @@ press_confirm <- function(s, pos_no, k, attempt, correct = length(attempt$codes)
   if (!is.null(placement)) data$placement <- placement
   # #161: feedback_key after placement, before time_since_scene_enter_s.
   if (writes_feedback_key(s)) {
-    data$feedback_key <- feedback_key_for(s$scene, pos_no, length(order_positions[[s$scene]]),
+    data$feedback_key <- feedback_key_for(s$scene, pos_no, length(order_positions_for(s$scene, s$layout)),
                                           vapply(attempt$codes, function(e) e$code, character(1)))
   }
   data$time_since_scene_enter_s <- at
@@ -776,14 +790,14 @@ places_shown_at <- function(s) {
 placement_obj <- function(s, pos_no, attempt) {
   if (!layout_at_least(s$layout, 29) || position_empf_kz(s$scene, pos_no, s$layout) != "003") return(NULL)
   places <- snap_places[[s$scene]]
-  item <- order_positions[[s$scene]][[pos_no]]$item
+  item <- order_positions_for(s$scene, s$layout)[[pos_no]]$item
   # The cartons of this position in the order container, in the order they
   # came in; ids as in grab_start (a run without interaction events has no
   # box bookkeeping: then the first placed_full ids of the material).
   box <- s$v$box
   ids <- if (is.null(box)) character(0) else box$obj[box$pos == pos_no & box$form == "full"]
   if (length(ids) != attempt$placed_full) {
-    ids <- vapply(seq_len(attempt$placed_full), function(n) object_id(s$scene, item, "full", n), character(1))
+    ids <- vapply(seq_len(attempt$placed_full), function(n) object_id(s$scene, item, "full", n, s$layout), character(1))
   }
   # #157 bug (fixed_press held_by_other): the carton taken out last still
   # holds its place, so one place fewer is free.
@@ -893,8 +907,10 @@ grab_scenes <- c("ConceptScene", picking_scenes)
 # ResearchObjectId.cs) of the n-th package of a kind taken in a visit. Names
 # follow the scenes (Basic "GG_Package (18)/SM_box_1", Mixed
 # "Interactables/GG_Package (2)", Complex "Interactables/ring (3)"); the
-# Complex carton names are made up.
-object_id <- function(scene, item, form, n) {
+# Complex carton names are made up. Layout "040" (#174): the RING D packages
+# are clear pouches GGB/RingPouch_1-3 (were cartons); loose rings and clamps
+# keep their names (fewer of them: ring ... ring (5), clamp ... clamp (4)).
+object_id <- function(scene, item, form, n, layout = NULL) {
   if (scene == "BasicPickingScene") return(sprintf("GG_Package (%d)/SM_box_1", 17 + n))
   if (scene == "MixedPickingScene" && item == "connector_a") {
     return(if (n == 1) "Interactables/GG_Package" else sprintf("Interactables/GG_Package (%d)", n - 1))
@@ -903,6 +919,7 @@ object_id <- function(scene, item, form, n) {
   if (item == "ring_d" && form == "loose") {
     return(if (n == 1) "Interactables/ring" else sprintf("Interactables/ring (%d)", n - 1))
   }
+  if (item == "ring_d" && layout_at_least(layout, 40)) return(sprintf("GGB/RingPouch_%d", n))
   if (item == "ring_d") return(sprintf("Interactables/RingD_Carton (%d)", n))
   if (form == "loose") return(if (n == 1) "Interactables/clamp" else sprintf("Interactables/clamp (%d)", n - 1))
   sprintf("Interactables/SB_Carton (%d)", n)
@@ -913,7 +930,7 @@ next_object <- function(s, item, form) {
   key <- paste(item, form)
   n <- if (is.null(s$v$taken[[key]])) 1 else s$v$taken[[key]] + 1
   s$v$taken[[key]] <- n
-  object_id(s$scene, item, form, n)
+  object_id(s$scene, item, form, n, s$layout)
 }
 
 grab_start <- function(s, obj, item) {
@@ -954,6 +971,11 @@ container_change <- function(s, entered, obj, item, pos, form) {
 # first, container_enter drop_fall_s later (same random draws, so the other
 # fake people keep their numbers).
 drop_fall_s <- 0.3
+# Layout "040" (#168, drop rule "settle"): a package let go is laid beside or
+# on the packages below; a push or a rise takes at least 0.3 s, so the
+# container_enter comes about 0.4 s after grab_end.
+drop_settle_s <- 0.4
+drop_delay_s <- function(layout) if (layout_at_least(layout, 40)) drop_settle_s else drop_fall_s
 put_in <- function(s, item, pos, form) {
   obj <- next_object(s, item, form)
   advance(s, round(side_runif(1, 3), 3))      # find the package
@@ -962,14 +984,39 @@ put_in <- function(s, item, pos, form) {
   if (layout_at_least(s$layout, 38)) {
     advance(s, round(side_runif(0.2, 0.8), 3))
     grab_end(s, obj, item)
-    advance(s, drop_fall_s)                    # the fall into the container
+    advance(s, drop_delay_s(s$layout))         # the fall into the container
     container_change(s, TRUE, obj, item, pos, form)
+    lift_cascade(s, obj, item, pos, form)
     return(invisible())
   }
   container_change(s, TRUE, obj, item, pos, form)
   advance(s, round(side_runif(0.2, 0.8), 3))
   grab_end(s, obj, item)
   snap_restart(s, obj, item, pos, form)
+}
+
+# #168 (layout "040"): lifting a held package more than 1 cm lets the
+# packages lying on it fall; one that falls across the zone edge writes
+# container_exit / container_enter without a grab of its own. Once per Mixed
+# visit of the people in cascade_pids (P822): the package just put in lies
+# on the one before it; 3 s later the trainee lifts that lower one, the
+# upper one slides out of the zone and back in, the lower one is let go
+# where it was (it never left the zone). No random draws.
+cascade_pids <- "P822"
+lift_cascade <- function(s, obj, item, pos, form) {
+  if (!s$pid %in% cascade_pids || s$scene != "MixedPickingScene" || isTRUE(s$v$cascaded) ||
+      !layout_at_least(s$layout, 40) || nrow(s$v$box) < 2) return(invisible())
+  s$v$cascaded <- TRUE
+  lower <- s$v$box$obj[nrow(s$v$box) - 1]
+  lower_item <- s$v$box$item[nrow(s$v$box) - 1]
+  advance(s, 3)
+  grab_start(s, lower, lower_item)
+  advance(s, 0.5)
+  container_change(s, FALSE, obj, item, pos, form)  # the upper one slides out ...
+  advance(s, 0.4)
+  container_change(s, TRUE, obj, item, pos, form)   # ... and back in
+  advance(s, 0.8)
+  grab_end(s, lower, lower_item)
 }
 
 # #114: the logger up to build 727eee1 also counted the SnapInteractor of a
@@ -1016,7 +1063,7 @@ pick_and_drop <- function(s, obj, item) {
 # pieces). Packages of finished positions stay in the box untouched.
 place_to <- function(s, pos_no, placed_full, placed_loose) {
   if (!s$interaction) return(invisible())
-  item <- order_positions[[s$scene]][[pos_no]]$item
+  item <- order_positions_for(s$scene, s$layout)[[pos_no]]$item
   # Sometimes a package is picked up and put back first (hesitation). It is
   # one the trainee did not take, so it gets an id of its own kind.
   # (The id is taken before the call: next_object changes s$v, so it must not
@@ -1247,7 +1294,7 @@ concept_move <- function(s, obj, from, to, carry_s = 1.5, reason = NULL, clears 
   grab_end(s, obj, "stecker_c")
   if (!is.null(to)) {
     # From layout "038" (#157) a carton let go above a container falls in.
-    advance(s, if (layout_at_least(s$layout, 38)) drop_fall_s else 0.011)
+    advance(s, if (layout_at_least(s$layout, 38)) drop_delay_s(s$layout) else 0.011)
     concept_container(s, TRUE, obj, to)
     if (!is.null(reason)) {
       advance(s, 0.5)
@@ -1373,9 +1420,16 @@ run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
 # into the order container; Complex is Empf Kz 000, so "poured" is right)
 # comes after loose; box 1 rides in only when it is right. Older layouts keep
 # exactly the two questions (and their random draws).
+# Layout "040" (#174): position 1 is SCHLAUCHSCHELLE B 152/50, so cartons
+# has the options 2 / 3 / 4 (right 3) and loose 2 / 48 / 152 (right 2).
 remainder_questions_for <- function(layout) {
   if (!layout_at_least(layout, 36)) return(remainder_questions)
-  c(remainder_questions,
+  base <- remainder_questions
+  if (layout_at_least(layout, 40)) {
+    base$cartons <- list(keys = c("2", "3", "4"), right = "3", skill = "calculate_quantity")
+    base$loose <- list(keys = c("2", "48", "152"), right = "2", skill = "calculate_loose")
+  }
+  c(base,
     list(ekz = list(keys = c("ordered", "separator", "poured"), right = "poured", skill = "ekz_placement")))
 }
 # wrong_first: fixed wrong first touches per question, e.g. list(ekz = "ordered").
@@ -1396,7 +1450,7 @@ run_remainder_quiz <- function(s, person, wrong_first = list(), quiz_first_befor
     ask_question(s, person, "complex_remainder", qid, questions[[qid]], wrong_first = wrong_first[[qid]])
   }
   ride_first_box_in(s)
-  advance(s, runif(1, 20, 50))  # pick the cartons and loose rings of position 1
+  advance(s, runif(1, 20, 50))  # pick the cartons and loose pieces of position 1
 }
 
 # A picking scene, one position after the other.
@@ -1412,7 +1466,7 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
                         double_cause_pause = FALSE, crash_after_position = NULL,
                         remainder_wrong_first = list(), quiz_first_before = NULL) {
   scene <- s$scene
-  positions <- order_positions[[scene]]
+  positions <- order_positions_for(scene, s$layout)
   advance(s, runif(1, 30, 70))  # read the WMS order and pick packages
   if (double_cause_pause) {
     # Two causes in the same frame: headset off and focus lost together.
@@ -1442,7 +1496,7 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
       } else {
         attempt <- draw_attempt(scene, pos_no, person, k, force_wrong = give_up,
                                 force_right = (k >= 8 && !give_up),
-                                empf_kz = position_empf_kz(scene, pos_no, s$layout))
+                                empf_kz = position_empf_kz(scene, pos_no, s$layout), layout = s$layout)
         place_to(s, pos_no, attempt$placed_full, attempt$placed_loose)
         pos_done <- press_confirm(s, pos_no, k, attempt)
       }
@@ -2110,6 +2164,28 @@ run_full_course(p821, "ggg7777", "2026-11-19T09:00:00Z", language = "EN", layout
                                  fixed_press(3, list(), placed_loose = 6))))))
 assign(".Random.seed", rng_before_p821, envir = globalenv())
 
+# P822: layout "040" (#168, #173, #174, #175 in one build). No event or field
+# changes. #168 drop rule "settle": a package let go over a container is laid
+# beside or on the packages below (never above the rim), so every
+# container_enter of a let-go package comes drop_settle_s (0.4 s) after its
+# grab_end, in the picking scenes and in ConceptScene (p820_hints: one carton
+# into the order container at step material). #174: ComplexScene position 1
+# is SCHLAUCHSCHELLE B 152/50 (training_b; 3 cartons + 2 clamps), position 2
+# RING D 53/25 (ring_d; 2 pouches GGB/RingPouch_n + 3 rings), the remainder
+# quiz asks cartons 2/3/4 (right 3) and loose 2/48/152 (right 2); P822 first
+# touches 2 at cartons. #173 (Mixed pouches) and #175 (Welcome practice items,
+# still no grab_*) change no event. R must give "040" its own drop_rule
+# (settle), never pool its picking positions with P821 ("039", fall), give
+# Complex position_1 the group ekz_question+book+settle and split the Complex
+# quiz items by order (position 1 material). Own random stream, restored.
+rng_before_p822 <- .Random.seed
+set.seed(822)
+p822 <- new_person("P822")
+run_full_course(p822, "hhh8888", "2026-11-26T09:00:00Z", language = "EN", layout = "040",
+                special = list(ConceptScene = list(hints = p820_hints),
+                               ComplexScene = list(remainder_wrong_first = list(cartons = "2"))))
+assign(".Random.seed", rng_before_p822, envir = globalenv())
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -2162,7 +2238,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P821  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P822  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -2233,7 +2309,8 @@ paper_rows <- list(
   paper_row("P818"),
   paper_row("P819"),
   paper_row("P820"),
-  paper_row("P821"))
+  paper_row("P821"),
+  paper_row("P822"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")

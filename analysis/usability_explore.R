@@ -375,6 +375,9 @@ cf$placed_full    <- vapply(cf$data, get_field, numeric(1), "line", "placed_full
 cf$required_loose <- vapply(cf$data, get_field, numeric(1), "line", "required_loose")
 cf$placed_loose   <- vapply(cf$data, get_field, numeric(1), "line", "placed_loose")
 cf$empf_kz        <- vapply(cf$data, function(d) as.character(get_field(d, "line", "empf_kz")), character(1))
+# Material of the press's order line (#174: ComplexScene swaps its lines in
+# layout "040", so never assume a material per position).
+cf$line_item      <- vapply(cf$data, function(d) as.character(get_field(d, "line", "item")), character(1))
 cf$n_loose_places <- vapply(cf$data, function(d)
   if (is.null(d$placement)) NA_real_ else length(d$placement$loose), numeric(1))
 cf$since_enter_s  <- vapply(cf$data, get_field, numeric(1), "time_since_scene_enter_s")
@@ -410,15 +413,26 @@ in_box_at <- function(s, sc, v, tt) {
 final <- cf[cf$event == "confirm_pressed" & cf$correct %in% "TRUE" &
             cf$scene %in% c("MixedPickingScene", "ComplexScene"), ]
 final <- final[final$position == ave(final$position, final$session_id, final$scene, FUN = max), ]
+# Material of position k in a visit = line.item of its presses (logged).
+pos_material <- function(s, sc, v, k) {
+  m <- cf$line_item[cf$event == "confirm_pressed" & cf$session_id == s & cf$scene == sc &
+                      cf$visit == v & cf$position %in% k & !is.na(cf$line_item)]
+  if (length(m) == 0) NA_character_ else m[1]
+}
 final_box <- do.call(rbind, lapply(seq_len(nrow(final)), function(i) {
   objs <- in_box_at(final$session_id[i], final$scene[i], final$visit[i], final$t[i])
   mats <- ev$material[match(objs, ev$object_id)]
-  form <- ifelse(grepl("ring|clamp", objs), "loose", "full")
+  form <- ifelse(grepl("ring|clamp", objs, ignore.case = TRUE), "loose", "full")
+  m1 <- pos_material(final$session_id[i], final$scene[i], final$visit[i], 1)
+  m2 <- pos_material(final$session_id[i], final$scene[i], final$visit[i], 2)
+  # A position without a press has no material: its counts are unknown (NA), not 0.
+  n_in <- function(m, f) if (is.na(m)) NA_integer_ else sum(mats %in% m & form == f)
   data.frame(label = final$label[i], scene = final$scene[i], position = final$position[i],
-             pos1_full_in_box = sum(mats %in% c("connector_a", "ring_d") & form == "full"),
-             pos1_loose_in_box = sum(mats %in% c("ring_d") & form == "loose"),
-             pos2_full_in_box = sum(mats %in% c("screw_b", "training_b") & form == "full"),
-             pos2_loose_in_box = sum(mats %in% c("training_b") & form == "loose"))
+             pos1_material = m1, pos2_material = m2,
+             pos1_full_in_box = n_in(m1, "full"),
+             pos1_loose_in_box = n_in(m1, "loose"),
+             pos2_full_in_box = n_in(m2, "full"),
+             pos2_loose_in_box = n_in(m2, "loose"))
 }))
 if (!is.null(final_box))
   write.csv(final_box, file.path(out_dir, "final_box_contents.csv"), row.names = FALSE)

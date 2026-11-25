@@ -2889,4 +2889,4 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Công:** M (tăng theo số mục dồn vào)
 - **Test trên kính:** không
 - **Depends on:** phần app của #168, #173, #174, #175 đã commit; trước khi phân tích dữ liệu thật của build mới (pilot/study)
-- **Status:** todo
+- **Status:** done (2026-11-25, nhánh `feat/176-r-batch`; selftest xanh, data-analyst duyệt không còn điểm chặn; báo cáo `docs/test-reports/bl176.md`; việc 3 (#163) bỏ qua, việc 4 chờ buổi kính đầu tiên với build "040")
