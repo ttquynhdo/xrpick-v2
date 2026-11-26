@@ -29,7 +29,8 @@ public static class ResearchEventData
     // trays instead of opened cartons; #175 (same build): Welcome practice carton, pouch and rings, not logged;
     // #169 (same build): the red button takes diagonal presses (no event changes).
     // "041" = decision 043 (P811 headset fixes, one build): #177 flat canvas buttons (Concept tour and quiz, Complex
-    // remainder quiz, Welcome „Zu den Aufgaben“) take presses that first touch the button's edge (no event changes).
+    // remainder quiz, Welcome „Zu den Aufgaben“) take presses that first touch the button's edge (no event changes);
+    // #180: a ring or clamp let go onto a package near the rim lies on it, up to 1 cm above the rim (no event changes).
     // R tells logs apart by it.
     public const string LayoutVersion = "041";
 

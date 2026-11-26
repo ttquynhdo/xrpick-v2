@@ -2958,7 +2958,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Test trên kính:** nhanh (Complex: xếp đầy thùng đơn rồi thả vòng/kẹp lên trên, nhìn từ chỗ đứng)
 - **Depends on:** — (cách (a) đã chọn trong decision 043; D48 hỏi người hướng dẫn, không chặn)
 - **Decision:** docs/decisions/043-p811-headset-fixes-one-build.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl180.md
+- **Status:** in progress (MCP 9/9 ✅, chờ Simulator S1 + kính H1)
 
 ### #181 [P1] Thẻ kết quả sau F12 quá dài: câu đúng tới 225 ký tự, câu sai tới ~120; chỉ giữ điều người học cần làm tiếp
 - **Type:** logic (chữ)

@@ -116,7 +116,8 @@ public readonly struct DropPlan
 /// stick out above the rim. 5. It always stays where the hand put it in x/z (except rule 3 and being pushed in from the
 /// walls), and its top never rises above the rim, so the counter always sees it: where lying on top would stick out,
 /// it is pushed aside like in rule 3 if that takes at most <see cref="MaxRimPushShare"/> of its longest side, and only
-/// otherwise lies lower, partly inside the others.
+/// otherwise lies lower, partly inside the others. #180: a thin package (ring, clamp) may stick out above the rim by its
+/// own thickness (at most <see cref="MaxThinOverhang"/>), so it is never hidden inside a package whose top is near the rim.
 /// </summary>
 public static class DropPlacementRule
 {
@@ -134,6 +135,9 @@ public static class DropPlacementRule
     // Lying on top would stick out above the rim: it may be pushed aside instead, at most this share of its longest
     // side in all (so it never wanders far from the hand).
     public const double MaxRimPushShare = 0.6;
+    // #180: a thin package (ring, clamp) may stick out above the rim by its own thickness, at most this much, so it
+    // lies on a package whose top is near the rim instead of being hidden inside it.
+    public const double MaxThinOverhang = 0.01;
     private const int MaxPushes = 4;
     private const int SupportSamples = 8;
 
@@ -156,7 +160,7 @@ public static class DropPlacementRule
             double top = HighestTop(below);
             List<DropBody> layer = below.FindAll(b => b.Top >= top - LayerTolerance);
             bool carried = layer.Exists(b => b.IsThin) || Support(here, layer) >= MinSupport;
-            bool fits = top + package.Height <= space.Rim - RimClearance;
+            bool fits = top <= HighestBottom(package, space);
             if (carried && fits)
                 return Finish(package, x, z, top, space, pushed ? DropOutcome.PushedAside : DropOutcome.OnTop);
 
@@ -192,7 +196,7 @@ public static class DropPlacementRule
 
     private static DropPlan Finish(DropBody package, double x, double z, double bottom, DropSpace space, DropOutcome outcome)
     {
-        double highest = space.Rim - RimClearance - package.Height;
+        double highest = HighestBottom(package, space);
         if (bottom > highest)
         {
             bottom = Math.Max(space.Floor, highest);
@@ -200,6 +204,15 @@ public static class DropPlacementRule
                 outcome = DropOutcome.Blocked;
         }
         return new DropPlan(x, z, bottom, outcome);
+    }
+
+    // Rule 5: the top stays below the rim. #180: a thin package may stick out by its own thickness (at most
+    // MaxThinOverhang), so a ring let go on a package whose top is near the rim lies on it, visible, not inside it.
+    private static double HighestBottom(DropBody package, DropSpace space)
+    {
+        if (package.IsThin)
+            return space.Rim + Math.Min(package.Height, MaxThinOverhang) - package.Height;
+        return space.Rim - RimClearance - package.Height;
     }
 
     private static (double x, double z) ClampInside(DropBody package, double x, double z, DropSpace space)

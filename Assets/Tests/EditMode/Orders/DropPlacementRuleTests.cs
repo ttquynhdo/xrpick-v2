@@ -183,5 +183,53 @@ namespace XRPick.Orders.Tests
             Assert.AreEqual(DropOutcome.Floor, plan.Outcome);
             Assert.AreEqual(slotCentre, plan.X, Tolerance);
         }
+
+        // #180: a carton pushed down so its top is just below the rim (rule 5) must not swallow a ring or clamp.
+        private static DropBody[] StackUpToTheRim(double rim = 0.2)
+        {
+            double upperBottom = rim - DropPlacementRule.RimClearance - Height;
+            return new[] { Carton(0.2), Carton(0.2, bottom: upperBottom) };
+        }
+
+        private static DropBody Piece(double height, double bottom = 0.4) => new(0.2, 0.2, 0.03, 0.03, 0, bottom, bottom + height);
+
+        [Test]
+        public void RingOnCartonAtTheRim_LiesOnItsTop_SticksOutByItsThickness()
+        {
+            DropBody[] others = StackUpToTheRim();
+            DropPlan plan = DropPlacementRule.Plan(Piece(0.004), Box(), others);
+
+            Assert.AreEqual(DropOutcome.OnTop, plan.Outcome);
+            Assert.AreEqual(0.2, plan.X, Tolerance);
+            Assert.AreEqual(others[1].Top, plan.Bottom, Tolerance);
+            Assert.LessOrEqual(plan.Bottom + 0.004 - 0.2, 0.004 + 1e-9);
+        }
+
+        [Test]
+        public void ThickClampOnCartonAtTheRim_SticksOutAtMostOneCentimetre()
+        {
+            DropPlan plan = DropPlacementRule.Plan(Piece(0.018), Box(), StackUpToTheRim());
+
+            Assert.AreEqual(0.2, plan.X, Tolerance);
+            Assert.AreEqual(0.2 + DropPlacementRule.MaxThinOverhang - 0.018, plan.Bottom, Tolerance);
+        }
+
+        [Test]
+        public void RingOnLowerCarton_LiesOnItsTop_AsBefore()
+        {
+            var others = new[] { Carton(0.2) };
+            DropPlan plan = DropPlacementRule.Plan(Piece(0.004), Box(), others);
+
+            Assert.AreEqual(DropOutcome.OnTop, plan.Outcome);
+            Assert.AreEqual(Height, plan.Bottom, Tolerance);
+        }
+
+        [Test]
+        public void CartonOnCartonAtTheRim_StillNeverAboveRim()
+        {
+            DropPlan plan = DropPlacementRule.Plan(Carton(0.2, bottom: 0.4), Box(), StackUpToTheRim());
+
+            Assert.LessOrEqual(plan.Bottom + Height, 0.2 - DropPlacementRule.RimClearance + 1e-9);
+        }
     }
 }
