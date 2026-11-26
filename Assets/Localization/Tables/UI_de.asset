@@ -398,12 +398,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627425
-    m_Localized: 1. Ware greifen
+    m_Localized: 1. Ware umlegen
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627426
-    m_Localized: Greifen Sie Karton, Beutel oder einen Ring, heben Sie ihn hoch und
-      legen Sie ihn ab.
+    m_Localized: "Legen Sie einen Karton oder Beutel aus dem Lagerbeh\xE4lter in
+      den Auftragsbeh\xE4lter."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627427

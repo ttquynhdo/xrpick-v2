@@ -11,18 +11,31 @@ using UnityEngine;
 /// the Menu highlight; the other step cards are dimmed.
 /// #175: the practice desk holds a standard carton, a screw pouch and loose rings in a tray; the first grab of any
 /// of them counts as the grab action (user, 2026-11-24).
+/// #179 (decision 043 item 5): the practice items lie in a storage container, an empty order container stands right
+/// of it; step 1 is done once any practice item has lain in the order container, not held, for <see cref="settleSeconds"/>
+/// (taking it out again keeps the mark). The items are kinematic, so the container is read by bounds, not by triggers.
 /// </summary>
 public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
 {
     [Header("Actions")]
-    [Tooltip("The practice carton; the first grab of it or of any other practice item counts.")]
+    [Tooltip("A practice carton; once it or any other practice item lies in the order container, step 1 is done.")]
     [SerializeField] private Grabbable box;
 
-    [Tooltip("#175: the other practice items (pouch, loose rings); the first grab of any of them counts too.")]
+    [Tooltip("#175/#179: the other practice items (second carton, pouches).")]
     [SerializeField] private Grabbable[] otherItems = Array.Empty<Grabbable>();
 
+    [Tooltip("#179: the solid collider of the empty order container (PlasticBox_Order).")]
+    [SerializeField] private Collider orderBox;
+
+    [Tooltip("#179: how long an item must lie in the order container, not held, before step 1 counts.")]
+    [SerializeField] private float settleSeconds = 0.5f;
+
+    // Item centres may lie this far inside the container's outer walls and this far above its rim.
+    private const float WallMargin = 0.01f;
+    private const float RimMargin = 0.02f;
+
     [Header("Feedback")]
-    [Tooltip("Check mark on card 1 (Karton greifen), inactive in the scene.")]
+    [Tooltip("Check mark on card 1 (Ware umlegen), inactive in the scene.")]
     [SerializeField] private GameObject boxCheck;
 
     [Tooltip("Check mark on card 2 (Knopf drücken), inactive in the scene.")]
@@ -32,7 +45,7 @@ public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
     [SerializeField] private GameObject nextLessonHighlight;
 
     [Header("Step cards (InstructionShelf/Panel/Cards)")]
-    [Tooltip("Card „1. Karton greifen“.")]
+    [Tooltip("Card „1. Ware umlegen“.")]
     [SerializeField] private RectTransform grabCard;
 
     [Tooltip("Card „2. Knopf drücken“.")]
@@ -53,28 +66,13 @@ public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
     private InstructionCardLook buttonLook;
     private InstructionCardLook lessonLook;
 
-    private bool boxGrabbed;
+    private bool itemPlaced;
     private bool buttonPressed;
+    private float placedSeconds;
 
-    public bool IsLessonCompleted => boxGrabbed && buttonPressed;
+    public bool IsLessonCompleted => itemPlaced && buttonPressed;
 
     public event Action LessonCompleted;
-
-    private void OnEnable()
-    {
-        foreach (Grabbable item in PracticeItems())
-        {
-            item.WhenPointerEventRaised += HandleBoxPointerEvent;
-        }
-    }
-
-    private void OnDisable()
-    {
-        foreach (Grabbable item in PracticeItems())
-        {
-            item.WhenPointerEventRaised -= HandleBoxPointerEvent;
-        }
-    }
 
     private System.Collections.Generic.IEnumerable<Grabbable> PracticeItems()
     {
@@ -91,6 +89,7 @@ public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
     private void Start()
     {
         RequiredReference.IsMissing(box, nameof(box), this);
+        RequiredReference.IsMissing(orderBox, nameof(orderBox), this);
         RequiredReference.IsMissing(boxCheck, nameof(boxCheck), this);
         RequiredReference.IsMissing(buttonCheck, nameof(buttonCheck), this);
         RequiredReference.IsMissing(nextLessonHighlight, nameof(nextLessonHighlight), this);
@@ -131,13 +130,52 @@ public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
         ApplyFrame();
     }
 
-    private void HandleBoxPointerEvent(PointerEvent evt)
+    private void Update()
     {
-        if (evt.Type != PointerEventType.Select || boxGrabbed)
+        if (itemPlaced || orderBox == null)
             return;
 
-        boxGrabbed = true;
-        ResearchLogger.LogWelcomePracticeDone(OutcomeEvents.PracticeGrab);
+        if (!AnyItemInOrderBox())
+        {
+            placedSeconds = 0f;
+            return;
+        }
+
+        placedSeconds += Time.deltaTime;
+        if (placedSeconds >= settleSeconds)
+        {
+            MarkItemPlaced();
+        }
+    }
+
+    // True when a practice item that no hand holds has its centre inside the order container.
+    private bool AnyItemInOrderBox()
+    {
+        Bounds container = orderBox.bounds;
+        foreach (Grabbable item in PracticeItems())
+        {
+            if (item.SelectingPointsCount > 0 || !item.isActiveAndEnabled)
+                continue;
+
+            Collider itemCollider = item.GetComponent<Collider>();
+            if (itemCollider == null)
+                continue;
+
+            Vector3 centre = itemCollider.bounds.center;
+            bool inside = centre.x > container.min.x + WallMargin && centre.x < container.max.x - WallMargin
+                          && centre.z > container.min.z + WallMargin && centre.z < container.max.z - WallMargin
+                          && centre.y > container.min.y && centre.y < container.max.y + RimMargin;
+            if (inside)
+                return true;
+        }
+
+        return false;
+    }
+
+    private void MarkItemPlaced()
+    {
+        itemPlaced = true;
+        ResearchLogger.LogWelcomePracticeDone(OutcomeEvents.PracticePlace);
         Show(boxCheck);
         UpdateNextLesson();
         ApplyFrame();
@@ -158,7 +196,7 @@ public class WelcomePracticeFeedback : MonoBehaviour, ILessonCompletion
         if (grabLook == null)
             return;
 
-        RectTransform current = !boxGrabbed ? grabCard : !buttonPressed ? buttonCard : lessonCard;
+        RectTransform current = !itemPlaced ? grabCard : !buttonPressed ? buttonCard : lessonCard;
         ShowCard(grabLook, current == grabCard);
         ShowCard(buttonLook, current == buttonCard);
         ShowCard(lessonLook, current == lessonCard);

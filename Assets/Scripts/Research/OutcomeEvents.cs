@@ -22,7 +22,9 @@ public static class OutcomeEvents
     public const string MoveOrderBox = "order_box";
 
     // welcome_practice_done.action values.
+    // "grab" up to layout "040"; from "041" (#179, decision 043 item 5) step 1 is "place" (an item lies in the order box).
     public const string PracticeGrab = "grab";
+    public const string PracticePlace = "place";
     public const string PracticeButton = "button";
 
     /// <summary>

@@ -2945,7 +2945,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Test trên kính:** nhanh (nhìn hai thùng từ chỗ đứng, lấy carton/túi ở lớp trên, bỏ một món vào thùng đơn)
 - **Depends on:** #178 (cùng WelcomeScene, túi dễ cầm trước khi nằm trong thùng)
 - **Decision:** docs/decisions/043-p811-headset-fixes-one-build.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl179.md
+- **Status:** in progress (MCP 18/18 ✅, chờ Simulator H1 + kính 5′ H2; phần R (dữ liệu giả `place`, kiểm từ vựng `action`, tách thời gian Welcome theo layout) ghi trong test report cho mục R kế tiếp)
 
 ### #180 [P1] Complex: vòng/kẹp thả lên carton đã chạm miệng thùng đơn bị giấu hẳn trong carton
 - **Type:** bug
