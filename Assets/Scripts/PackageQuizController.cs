@@ -113,6 +113,13 @@ public class PackageQuizController : MonoBehaviour, ILessonCompletion
 
     public bool IsAnswered { get; private set; }
 
+    /// <summary>#182: id of the question on the cluster while it is open and not all answered; null otherwise.</summary>
+    public string ShownQuestionId =>
+        IsUnlocked && !IsAnswered && clusterRoot != null && clusterRoot.activeInHierarchy && questions != null
+        && current >= 0 && current < questions.Length
+            ? questions[current].id
+            : null;
+
     // Question id, answer key, correct. #28 will log it.
     public event Action<string, string, bool> AnswerChosen;
 

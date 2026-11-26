@@ -91,6 +91,14 @@ public class RemainderQuizController : MonoBehaviour
 
     public bool IsAnswered { get; private set; }
 
+    /// <summary>#182: id of the question shown („cartons“ / „loose“ / „ekz“) until all are right; null afterwards.</summary>
+    public string ShownQuestionId => IsAnswered || !isSetUp ? null : question switch
+    {
+        CartonsQuestion => CartonsId,
+        LooseQuestion => LooseId,
+        _ => PlacementId,
+    };
+
     // Answer of the last switched-on toggle: an invariant integer, e.g. "2", or a placement key (for #28).
     public string LastAnswerKey { get; private set; }
 

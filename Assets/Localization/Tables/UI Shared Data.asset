@@ -907,6 +907,14 @@ MonoBehaviour:
     m_Key: complex.quiz.next_third
     m_Metadata:
       m_Items: []
+  - m_Id: 8673682625794048
+    m_Key: help.button
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8673682680320000
+    m_Key: help.waiting
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
