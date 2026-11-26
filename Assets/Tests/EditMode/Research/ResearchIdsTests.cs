@@ -57,15 +57,5 @@ namespace XRPick.Research.Tests
         {
             Assert.AreEqual("root", ResearchIds.FolderFor("root", "P017"));
         }
-
-        [TestCase("P017", "EN", "DE")]
-        [TestCase("P799", "EN", "DE")]
-        [TestCase("P801", "EN", "EN")]
-        [TestCase("P801", "DE", "DE")]
-        [TestCase("P950", "EN", "EN")]
-        public void SessionLanguage_OnlyStudyIdsAreForcedToGerman(string id, string chosen, string expected)
-        {
-            Assert.AreEqual(expected, ResearchIds.SessionLanguage(id, chosen));
-        }
     }
 }

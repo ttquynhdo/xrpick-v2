@@ -3010,3 +3010,16 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Depends on:** #180 (cùng `DropPlacementRule`), #178 (cùng ComplexScene)
 - **Test report:** docs/test-reports/bl183.md
 - **Status:** in progress (MCP 11/11 ✅, chờ Simulator H1 + kính 5′ H2; khay sang góc trước trái theo *Sửa đổi khi làm #183* của decision 043; phần R ghi trong spec cho mục R kế tiếp)
+
+### #184 [P1] Mã study (`P001`–`P799`) giữ ngôn ngữ người học chọn, không ép tiếng Đức
+- **Type:** logic
+- **Scene(s):** WelcomeScene
+- **Files:** `Assets/Scripts/Research/ResearchIds.cs` (bỏ `SessionLanguage`), `Assets/Scripts/ParticipantEntry/ParticipantEntryController.cs` (`Begin`), `Assets/Tests/EditMode/Research/ResearchIdsTests.cs`, `ResearchEventDataTests.cs`; `docs/research-logging-spec.md`, `docs/research-data-guide.md`, `docs/decisions/023-pilot-id-range.md`, `analysis/README.md`
+- **Problem:** người dùng 2026-11-26: thiết kế study đổi, người tham gia chọn bản tiếng Đức hoặc tiếng Anh. App hiện ép mọi mã `P001`–`P799` về `DE` (#11, decision 023), nên người chọn English vẫn nhận bản tiếng Đức.
+- **Done when:** Chọn English trên bàn phím Welcome rồi nhập mã study `P017` → phiên chạy tiếng Anh, header log `language` = `EN`. Chọn Deutsch rồi nhập `P017` → tiếng Đức, `language` = `DE`. Mã pilot `P801` và mã thử `P901` vẫn giữ ngôn ngữ đã chọn như trước. Sau khi phiên bắt đầu vẫn không đổi được ngôn ngữ (nút Deutsch/English ẩn). (code) Không còn chỗ nào ép ngôn ngữ theo mã; test EditMode `XRPick.Research.Tests` xanh; spec §9 và hướng dẫn người điều phối ghi quy tắc mới; phần R (bỏ cảnh báo `language_not_de` cho study, thêm ngôn ngữ làm biến khi phân tích) ghi vào mục R kế tiếp.
+- **Inspector work expected:** no
+- **Công:** S
+- **Test trên kính:** nhanh (chọn English, nhập mã study, xem cả khoá bằng tiếng Anh)
+- **Depends on:** —
+- **Test report:** docs/test-reports/bl184.md
+- **Status:** verified-mcp (9/10 ✅, chờ kính H1: cả khoá tiếng Anh với mã study; phần R ghi trong test report cho mục R kế tiếp)

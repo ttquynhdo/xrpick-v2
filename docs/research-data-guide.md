@@ -46,8 +46,7 @@ Không cài thêm gì lên Quest (decision 022). Trên máy tính chỉ cần c�
 
 1. Mở app `xpick`. Màn hình đầu (WelcomeScene) hiện bàn phím „Teilnehmercode eingeben“ (Nhập mã người tham gia).
 2. Ngôn ngữ:
-   - Mã thật (`P001`–`P799`): app luôn chạy tiếng Đức, không cần chọn. Chọn English rồi gõ mã thật thì app tự đổi về tiếng Đức.
-   - Mã pilot (`P800`–`P899`): **chọn ngôn ngữ trước khi gõ mã**, bằng nút `Deutsch` / `English` dưới bàn phím. Chạm nút sẽ tải lại màn hình. Sau khi phiên bắt đầu thì không đổi được nữa.
+   - Mọi mã (thật `P001`–`P799` và pilot `P800`–`P899`, #184): **hỏi người tham gia muốn dùng tiếng Đức hay tiếng Anh, rồi chọn ngôn ngữ trước khi gõ mã**, bằng nút `Deutsch` / `English` dưới bàn phím. Chạm nút sẽ tải lại màn hình. Nút đang chọn được làm nổi; kiểm lại trước khi gõ mã. Sau khi phiên bắt đầu thì không đổi được nữa. Ghi ngôn ngữ vào phiếu của người tham gia.
 3. Gõ đúng mã trên phiếu, ví dụ `P017`, rồi chạm **OK**.
 4. App hỏi „Ist der Code P017 richtig?“ (Mã P017 đúng không?):
    - **Ja** (Có): bắt đầu khoá học.

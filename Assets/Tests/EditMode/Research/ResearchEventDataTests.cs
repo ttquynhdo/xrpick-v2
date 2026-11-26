@@ -147,16 +147,6 @@ namespace XRPick.Research.Tests
             StringAssert.Contains("\"language\":\"" + language + "\"", json);
         }
 
-        [TestCase("P101", "EN", "DE")]
-        [TestCase("P101", "DE", "DE")]
-        [TestCase("P901", "EN", "EN")]
-        [TestCase("P000", "EN", "EN")]
-        [TestCase("P901", "DE", "DE")]
-        public void SessionLanguage_ResearchCodesAreGerman(string id, string chosen, string expected)
-        {
-            Assert.AreEqual(expected, ResearchIds.SessionLanguage(id, chosen));
-        }
-
         [Test]
         public void Header_NullsStayNull()
         {

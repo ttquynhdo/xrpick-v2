@@ -76,7 +76,7 @@ participant's data is lost silently: check it in `warnings.txt`.
 
 | IDs | Set | Folder on the headset | Language | Outputs |
 |---|---|---|---|---|
-| `P001`–`P799` | study | `research/` | always `DE` (else warned) | `output_dir` (`analysis/output/`) |
+| `P001`–`P799` | study | `research/` | chosen on the keypad (`DE` or `EN`; before #184 always `DE`, else warned) | `output_dir` (`analysis/output/`) |
 | `P800`–`P899` | pilot | `research/pilot/` | the one chosen on the keypad (`EN` or `DE`), no warning | `output_dir/pilot/` (`analysis/output/pilot/`) |
 | `P000`, `P900`–`P999` | test | `research/practice/` | any | none (dropped) |
 

@@ -30,3 +30,6 @@ App trước đó không cho làm điều này:
 ## Được / mất
 - **Được:** log pilot tiếng Anh dùng được đầy đủ, có biểu đồ, không bao giờ trộn với đợt thật. Mã thật vẫn bắt buộc tiếng Đức.
 - **Mất:** dải mã thật ngắn lại còn 799 mã (đủ cho nghiên cứu). Phiếu giấy đã in sẵn mã `P800`–`P899` (nếu có) phải in lại.
+
+## Sửa đổi 2026-11-26 (#184)
+Người dùng đổi thiết kế study: mỗi người tham gia tự chọn bản tiếng Đức hoặc tiếng Anh. Mã thật `P001`–`P799` không còn bị ép `DE`, mà giữ ngôn ngữ chọn trên bàn phím như mã pilot và mã thử. Dải mã, thư mục log và cách tách pilot giữ nguyên. Rủi ro đã nêu ở phương án B (người điều phối quên chọn Deutsch) nay được chấp nhận: hướng dẫn người điều phối bảo hỏi người tham gia, chọn nút trước khi gõ mã và ghi ngôn ngữ vào phiếu; R đọc `language` của từng phiên làm biến nghiên cứu, không còn cảnh báo `language_not_de` cho study (việc của mục R kế tiếp).
