@@ -231,5 +231,44 @@ namespace XRPick.Orders.Tests
 
             Assert.LessOrEqual(plan.Bottom + Height, 0.2 - DropPlacementRule.RimClearance + 1e-9);
         }
+
+        // #183: a raised tray („Modul“) is a fixed block in the storage container: 17 x 15 cm, its surface 5 cm
+        // below the rim. Rings and clamps let go over it lie on its surface, not inside it.
+        private static DropBody Tray(double rim = 0.2) => new(0.1, 0.2, 0.085, 0.075, 0, 0, rim - 0.05);
+
+        [Test]
+        public void RingOnFixedBlock_LiesOnItsSurface()
+        {
+            DropBody tray = Tray();
+            DropPlan plan = DropPlacementRule.Plan(new DropBody(0.1, 0.2, 0.03, 0.03, 0, 0.3, 0.304), Box(), new[] { tray });
+
+            Assert.AreEqual(DropOutcome.OnTop, plan.Outcome);
+            Assert.AreEqual(0.1, plan.X, Tolerance);
+            Assert.AreEqual(tray.Top, plan.Bottom, Tolerance);
+        }
+
+        [Test]
+        public void ClampOnFixedBlockBesideRings_LiesOnTheRings()
+        {
+            DropBody tray = Tray();
+            DropBody ring = new(0.1, 0.2, 0.03, 0.03, 0, tray.Top, tray.Top + 0.004);
+            DropPlan plan = DropPlacementRule.Plan(new DropBody(0.1, 0.2, 0.01, 0.04, 0, 0.3, 0.318), Box(), new[] { tray, ring });
+
+            Assert.AreEqual(DropOutcome.OnTop, plan.Outcome);
+            Assert.AreEqual(ring.Top, plan.Bottom, Tolerance);
+        }
+
+        [Test]
+        public void RingMostlyOffFixedBlock_PushedAside_OnFloor()
+        {
+            DropBody tray = Tray();
+            // 60 % of the ring's width lies beyond the tray's right edge (x 0.185).
+            double x = tray.X + tray.HalfX + 0.2 * 0.06;
+            DropPlan plan = DropPlacementRule.Plan(new DropBody(x, 0.2, 0.03, 0.03, 0, 0.3, 0.304), Box(), new[] { tray });
+
+            Assert.AreEqual(DropOutcome.PushedAside, plan.Outcome);
+            Assert.GreaterOrEqual(plan.X - 0.03, tray.X + tray.HalfX - DropPlacementRule.Nestle);
+            Assert.AreEqual(0, plan.Bottom, Tolerance);
+        }
     }
 }

@@ -26,6 +26,7 @@ public static class PouchBuilder
     private const string RingMaterialSource = "Assets/media/ring.obj";
     private const string TrayMaterialPath = "Assets/Materials/Grey.mat";
     private const string TrayMeshName = "StorageTray";
+    private const string RaisedTrayMeshName = "StorageTrayRaised";
     private const string CartonMeshName = "SM_box_1";
     private const string CartonStickerName = "Cube";
     private const string OldBagMeshName = "PlasticBag02";
@@ -101,6 +102,9 @@ public static class PouchBuilder
     public static readonly Vector3 TraySize = new Vector3(0.17f, 0.03f, 0.15f);
     private const float TrayWall = 0.004f;
     private const float TrayFloor = 0.002f;
+    // #183 (decision 043 item 6): ComplexScene's tray stands on a solid base, so its floor lies 5 cm below the storage
+    // container's rim (inner floor 0.779, rim 0.968 at the work spot): the trainee takes clamps and rings near the rim.
+    public const float RaisedTrayBase = 0.137f;
 
     [MenuItem("XRPick/Packages/Build pouch assets")]
     private static void BuildMenu() => Debug.Log(BuildAssets());
@@ -123,6 +127,7 @@ public static class PouchBuilder
 
         Mesh tray = SaveMesh(BuildTrayMesh(), TrayMeshName);
         report.Append($"\n- {tray.name}: {tray.triangles.Length / 3} tris, bounds {tray.bounds.size.ToString("F3")}");
+        report.Append($"\n- {BuildRaisedTrayAsset()}");
 
         Material material = PouchMaterial();
         report.Append($"\n- {material.name}: {material.shader.name}, queue {material.renderQueue}");
@@ -236,6 +241,23 @@ public static class PouchBuilder
 
     /// <summary>#174: the storage tray mesh and its material, for the scene step that places a tray in a box.</summary>
     public static Mesh TrayMesh() => AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshFolder}/{TrayMeshName}.asset");
+
+    public static Mesh RaisedTrayMesh() => AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshFolder}/{RaisedTrayMeshName}.asset");
+
+    /// <summary>#183: writes (or overwrites in place) only the raised tray mesh; returns a one-line report.</summary>
+    public static string BuildRaisedTrayAsset()
+    {
+        Mesh raised = SaveMesh(BuildTrayMesh(RaisedTrayBase, RaisedTrayMeshName), RaisedTrayMeshName);
+        AssetDatabase.SaveAssets();
+        return $"{raised.name}: {raised.triangles.Length / 3} tris, bounds {raised.bounds.size.ToString("F3")}";
+    }
+
+    /// <summary>#183: the solid part of the raised tray (base + floor) in its mesh space, for its FixedDropBlock.</summary>
+    public static (Vector3 centre, Vector3 size) RaisedTraySolid()
+    {
+        float height = RaisedTrayBase + TrayFloor;
+        return (new Vector3(0f, height * 0.5f, 0f), new Vector3(TraySize.x, height, TraySize.z));
+    }
 
     public static Material TrayMaterial() => AssetDatabase.LoadAssetAtPath<Material>(TrayMaterialPath);
 
@@ -512,26 +534,29 @@ public static class PouchBuilder
         return mesh;
     }
 
-    // ---- Storage tray: floor + 4 walls, pivot at the bottom centre ----
+    // ---- Storage tray: floor + 4 walls, pivot at the bottom centre; #183: optionally on a solid base ----
 
-    private static Mesh BuildTrayMesh()
+    private static Mesh BuildTrayMesh(float baseHeight = 0f, string meshName = TrayMeshName)
     {
         Vector3 s = TraySize;
-        var parts = new (Vector3 centre, Vector3 size)[]
+        float y = baseHeight;
+        var parts = new List<(Vector3 centre, Vector3 size)>
         {
-            (new Vector3(0f, TrayFloor * 0.5f, 0f), new Vector3(s.x, TrayFloor, s.z)),
-            (new Vector3(0f, s.y * 0.5f, -(s.z - TrayWall) * 0.5f), new Vector3(s.x, s.y, TrayWall)),
-            (new Vector3(0f, s.y * 0.5f, (s.z - TrayWall) * 0.5f), new Vector3(s.x, s.y, TrayWall)),
-            (new Vector3(-(s.x - TrayWall) * 0.5f, s.y * 0.5f, 0f), new Vector3(TrayWall, s.y, s.z - 2f * TrayWall)),
-            (new Vector3((s.x - TrayWall) * 0.5f, s.y * 0.5f, 0f), new Vector3(TrayWall, s.y, s.z - 2f * TrayWall)),
+            (new Vector3(0f, y + TrayFloor * 0.5f, 0f), new Vector3(s.x, TrayFloor, s.z)),
+            (new Vector3(0f, y + s.y * 0.5f, -(s.z - TrayWall) * 0.5f), new Vector3(s.x, s.y, TrayWall)),
+            (new Vector3(0f, y + s.y * 0.5f, (s.z - TrayWall) * 0.5f), new Vector3(s.x, s.y, TrayWall)),
+            (new Vector3(-(s.x - TrayWall) * 0.5f, y + s.y * 0.5f, 0f), new Vector3(TrayWall, s.y, s.z - 2f * TrayWall)),
+            (new Vector3((s.x - TrayWall) * 0.5f, y + s.y * 0.5f, 0f), new Vector3(TrayWall, s.y, s.z - 2f * TrayWall)),
         };
+        if (baseHeight > 0f)
+            parts.Add((new Vector3(0f, baseHeight * 0.5f, 0f), new Vector3(s.x, baseHeight, s.z)));
 
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
         foreach ((Vector3 centre, Vector3 size) in parts)
             AddBox(vertices, triangles, centre, size);
 
-        var mesh = new Mesh { name = TrayMeshName };
+        var mesh = new Mesh { name = meshName };
         mesh.SetVertices(vertices);
         mesh.SetTriangles(triangles, 0);
         mesh.RecalculateNormals();
