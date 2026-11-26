@@ -95,13 +95,26 @@ Một bộ thay đổi, tăng `layout_version` một lần lên **"041"**, theo 
 
 ## Làm gì nếu giả định sai
 
-- Test MCP #177 cho thấy nút không hề hover: đổi `_enterHoverNormal` thay vì tangent, vẫn qua `PokeButtonFixer`.
-- Tangent 0,05 gây chọn nhầm mục Menu trên kính: hạ lại giá trị, hoặc thu `Surface` của Menu.
+- (#177 đã làm theo mục *Sửa đổi khi làm #177*; hai dòng về hover/tangent không còn áp dụng.) Vùng click 1 cm vẫn hụt trên kính: nới lề trên/dưới của `Surface` và vùng click cùng lúc (hằng `MarginTopBottom`), vẫn qua `PokeButtonFixer`.
 - Túi to và dày hơn vẫn khó cầm trên kính: thêm vùng cầm vô hình, rồi đến đặt túi lên bậc hoặc hand pose. Nếu làm sau buổi pilot thì tăng "042".
 - Vòng nhô quá miệng không còn được đếm: nới vùng đếm ≤ 1 cm và ghi lại là sửa một phần #168.
 - Người hướng dẫn nói không được để hàng cao hơn miệng thùng (D48): chuyển sang hạ carton trên để có chỗ cho vật mỏng.
 - Thùng ở Welcome làm bài 1 quá khó trên kính: kéo túi lên lớp trên hoặc ra nửa trước thùng (chỉ ở Welcome); đường lùi cuối là phương án C.
 - Thẻ vẫn vượt 3 dòng: rút chữ tiếp, không thu font (#132).
+
+## Sửa đổi khi làm #177 (2026-11-26, người dùng chấp nhận)
+
+Test MCP trước khi sửa (ngón ảo `PokeInteractor`, ConceptScene, `docs/test-reports/bl177.md`) bác cả hai giả định của mục 1: không có lần ấn nào bị **Cancel**, và nút **có** hover. Nguyên nhân thật:
+- Tay đưa ra trước tới thanh nghiêng 50° chạm mặt panel trước ở mép dưới nút. SDK ghim điểm chạm ở chỗ chạm đầu (`PositionPinning`).
+- Vùng poke (`Surface`) rộng hơn nút 1 cm trên/dưới (#126), nhưng `Mask` của `Viewport` (không hiện gì) cắt vùng nhận click đúng bằng hình nút. Canvas nhận lần ấn ở chỗ không có nút, nên không có click và không có event.
+
+Cách làm thay cho mục 1:
+- `PokeButtonFixer` (bước 4): trên mọi canvas poke phẳng (Concept: tour, câu hỏi A/B/C + „Zurück“; Complex: `Remainder Quiz`; Welcome: `Tasks Button`):
+  - tắt `Mask` không hiện gì (`showMaskGraphic` tắt) và Image của nó;
+  - nới vùng click của nút bằng lề của vùng poke (2 mm hai bên, 1 cm trên/dưới, bị cắt bởi Mask còn hiện: thanh tour và nút „Zurück“ được 0,8 cm).
+  - `Check()` báo khi còn thiếu, và báo khi vùng click của hai nút chồng nhau.
+- Không đổi `_cancelSelectTangent`, `MinNormal` của canvas (cả 5 scene đã dùng một giá trị chung), không đụng nút đỏ, Menu, bàn phím, nút kết thúc.
+- Menu cong không tái hiện được lỗi bằng MCP (17 đường ấn đều click đúng mục chạm đầu). Mỗi mục Menu chỉ cao 2,6 cm; nếu buổi kính vẫn đếm được lần hụt thì làm mục riêng (bố cục Menu), không nới tangent.
 
 ## Câu hỏi còn mở
 
@@ -115,4 +128,4 @@ Một bộ thay đổi, tăng `layout_version` một lần lên **"041"**, theo 
 - Nguyên nhân #180: `Finish` hạ `bottom` xuống `Rim − RimClearance − Height` → `Assets/Scripts/Orders/DropPlacementRule.cs` dòng 193–203; tái hiện qua MCP (nóc carton 0,966 → vòng 4 mm nằm ở 0,962, trong carton).
 - Khay „Modul“ không cầm được → decision 042 mục 3; quy tắc cầm → decision 032.
 - Video và log P811 → `analysis/data/20261125/` (không commit), khung hình ở `TestEvidence/P811-2026-11-25/`.
-- Chưa kiểm: vòng nhô ≤ 1 cm vẫn chạm trigger bộ đếm; Cancel hay không Hover ở #177; caption `complex.example` còn hiện ở vị trí 2.
+- Chưa kiểm: vòng nhô ≤ 1 cm vẫn chạm trigger bộ đếm; caption `complex.example` còn hiện ở vị trí 2.

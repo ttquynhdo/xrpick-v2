@@ -28,8 +28,10 @@ public static class ResearchEventData
     // Complex position 1 = SCHLAUCHSCHELLE B 152/50, position 2 = RING D 53/25 in pouches, quiz with the new numbers,
     // trays instead of opened cartons; #175 (same build): Welcome practice carton, pouch and rings, not logged;
     // #169 (same build): the red button takes diagonal presses (no event changes).
+    // "041" = decision 043 (P811 headset fixes, one build): #177 flat canvas buttons (Concept tour and quiz, Complex
+    // remainder quiz, Welcome „Zu den Aufgaben“) take presses that first touch the button's edge (no event changes).
     // R tells logs apart by it.
-    public const string LayoutVersion = "040";
+    public const string LayoutVersion = "041";
 
     // Event groups this build emits; R treats a missing group as NA, not 0 (#29 adds interaction, #30 pose/perf).
     public static readonly string[] EventGroups = { "session", "outcome", "interaction" };

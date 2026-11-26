@@ -18,6 +18,11 @@ using UnityEngine.UI;
 ///    of them.
 /// 3. Each flat poke Surface (BoundsClipper) is grown, never shrunk, to cover its buttons plus a margin, so a
 ///    touch at the edge of a button is still a poke.
+/// 4. #177: on flat poke canvases the click area of each button reaches the poke surface margin. A finger that
+///    comes in at an angle touches the panel first at the button's edge (or in the surface margin), and the touch
+///    point stays pinned there; a click area as small as the visible button then misses although the poke selected.
+///    So the invisible "Viewport" mask (and its graphic) above a button is switched off, and the button's raycast
+///    graphic gets a padding of the surface margin, clamped to any mask that stays (a visible one).
 /// Run it again after adding a canvas button to a scene. Check() lists what is still wrong.
 /// </summary>
 public static class PokeButtonFixer
@@ -65,6 +70,7 @@ public static class PokeButtonFixer
         DisableScrollRects(scene, changes);
         PadMenuItems(scene, changes, report);
         GrowSurfaces(scene, changes);
+        OpenHitAreas(scene, changes, report);
         ReportSurfaceOverlaps(scene, report);
 
         foreach (Change change in changes)
@@ -190,6 +196,113 @@ public static class PokeButtonFixer
                 fresh.ApplyModifiedPropertiesWithoutUndo();
             }));
         }
+    }
+
+    // #177: the click area of a flat canvas button = its rect plus the surface margin. Curved canvases (Menu,
+    // keypad, end control) are left alone: their items are padded by PadMenuItems or have no mask above them.
+    private static void OpenHitAreas(Scene scene, List<Change> changes, StringBuilder report)
+    {
+        foreach (PokeInteractable poke in Components<PokeInteractable>(scene))
+        {
+            if (!(Reference(poke, "_pointableElement") is PointableCanvas pointable) || pointable is PointableCanvasMesh
+                || pointable.Canvas == null)
+                continue;
+
+            Transform canvasRoot = pointable.Canvas.transform;
+            var padded = new List<(string name, Rect rect)>();
+            foreach (Selectable button in canvasRoot.GetComponentsInChildren<Selectable>(true))
+            {
+                Graphic hitArea = HitGraphicOf(button);
+                if (hitArea == null)
+                {
+                    report.AppendLine($"  WARNING canvas button without raycast graphic: {PathOf(button.transform)}");
+                    continue;
+                }
+
+                RectTransform hitRect = hitArea.rectTransform;
+                Rect allowed = new Rect(-1e6f, -1e6f, 2e6f, 2e6f);
+                for (Transform parent = button.transform.parent; parent != null; parent = parent.parent)
+                {
+                    var mask = parent.GetComponent<Mask>();
+                    if (mask != null && mask.enabled)
+                    {
+                        if (!mask.showMaskGraphic)
+                            SwitchOffMask(mask, changes);
+                        else
+                            allowed = Intersect(allowed, RectIn((RectTransform)parent, hitRect));
+                    }
+
+                    if (parent == canvasRoot)
+                        break;
+                }
+
+                Vector3 scale = hitRect.lossyScale;
+                Rect own = hitRect.rect;
+                float side = MarginSide / Mathf.Abs(scale.x);
+                float topBottom = MarginTopBottom / Mathf.Abs(scale.y);
+                // Vector4 = left, bottom, right, top; negative grows the area.
+                var padding = new Vector4(
+                    -Mathf.Clamp(own.xMin - allowed.xMin, 0f, side),
+                    -Mathf.Clamp(own.yMin - allowed.yMin, 0f, topBottom),
+                    -Mathf.Clamp(allowed.xMax - own.xMax, 0f, side),
+                    -Mathf.Clamp(allowed.yMax - own.yMax, 0f, topBottom));
+                padded.Add((PathOf(button.transform), WorldRect(hitRect, padding, canvasRoot)));
+
+                if ((hitArea.raycastPadding - padding).sqrMagnitude > 0.01f)
+                {
+                    string cm = $"{-padding.x * scale.x * 100f:0.0}/{-padding.y * scale.y * 100f:0.0}/{-padding.z * scale.x * 100f:0.0}/{-padding.w * scale.y * 100f:0.0} cm";
+                    changes.Add(new Change(hitArea, $"click area +{cm} (left/bottom/right/top): {PathOf(hitArea.transform)}",
+                        target => ((Graphic)target).raycastPadding = padding));
+                }
+            }
+
+            for (int i = 0; i < padded.Count; i++)
+            {
+                for (int j = i + 1; j < padded.Count; j++)
+                {
+                    if (padded[i].rect.Overlaps(padded[j].rect))
+                        report.AppendLine($"  WARNING click areas overlap: {padded[i].name} / {padded[j].name}");
+                }
+            }
+        }
+    }
+
+    // An invisible mask only clips; switching it off would draw its graphic, so the graphic goes off too.
+    private static void SwitchOffMask(Mask mask, List<Change> changes)
+    {
+        string path = PathOf(mask.transform);
+        if (changes.Any(change => change.Text.EndsWith(": " + path)))
+            return;
+
+        changes.Add(new Change(mask, $"invisible mask off: {path}", target => ((Mask)target).enabled = false));
+        var graphic = mask.GetComponent<Graphic>();
+        if (graphic != null && graphic.enabled)
+            changes.Add(new Change(graphic, $"invisible mask graphic off: {path}", target => ((Graphic)target).enabled = false));
+    }
+
+    // The rect of `other` in the local space of `space`.
+    private static Rect RectIn(RectTransform other, RectTransform space)
+    {
+        var corners = new Vector3[4];
+        other.GetWorldCorners(corners);
+        Vector3 min = space.InverseTransformPoint(corners[0]);
+        Vector3 max = space.InverseTransformPoint(corners[2]);
+        return Rect.MinMaxRect(Mathf.Min(min.x, max.x), Mathf.Min(min.y, max.y), Mathf.Max(min.x, max.x), Mathf.Max(min.y, max.y));
+    }
+
+    private static Rect Intersect(Rect a, Rect b)
+    {
+        return Rect.MinMaxRect(Mathf.Max(a.xMin, b.xMin), Mathf.Max(a.yMin, b.yMin), Mathf.Min(a.xMax, b.xMax), Mathf.Min(a.yMax, b.yMax));
+    }
+
+    // The padded rect in the canvas root's local space, for the overlap check between buttons of one canvas.
+    private static Rect WorldRect(RectTransform rect, Vector4 padding, Transform canvasRoot)
+    {
+        Rect own = rect.rect;
+        Rect grown = Rect.MinMaxRect(own.xMin + padding.x, own.yMin + padding.y, own.xMax - padding.z, own.yMax - padding.w);
+        Vector3 min = canvasRoot.InverseTransformPoint(rect.TransformPoint(new Vector3(grown.xMin, grown.yMin)));
+        Vector3 max = canvasRoot.InverseTransformPoint(rect.TransformPoint(new Vector3(grown.xMax, grown.yMax)));
+        return Rect.MinMaxRect(Mathf.Min(min.x, max.x), Mathf.Min(min.y, max.y), Mathf.Max(min.x, max.x), Mathf.Max(min.y, max.y));
     }
 
     // Two flat surfaces that overlap in world space make the poke pick one of them; only report it.
