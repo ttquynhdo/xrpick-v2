@@ -2929,7 +2929,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Test trên kính:** bắt buộc (cầm túi bằng tay thật trong thùng kho, đếm lần hụt)
 - **Depends on:** #177 (cùng sửa Mixed/Complex/Welcome)
 - **Decision:** docs/decisions/043-p811-headset-fixes-one-build.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl178.md
+- **Status:** in progress (MCP 12/12 ✅, chờ Simulator S1 + kính H1/H2)
 
 ### #179 [P1] Welcome: bàn tập mất cân đối (đồ quá nhỏ so với bàn) và khay vòng trông cầm được nhưng không cầm được
 - **Type:** bug

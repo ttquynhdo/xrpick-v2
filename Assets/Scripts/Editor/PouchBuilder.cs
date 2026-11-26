@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// #173, decision 042 item 2: the clear plastic pouch that replaces the PlasticBag02 bags.
-/// BuildAssets writes the pouch mesh (flat on its bottom, thin welded seam, 3.5 cm thick in the middle, pivot at the
+/// BuildAssets writes the pouch mesh (flat on its bottom, thin welded seam, 4.5 cm thick in the middle (#178), pivot at the
 /// bottom centre, label side up), the mesh of the goods inside (one combined mesh, view only, no colliders) and the
 /// clear material. ConvertOpenScene turns every PlasticBag02 package of the open scene into a pouch: same GameObject
 /// (Grabbable, Rigidbody, PackageData, hand-grab interactable kept), mesh and material swapped, scale 1, one solid
@@ -47,26 +47,27 @@ public static class PouchBuilder
         public float Dome = 0.03f;          // the top sinks this share towards the corners
     }
 
-    // Mixed SCHRAUBE B: 12 x 10 cm, 3.5 cm thick, 20 screws (VPE 20). User choice 2026-11-24 (clear_pouch_*.png).
+    // Mixed SCHRAUBE B: 20 screws (VPE 20). User choice 2026-11-24 (clear_pouch_*.png): 12 x 10 cm, 3.5 cm thick;
+    // #178 (decision 043 item 4): 14 x 14 cm like the RING D pouch and 4.5 cm thick, so a hand closes round it.
     private static readonly PouchSpec ScrewPouch = new PouchSpec
     {
         MaterialKey = "screw_b",
         MeshName = "ScrewPouch",
         ContentsMeshName = "ScrewPouchScrews",
-        Size = new Vector3(0.12f, 0.035f, 0.10f),
+        Size = new Vector3(0.14f, 0.045f, 0.14f),
         Goods = Goods.Screws,
         Pieces = 20,
         Seed = 173,
     };
 
-    // Complex RING D (#174): 14 x 14 cm, 3.5 cm thick, 4 stacks (2 x 2) of 5 rings. A steeper edge than the screw
+    // Complex RING D (#174): 14 x 14 cm, 4 stacks (2 x 2) of 5 rings; 4.5 cm thick since #178 (was 3.5 cm). A steeper edge than the screw
     // pouch, because the ring stacks reach almost to the seam (outer ring edge 5.5 mm from it, 2.2 cm high there).
     private static readonly PouchSpec RingPouch = new PouchSpec
     {
         MaterialKey = "ring_d",
         MeshName = "RingPouch",
         ContentsMeshName = "RingPouchRings",
-        Size = new Vector3(0.14f, 0.035f, 0.14f),
+        Size = new Vector3(0.14f, 0.045f, 0.14f),
         Goods = Goods.Rings,
         Pieces = 20,
         Seed = 174,

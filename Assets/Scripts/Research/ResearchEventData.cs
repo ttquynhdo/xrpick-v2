@@ -31,7 +31,8 @@ public static class ResearchEventData
     // "041" = decision 043 (P811 headset fixes, one build): #177 flat canvas buttons (Concept tour and quiz, Complex
     // remainder quiz, Welcome „Zu den Aufgaben“) take presses that first touch the button's edge (no event changes);
     // #180: a ring or clamp let go onto a package near the rim lies on it, up to 1 cm above the rim (no event changes);
-    // #181: short result-card bodies, same keys (feedback_key unchanged).
+    // #181: short result-card bodies, same keys (feedback_key unchanged);
+    // #178: pouches 14 x 14 x 4.5 cm, stacked in the storage containers (new object_ids, no event changes).
     // R tells logs apart by it.
     public const string LayoutVersion = "041";
 
