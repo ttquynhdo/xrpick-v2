@@ -166,6 +166,24 @@ raw sums × 9.54, 7.58, 13.92; total = sum of the three raw sums × 3.74),
 `ssq_change_<scale>` = post − pre, the 6 `tlx_*` scales, `tlx_raw` (mean of the 6),
 `paper_problems`.
 
+## Facilitator help sheet („Hilfe“ button, #182)
+
+From layout `"041"` every scene has a „Hilfe“ button. The app logs the moment
+of each call (`help_requested`, real time in `utc`) and when the button opens
+again (`help_reset`); the facilitator writes what help was given on the paper
+sheet `docs/facilitator-help-sheet.md`. To join the two:
+
+1. Copy `analysis/help_sheet_template.csv` to
+   `analysis/data/<wave>/help_sheet.csv` (name starts with `help_sheet`, git-ignored).
+2. One row per sheet line: `participant_id`, `session_date` (DD.MM.YYYY or
+   YYYY-MM-DD), `time_local` (HH:MM or HH:MM:SS, the wall clock, same time
+   zone as `paper_time_zone`), `scene_step` (as written), `help_level` (1 point,
+   2 explain, 3 model), `note`. Semicolons and Windows-1252 from Excel are fine.
+3. R matches each line to the call of the same participant nearest in time
+   within 3 minutes (`help_match_window_min`), each call and each line once.
+   A line without a call is warned. The note never leaves the sheet: outputs
+   say only `sheet_note_present`.
+
 ## Run
 
 From the repo root (in RStudio: *Session → Set Working Directory* to the repo folder):
@@ -219,6 +237,9 @@ RStudio. Without Rscript on PATH use the full path, e.g.
 | `wide_with_paper.csv` | 4, 5 | Only with a paper file: `wide.csv` + the paper columns (see *Paper forms*). The file to give SPSS for questions 4 and 5. |
 | `ssq_pre_post.png` | 4 | SSQ subscales and total before and after, one line per participant with both forms, `n` per panel. Colour = the log shows a headset removal, a pause or an end other than `completed`. No frame-rate or head-movement data (decision 022). |
 | `tlx_vs_attempts.png` | 5 | Raw NASA-TLX against rated attempts over the whole course and the trainee's active time (minutes, facilitator tail removed), `n` per panel. Hollow = did not finish (fewer scenes). |
+| `help_requests.csv` | 1, 6 | „Hilfe“ calls (#182, layout `"041"` on): one row per `help_requested` with `scene`, `tour_step`, `question_id`, `position` (as logged), `item` (the question if one was shown, else `position_<n>`, else empty = a tour step or WelcomeScene; a call between `position_completed` and the next storage box's arrival belongs to the finished position: `during_ride` TRUE), `reset_reason` (`attempt` / `timeout` / `scene_change`; empty with `paired` FALSE = the session ended or crashed while the button waited), `closed_by_event` / `closed_by_attempt_no` (the attempt that opened the button again), `wait_s` (active seconds call → reset; `wait_censored` when unpaired), and from the facilitator's sheet `sheet_matched`, `sheet_diff_s`, `help_level`, `sheet_note_present`. Counts: `help_requests` per visit (`visits`), per scene (`help_requests_<Scene>` in `wide.csv`), per person (`data_quality.csv`, `wide.csv`), per position (`process_by_position.csv`, with `help_wait_s`); NA before `"041"` (no button), 0 = no call. |
+| `welcome_times.csv` | 3, 6 | One row per WelcomeScene visit (#179): `step1_action` (`grab` up to `"040"`, `place` from `"041"`: step 1 done once an item lies in the order container), `step1_logged`, `clock_from` (`tasks_opened` from `"036"`, else `scene_enter`), `objectives_read_s`, `to_step1_s`, `to_button_s`, `to_menu_s` (active seconds from the clock start to step 1, the first red-button press and the first open `menu_select`). Never pool `"040"` and `"041"` rows. |
+| `language_by_scene.csv` | 1, 2, 3 | Per course language (#184) and scene (counting visits): `n_people`, `first_attempt_right_share`, `median_error_rate`, `completed`, `median_time_to_correct_s` (box-change waits removed) and the median `read_s` / `pick_s` / `check_s`. Descriptive only: the language is self-chosen. |
 | `warnings.txt` | 6 | Everything the script found odd, then the validity limits. Read it first. |
 
 Rules the script applies (design §8, decision 021): `events.jsonl` is the source of truth;
@@ -283,9 +304,17 @@ started despite the "already finished" warning
 (`session_start.ended_session_warning` true) is warned and the participant
 flagged: check it is the same person. The header `language` (#11, fixed per
 session, no `language_change` event) is listed per participant in
-`data_quality.csv` (`languages`, `NA` = log from before #11, allowed); a real
-ID with a language other than `DE` is warned and flagged (`language_not_de`):
-that trainee saw non-German texts.
+`data_quality.csv` (`languages`, `NA` = log from before #11, allowed). Since
+#184 (user 2026-11-26) every participant chooses German or English on the
+keypad: **language is a study variable, not a data-quality problem** (no
+warning, no flag, never orange). It is a self-chosen covariate, not
+randomised: `language` is a person column in `data_quality.csv` and
+`wide.csv` (second column), `items.csv` and `process_by_position.csv` carry
+it, every Q1–Q3 chart names `n` per language in its subtitle, and
+`language_by_scene.csv` gives the numbers per language. Builds before #184
+switched study IDs to `DE`, so an `EN` study session of a `"040"`-or-older
+build started from the keypad is warned as a possible build mix-up (an
+autoStart session is already warned for its start mode).
 Interaction checks (#29): a session counts as "interaction logged" only when
 its header `event_groups` lists `interaction` (interaction events in a session
 without it are warned and not read); `grab_end.duration_s` is compared with
@@ -474,10 +503,51 @@ it from every older layout.
   WelcomeScene still writes no `grab_*` and no `container_*`, and
   from `"040"` `welcome_practice_done.grab` is the first grab of any of the
   five small practice items, not of the 59 cm box. Welcome times are read
-  as before.
+  as before. (From `"041"`, #179, the action is `place`: see below.)
 - *Red button (#169).* Easier red-button presses: a diagonal finger is no
   longer missed, so `confirm_pressed` counts per position may rise slightly
   in `"040"` (fewer silent misses, fewer retries after one). No R change.
+
+**Layout `"041"` (decision 043: #177–#183, plus the „Hilfe“ button #182).**
+Only #182 adds events (`help_requested`, `help_reset`); the rest changes no
+event or field. `"041"` is the first layout of each change, so R splits it
+from `"040"` as below.
+
+- *Edge presses (#177).* Flat poke buttons (Concept tour and quiz, Complex
+  A/B/C, Welcome „Zu den Aufgaben“) also take a press at their edge, so fewer
+  presses are missed: ConceptScene is split by layout anyway (decision 024),
+  Complex `position_1` by its chart group (`ekz_question+book+settle_thin`,
+  label `[041]`), and Welcome times are in `welcome_times.csv` per layout.
+- *Pouches near the rim (#178), raised Complex trays (#183).* Pick times of
+  Mixed and Complex `position_2` and of Complex loose pieces are not
+  comparable with `"040"`; the drop-rule split below separates them.
+- *Welcome step 1 `place` (#179).* `welcome_practice_done.action` is
+  `place` (an item lay in the order container for 0.5 s) instead of `grab`;
+  R reads both as "step 1 done" and warns about any other value for the
+  layout. `welcome_times.csv` keeps the layouts apart.
+- *Drop rule `settle_thin` (#180).* A ring or clamp may stick out of the rim
+  by its thickness (max 1 cm), so it lies visibly on a package at the rim.
+  `drop_rule` has a fourth level `settle_thin` (≥ `"041"`, constant
+  `drop_settle_thin_from_layout`), never pooled with `settle`; labels read
+  `[drop settle_thin, cards short]`. Expect fewer `container_unheld_lines`
+  per Complex visit than in `"040"`.
+- *Short result cards (#181).* `result_text` `long` (up to `"040"`) /
+  `short` (`"041"` on) in `items.csv` (positions) and
+  `process_by_position.csv`; post-press times and retries are not compared
+  across it. The charts split it through the drop rule (both start with
+  `"041"`); a guard warns if a chart group ever holds both.
+- *„Hilfe“ button (#182).* See `help_requests.csv` above and *Facilitator
+  help sheet*. Per rated attempt: `help_before_first_attempt` (the item had
+  a call in the same visit before its first attempt; such first attempts are
+  left out of `first_attempt_by_item.png`, the subtitle says how many, and
+  stay in `items.csv`) and `help_closed_by` (this attempt wrote the
+  `help_reset` `attempt` right after it). Checks: one reset per call,
+  `reason` in the list, `repeat` false, `attempt` right after a press or
+  quiz touch, `scene_change` the last line before `scene_exit`, `timeout`
+  ≥ 59 s real time after the call, help events in a pre-`"041"` log (not
+  read), an unpaired call (accepted at a crash or session end).
+- *Language (#184, no layout change).* Study IDs keep the chosen language:
+  see *Checks* above.
 
 **Mixed position 1 Empf Kz (#94, decision 028).** Builds before #94 had
 Empf Kz `000` at Mixed `position_1` (cartons put in any way, never rated);
@@ -509,6 +579,8 @@ logged one).
 - Q4: no frame-rate, frame-drop, head-movement or tracking data exist (decision 022). The SSQ change can only be set against headset removals, pauses, an early end (`end_status`, `abbruchgrund`) and active time, for the whole session; sickness per scene can't be analysed. Pre-existing symptoms are why the change (post − pre) is used, not post alone.
 - Q5: NASA-TLX is asked once at the end (raw, unweighted). Who stopped early did fewer scenes, so their attempts and time are not comparable with finishers.
 - Concept tour (`tour_steps.csv`): a „Zurück“ < 2 s after „Weiter“ is read as a likely mis-press, not proven; step time runs until the next step, so looking at the label board or packages during a step is in it. Never pool Concept numbers of different `layout_version` (`"025"` and `"029"` are split too: decision 030 changed the Concept station).
+- „Hilfe“ calls (#182, `"041"` on): a first attempt after a call for its item measures the facilitator's help (left out of the first-attempt shares); a `timeout` reset never means help was given; calls measure asking, not need (someone who never calls may still have needed help).
+- Course language (#184): self-chosen, not randomised; EN people may differ in other ways. Report results with `n` per language and never read a language difference as an effect.
 - Concept hint tags (`concept_hints*.csv`): one tag at a time, so a second wrong package gets its tag only when the first is gone; hint counts are not errors or attempts (on `"029"` placing packages in Concept is not logged; from `"032"` the carton moves are in `concept_containers_by_visit.csv`, `order_over_soll_enters` = chances for `TOO_MANY`).
 
 ## If the logger format changes

@@ -370,19 +370,33 @@ local({
   stopifnot(sum(grepl("ended-session warning overridden", warn_lines)) == 1)
   stopifnot("P112" %in% flagged)
 
-  # 8l. Language (#11): research sessions are DE; P108 ran in EN (autoStart
-  #     bypassed the keypad's DE lock) and is warned and flagged; P105 is a
-  #     pre-#11 log (language null): "NA", not flagged, not warned. The test
-  #     ID P950 (EN) is dropped before the check.
+  # 8l. Language (#11, #184): since #184 every ID keeps the language chosen
+  #     on the keypad, so language is a study variable, never a warning or a
+  #     flag. P108 is an ordinary English study person (autoStart is warned
+  #     in 8f, not the language); P105 is a pre-#11 log (language null):
+  #     "NA". The test ID P950 (EN) is dropped before the check. P108 ran an
+  #     autoStart session, so the "EN from an old build" check skips it.
   dq <- function(col, pid) data_quality[[col]][data_quality$participant_id == pid]
-  stopifnot(dq("languages", "P108") == "EN", isTRUE(dq("language_not_de", "P108")))
-  stopifnot(dq("languages", "P105") == "NA", isFALSE(dq("language_not_de", "P105")))
-  stopifnot(dq("languages", "P101") == "DE", isFALSE(dq("language_not_de", "P101")))
-  stopifnot(identical(data_quality$participant_id[data_quality$language_not_de], "P108"))
-  stopifnot("P108" %in% flagged)
-  stopifnot(sum(grepl("language '", warn_lines)) == 1,
-            any(grepl("language 'EN'", warn_lines) & grepl("P108", warn_lines)))
+  stopifnot(!"language_not_de" %in% names(data_quality), !"language_not_de" %in% names(wide))
+  stopifnot(dq("languages", "P108") == "EN", dq("language", "P108") == "EN")
+  stopifnot(dq("languages", "P105") == "NA", is.na(dq("language", "P105")))
+  stopifnot(dq("languages", "P101") == "DE", dq("language", "P101") == "DE")
+  stopifnot(!"P108" %in% flagged, isTRUE(wide$course_finished[wide$participant_id == "P108"]))
+  stopifnot(!any(grepl("language", warn_lines, ignore.case = TRUE) & grepl("P108", warn_lines)),
+            !any(grepl("research sessions must run in DE", warn_lines)))
   stopifnot(!any(grepl("P950", warn_lines) & grepl("language", warn_lines)))
+  # language is a person column in wide.csv (second column) and items /
+  # process_by_position carry it; the Q1-Q3 charts name n per language and
+  # language_by_scene.csv has one row per language x scene.
+  stopifnot(names(wide)[2] == "language", wide$language[wide$participant_id == "P108"] == "EN",
+            all(items$language[items$participant_id == "P108"] == "EN"),
+            all(process$language[process$participant_id == "P101"] == "DE"))
+  stopifnot(identical(language_n_text(c("P101", "P108", "P105", "P108")), "n per language: DE 1, EN 1, NA 1"))
+  lbs <- read_csv(file.path(output_dir, "language_by_scene.csv"), show_col_types = FALSE, na = "")
+  stopifnot(setequal(unique(lbs$language), c("DE", "EN", "NA")),
+            lbs$n_people[lbs$language == "EN" & lbs$scene == "ComplexScene"] == 1)
+  # The warnings file carries the validity line on language.
+  stopifnot(any(grepl("self-chosen", warn_lines) & grepl("not randomised", warn_lines)))
 
   # 8p. Paper forms (#31): data/fake/paper_forms.csv (semicolons,
   #     Windows-1252, German dates, as German Excel saves it) is read,
@@ -464,7 +478,8 @@ local({
   missing_pilot <- pilot_files[!file.exists(file.path(pilot_dir, pilot_files))]
   if (length(missing_pilot) > 0) stop("missing pilot outputs: ", paste(missing_pilot, collapse = ", "))
   stopifnot(is.environment(pilot_set), identical(pilot_set$analysis_group, "pilot"))
-  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815", "P816", "P817", "P818", "P819", "P820", "P821", "P822")
+  pilot_ids <- c("P801", "P802", "P803", "P811", "P812", "P813", "P814", "P815", "P816", "P817", "P818", "P819", "P820", "P821", "P822",
+                 "P823", "P824")
   stopifnot(identical(sort(pilot_set$wide$participant_id), pilot_ids),
             identical(sort(pilot_set$data_quality$participant_id), pilot_ids))
   is_p8 <- function(x) grepl("^P8[0-9]{2}$", x)
@@ -479,10 +494,9 @@ local({
   p_wp <- read_csv(file.path(pilot_dir, "wide_with_paper.csv"), show_col_types = FALSE, guess_max = 1000)
   stopifnot(identical(sort(p_wp$participant_id), pilot_ids), all(p_wp$paper_status == "joined"),
             all(p_wp$has_log), !any(is_p8(wp$participant_id)))
-  # EN is expected for pilots: no language warning, language_not_de FALSE,
-  # languages recorded as logged.
+  # EN is expected for pilots: no language warning, languages recorded as logged.
   p_warn <- readLines(file.path(pilot_dir, "warnings.txt"), encoding = "UTF-8")
-  stopifnot(!any(grepl("language '", p_warn)), !any(pilot_set$data_quality$language_not_de))
+  stopifnot(!any(grepl("language '", p_warn)), !any(grepl("EN from a layout", p_warn)))
   pq <- function(col, pid) pilot_set$data_quality[[col]][pilot_set$data_quality$participant_id == pid]
   stopifnot(pq("languages", "P801") == "EN", pq("languages", "P802") == "DE", pq("languages", "P803") == "EN")
   stopifnot(any(grepl("PILOT SET", p_warn)), !any(grepl("PILOT SET", warn_lines)))
@@ -578,7 +592,7 @@ local({
   stopifnot(any(grepl("concept_hint_cleared without a preceding", p_warn) & grepl("P813", p_warn)),
             sum(grepl("concept_hint_", p_warn, fixed = TRUE)) == 1, !any(grepl("concept_hint_", warn_lines, fixed = TRUE)))
   # Older layouts: no tags existed, so every hint column is NA (not 0).
-  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815", "P816", "P817", "P818", "P819", "P820", "P821", "P822"))
+  old_v <- pilot_set$concept_hints_by_visit %>% filter(!participant_id %in% c("P813", "P814", "P815", "P816", "P817", "P818", "P819", "P820", "P821", "P822", "P823", "P824"))
   stopifnot(nrow(old_v) > 0, !any(old_v$hints_logged), all(is.na(old_v$hints_shown)),
             all(is.na(old_v$hint_shown_s)), all(is.na(old_v$material_flow_wait_max_s)))
   stopifnot(nrow(concept_hints_by_visit) > 0, !any(concept_hints_by_visit$hints_logged),
@@ -627,7 +641,7 @@ local({
                                                       pilot_set$visits$scene == "ConceptScene"]))
   # Older layouts: NA, not 0; no container warnings on the fake data.
   stopifnot(all(is.na(pilot_set$concept_containers_by_visit$order_enters[
-              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815", "P816", "P817", "P818", "P819", "P820", "P821", "P822")])),
+              !pilot_set$concept_containers_by_visit$participant_id %in% c("P814", "P815", "P816", "P817", "P818", "P819", "P820", "P821", "P822", "P823", "P824")])),
             !any(concept_containers_by_visit$containers_logged),
             !any(grepl("container_\\* line|ConceptScene (order|storage) container", c(p_warn, warn_lines))))
   # label_by_matnr replaces material_by_matnr from "032", same skill.
@@ -845,7 +859,7 @@ local({
             setequal(scf$press_id[scf$press_id %in% pr816$press_id],
                      c(b816$press_id, m816$press_id[2:3])),
             # Older layouts never scaffold a skill ("036" = "034" outside Welcome: P818 may).
-            !any(scf$press_id %in% pilot_set$presses$press_id[!pilot_set$presses$participant_id %in% c("P816", "P818", "P819", "P820", "P821", "P822")]))
+            !any(scf$press_id %in% pilot_set$presses$press_id[!pilot_set$presses$participant_id %in% c("P816", "P818", "P819", "P820", "P821", "P822", "P823", "P824")]))
   sr816 <- pilot_set$skill_rates %>% filter(participant_id == "P816")
   # Basic: no ekz_placement test at all from "034"; quantity tested by all 3 presses, 1 error.
   stopifnot(!any(sr816$scene == "BasicPickingScene" & sr816$skill == "ekz_placement"),
@@ -895,7 +909,7 @@ local({
             file.exists(file.path(output_dir, "menu_after_done.csv")))
   mad <- pilot_set$menu_after_done
   stopifnot(identical(sort(unique(mad$menu_cue[mad$participant_id == "P816"])), "highlight"),
-            all(mad$menu_cue[!mad$participant_id %in% c("P816", "P818", "P819", "P820", "P821", "P822")] == "text"),
+            all(mad$menu_cue[!mad$participant_id %in% c("P816", "P818", "P819", "P820", "P821", "P822", "P823", "P824")] == "text"),
             all(menu_after_done$menu_cue == "text"),
             nrow(mad %>% filter(participant_id == "P816")) == 2,
             all(!is.na(mad$departed_t[mad$participant_id == "P816"])),
@@ -978,7 +992,9 @@ local({
   lay_of <- pilot_set$data_quality$layout_versions
   stopifnot(pq("places_held_by_other_presses", "P816") == 1,
             all(pilot_set$data_quality$places_held_by_other_presses[
-              !pilot_set$data_quality$participant_id %in% "P816" & as.integer(lay_of) >= 29L] == 0),
+              !pilot_set$data_quality$participant_id %in% c("P816", "P824") & as.integer(lay_of) >= 29L] == 0),
+            # P824 ("041") crashed in ConceptScene: no Basic/Mixed press, not measured.
+            is.na(pq("places_held_by_other_presses", "P824")),
             all(is.na(pilot_set$data_quality$places_held_by_other_presses[as.integer(lay_of) < 29L])),
             all(is.na(data_quality$places_held_by_other_presses)))
   stopifnot(sum(grepl("snap place held by a carton outside the order container", p_warn, fixed = TRUE)) == 1,
@@ -1010,7 +1026,7 @@ local({
             all(fk$feedback_key[fk$scene == "BasicPickingScene" & fk$n_codes == 0] == "basic.result.correct.text"))
   pk <- pilot_set$presses %>% filter(event == "confirm_pressed")
   pk816 <- pk %>% filter(participant_id == "P816", scene == "MixedPickingScene")
-  stopifnot(identical(sort(unique(pk$participant_id[pk$has_feedback_key])), c("P816", "P818", "P819", "P820", "P821", "P822")),
+  stopifnot(identical(sort(unique(pk$participant_id[pk$has_feedback_key])), c("P816", "P818", "P819", "P820", "P821", "P822", "P823")),
             all(is.na(pk$feedback_key[pk$participant_id %in% c("P801", "P811", "P815", "P817")])),
             identical(pk816$feedback_key, c("order.feedback.ekz3_loose", "order.feedback.ekz3_loose",
                                             "mixed.feedback.position_done", "mixed.feedback.correct")),
@@ -1038,7 +1054,7 @@ local({
   stopifnot(length(to_i) == 1, length(pd_i) == 2, all(pd_i > to_i),
             # wall time from scene_enter is 25 s (the pause) longer than the logged active time
             abs((ev818$t[to_i] - ev818$t[ev818$event == "scene_enter"]) - 25 - v818$objectives_read_s) < 0.01)
-  stopifnot(all(is.na(pilot_set$visits$objectives_read_s[!pilot_set$visits$participant_id %in% c("P818", "P819", "P820", "P821", "P822") |
+  stopifnot(all(is.na(pilot_set$visits$objectives_read_s[!pilot_set$visits$participant_id %in% c("P818", "P819", "P820", "P821", "P822", "P823", "P824") |
                                                          pilot_set$visits$scene != "WelcomeScene"])),
             all(is.na(visits$objectives_read_s)))
   stopifnot("objectives_read_s_WelcomeScene" %in% names(pilot_set$wide),
@@ -1064,7 +1080,7 @@ local({
   stopifnot("quiz_layout" %in% names(cq37),
             all(cq37$quiz_layout[cq37$participant_id == "P819"] == "read_far"),
             all(cq37$scaffold_level[cq37$participant_id == "P819"] == "ekz_question"),
-            all(cq37$quiz_layout[!cq37$participant_id %in% c("P819", "P820", "P821", "P822")] == "near_panel"),
+            all(cq37$quiz_layout[!cq37$participant_id %in% c("P819", "P820", "P821", "P822", "P823", "P824")] == "near_panel"),
             all(cq37$quiz_questions[cq37$participant_id == "P819" & !is.na(cq37$quiz_s)] == 3),
             isTRUE(all(cq37$ekz_right_before_box[cq37$participant_id == "P819"])))
   # #137: "037" swaps tour steps 8/9; tour_steps.csv names them per layout.
@@ -1117,8 +1133,8 @@ local({
   p2o <- pilot_set$objectives_summary %>% filter(objective_id == "P2")
   stopifnot(identical(p2o$evidence, c("rated", "observed")), identical(p2o$to_layout, c("038", NA)),
             identical(p2o$from_layout, c(NA, "038")), p2o$measure[2] == "ekz_positions_right_with_places",
-            # P820, P821 and P822 ("040").
-            p2o$n_persons[2] == 3L, p2o$k[2] == 3L, p2o$n[1] > 0,
+            # P820, P821, P822 ("040") and P823 ("041"; P824 crashed before Basic).
+            p2o$n_persons[2] == 4L, p2o$k[2] == 4L, p2o$n[1] > 0,
             any(grepl("objectives_summary.csv holds more than one row for P2", p_warn, fixed = TRUE)),
             !any(grepl("objectives_summary.csv holds more than one row", warn_lines, fixed = TRUE)),
             all(is.na(objectives_summary$from_layout)))
@@ -1206,7 +1222,7 @@ local({
   #      GGB/RingPouch_n. (3) #175: WelcomeScene still writes no grab_* /
   #      container_*. data_quality.csv flags both mixes in the pilot set only.
   stopifnot(pilot_set$drop_settle_from_layout == 40L,
-            identical(pilot_set$drop_rule(c("019", "038", "039", "040", "041")), c("hang", "fall", "fall", "settle", "settle")),
+            identical(pilot_set$drop_rule(c("019", "038", "039", "040", "041")), c("hang", "fall", "fall", "settle", "settle_thin")),
             pilot_set$complex_p1_group("040") == "ekz_question+book+settle",
             pilot_set$complex_p1_group("039") == "ekz_question+book+fall",
             "ekz_question+book+settle" %in% pilot_set$complex_p1_groups,
@@ -1265,7 +1281,9 @@ local({
   # _exits keep every line (they equal summary.csv: no mismatch warning).
   dq822 <- pilot_set$data_quality
   stopifnot(identical(dq822$container_unheld_lines[dq822$participant_id == "P822"], 2L),
-            all(dq822$container_unheld_lines[dq822$participant_id != "P822"] == 0L),
+            all(dq822$container_unheld_lines[!dq822$participant_id %in% c("P822", "P824")] == 0L),
+            # P824 crashed in ConceptScene: no order-container visit, not measured.
+            is.na(dq822$container_unheld_lines[dq822$participant_id == "P824"]),
             sum(pilot_set$visits$container_unheld_lines[pilot_set$visits$participant_id == "P822" &
                                                           pilot_set$visits$scene == "MixedPickingScene"]) == 2L,
             all(dq822$summary_mismatches[dq822$participant_id == "P822"] == 0L),
@@ -1282,8 +1300,8 @@ local({
             identical(pi$material_key[pi$participant_id == "P822" & pi$scene == "ComplexScene" & pi$item == "position_1"],
                       "training_b"),
             all(is.na(pi$material_key[pi$kind == "quiz"])),
-            all(cq37$complex_order[cq37$participant_id == "P822"] == "training_b_first"),
-            all(cq37$complex_order[cq37$participant_id != "P822"] == "ring_d_first"))
+            all(cq37$complex_order[cq37$participant_id %in% c("P822", "P823")] == "training_b_first"),
+            all(cq37$complex_order[!cq37$participant_id %in% c("P822", "P823")] == "ring_d_first"))
   pr822 <- pilot_set$presses %>% filter(participant_id == "P822", scene == "ComplexScene") %>% arrange(t, line)
   stopifnot(identical(unique(pr822$line_item[pr822$event == "confirm_pressed" & pr822$position %in% 1L]), "training_b"),
             identical(unique(pr822$soll[pr822$event == "confirm_pressed" & pr822$position %in% 1L]), 152L),
@@ -1319,6 +1337,133 @@ local({
                    pilot_set$v2_events$event %in% c("grab_start", "grab_end", "container_enter", "container_exit")),
             sum(pilot_set$v2_events$participant_id == "P822" & pilot_set$v2_events$event == "welcome_practice_done") == 2)
 
+  # 8z9. Layout "041" (decision 043, P823 / P824). (1) #179: WelcomeScene
+  #      step 1 is "place" from "041" ("grab" up to "040"); welcome_times.csv
+  #      gives the times per layout. (2) #180: drop_rule settle_thin, never
+  #      pooled with settle (P822). (3) #181: result_text short from "041".
+  #      (4) #182: the „Hilfe" button: all three reset reasons, an unpaired
+  #      request at a crash (P824), a Concept request with tour_step AND
+  #      question_id (the question is the item), a Mixed request during the
+  #      box change (logged position 2, read as position_1), the per-press
+  #      flags, the counts per visit / scene / person, NA before "041", the
+  #      facilitator help sheet matched by time.
+  wt <- read_csv(file.path(pilot_dir, "welcome_times.csv"), show_col_types = FALSE,
+                 col_types = cols(layout_version = col_character()))
+  stopifnot(identical(wt$step1_logged[wt$participant_id %in% c("P823", "P824")], c("place", "place")),
+            all(wt$step1_action[wt$participant_id %in% c("P823", "P824")] == "place"),
+            all(wt$step1_logged[!wt$participant_id %in% c("P823", "P824") & !is.na(wt$step1_logged)] == "grab"),
+            all(wt$clock_from[wt$participant_id %in% c("P818", "P822", "P823")] == "tasks_opened"),
+            all(wt$clock_from[wt$participant_id %in% c("P801", "P811")] == "scene_enter"),
+            all(!is.na(wt$to_step1_s[wt$participant_id == "P823"])), all(wt$to_step1_s >= 0, na.rm = TRUE),
+            all(wt$to_menu_s[wt$participant_id == "P823"] > wt$to_button_s[wt$participant_id == "P823"]),
+            !any(grepl("welcome_practice_done action", p_warn, fixed = TRUE)))
+  # (2) + (3)
+  stopifnot(pilot_set$drop_settle_thin_from_layout == 41L,
+            identical(pilot_set$drop_rule(c("039", "040", "041", "042")), c("fall", "settle", "settle_thin", "settle_thin")),
+            "settle_thin" %in% pilot_set$drop_rules_falling,
+            pilot_set$complex_p1_group("041") == "ekz_question+book+settle_thin",
+            identical(pilot_set$result_text(c("040", "041", NA)), c("long", "short", NA)),
+            all(ppe$drop_rule[ppe$participant_id == "P823"] == "settle_thin"),
+            all(ppe$result_text[ppe$participant_id == "P823"] == "short"),
+            all(ppe$result_text[ppe$participant_id == "P822"] == "long"),
+            all(pi$result_text[pi$participant_id == "P823" & pi$kind == "position"] == "short"),
+            all(is.na(pi$result_text[pi$kind == "quiz"])),
+            "Mixed\nposition_2\n[drop settle_thin, cards short]" %in% pilot_set$item_shares$x_label,
+            "Complex\nposition 2\n[drop settle_thin, cards short]" %in% levels(pilot_set$proc_long$slot),
+            !any(grepl("pools long and short result cards", p_warn, fixed = TRUE)),
+            any(grepl("settle_thin: P823, P824", p_warn, fixed = TRUE)))
+  # (4) help_requests.csv: P823's five calls and P824's unpaired one.
+  hr <- read_csv(file.path(pilot_dir, "help_requests.csv"), show_col_types = FALSE,
+                 col_types = cols(layout_version = col_character(), item = col_character(),
+                                  question_id = col_character(), tour_step = col_character()))
+  h823 <- hr %>% filter(participant_id == "P823") %>% arrange(req_utc)
+  stopifnot(nrow(hr) == 6, all(hr$layout_version == "041"), all(hr$participant_id %in% c("P823", "P824")),
+            identical(h823$reset_reason, c("timeout", "attempt", "attempt", "scene_change", "attempt")),
+            identical(h823$scene, c("ConceptScene", "ConceptScene", "BasicPickingScene", "BasicPickingScene",
+                                    "MixedPickingScene")),
+            # Concept: tour step only -> no item; during the questions both set, the question wins.
+            is.na(h823$item[1]), h823$tour_step[1] == "cartons",
+            h823$tour_step[2] == "material_flow", h823$question_id[2] == "label_by_matnr",
+            h823$item[2] == "label_by_matnr", h823$closed_by_event[2] == "quiz_answer",
+            # Mixed: logged position 2 during the box change -> the finished position_1.
+            h823$position[5] == 2, isTRUE(h823$during_ride[5]), h823$item[5] == "position_1",
+            !any(h823$during_ride[1:4]),
+            h823$closed_by_event[5] == "confirm_pressed",
+            all(is.na(h823$closed_by_event[c(1, 4)])),
+            # The timeout waited 60 s (no pause), every P823 call is paired.
+            abs(h823$wait_s[1] - 60) < 0.01, all(h823$paired), !any(h823$wait_censored))
+  h824 <- hr %>% filter(participant_id == "P824")
+  stopifnot(nrow(h824) == 1, !h824$paired, is.na(h824$reset_reason), h824$wait_censored, h824$tour_step == "soll")
+  stopifnot(sum(grepl("help_requested without help_reset", p_warn, fixed = TRUE)) == 1,
+            any(grepl("P824 ConceptScene visit 1 (session crashed while the button waited; accepted", p_warn, fixed = TRUE)),
+            # No contract warning for the clean P823 log.
+            !any(grepl("help_reset attempt not right after|scene_change is not the last|help_reset without|timeout only|help_reset reason|repeat must be false|help_requested time_since",
+                       p_warn)),
+            # No help event in the study set (all layouts before "041").
+            !any(grepl("help_requested|help_reset", warn_lines)))
+  # Per-press flags: help_before_first_attempt for the Concept question and
+  # Basic position_1 (call before the first try); Mixed position_2's first
+  # press closed the ride-time call (help_closed_by) but had no call before it.
+  pp <- pilot_set$presses
+  f823 <- pp %>% filter(participant_id == "P823") %>% arrange(t, line)
+  first_of <- function(sc, it) f823 %>% filter(scene == sc, item == it) %>% slice(1)
+  stopifnot(isTRUE(first_of("ConceptScene", "label_by_matnr")$help_before_first_attempt),
+            isTRUE(first_of("BasicPickingScene", "position_1")$help_before_first_attempt),
+            isFALSE(first_of("MixedPickingScene", "position_2")$help_before_first_attempt),
+            isTRUE(first_of("MixedPickingScene", "position_2")$help_closed_by),
+            isFALSE(first_of("MixedPickingScene", "position_1")$help_before_first_attempt),
+            sum(f823$help_closed_by) == 3,
+            sum(f823$help_before_first_attempt, na.rm = TRUE) ==
+              sum(f823$scene == "ConceptScene" & f823$item == "label_by_matnr") +
+              sum(f823$scene == "BasicPickingScene" & f823$item == "position_1"),
+            # Not measured before "041": NA, never FALSE.
+            all(is.na(pp$help_before_first_attempt[pp$participant_id == "P822"])),
+            all(is.na(pp$help_closed_by[pp$participant_id == "P822"])),
+            all(is.na(presses$help_before_first_attempt)))
+  # items.csv carries the flag; the two helped first attempts are not in the shares.
+  stopifnot(identical(sort(pi$item[pi$participant_id == "P823" & pi$help_before_first_attempt %in% TRUE]),
+                      c("label_by_matnr", "position_1")),
+            all(!pi$help_before_first_attempt[pi$participant_id == "P823" & !pi$item %in% c("label_by_matnr", "position_1")]),
+            all(is.na(pi$help_before_first_attempt[pi$participant_id == "P822"])),
+            nrow(pilot_set$helped_first) == 2,
+            sum(pilot_set$item_shares$n) == sum(!is.na(pilot_set$items$skill)) - 2)
+  # Counts: per visit (NA before "041", 0 = no call), per scene in wide.csv,
+  # per person in data_quality.csv, per position in process_by_position.csv.
+  pv <- pilot_set$visits
+  hv <- function(pid, sc) pv$help_requests[pv$participant_id == pid & pv$scene == sc]
+  stopifnot(hv("P823", "ConceptScene") == 2, hv("P823", "BasicPickingScene") == 2, hv("P823", "MixedPickingScene") == 1,
+            hv("P823", "ComplexScene") == 0, hv("P823", "WelcomeScene") == 0, hv("P824", "ConceptScene") == 1,
+            all(is.na(pv$help_requests[!pv$participant_id %in% c("P823", "P824")])),
+            all(is.na(visits$help_requests)),
+            pv$help_unpaired[pv$participant_id == "P824" & pv$scene == "ConceptScene"] == 1,
+            abs(pv$help_wait_s[pv$participant_id == "P823" & pv$scene == "ConceptScene"] - sum(h823$wait_s[1:2])) < 0.01)
+  pdq <- pilot_set$data_quality
+  stopifnot(pdq$help_requests[pdq$participant_id == "P823"] == 5, pdq$help_requests[pdq$participant_id == "P824"] == 1,
+            pdq$help_unpaired[pdq$participant_id == "P824"] == 1, pdq$help_unpaired[pdq$participant_id == "P823"] == 0,
+            all(is.na(pdq$help_requests[!pdq$participant_id %in% c("P823", "P824")])),
+            all(is.na(data_quality$help_requests)))
+  pwide <- pilot_set$wide
+  stopifnot(pwide$help_requests_ConceptScene[pwide$participant_id == "P823"] == 2,
+            pwide$help_requests_ComplexScene[pwide$participant_id == "P823"] == 0,
+            is.na(pwide$help_requests_ConceptScene[pwide$participant_id == "P822"]),
+            pwide$help_requests[pwide$participant_id == "P823"] == 5,
+            "help_requests_WelcomeScene" %in% names(pwide))
+  hp <- function(sc, pos) ppe$help_requests[ppe$participant_id == "P823" & ppe$scene == sc & ppe$position == pos]
+  stopifnot(hp("BasicPickingScene", 1) == 2, hp("MixedPickingScene", 1) == 1, hp("MixedPickingScene", 2) == 0,
+            all(is.na(ppe$help_requests[ppe$participant_id == "P822"])))
+  # Facilitator sheet: rows 1-4 of P823 matched (with their levels), the
+  # Mixed call has no line, the line 2 h off is warned, P824 matched.
+  stopifnot(identical(h823$sheet_matched, c(TRUE, TRUE, TRUE, TRUE, FALSE)),
+            identical(h823$help_level[1:4], c(1, 2, 3, 1)),
+            all(abs(h823$sheet_diff_s[1:4]) <= 60),
+            identical(h823$sheet_note_present[1:4], c(FALSE, TRUE, FALSE, FALSE)),
+            isTRUE(h824$sheet_matched), h824$help_level == 1,
+            sum(grepl("help sheet help_sheet.csv row", p_warn, fixed = TRUE)) == 1,
+            any(grepl("row 6 (P823, 12:09): no help_requested", p_warn, fixed = TRUE)),
+            # The free-text note never reaches an output file.
+            !"note" %in% names(hr), !any(grepl("Mat.-Nr unklar", readLines(file.path(pilot_dir, "help_requests.csv"),
+                                                                            encoding = "UTF-8"), fixed = TRUE)))
+
   # 8z2. Complex third question ekz (#123, decision 039, layout "036"). P818
   #      touches ordered, separator, then poured (right) after loose, and
   #      presses the red button before it (confirm_ignored quiz_first). The
@@ -1352,7 +1497,7 @@ local({
   stopifnot(nrow(cq8) == 1, cq8$scaffold_level == "ekz_question", cq8$quiz_questions == 3,
             cq8$quiz_touches >= 5, isTRUE(cq8$ekz_right_before_box), cq8$quiz_s > 0,
             cq8$first_confirm_p1_s > cq8$quiz_s,
-            all(cq$quiz_questions[!cq$participant_id %in% c("P818", "P819", "P820", "P821", "P822") & !is.na(cq$quiz_s)] == 2),
+            all(cq$quiz_questions[!cq$participant_id %in% c("P818", "P819", "P820", "P821", "P822", "P823", "P824") & !is.na(cq$quiz_s)] == 2),
             !any(cq$ekz_right_before_box[cq$scaffold_level != "ekz_question"] %in% TRUE),
             !any(grepl("started without a right quiz_answer ekz", c(p_warn, warn_lines), fixed = TRUE)))
   ev8c <- pilot_set$v2_events %>% filter(participant_id == "P818", scene == "ComplexScene") %>% arrange(t, line)
@@ -1591,6 +1736,17 @@ local({
   # Complex presses carry the "040" order (training_b first): the contract
   # check must warn once per position, naming P822, the position and both
   # materials.
+  edit_events("P823", function(lines) {
+    k <- grep("\"reason\":\"timeout\"", lines, fixed = TRUE)[1]
+    lines[k] <- sub("\"reason\":\"timeout\"", "\"reason\":\"later\"", lines[k], fixed = TRUE)
+    k <- grep("\"event\":\"help_requested\"", lines, fixed = TRUE)[2]
+    lines[k] <- sub("\"repeat\":false", "\"repeat\":true", lines[k], fixed = TRUE)
+    lines
+  })
+  edit_events("P822", function(lines) {
+    k <- grep("\"event\":\"tour_step\"", lines, fixed = TRUE)[1]
+    append(lines, sub("\"event\":\"tour_step\"", "\"event\":\"help_requested\"", lines[k], fixed = TRUE), after = k)
+  })
   edit_events("P822", function(lines) {
     stopifnot(grepl("\"layout_version\":\"040\"", lines[1], fixed = TRUE))
     lines[1] <- sub("\"layout_version\":\"040\"", "\"layout_version\":\"039\"", lines[1], fixed = TRUE)
@@ -1614,6 +1770,13 @@ local({
             sum(grepl("feedback_key on only", fk_warn, fixed = TRUE) & grepl("P819", fk_warn, fixed = TRUE)) == 1,
             sum(is.na(pilot_set$presses$feedback_key[pilot_set$presses$participant_id == "P819" &
                                                        pilot_set$presses$event == "confirm_pressed"])) == 1)
+  # #182 contract checks on the same copy: P823's timeout reason renamed and
+  # its second request marked repeat, a help_requested in P822's log (header "039" below).
+  hlp_warn <- plc_warn[grepl("help_", plc_warn, fixed = TRUE)]
+  stopifnot(any(grepl("help_reset reason 'later' (P823 ConceptScene visit 1)", hlp_warn, fixed = TRUE)),
+            any(grepl("help_requested with repeat TRUE (P823 ConceptScene visit 1)", hlp_warn, fixed = TRUE)),
+            any(grepl("help_requested / help_reset in a layout 039 log (P822)", hlp_warn, fixed = TRUE)),
+            is.na(pilot_set$data_quality$help_requests[pilot_set$data_quality$participant_id == "P822"]))
   cx_warn <- plc_warn[grepl("check the build's layout_version", plc_warn, fixed = TRUE)]
   stopifnot(length(cx_warn) == 2, all(grepl("P822 ComplexScene position ", cx_warn, fixed = TRUE)),
             any(grepl("position 1: confirm_pressed.line.item training_b but layout 039 has ring_d", cx_warn, fixed = TRUE)),

@@ -177,16 +177,25 @@ scaffold_row_for <- function(scene, item, skill, lay) {
 # counter zone). container_enter still comes after grab_end (0.3-0.7 s), and
 # packages lying on a lifted one may write container_* without their own
 # grab_*. Never pooled with "fall": a level of its own, same splits.
+# From "041" (#180, decision 043 item 3) the rule is "settle_thin": a thin
+# package (<= 2 cm: ring, clamp) may stick out of the rim by its own
+# thickness (max 1 cm) and lies visibly on a package whose top is at the rim;
+# #183 raises the Complex trays (pieces lie 5 cm below the rim). Loose-piece
+# pick times and container_unheld_lines (expected fewer: hidden rings no
+# longer make trainees lift the carton above them) are not comparable with
+# "040": a level of its own, never pooled with "settle".
 drop_rule_from_layout <- 38L
 drop_settle_from_layout <- 40L
+drop_settle_thin_from_layout <- 41L
 drop_rule <- function(layout_version) {
   lay <- suppressWarnings(as.integer(layout_version))
-  case_when(is.na(lay) ~ NA_character_, lay >= drop_settle_from_layout ~ "settle",
+  case_when(is.na(lay) ~ NA_character_, lay >= drop_settle_thin_from_layout ~ "settle_thin",
+            lay >= drop_settle_from_layout ~ "settle",
             lay >= drop_rule_from_layout ~ "fall", TRUE ~ "hang")
 }
 # Drop rules under which a package let go in the air falls/settles down
 # (container_enter after grab_end, Basic/Mixed snap on drop): "038" on.
-drop_rules_falling <- c("fall", "settle")
+drop_rules_falling <- c("fall", "settle", "settle_thin")
 
 # ComplexScene order (#174, decision 042, layout "040"): up to "039"
 # position 1 is RING D 55/25 and position 2 SCHLAUCHSCHELLE B 156/50
@@ -225,6 +234,21 @@ card_text_from_layout <- 39L
 card_text <- function(layout_version) {
   lay <- suppressWarnings(as.integer(layout_version))
   case_when(is.na(lay) ~ NA_character_, lay >= card_text_from_layout ~ "short", TRUE ~ "long")
+}
+
+# Result card text (#181, decision 043 item 2, layout "041"): the result
+# cards after a press in Basic, Mixed and Complex say much less (a correct
+# order only the watch sentence, a wrong press only what to do next, no
+# numbers or material names), same feedback_key values. Post-press reading
+# times, retries after an error (attempt >= 2) and the Concept hint shown ->
+# cleared time are not comparable with "040"-or-older: result_text "long" (up
+# to "040") / "short" ("041" on). items.csv and process_by_position.csv carry
+# it; the charts split it through the drop rule ("settle_thin" starts with
+# "041" too), and a guard (section 13b) warns if a chart group ever holds both.
+result_text_from_layout <- 41L
+result_text <- function(layout_version) {
+  lay <- suppressWarnings(as.integer(layout_version))
+  case_when(is.na(lay) ~ NA_character_, lay >= result_text_from_layout ~ "short", TRUE ~ "long")
 }
 
 # A position item without a skill in item_skills.csv (all of them until the
@@ -444,7 +468,7 @@ known_events <- c("header", "session_start", "session_end", "scene_enter", "scen
                   "task_completed", "quiz_answer", "quiz_unlocked", "tour_step",
                   "station_move_start", "station_move_arrived", "welcome_practice_done",
                   "welcome_tasks_opened", "grab_start", "grab_end", "container_enter", "container_exit",
-                  "concept_hint_shown", "concept_hint_cleared")
+                  "concept_hint_shown", "concept_hint_cleared", "help_requested", "help_reset")
 # Decision 022 dropped #30 (pose, perf) and #74 (floor drops, input mode,
 # tracking): the app must never write these. If one turns up, the build is not
 # the study build (or the decision was reopened): warn, don't read them.
@@ -567,22 +591,47 @@ for (i in seq_len(nrow(auto_real))) {
        auto_real$session_id[i], "): started by autoStart, not by the keypad")
 }
 
-# Language (#11). Research IDs must run in German: the keypad forces "DE"
-# for them, so "EN" means the session bypassed the keypad (e.g. autoStart) or
-# a bug; the trainee saw English texts, so their data are not comparable.
+# Language (#11, #184). Since #184 (user 2026-11-26) every ID keeps the
+# language chosen on the keypad: the study lets each participant choose
+# German or English. language is a study variable (a self-chosen covariate,
+# not randomised), never a data-quality warning or flag: it is a person-level
+# column in data_quality.csv and wide.csv, items.csv / process_by_position.csv
+# carry it, and the Q1-Q3 charts name n per language.
+# Before #184 the keypad switched study IDs (P001-P799) to DE, so an EN study
+# session from a "040"-or-older build that was started from the keypad means
+# a build error (warned). autoStart skipped the keypad lock, so an EN "auto"
+# session is already explained by its session_start_mode warning above.
 # Null is allowed (logs from before #11) but counted, so the report says how
 # many sessions have no recorded language.
-# Pilot IDs (decision 023) keep the language chosen on the keypad (EN pilot,
-# a German expert in DE): no warning in the pilot set.
-non_de <- sessions %>% filter(!is_pilot_set, has_header, !is.na(language), language != "DE")
-for (i in seq_len(nrow(non_de))) {
-  warn("language '", non_de$language[i], "' for real ID ", non_de$participant_id[i], " (session ",
-       non_de$session_id[i], "): research sessions must run in DE")
+language_free_from_layout <- 41L
+en_old_build <- sessions %>%
+  filter(!is_pilot_set, has_header, language %in% "EN", !session_start_mode %in% "auto",
+         coalesce(suppressWarnings(as.integer(layout_version)) < language_free_from_layout, TRUE))
+for (i in seq_len(nrow(en_old_build))) {
+  warn("study session in EN from a layout ", coalesce(en_old_build$layout_version[i], "none"), " build (",
+       en_old_build$participant_id[i], ", session ", en_old_build$session_id[i], "): builds before #184 ",
+       "(layout \"041\") forced study IDs to DE, so check which build this was; the data are kept")
 }
 null_lang <- sessions %>% filter(has_header, is.na(language))
 if (nrow(null_lang) > 0) {
   message("Note: ", nrow(null_lang), " session(s) with header language null (logs from before #11): ",
           paste(unique(null_lang$participant_id), collapse = ", "))
+}
+
+# Course language per person (#184): a self-chosen covariate, not randomised.
+# Every Q1-Q3 chart names n per language (language_n_text) and
+# language_by_scene.csv (section 13b) gives the descriptive numbers per
+# language, so a reader sees whether EN people sit in a group before pooling.
+person_language <- sessions %>% group_by(participant_id) %>%
+  summarise(language = { l <- unique(na.omit(language)); if (length(l) == 1) l else NA_character_ },
+            .groups = "drop") %>%
+  { setNames(.$language, .$participant_id) }
+language_of <- function(pid) unname(person_language[pid])
+language_n_text <- function(pids) {
+  pids <- unique(pids)
+  if (length(pids) == 0) return("n per language: none")
+  tab <- table(coalesce(language_of(pids), "NA"))
+  paste0("n per language: ", paste(names(tab), as.integer(tab), collapse = ", "))
 }
 
 # Resume offers (#27). A declined offer means the trainee started again at
@@ -1209,6 +1258,28 @@ for (i in seq_len(nrow(practice_rows))) {
        practice_rows$participant_id[i], ", layout ", practice_rows$layout_version[i],
        "): objectives_read_s of that visit is not trustworthy")
 }
+# WelcomeScene practice actions (#39; #179, layout "041"): step 1 is done at
+# the first grab of a practice item up to "040" (action "grab") and once an
+# item has lain in the order container from "041" ("place"); "button" = the
+# first red-button press. R reads "grab" and "place" alike as "step 1 done",
+# but the times before them are not comparable across the two layouts
+# (welcome_times.csv carries layout_version and step1_action).
+welcome_step1_action <- function(layout_version) {
+  if_else(coalesce(suppressWarnings(as.integer(layout_version)) >= 41L, FALSE), "place", "grab")
+}
+practice_actions <- v2_events %>% filter(event == "welcome_practice_done") %>%
+  transmute(participant_id, session_id, scene, scene_visit, t,
+            action = map_chr(data, ~ as_chr(.x$action))) %>%
+  left_join(sessions %>% select(session_id, layout_version), by = "session_id")
+odd_action <- practice_actions %>%
+  filter(!action %in% c(welcome_step1_action(layout_version), "button")) %>%
+  distinct(participant_id, layout_version, action)
+for (i in seq_len(nrow(odd_action))) {
+  warn("welcome_practice_done action '", coalesce(odd_action$action[i], "missing"), "' in a layout ",
+       coalesce(odd_action$layout_version[i], "none"), " log (", odd_action$participant_id[i], "): expected '",
+       welcome_step1_action(odd_action$layout_version[i]), "' or 'button' (#179: \"place\" from \"041\")")
+}
+tasks_opened_t <- tasks_opened %>% select(session_id, scene, scene_visit, to_t)
 tasks_opened <- tasks_opened %>% transmute(session_id, scene, scene_visit, ev_objectives_read_s = to_s)
 
 # Active time at an attempt, for logs whose attempts carry no time field: wall
@@ -1494,6 +1565,212 @@ session_outcome <- sessions %>%
               groups_logged %in% TRUE ~ str_detect(coalesce(event_groups, ""), "(^|;)outcome(;|$)"),
               TRUE ~ session_id %in% presses_all$session_id))
 outcome_sessions <- session_outcome$session_id[session_outcome$outcome_measured]
+
+# ---- 7a. „Hilfe" button (#182, layout "041"): help calls and their resets ------
+
+# From layout "041" every scene has a „Hilfe" button (decision 043 build,
+# design 2026-11-26-help-button-design.md). help_requested {tour_step,
+# question_id, position, repeat, time_since_scene_enter_s} = the trainee
+# called the facilitator; its utc is the real time that matches the
+# facilitator's paper sheet (docs/facilitator-help-sheet.md). Exactly one
+# help_reset {reason} follows each request in the same visit: "attempt"
+# (written right after the confirm_pressed / quiz_answer line that opened the
+# button again), "timeout" (60 s real time after the request; after a long
+# pause it follows the resume at once, so a timeout is never read as "help
+# was given") or "scene_change" (last line of the visit before scene_exit).
+# A session end or a crash leaves a request unpaired (accepted, warned).
+# Never an attempt, never in confirm_count. Layouts before "041" have no
+# button: their help numbers are NA (not measured), never 0; from "041" a
+# visit without a request counts 0.
+# Item of a request: question_id (the Concept or Complex quiz question shown;
+# in ConceptScene after „Zu den Fragen" tour_step is material_flow as well,
+# the question wins), else "position_<n>", else NA (tour step, WelcomeScene).
+# The logged position switches to the next one at once after a correct press,
+# so a request between position_completed (p - 1) and the arrival of storage
+# box p belongs to the finished position p - 1 (during_ride = TRUE).
+help_from_layout <- 41L
+help_layout <- function(layout_version) {
+  coalesce(suppressWarnings(as.integer(layout_version)) >= help_from_layout, FALSE)
+}
+help_reasons <- c("attempt", "scene_change", "timeout")
+# Sessions where help is measured: outcome group logged and a "041"+ build.
+help_sessions <- sessions %>%
+  filter(session_id %in% outcome_sessions, help_layout(layout_version)) %>% pull(session_id)
+help_events_all <- v2_events %>% filter(event %in% c("help_requested", "help_reset")) %>%
+  left_join(sessions %>% select(session_id, layout_version), by = "session_id")
+odd_help <- help_events_all %>% filter(!session_id %in% help_sessions) %>%
+  distinct(participant_id, layout_version)
+for (i in seq_len(nrow(odd_help))) {
+  warn("help_requested / help_reset in a layout ", coalesce(odd_help$layout_version[i], "none"), " log (",
+       odd_help$participant_id[i], "): only builds from layout \"041\" (#182) with the outcome group write them ",
+       "(not read)")
+}
+# Line order inside each session file: the line before a reset (attempt
+# check, the press that closed it) and the lines after it (scene_change check).
+session_lines <- events %>% filter(!is.na(session_id)) %>%
+  arrange(session_id, line) %>%
+  group_by(session_id) %>%
+  mutate(prev_event = lag(event), prev_line = lag(line)) %>%
+  ungroup() %>%
+  select(session_id, line, prev_event, prev_line)
+help_events <- help_events_all %>% filter(session_id %in% help_sessions) %>%
+  arrange(session_id, line) %>%
+  transmute(participant_id, session_id, scene, scene_visit, t, line, utc, event, layout_version,
+            tour_step = map_chr(data, ~ as_chr(.x$tour_step)),
+            question_id = map_chr(data, ~ as_chr(.x$question_id)),
+            position = map_int(data, ~ as_int(.x$position)),
+            # "repeat" is a reserved word in R: read the key with [[ ]].
+            repeat_flag = map_lgl(data, ~ as_lgl(.x[["repeat"]])),
+            logged_s = map_dbl(data, ~ as_num(.x$time_since_scene_enter_s)),
+            reason = map_chr(data, ~ as_chr(.x$reason))) %>%
+  group_by(session_id, scene, scene_visit) %>%
+  mutate(req_no = cumsum(event == "help_requested")) %>%
+  ungroup()
+bad_repeat <- help_events %>% filter(event == "help_requested", !repeat_flag %in% FALSE)
+for (i in seq_len(nrow(bad_repeat))) {
+  warn("help_requested with repeat ", coalesce(as.character(bad_repeat$repeat_flag[i]), "missing"), " (",
+       bad_repeat$participant_id[i], " ", bad_repeat$scene[i], " visit ", bad_repeat$scene_visit[i],
+       "): the button takes no press while it waits, so repeat must be false")
+}
+bad_reason <- help_events %>% filter(event == "help_reset", !reason %in% help_reasons)
+for (i in seq_len(nrow(bad_reason))) {
+  warn("help_reset reason '", coalesce(bad_reason$reason[i], "missing"), "' (", bad_reason$participant_id[i], " ",
+       bad_reason$scene[i], " visit ", bad_reason$scene_visit[i], "): expected ",
+       paste(help_reasons, collapse = " / "))
+}
+help_resets <- help_events %>% filter(event == "help_reset") %>%
+  left_join(session_lines, by = c("session_id", "line"))
+orphan_resets <- help_resets %>% filter(req_no == 0)
+for (i in seq_len(nrow(orphan_resets))) {
+  warn("help_reset without a help_requested before it in ", orphan_resets$participant_id[i], " ",
+       orphan_resets$scene[i], " visit ", orphan_resets$scene_visit[i], " (not read)")
+}
+help_resets <- help_resets %>% filter(req_no > 0) %>%
+  group_by(session_id, scene, scene_visit, req_no) %>%
+  mutate(n_resets = n()) %>%
+  slice(1) %>%
+  ungroup()
+twice_reset <- help_resets %>% filter(n_resets > 1)
+for (i in seq_len(nrow(twice_reset))) {
+  warn(twice_reset$n_resets[i], " help_reset lines for one help_requested in ", twice_reset$participant_id[i], " ",
+       twice_reset$scene[i], " visit ", twice_reset$scene_visit[i], ": the first one counts")
+}
+# "attempt": the line right before must be the press / quiz touch that closed it.
+help_resets <- help_resets %>%
+  left_join(presses_all %>% select(session_id, line, closed_by_press = press_id),
+            by = c("session_id", "prev_line" = "line"))
+bad_attempt <- help_resets %>% filter(reason %in% "attempt", is.na(closed_by_press))
+for (i in seq_len(nrow(bad_attempt))) {
+  warn("help_reset attempt not right after a confirm_pressed / quiz_answer (line before: ",
+       coalesce(bad_attempt$prev_event[i], "none"), ") in ", bad_attempt$participant_id[i], " ",
+       bad_attempt$scene[i], " visit ", bad_attempt$scene_visit[i], ": no attempt is marked help_closed_by")
+}
+help_resets <- help_resets %>% mutate(closed_by_press = if_else(reason %in% "attempt", closed_by_press, NA_integer_))
+# "scene_change": only scene_exit (and folded unity_error lines) may follow in the visit.
+after_scene_change <- help_resets %>% filter(reason %in% "scene_change") %>%
+  select(participant_id, session_id, scene, scene_visit, reset_line = line) %>%
+  left_join(visit_events %>% select(session_id, scene, scene_visit, line, event),
+            by = c("session_id", "scene", "scene_visit"), relationship = "many-to-many") %>%
+  filter(line > reset_line) %>%
+  group_by(participant_id, session_id, scene, scene_visit) %>%
+  summarise(others = sum(!event %in% c("unity_error", "scene_exit")), has_exit = any(event == "scene_exit"),
+            .groups = "drop")
+bad_scene_change <- help_resets %>% filter(reason %in% "scene_change") %>%
+  distinct(participant_id, session_id, scene, scene_visit) %>%
+  left_join(after_scene_change, by = c("participant_id", "session_id", "scene", "scene_visit")) %>%
+  filter(coalesce(others, 0L) > 0 | !coalesce(has_exit, FALSE))
+for (i in seq_len(nrow(bad_scene_change))) {
+  warn("help_reset scene_change is not the last line before scene_exit in ", bad_scene_change$participant_id[i],
+       " ", bad_scene_change$scene[i], " visit ", bad_scene_change$scene_visit[i], " (read as written)")
+}
+# Requests with their reset, item and wait.
+last_visit_of_session <- enters %>% group_by(session_id) %>%
+  slice_max(enter_t, n = 1, with_ties = FALSE) %>% ungroup() %>%
+  transmute(session_id, last_scene = scene, last_visit = scene_visit)
+help_requests <- help_events %>% filter(event == "help_requested") %>%
+  select(-event, -reason) %>%
+  rename(req_t = t, req_line = line, req_utc = utc) %>%
+  left_join(help_resets %>% select(session_id, scene, scene_visit, req_no, reset_t = t, reset_utc = utc,
+                                   reset_reason = reason, closed_by_press),
+            by = c("session_id", "scene", "scene_visit", "req_no")) %>%
+  group_by(session_id, scene, scene_visit) %>%
+  mutate(last_request_of_visit = req_no == suppressWarnings(max(req_no))) %>%
+  ungroup() %>%
+  left_join(last_visit_of_session, by = "session_id") %>%
+  left_join(sessions %>% select(session_id, end_status), by = "session_id") %>%
+  left_join(visits_base %>% select(session_id, scene, scene_visit, enter_t, visit_end_t = end_t),
+            by = c("session_id", "scene", "scene_visit")) %>%
+  # The finished position of a request made during the box change (see above).
+  left_join(pos_done_t %>% transmute(session_id, scene, scene_visit, prev_position = done_position + 1L,
+                                     prev_done_t = done_t),
+            by = c("session_id", "scene", "scene_visit", "position" = "prev_position")) %>%
+  left_join(storage_in %>% select(session_id, scene, scene_visit, position, box_arrived_t = arrived_t),
+            by = c("session_id", "scene", "scene_visit", "position")) %>%
+  mutate(paired = !is.na(reset_reason),
+         during_ride = scene %in% red_button_scenes & coalesce(position > 1L, FALSE) & is.na(question_id) &
+           coalesce(prev_done_t <= req_t, FALSE) & coalesce(box_arrived_t > req_t, TRUE),
+         item_position = if_else(during_ride, position - 1L, position),
+         item = case_when(!is.na(question_id) ~ question_id,
+                          !is.na(item_position) ~ paste0("position_", item_position),
+                          TRUE ~ NA_character_),
+         # Active seconds the trainee waited: request -> reset (unpaired: -> visit end, censored).
+         wait_end_t = coalesce(reset_t, visit_end_t),
+         wait_s = if_else(is.na(wait_end_t), NA_real_,
+                          round(wait_end_t - req_t - paused_between(session_id, req_t, wait_end_t), 3)),
+         wait_censored = !paired,
+         rebuilt_s = round(req_t - enter_t - paused_between(session_id, enter_t, req_t), 3),
+         # Real seconds request -> reset (utc); "timeout" needs about 60.
+         reset_real_s = as.numeric(difftime(parse_utc(reset_utc), parse_utc(req_utc), units = "secs")))
+bad_help_s <- help_requests %>% filter(is.na(logged_s) | abs(logged_s - rebuilt_s) > 0.005)
+for (i in seq_len(nrow(bad_help_s))) {
+  warn("help_requested time_since_scene_enter_s ", coalesce(as.character(bad_help_s$logged_s[i]), "missing"),
+       " but events say ", bad_help_s$rebuilt_s[i], " s (", bad_help_s$participant_id[i], " ",
+       bad_help_s$scene[i], " visit ", bad_help_s$scene_visit[i], ")")
+}
+short_timeout <- help_requests %>% filter(reset_reason %in% "timeout", coalesce(reset_real_s < 59, TRUE))
+for (i in seq_len(nrow(short_timeout))) {
+  warn("help_reset timeout only ", round(short_timeout$reset_real_s[i], 1), " s (utc) after its request (",
+       short_timeout$participant_id[i], " ", short_timeout$scene[i], " visit ", short_timeout$scene_visit[i],
+       "): the button times out after 60 s real time")
+}
+# Unpaired requests: fine at a session end or crash (the last request of the
+# session's last visit), a contract break anywhere else.
+unpaired <- help_requests %>% filter(!paired)
+for (i in seq_len(nrow(unpaired))) {
+  r <- unpaired[i, ]
+  at_end <- r$last_request_of_visit && r$scene == r$last_scene && r$scene_visit == r$last_visit
+  warn("help_requested without help_reset: ", r$participant_id, " ", r$scene, " visit ", r$scene_visit,
+       if (at_end) paste0(" (session ", if (r$end_status == "crash") "crashed" else paste0("ended: ", r$end_status),
+                          " while the button waited; accepted, wait_s censored)")
+       else " (not at the session end: contract break; wait_s up to the visit end)")
+}
+# Visit-level numbers (joined into visits in section 8).
+help_visit <- help_requests %>%
+  group_by(session_id, scene, scene_visit) %>%
+  summarise(ev_help_requests = n(), ev_help_wait_s = round(sum(wait_s, na.rm = TRUE), 3),
+            ev_help_unpaired = sum(!paired), .groups = "drop")
+# Per-press flags. help_before_first_attempt (main flag): the item had a
+# request in the same visit before its first attempt; such first attempts are
+# kept apart from the first-attempt results (items.csv, section 11).
+# help_closed_by: this attempt wrote the help_reset "attempt" right after it.
+# NA = not measured (layout before "041" or no outcome group).
+help_item_first <- help_requests %>% filter(!is.na(item)) %>%
+  group_by(session_id, scene, scene_visit, item) %>%
+  summarise(first_help_line = suppressWarnings(min(req_line)), .groups = "drop")
+add_help_flags <- function(p) {
+  p %>%
+    left_join(p %>% filter(!is.na(item)) %>% group_by(session_id, scene, scene_visit, item) %>%
+                summarise(first_item_line = min(line), .groups = "drop"),
+              by = c("session_id", "scene", "scene_visit", "item")) %>%
+    left_join(help_item_first, by = c("session_id", "scene", "scene_visit", "item")) %>%
+    mutate(help_measured = session_id %in% help_sessions,
+           help_before_first_attempt = if_else(help_measured & !is.na(item),
+                                               coalesce(first_help_line < first_item_line, FALSE), NA),
+           help_closed_by = if_else(help_measured, press_id %in% help_requests$closed_by_press, NA)) %>%
+    select(-first_item_line, -first_help_line, -help_measured)
+}
+presses_all <- add_help_flags(presses_all)
+presses <- add_help_flags(presses)
 
 # ---- 7b. Interaction events (#29): grabs, order container, menu, end control --
 
@@ -1837,10 +2114,17 @@ visits <- visits_base %>%
   left_join(wait_stats, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(interaction_visit, by = c("session_id", "scene", "scene_visit")) %>%
   left_join(tasks_opened, by = c("session_id", "scene", "scene_visit")) %>%
+  left_join(help_visit, by = c("session_id", "scene", "scene_visit")) %>%
   mutate(
     # Reading time of the Welcome learning objectives (layout "036" on, see
     # tasks_opened above); NA when not measured, never 0.
     objectives_read_s = ev_objectives_read_s,
+    # „Hilfe" calls (#182, layout "041"): NA before "041" (no button), else
+    # a visit without a call is 0. help_wait_s = active seconds request ->
+    # reset (an unpaired request up to the visit end).
+    help_requests = if_else(session_id %in% help_sessions, coalesce(ev_help_requests, 0L), NA_integer_),
+    help_wait_s = if_else(session_id %in% help_sessions, coalesce(ev_help_wait_s, 0), NA_real_),
+    help_unpaired = if_else(session_id %in% help_sessions, coalesce(ev_help_unpaired, 0L), NA_integer_),
     # Outcome numbers exist only for scenes with a confirm or quiz in sessions
     # that measured outcomes; everywhere else they stay NA (not measured).
     # Inside a measuring session a visit without a press is a real 0.
@@ -1926,6 +2210,46 @@ for (i in seq_len(nrow(no_open))) {
   warn("session ", no_open$session_id[i], " (", no_open$participant_id[i], ") ended by the facilitator ",
        "without end_control_opened in its last visit: facilitator time can't be cut")
 }
+
+# WelcomeScene times (#179, #177, #121): one row per Welcome visit, active
+# seconds (pauses removed) from the start of the practice part to step 1
+# done (first "grab" up to "040", first "place" from "041"), to the first
+# red-button press and to the first open menu_select. Start = „Zu den
+# Aufgaben" (welcome_tasks_opened, layout "036" on), else the scene enter
+# (clock_from says which). From "041" step 1 means another action and
+# „Zu den Aufgaben" takes edge presses (#177), so these times and
+# objectives_read_s are read per layout_version, never pooled across "040"
+# and "041". NA = not reached in the visit (never 0).
+welcome_first <- function(rows, ev_filter) {
+  rows %>% filter(ev_filter) %>% group_by(session_id, scene_visit) %>%
+    summarise(first_t = min(t), .groups = "drop")
+}
+wv <- visits %>% filter(scene == "WelcomeScene") %>%
+  transmute(participant_id, session_id, scene_visit, layout_version, enter_t, objectives_read_s) %>%
+  left_join(tasks_opened_t %>% filter(scene == "WelcomeScene") %>% select(session_id, scene_visit, to_t),
+            by = c("session_id", "scene_visit")) %>%
+  left_join(practice_actions %>% filter(scene == "WelcomeScene", action %in% c("grab", "place")) %>%
+              group_by(session_id, scene_visit) %>%
+              summarise(step1_t = min(t), step1_logged = first(action), .groups = "drop"),
+            by = c("session_id", "scene_visit")) %>%
+  left_join(practice_actions %>% filter(scene == "WelcomeScene", action == "button") %>%
+              group_by(session_id, scene_visit) %>% summarise(button_t = min(t), .groups = "drop"),
+            by = c("session_id", "scene_visit")) %>%
+  left_join(menu_rows %>% filter(scene == "WelcomeScene", blocked %in% FALSE) %>%
+              group_by(session_id, scene_visit) %>% summarise(menu_t = min(t), .groups = "drop"),
+            by = c("session_id", "scene_visit"))
+welcome_times <- wv %>%
+  mutate(clock_from = if_else(is.na(to_t), "scene_enter", "tasks_opened"),
+         from_t = coalesce(to_t, enter_t),
+         step1_action = welcome_step1_action(layout_version),
+         to_step1_s = if_else(is.na(step1_t), NA_real_, round(step1_t - from_t - paused_between(session_id, from_t, step1_t), 3)),
+         to_button_s = if_else(is.na(button_t), NA_real_, round(button_t - from_t - paused_between(session_id, from_t, button_t), 3)),
+         to_menu_s = if_else(is.na(menu_t), NA_real_, round(menu_t - from_t - paused_between(session_id, from_t, menu_t), 3)),
+         language = language_of(participant_id)) %>%
+  select(participant_id, session_id, scene_visit, layout_version, language, step1_action, step1_logged, clock_from,
+         objectives_read_s, to_step1_s, to_button_s, to_menu_s) %>%
+  arrange(participant_id, session_id, scene_visit)
+write_csv(welcome_times, file.path(output_dir, "welcome_times.csv"), na = "")
 
 unknown_scenes <- setdiff(levels(visits$scene), scene_levels)
 if (length(unknown_scenes) > 0) {
@@ -2016,7 +2340,8 @@ complex_p1_quiz_layout <- function(layout_version) {
 # Chart group = scaffold level, plus the reading layout from "037" on, plus
 # the drop rule from "038" (#157: packages let go in the air fall, so the
 # picking part of position 1 is easier; "037" and "038" are never pooled;
-# #168: "+settle" from "040", the layout that also swaps the order lines, #174).
+# #168: "+settle" from "040", the layout that also swaps the order lines, #174;
+# #180: "+settle_thin" from "041", with #177's edge presses on the A/B/C row).
 complex_p1_group <- function(layout_version) {
   sc <- complex_p1_scaffold(layout_version)
   ql <- complex_p1_quiz_layout(layout_version)
@@ -2026,7 +2351,7 @@ complex_p1_group <- function(layout_version) {
 }
 complex_p1_groups <- c(complex_p1_levels, paste0(complex_p1_levels, "+read_far"),
                        paste0(complex_p1_levels, "+read_far+fall"), paste0(complex_p1_levels, "+book+fall"),
-                       paste0(complex_p1_levels, "+book+settle"))
+                       paste0(complex_p1_levels, "+book+settle"), paste0(complex_p1_levels, "+book+settle_thin"))
 p1_levels <- complex_p1_group(session_layout$layout_version)
 mixed_p1_scaffold <- n_distinct(p1_levels) > 1
 # Chart label per group = the layouts of the set with that group, e.g. "019/025".
@@ -2113,7 +2438,8 @@ if (mixed_drop_rule_set) {
          l, ": ", paste(sort(unique(drop_rules_in_set$participant_id[
            drop_rules_in_set$drop_rule %in% l])), collapse = ", "))), collapse = "; "),
        "; #157, layout \"038\": packages let go in the air fall instead of hanging; #168, layout \"040\": ",
-       "they settle beside or on the packages below, never above the rim): every picking position in ",
+       "they settle beside or on the packages below, never above the rim; #180, layout \"041\": settle_thin, ",
+       "a ring or clamp may stick out of the rim by its thickness): every picking position in ",
        "first_attempt_by_item.png and time_by_phase.png and the picking scenes in time_to_correct_by_scene.png ",
        "are split by drop rule, never pooled; process_by_position.csv and complex_quiz.csv carry drop_rule. ",
        "Per-scene error charts and wide.csv still pool them: filter by layout_version")
@@ -2469,9 +2795,10 @@ data_quality <- sessions %>%
     builds = paste(unique(build), collapse = ";"),
     # Header language per session ("NA" = log from before #11, not recorded).
     languages = paste(unique(coalesce(language, "NA")), collapse = ";"),
-    # TRUE = a session ran in a language other than DE (warned above).
-    # Always FALSE in the pilot set: pilots may run in EN (decision 023).
-    language_not_de = !is_pilot_set & any(!is.na(language) & language != "DE"),
+    # #184: the person's course language, a study variable (self-chosen, not
+    # randomised): DE / EN; NA = not recorded (log before #11) or, never seen
+    # yet, sessions in two languages ("languages" then lists both).
+    language = language_of(first(participant_id)),
     schema_versions = paste(unique(schema_version), collapse = ";"),
     # Station layout per session ("NA" = schema 1 log, no layout_version).
     layout_versions = paste(unique(coalesce(layout_version, "NA")), collapse = ";"),
@@ -2491,7 +2818,7 @@ data_quality <- sessions %>%
     # ("039") shelf card texts (#155): picking positions and scenes are split.
     mixed_card_text = mixed_card_text_set,
     # TRUE on every row when the set mixes drop rules (hang / fall "038" /
-    # settle "040", #157/#168): picking positions and scenes are split.
+    # settle "040", settle_thin "041", #157/#168/#180): picking positions and scenes are split.
     mixed_drop_rule = mixed_drop_rule_set,
     # TRUE on every row when the set mixes the ComplexScene order lines
     # (#174, "040"): every Complex item is split.
@@ -2544,6 +2871,10 @@ data_quality <- sessions %>%
                         container_unheld_lines = if (any(grab_logged & container_logged))
                           sum(container_unheld_lines, na.rm = TRUE) else NA_integer_,
                         facilitator_tail_s = if (any(!is.na(facilitator_tail_s))) sum(facilitator_tail_s, na.rm = TRUE) else NA_real_,
+                        # #182: „Hilfe" calls of the person (all sessions); NA when no
+                        # session was a "041"+ build (no button), never 0 then.
+                        help_requests = if (any(!is.na(help_requests))) sum(help_requests, na.rm = TRUE) else NA_integer_,
+                        help_unpaired = if (any(!is.na(help_unpaired))) sum(help_unpaired, na.rm = TRUE) else NA_integer_,
                         .groups = "drop"),
             by = "participant_id") %>%
   left_join(placement_by_person, by = "participant_id") %>%
@@ -2557,17 +2888,18 @@ data_quality <- sessions %>%
                   duplicate_files), ~ coalesce(.x, 0L)),
          error_cap_reached = participant_id %in% cap_sessions$participant_id) %>%
   select(participant_id, end_status, course_finished, n_sessions, multi_session, builds,
-         mixed_build, languages, language_not_de, schema_versions, old_schema_log, layout_versions, mixed_layout, mixed_station_wait,
+         mixed_build, language, languages, schema_versions, old_schema_log, layout_versions, mixed_layout, mixed_station_wait,
          mixed_ekz_places, mixed_menu_cue, mixed_card_text, mixed_drop_rule, mixed_complex_order, gap_h, n_crashes, resume_offered, resume_declined,
          ended_session_override, duration_censored, n_visits,
          n_repeat_visits, n_repeat_after_crash, active_s, paused_s, pauses, hmd_removed_count,
          unity_errors, error_cap_reached, outcome_logged, total_confirms, excluded_presses, exclusions, interaction_logged,
          end_control_opens, menu_blocked, open_grabs, snap_grab_artifacts, container_unheld_lines, places_held_by_other_presses,
-         facilitator_tail_s, invariant_breaks, unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
+         facilitator_tail_s, help_requests, help_unpaired, invariant_breaks, unknown_codes, summary_mismatches, exit_disagreements, duplicate_files,
          first_start_utc) %>%
   arrange(participant_id)
 
 write_csv(data_quality, file.path(output_dir, "data_quality.csv"), na = "")
+
 
 # Data-quality picture: one row per participant, cells that need a look in orange.
 dq_long <- data_quality %>%
@@ -2578,8 +2910,9 @@ dq_long <- data_quality %>%
             sessions = as.character(n_sessions), builds = str_replace_all(builds, ";", "\n"),
             # Orange = not schema 2 (a schema 1 log: its outcomes are NA, not read).
             schema = str_replace_all(schema_versions, ";", "\n"),
-            # "NA" = not recorded (log from before #11); orange = not DE.
-            language = if_else(language_not_de, paste0("!", languages), languages),
+            # "NA" = not recorded (log from before #11). A study variable since
+            # #184 (never orange): shown so the reader sees who ran in EN.
+            language = languages,
             gap_h = if_else(is.na(gap_h), "", as.character(gap_h)),
             # Empty = not measured (log from before #27).
             resume_declined = coalesce(as.character(resume_declined), ""),
@@ -2601,6 +2934,9 @@ dq_long <- data_quality %>%
             snap_restarts = coalesce(as.character(snap_grab_artifacts), ""),
             # #160: orange = a snap place was held by a carton outside the box (app bug #157); empty = not logged.
             held_place = coalesce(as.character(places_held_by_other_presses), ""),
+            # #182: orange = the trainee called for help (results after a call are
+            # kept apart in items.csv); empty = no button (layout before "041").
+            help_calls = coalesce(as.character(help_requests), ""),
             invariant = as.character(invariant_breaks),
             unknown_code = as.character(unknown_codes),
             summary_diff = as.character(summary_mismatches),
@@ -2615,7 +2951,7 @@ dq_long <- data_quality %>%
            column == "builds" ~ str_detect(value, "\n") | value %in% c("editor", "unknown", "NA"),
            column == "schema" ~ value != "2",
            column == "gap_h" ~ value != "",
-           column == "language" ~ str_starts(value, "!"),
+           column == "language" ~ FALSE,
            column %in% c("censored", "error_cap", "resume_declined", "ended_override") ~ value == "TRUE",
            column %in% c("outcome", "interaction") ~ value == "FALSE",
            # One open is the facilitator's own Beenden; more = accidental opens.
@@ -2671,6 +3007,9 @@ items <- item_attempts %>%
             # Material of a position = confirm_pressed.line.item of its first
             # press (#174: Complex swaps its order lines in "040"); NA for quiz items.
             material_key = first(line_item),
+            # #182: a „Hilfe" call for this item before its first attempt (same
+            # visit); NA before layout "041". Kept apart from the first-attempt shares.
+            help_before_first_attempt = first(help_before_first_attempt),
             .groups = "drop") %>%
   mutate(first_attempt_codes = na_if(first_attempt_codes, "")) %>%
   left_join(item_skills, by = c("scene", "item")) %>%
@@ -2689,6 +3028,10 @@ items <- item_attempts %>%
     chart_scene = chart_scene(scene, session_id),
     # ComplexScene order lines (#174): NA outside ComplexScene.
     complex_order = if_else(scene == "ComplexScene", complex_order(layout_version), NA_character_),
+    # Result card text (#181): long up to "040", short from "041" (picking positions only).
+    result_text = if_else(scene %in% red_button_scenes & kind == "position", result_text(layout_version), NA_character_),
+    # Course language of the person (#184): a self-chosen covariate.
+    language = language_of(participant_id),
     scene = factor(scene, levels = levels(visits$scene))) %>%
   arrange(participant_id, scene, item)
 unmapped_items <- items %>% filter(is.na(skill)) %>% distinct(scene, item)
@@ -2709,7 +3052,7 @@ if (mixed_complex_order_set) {
   }
 }
 write_csv(items %>% select(participant_id, scene, layout_version, item, kind, quiz, skill, scaffolded, scaffold_level, empf_kz,
-                           ekz_places, material_key, complex_order,
+                           ekz_places, material_key, complex_order, result_text, language, help_before_first_attempt,
                            first_attempt_correct, attempts, reached_correct, first_attempt_codes,
                            session_id, scene_visit, repeat_visit),
           file.path(output_dir, "items.csv"), na = "")
@@ -2738,7 +3081,11 @@ skill_levels <- unique(c(unique(scene_skills$skill), sort(unique(na.omit(item_sk
 skill_colours <- setNames(okabe_ito[seq_along(skill_levels)], skill_levels)
 
 title_items <- "Is the first attempt per item right more often later in the course?"
-item_shares <- items %>% filter(!is.na(skill)) %>%
+# #182: a first attempt made after a „Hilfe" call for that item measures the
+# facilitator's help, not the trainee: kept apart (not in the shares; the
+# chart says how many), still in items.csv with help_before_first_attempt.
+helped_first <- items %>% filter(!is.na(skill), help_before_first_attempt %in% TRUE)
+item_shares <- items %>% filter(!is.na(skill), !help_before_first_attempt %in% TRUE) %>%
   group_by(skill, scene, chart_scene, item, chart_item, kind, scaffolded) %>%
   summarise(k = sum(first_attempt_correct %in% TRUE), n = n(), .groups = "drop")
 if (nrow(item_shares) == 0) {
@@ -2776,7 +3123,10 @@ if (nrow(item_shares) == 0) {
          subtitle = paste0("Point = share of participants right at the first attempt; line = 95 % Wilson interval; ",
                            "label = right / participants.\nHollow = scaffolded (Complex position 1: the remainder ",
                            "quiz gave the numbers).\nQuiz guess rate 33 % (A/B/C, incl. Complex ekz), 50 % (Concept ekz_003 / ekz_000). ",
-                           "Indication only: fixed scene order, no control group."),
+                           "Indication only: fixed scene order, no control group.\n",
+                           language_n_text(items$participant_id[!is.na(items$skill)]),
+                           if (nrow(helped_first) > 0) paste0("; ", nrow(helped_first),
+                             " first attempt(s) after a Hilfe call left out (items.csv help_before_first_attempt)") else ""),
          x = "Scene and item (build order)", y = "Right at the first attempt (% of participants)") +
     theme_minimal(base_size = 11) +
     theme(legend.position = "bottom")
@@ -2897,7 +3247,8 @@ if (nrow(skill_rates) == 0) {
                            "picking: every press, a position tests all skills of its scene;\n",
                            "ekz_placement only presses with the right quantity at an Empf Kz 003 position). ",
                            "Scaffolded Complex position 1 and presses with EKZ place outlines (#108) left out. ",
-                           "Indication only: fixed scene order, no control group."),
+                           "Indication only: fixed scene order, no control group. ",
+                           language_n_text(skill_rates$participant_id), "."),
          x = "Scene (build order)", y = "Attempts at this skill with its error (%)") +
     theme_minimal(base_size = 11) +
     theme(axis.text.x = element_text(angle = 25, hjust = 1))
@@ -2957,7 +3308,8 @@ if (nrow(codes_counting) == 0) {
     scale_y_continuous(expand = expansion(mult = c(0, 0.25))) +
     labs(title = title_q2,
          subtitle = paste0("Counting visits only (first visit with >= 1 confirm). One press can carry several codes. ",
-                           "Complex remainder quiz not included (see items.csv)."),
+                           "Complex remainder quiz not included (see items.csv).\n",
+                           language_n_text(codes_counting$participant_id)),
          x = "Scene (build order)", y = "Error codes logged (count)") +
     theme_minimal(base_size = 11) +
     theme(axis.text.x = element_text(angle = 25, hjust = 1))
@@ -2978,8 +3330,8 @@ ttc_scene <- function(scene, session_id) {
   tag <- picking_split_tag(sessions$layout_version[match(session_id, sessions$session_id)])
   sc <- if_else(sc %in% red_button_scenes, paste0(sc, " [", tag, "]"), sc)
   # Every possible tag in a fixed order (hang before fall, long before short).
-  all_tags <- picking_split_tag(c("037", "038", NA, "039", "040"))
-  all_tags <- unique(all_tags[order(match(str_extract(all_tags, "drop \\w+"), paste("drop", c("hang", "fall", "settle", "unknown"))),
+  all_tags <- picking_split_tag(c("037", "038", NA, "039", "040", "041"))
+  all_tags <- unique(all_tags[order(match(str_extract(all_tags, "drop \\w+"), paste("drop", c("hang", "fall", "settle", "settle_thin", "unknown"))),
                                     match(str_extract(all_tags, "cards \\w+"), paste("cards", c("long", "short", "unknown"))))])
   lv <- unlist(map(chart_scene_levels, function(l) {
     if (l %in% red_button_scenes) paste0(l, " [", all_tags, "]") else l
@@ -3015,7 +3367,8 @@ if (!any(ttc_people$reached)) {
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.25))) +
     labs(title = title_ttc,
          subtitle = paste0("Active time (pauses removed) from scene start to the first correct confirm, ",
-                           "counting visit, box-change waits (wait_s) removed. 'never' = no correct confirm in it (survivor bias)."),
+                           "counting visit, box-change waits (wait_s) removed. 'never' = no correct confirm in it (survivor bias).\n",
+                           language_n_text(ttc_people$participant_id)),
          x = "Scene (build order)", y = "Time to correct (s, active)") +
     theme_minimal(base_size = 11) +
     theme(axis.text.x = element_text(angle = 25, hjust = 1))
@@ -3119,16 +3472,70 @@ process <- proc_positions %>%
          complex_order = if_else(scene == "ComplexScene", complex_order(layout_version), NA_character_),
          # Shelf card text (#155): long up to "038", short from "039"; never pool read_s across it.
          card_text = card_text(layout_version),
+         # Result card text (#181): long up to "040", short from "041"; post-press
+         # times (pick_s with its retries, check_s) are never pooled across it.
+         result_text = result_text(layout_version),
+         # Course language of the person (#184): a self-chosen covariate.
+         language = language_of(participant_id),
          scene = factor(scene, levels = levels(visits$scene))) %>%
+  # „Hilfe" calls for this position (#182; requests made during the box
+  # change belong to the finished position): count and active waiting
+  # seconds. They stay inside read_s / pick_s / check_s (the trainee waited
+  # there); NA before layout "041", 0 = no call.
+  left_join(help_requests %>% filter(str_detect(coalesce(item, ""), "^position_")) %>%
+              group_by(session_id, scene, scene_visit, position = item_position) %>%
+              summarise(ev_help = n(), ev_help_wait_s = round(sum(wait_s, na.rm = TRUE), 3), .groups = "drop") %>%
+              mutate(scene = factor(scene, levels = levels(visits$scene))),
+            by = c("session_id", "scene", "scene_visit", "position")) %>%
+  mutate(help_requests = if_else(session_id %in% help_sessions, coalesce(ev_help, 0L), NA_integer_),
+         help_wait_s = if_else(session_id %in% help_sessions, coalesce(ev_help_wait_s, 0), NA_real_)) %>%
+  select(-ev_help, -ev_help_wait_s) %>%
   # Data exclusions (#159): an excluded position (or a whole excluded scene)
   # measures the app, not the learner: no row.
   filter(is.na(exclusion_reason(session_id, scene, position))) %>%
   arrange(participant_id, scene, scene_visit, position)
 write_csv(process %>% select(participant_id, session_id, scene, scene_visit, counting, repeat_visit,
-                             layout_version, drop_rule, card_text, complex_order, position, material_key, expected_material_key, scaffolded, scaffold_level,
-                             empf_kz, ekz_places, completed, presses,
+                             layout_version, drop_rule, card_text, result_text, complex_order, position, material_key, expected_material_key, scaffolded, scaffold_level,
+                             empf_kz, ekz_places, language, completed, presses, help_requests, help_wait_s,
                              read_s, pick_s, check_s, position_s),
           file.path(output_dir, "process_by_position.csv"), na = "")
+
+# Guard (#181): result_text is split in the charts only through the drop rule
+# ("settle_thin" and "short" both start with "041"). If a later layout ever
+# separates them, a chart group could pool long and short result cards.
+rt_pooled <- process %>% filter(!is.na(result_text)) %>%
+  group_by(scene, chart_item) %>%
+  summarise(n_texts = n_distinct(result_text), .groups = "drop") %>%
+  filter(n_texts > 1)
+for (i in seq_len(nrow(rt_pooled))) {
+  warn(rt_pooled$scene[i], " '", rt_pooled$chart_item[i], "' pools long and short result cards (#181, layout ",
+       "\"041\") in time_by_phase.png / first_attempt_by_item.png: split it before reading it")
+}
+
+# Q1-Q3 per course language (#184): descriptive only, one row per language
+# and scene (counting visits). Language is self-chosen, not randomised, and
+# the EN group is small: read differences as a hint, never as an effect.
+language_by_scene <- visits %>% filter(counting, outcome_logged) %>%
+  mutate(scene = as.character(scene), language = coalesce(language_of(participant_id), "NA")) %>%
+  group_by(language, scene) %>%
+  summarise(n_people = n_distinct(participant_id),
+            n_with_confirm = sum(confirm_count > 0, na.rm = TRUE),
+            first_attempt_right_share = round(mean(first_attempt_correct, na.rm = TRUE), 3),
+            median_error_rate = round(median(error_rate, na.rm = TRUE), 3),
+            completed = sum(completed %in% TRUE),
+            median_time_to_correct_s = round(median(time_to_correct_net_s, na.rm = TRUE), 1),
+            .groups = "drop") %>%
+  left_join(process %>% filter(counting, completed) %>%
+              mutate(scene = as.character(scene), language = coalesce(language, "NA")) %>%
+              group_by(language, scene) %>%
+              summarise(median_read_s = round(median(read_s, na.rm = TRUE), 1),
+                        median_pick_s = round(median(pick_s, na.rm = TRUE), 1),
+                        median_check_s = round(median(check_s, na.rm = TRUE), 1), .groups = "drop"),
+            by = c("language", "scene")) %>%
+  mutate(across(where(is.double), ~ if_else(is.nan(.x), NA_real_, .x)),
+         scene = factor(scene, levels = levels(visits$scene))) %>%
+  arrange(language, scene)
+write_csv(language_by_scene, file.path(output_dir, "language_by_scene.csv"), na = "")
 
 proc_long <- process %>% filter(counting, completed) %>%
   select(participant_id, scene, position, chart_item, read_s, pick_s, check_s) %>%
@@ -3160,7 +3567,8 @@ if (nrow(proc_long) == 0) {
     scale_y_continuous(expand = expansion(mult = c(0.02, 0.15))) +
     labs(title = title_q3,
          subtitle = paste0("Completed positions of counting visits; active seconds (pauses and box-change ",
-                           "waits removed). Bar = median, point = one participant."),
+                           "waits removed). Bar = median, point = one participant.\n",
+                           language_n_text(proc_long$participant_id)),
          x = "Scene and order position (build order)", y = "Active time (s)") +
     theme_minimal(base_size = 11) +
     theme(legend.position = "bottom", legend.direction = "vertical")
@@ -4068,7 +4476,9 @@ per_scene <- visits %>% filter(counting) %>%
             visit_censored = duration_censored,
             grabs = grabs, regrabs = regrabs, container_enters = container_enters,
             container_exits = container_exits, time_to_first_grab_s = time_to_first_grab_s,
-            objectives_read_s = objectives_read_s)
+            objectives_read_s = objectives_read_s,
+            # #182: „Hilfe" calls in the counting visit (NA before layout "041").
+            help_requests = help_requests)
 visit_counts <- visits %>% mutate(scene = as.character(scene)) %>% count(participant_id, scene, name = "visits")
 per_scene <- full_join(visit_counts, per_scene, by = c("participant_id", "scene"))
 
@@ -4079,7 +4489,7 @@ wide_scene <- per_scene %>%
               values_from = c(visits, active_s, paused_s, confirms, confirm_ignored, wait_s, wait_after_done_s, errors,
                               error_rate, first_correct, attempts_to_correct, time_to_correct_s,
                               completed, visit_censored, grabs, regrabs, container_enters,
-                              container_exits, time_to_first_grab_s, objectives_read_s))
+                              container_exits, time_to_first_grab_s, objectives_read_s, help_requests))
 # Scenes without a confirm or quiz (WelcomeScene) never have outcome values:
 # drop those always-empty columns.
 no_outcome_cols <- as.vector(outer(outcome_measures, setdiff(unique(per_scene$scene), outcome_scenes),
@@ -4119,12 +4529,13 @@ scene_col_order <- function(cols) {
   cols[order(factor(measure, levels = unique(measure)), match(scene_of, levels(visits$scene)))]
 }
 
-participant_cols <- c("participant_id", "end_status", "course_finished", "multi_session",
+participant_cols <- c("participant_id", "language", "end_status", "course_finished", "multi_session",
                       "mixed_build", "builds", "schema_versions", "layout_versions", "gap_h", "n_sessions",
                       "resume_offered", "resume_declined", "ended_session_override",
                       "duration_censored", "active_s", "paused_s", "pauses",
                       "hmd_removed_count", "unity_errors", "total_confirms", "interaction_logged",
-                      "end_control_opens", "menu_blocked", "open_grabs", "snap_grab_artifacts", "facilitator_tail_s")
+                      "end_control_opens", "menu_blocked", "open_grabs", "snap_grab_artifacts", "facilitator_tail_s",
+                      "help_requests")
 wide <- data_quality %>%
   select(all_of(participant_cols)) %>%
   left_join(wide_scene, by = "participant_id") %>%
@@ -4480,6 +4891,117 @@ if (length(paper_files) == 0 || nrow(paper_raw) == 0) {
   }
 }
 
+# ---- 14c. „Hilfe" calls (#182) and the facilitator's help sheet --------------------
+
+# help_requests.csv: one row per help_requested of this set (layout "041" on),
+# with its item, how the button opened again (reset_reason), the active
+# seconds the trainee waited and, when a help sheet exists, the facilitator's
+# line for it. The sheet (docs/facilitator-help-sheet.md) is typed into a CSV
+# built from analysis/help_sheet_template.csv and saved as
+# analysis/data/<wave>/help_sheet*.csv (";" or ",", UTF-8 or Windows-1252,
+# local wall-clock time like the paper forms). A sheet line is matched to the
+# request of the same participant nearest in time within help_match_window_min
+# (the log utc is the real time; the facilitator reads a wall clock), each
+# request and each line at most once. help_level (1 point / 2 explain /
+# 3 model) says what kind of help was given; the free-text note never leaves
+# the sheet (only note_present). A "timeout" reset never means help was given.
+help_match_window_min <- 3
+help_sheet_cols <- c("participant_id", "session_date", "time_local", "scene_step", "help_level", "note")
+help_template_path <- file.path(analysis_folder, "help_sheet_template.csv")
+if (file.exists(help_template_path)) {
+  tc <- strsplit(sub("﻿", "", readLines(help_template_path, n = 1, warn = FALSE)), ",")[[1]]
+  if (!identical(tc, help_sheet_cols)) {
+    stop("help_sheet_template.csv and analyse_set.R list different help sheet columns; change both together.")
+  }
+}
+read_help_sheet <- function(path) {
+  raw <- readLines(path, warn = FALSE)
+  if (length(raw) == 0) return(NULL)
+  if (!all(validUTF8(raw))) raw <- iconv(raw, from = "windows-1252", to = "UTF-8")
+  raw[1] <- sub("^﻿", "", raw[1])
+  delim <- if (str_count(raw[1], fixed(";")) > str_count(raw[1], fixed(","))) ";" else ","
+  tab <- read_delim(I(paste(c(raw, ""), collapse = "\n")), delim = delim, na = character(),
+                    col_types = cols(.default = col_character()), trim_ws = TRUE,
+                    show_col_types = FALSE, progress = FALSE)
+  names(tab) <- tolower(trimws(names(tab)))
+  for (cl in setdiff(help_sheet_cols, names(tab))) {
+    warn("help sheet ", path, " has no column ", cl, " (read as empty)")
+    tab[[cl]] <- ""
+  }
+  tab %>% mutate(sheet_file = basename(path), sheet_row = row_number() + 1L) %>%
+    select(sheet_file, sheet_row, all_of(help_sheet_cols)) %>%
+    mutate(across(all_of(help_sheet_cols), ~ coalesce(trimws(.x), ""))) %>%
+    filter(if_any(all_of(help_sheet_cols), ~ .x != ""))
+}
+help_sheet_files <- list.files(data_dir, pattern = "^help_sheet.*\\.csv$", recursive = TRUE, full.names = TRUE)
+if (!grepl("fake", data_dir)) help_sheet_files <- help_sheet_files[!grepl("/fake/", help_sheet_files)]
+help_sheet <- map(help_sheet_files, read_help_sheet) %>% compact() %>% list_rbind()
+if (is.null(help_sheet) || nrow(help_sheet) == 0) {
+  help_sheet <- tibble(sheet_file = character(), sheet_row = integer(),
+                       !!!set_names(rep(list(character()), length(help_sheet_cols)), help_sheet_cols))
+}
+help_sheet <- help_sheet %>% filter(in_set(participant_id), is_valid_id(participant_id), !is_test_id(participant_id))
+sheet_date <- function(x) {
+  out <- if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}$", x), as.Date(x, format = "%Y-%m-%d"),
+                 as.Date(x, format = "%d.%m.%Y"))
+  out[!grepl("^(\\d{4}-\\d{1,2}-\\d{1,2}|\\d{1,2}\\.\\d{1,2}\\.\\d{4})$", x)] <- NA
+  out
+}
+help_sheet <- help_sheet %>%
+  mutate(date_parsed = sheet_date(session_date),
+         time_ok = grepl("^\\d{1,2}:\\d{2}(:\\d{2})?$", time_local),
+         time_hms = if_else(grepl("^\\d{1,2}:\\d{2}$", time_local), paste0(time_local, ":00"), time_local),
+         sheet_utc = as.POSIXct(if_else(!is.na(date_parsed) & time_ok, paste(format(date_parsed), time_hms),
+                                        NA_character_), format = "%Y-%m-%d %H:%M:%S", tz = paper_time_zone),
+         help_level = suppressWarnings(as.integer(help_level)),
+         help_level = if_else(help_level %in% 1:3, help_level, NA_integer_),
+         note_present = note != "",
+         sheet_id = row_number())
+for (i in which(is.na(help_sheet$sheet_utc))) {
+  warn("help sheet ", help_sheet$sheet_file[i], " row ", help_sheet$sheet_row[i], " (", help_sheet$participant_id[i],
+       "): date '", help_sheet$session_date[i], "' / time '", help_sheet$time_local[i],
+       "' not readable (DD.MM.YYYY or YYYY-MM-DD, HH:MM): not matched")
+}
+# Nearest pairs first, each request and each sheet line used once.
+help_pairs <- help_requests %>%
+  transmute(participant_id, session_id, req_line, req_time = parse_utc(req_utc)) %>%
+  inner_join(help_sheet %>% filter(!is.na(sheet_utc)) %>% select(participant_id, sheet_id, sheet_utc),
+             by = "participant_id", relationship = "many-to-many") %>%
+  mutate(diff_s = as.numeric(difftime(sheet_utc, req_time, units = "secs"))) %>%
+  filter(abs(diff_s) <= help_match_window_min * 60) %>%
+  arrange(abs(diff_s))
+help_match <- help_pairs[0, ]
+for (k in seq_len(nrow(help_pairs))) {
+  r <- help_pairs[k, ]
+  if (!paste(r$session_id, r$req_line) %in% paste(help_match$session_id, help_match$req_line) &&
+      !r$sheet_id %in% help_match$sheet_id) help_match <- bind_rows(help_match, r)
+}
+unmatched_sheet <- help_sheet %>% filter(!is.na(sheet_utc), !sheet_id %in% help_match$sheet_id)
+for (i in seq_len(nrow(unmatched_sheet))) {
+  warn("help sheet ", unmatched_sheet$sheet_file[i], " row ", unmatched_sheet$sheet_row[i], " (",
+       unmatched_sheet$participant_id[i], ", ", unmatched_sheet$time_local[i], "): no help_requested of that ",
+       "person within ", help_match_window_min, " min (wrong time, wrong ID, or a call without the button?)")
+}
+help_out <- help_requests %>%
+  left_join(help_match %>% select(session_id, req_line, sheet_id, sheet_diff_s = diff_s),
+            by = c("session_id", "req_line")) %>%
+  left_join(help_sheet %>% select(sheet_id, help_level, sheet_note_present = note_present), by = "sheet_id") %>%
+  left_join(presses_all %>% select(closed_by_press = press_id, closed_by_event = event, closed_by_attempt_no = attempt_no),
+            by = "closed_by_press") %>%
+  mutate(language = language_of(participant_id),
+         # NA = no sheet line for this person at all (not measured); FALSE = sheet kept, no line for this call.
+         sheet_matched = if_else(participant_id %in% help_sheet$participant_id, !is.na(sheet_id), NA),
+         sheet_diff_s = round(sheet_diff_s, 1)) %>%
+  arrange(participant_id, req_utc) %>%
+  select(participant_id, session_id, language, layout_version, scene, scene_visit, req_utc,
+         tour_step, question_id, position, item, during_ride, paired, reset_reason, reset_utc,
+         closed_by_event, closed_by_attempt_no, wait_s, wait_censored,
+         sheet_matched, sheet_diff_s, help_level, sheet_note_present)
+write_csv(help_out, file.path(output_dir, "help_requests.csv"), na = "")
+if (length(help_sheet_files) > 0) {
+  message("Help sheet: ", nrow(help_sheet), " line(s), ", nrow(help_match), " matched to a help_requested")
+}
+
 # ---- 15. Validity limits and warnings file --------------------------------------
 
 validity_limits <- c(
@@ -4499,12 +5021,15 @@ validity_limits <- c(
   "- ConceptScene hint tags (concept_hints*.csv, layout \"029\" on, decision 030): hint counts are never an error rate or an attempt. On \"029\" placing packages in Concept is not logged otherwise; from \"032\" (decision 032) the carton moves are in concept_containers_by_visit.csv, but filling the sample order is still not a rated attempt. \"029\" and \"032\" tags mean different things (\"029\": desk packages of other materials, TOO_MANY also caused by the counting demo; \"032\": only STECKER C cartons, TOO_MANY only from a 4th carton the trainee laid in): never pool them. One tag at a time: a second wrong package gets its tag only when the first is gone, so its shown time is not its placement time. The material_flow wait assumes the lane demo starts 4 s (layout up to \"034\") or 8 s (\"035\" on, #118) after the step; older layouts have NA, not 0.",
   "- Station start delay (decision 033, station_waits.csv): from layout \"033\" the boxes wait 4 s after a correct confirm before they ride (Complex box 1 after the remainder quiz: 0.6 s), before \"033\" 0.6 s. wait_s, wait_after_done_s and the per-scene active_s include this wait, so they are never pooled across station_wait_group; time_to_correct_by_scene.png uses time_to_correct_s minus wait_s for the picking scenes (wide.csv keeps the logged time_to_correct_s). wait_after_done_s starts at the first ride, not at task_completed, so it leaves out the start delay after the last confirm.",
   "- EKZ place help (#108, decision 037, layout \"034\", skill_scaffolds.csv): Basic position 1 outlines its 6 snap places from the start, Mixed position 1 its 3 places after the first EKZ_PLACEMENT of the visit; from \"034\" each place takes one carton, a carton released in the box lies flat, and a placement error marks the loose cartons. A press x skill pair with the outlines visible is left out of the ekz_placement rate and of P2 (numerator and denominator), so from \"034\" Basic gives no ekz_placement measure and Mixed only up to its first EKZ_PLACEMENT (P2 = the first EKZ opportunity of Mixed position 1, always made without outlines). Basic calculate_quantity stays measured although the 6 outlines equal the 6 cartons the order needs: read Basic TOO_FEW/TOO_MANY of \"034\" as a lower bound of calculation errors. position_1 of Basic and Mixed is never pooled across ekz_places levels (hidden / always / after_error; items.csv, process_by_position.csv; split charts when a set mixes them), and P802's (\"033\") placement data are not pooled with \"034\".",
-  "- Drop rule and EKZ places from the start (#157, layout \"038\"): a package let go in the air falls straight down (into the container below it, onto the desk, or beyond the desk back to where it was grabbed) instead of hanging; a Basic/Mixed carton grabbed from a snap place leaves it cleanly and one let go above a free place snaps in; Mixed position 1 outlines its 3 places from the start (skill_scaffolds.csv row \"038\" always). So from \"038\" no press anywhere tests ekz_placement: P2 is rated up to \"037\" and observed from \"038\" (objectives.csv from_layout; persons whose Empf Kz 003 positions were all right with the places visible: doing it with help, not a test; the Concept/Complex EKZ quiz questions measure D3, not P2); EKZ_PLACEMENT codes of \"038\" are made with the outlines visible; Basic/Mixed position_1 carry ekz_places \"always+drop_snap\" and are never pooled with \"037\"; a container_enter may follow its grab_end by the fall (Concept link window 2 s from \"038\"). In a set that mixes drop rules every picking position (first_attempt_by_item.png, time_by_phase.png) and the picking scenes in time_to_correct_by_scene.png are split by drop_rule (hang / fall / settle from \"040\", #168); the per-scene error charts and wide.csv still pool both.",
+  "- Drop rule and EKZ places from the start (#157, layout \"038\"): a package let go in the air falls straight down (into the container below it, onto the desk, or beyond the desk back to where it was grabbed) instead of hanging; a Basic/Mixed carton grabbed from a snap place leaves it cleanly and one let go above a free place snaps in; Mixed position 1 outlines its 3 places from the start (skill_scaffolds.csv row \"038\" always). So from \"038\" no press anywhere tests ekz_placement: P2 is rated up to \"037\" and observed from \"038\" (objectives.csv from_layout; persons whose Empf Kz 003 positions were all right with the places visible: doing it with help, not a test; the Concept/Complex EKZ quiz questions measure D3, not P2); EKZ_PLACEMENT codes of \"038\" are made with the outlines visible; Basic/Mixed position_1 carry ekz_places \"always+drop_snap\" and are never pooled with \"037\"; a container_enter may follow its grab_end by the fall (Concept link window 2 s from \"038\"). In a set that mixes drop rules every picking position (first_attempt_by_item.png, time_by_phase.png) and the picking scenes in time_to_correct_by_scene.png are split by drop_rule (hang / fall / settle from \"040\", #168 / settle_thin from \"041\", #180); the per-scene error charts and wide.csv still pool both.",
   "- Menu after a done order (#109, menu_after_done.csv): up to layout \"033\" the Basic/Mixed result card told the trainee to choose the next lesson in the Menu from the correct confirm on (menu_cue text); from \"034\" the next Menu item is highlighted once the order box departs (menu_cue highlight). time_to_menu_after_done_s includes the 4 s start delay and the storage-box exit in both groups, but the cue itself comes later in \"034\"; compare within one menu_cue only. #111 (layout \"034\": box signs on the inner back wall, one note on Complex's opened carton, Basic/Complex storage cartons rearranged with the same counts and names) changes no logged field; Basic/Complex grab order and time to first grab may shift slightly, so read picking-scene grab and phase times within one layout.",
   "- One text rule (#155, decision 041, layout \"039\"): no event or field changes. Basic/Mixed/Complex step cards say one sentence and the goal cards lost their \"So ...\" sentence, so read_s, time_to_first_grab_s and the time to the first press are not comparable with \"038\"-or-older (card_text long / short; split in first_attempt_by_item.png, time_by_phase.png, time_to_correct_by_scene.png when a set mixes them; visits and wide.csv still pool: filter by layout_version). The removed \"work out how many\" prompts and the pointer to the Complex worked example may also make the first attempt slightly harder: that is why item charts are split too. No removed sentence was help for a rated skill (skill_scaffolds.csv unchanged). ConceptScene: card 1 is gone and the tour bar opens by itself 2 s (game time) after the scene starts, not on the first grab; concept_tour_open.csv reads the opening from the first logged tour_step (tour_opens auto_2s) and grab_before_leaving_material shows who left step material without holding a carton. Concept time_to_first_grab_s changes meaning (no longer the gate to the tour). Complex position_1: question and A/B/C in one cluster near the hands (quiz_layout book), its own chart group.",
   "- Layout \"040\" (#168, #173, #174, #175): no event or field changes. Drop rule settle (a package let go over a container lies beside or on the packages below, never above the rim): picking positions and scenes are split from fall (\"038\"/\"039\") and hang like the earlier drop-rule split; container_unheld_lines = container lines no grab explains (from \"040\" mostly packages falling off a lifted one; wall-time window, so a pause can count a line as unheld), still inside container_enters/_exits. ComplexScene swaps its order lines (position 1 SCHLAUCHSCHELLE B 152/50, position 2 RING D 53/25 in pouches) and the remainder quiz numbers (cartons 2/3/4, loose 2/48/152): material_key comes from confirm_pressed.line, complex_order splits the Complex quiz items when a set mixes the orders; skill rates, error charts and wide.csv still pool them (filter by layout_version). Mixed position 2 has flat pouches (#173), WelcomeScene still logs no grab_*/container_* (#175).",
   "- ConceptScene containers (concept_containers_by_visit.csv, layout \"032\" on): only the trainee's own carton moves are logged; the lane demo's top-up to Soll and the reset after material_flow are not, so time_to_soll_s and soll_reached describe the trainee's own picking before the demo. Counts are checked against storage 6 / order 0 after every reset; container_count_breaks or container_unlinked_lines > 0 means the log does not follow that rule (read that visit with care).",
-  "- WelcomeScene in two steps (#121/#124, decision 038, layout \"036\"): the learning objectives come first and the practice box, red button and Menu appear only after „Zu den Aufgaben\" (objectives_read_s = active seconds to that press; NA for older layouts, never 0). Welcome active_s and the times before the first welcome_practice_done of \"036\" are not comparable with \"035\"-or-older logs. objectives_read_s is time on the panel, not proof it was read.")
+  "- WelcomeScene in two steps (#121/#124, decision 038, layout \"036\"): the learning objectives come first and the practice box, red button and Menu appear only after „Zu den Aufgaben\" (objectives_read_s = active seconds to that press; NA for older layouts, never 0). Welcome active_s and the times before the first welcome_practice_done of \"036\" are not comparable with \"035\"-or-older logs. objectives_read_s is time on the panel, not proof it was read. From \"041\" (#179) step 1 is done when an item lies in the order container (welcome_practice_done \"place\"; \"grab\" up to \"040\"), and „Zu den Aufgaben\" takes edge presses (#177): welcome_times.csv (to_step1_s, to_button_s, to_menu_s) and objectives_read_s are read per layout_version, never pooled across \"040\" and \"041\".",
+  "- Layout \"041\" (decision 043: #177-#183; #182 adds help events, the rest no event or field change): flat poke buttons take presses at their edges (#177: Concept tour and quiz times, Complex position_1 quiz times and the Welcome time to „Zu den Aufgaben\" may shorten); larger pouches stacked near the rim in Mixed and Complex position 2 (#178) and raised Complex trays (#183) change pick times; drop rule settle_thin (#180: a ring or clamp may stick out of the rim, so fewer container_unheld_lines are expected); short result cards (#181, result_text short: post-press times, retries after an error and the Concept hint shown -> cleared time change). Picking positions and scenes are split from \"040\" by drop_rule (settle_thin), Complex position_1 by its group (+book+settle_thin), ConceptScene by layout; visits and wide.csv still pool: filter by layout_version.",
+  "- „Hilfe\" button (#182, layout \"041\", help_requests.csv): a call is not an attempt. A first attempt made after a call for its item (help_before_first_attempt) measures the facilitator's help and is left out of first_attempt_by_item.png (still in items.csv); help_closed_by marks the attempt that opened the button again. A timeout reset (60 s real time) never means help was given; only the facilitator's sheet (help_level, matched by time within 3 min) says what help was given. Help counts are NA before \"041\" (no button), never 0. A trainee who never calls may still have needed help: calls measure asking, not need.",
+  "- Course language (#184): from layout \"041\" every participant chooses German or English on the keypad. language is a self-chosen covariate, not randomised: people who choose English may differ in other ways (reading German, IT habits). Every Q1-Q3 chart names n per language and language_by_scene.csv gives the numbers per language; with few EN people a difference is a hint, never an effect of the language.")
 # Data exclusions (#159): said on every report of a set that has some.
 if (nrow(excluded_press_rows) > 0) {
   validity_limits <- c(validity_limits,
@@ -4521,7 +5046,7 @@ flagged <- data_quality %>%
   filter(end_status != "completed" | multi_session | mixed_build | duration_censored |
            invariant_breaks > 0 | unknown_codes > 0 | summary_mismatches > 0 |
            exit_disagreements > 0 | duplicate_files > 0 | error_cap_reached |
-           resume_declined %in% TRUE | ended_session_override %in% TRUE | language_not_de |
+           resume_declined %in% TRUE | ended_session_override %in% TRUE |
            old_schema_log | coalesce(excluded_presses > 0, FALSE)) %>%
   pull(participant_id)
 

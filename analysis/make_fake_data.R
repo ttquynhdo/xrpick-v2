@@ -32,6 +32,12 @@
 # package let go lands about 0.4 s after grab_end (drop rule settle); Complex
 # position 1 is SCHLAUCHSCHELLE B 152/50, position 2 RING D 53/25 in pouches
 # (GGB/RingPouch_n), remainder quiz answers cartons 2/3/4, loose 2/48/152.
+# P823 runs layout "041" (decision 043, #177-#183): WelcomeScene step 1 logs
+# welcome_practice_done "place", drop rule settle_thin, short result cards,
+# and the „Hilfe" button (#182: help_requested / help_reset with all three
+# reasons). P824 ("041") crashes while a help request waits (unpaired).
+# Also writes data/fake/help_sheet.csv, the facilitator's help log sheet
+# (docs/facilitator-help-sheet.md) as typed in for P823/P824 (section 9b).
 # Header event_groups =
 # ["session","outcome","interaction"]; P104 ran a build before #29 (no
 # "interaction" group: its interaction numbers must be NA, not 0). No pose,
@@ -46,7 +52,7 @@
 # fake files are the contract between the C# logger and R.
 #
 # Run from the repo root:   Rscript analysis/make_fake_data.R
-# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P822, research/practice/,
+# Output (git-ignored):     analysis/data/fake/research/ (+ research/pilot/ for P801-P803, P811-P824, research/practice/,
 #                           research/backup/ with a partial duplicate of P101)
 #
 # Base R only (no packages), so it runs right after installing R.
@@ -608,6 +614,11 @@ go_to_scene <- function(s, scene, via = "menu") {
     emit(s, "menu_select", json_obj(target_scene = scene, blocked = FALSE))
     advance(s, round(side_runif(0.3, 0.9), 3))  # the scene loads
   }
+  # #182: a help request still waiting when the scene unloads.
+  if (isTRUE(s$help_open)) {
+    help_reset(s, "scene_change")
+    advance(s, 0.001)
+  }
   exit_scene(s)
   advance(s, 0.001)
   if (s$schema == 1 || !s$interaction) via <- NULL
@@ -764,6 +775,7 @@ press_confirm <- function(s, pos_no, k, attempt, correct = length(attempt$codes)
   }
   data$time_since_scene_enter_s <- at
   emit(s, "confirm_pressed", data)
+  help_reset_after_attempt(s)
   # Mixed "034"-"037" shows the place outlines from the first EKZ_PLACEMENT on.
   if ("EKZ_PLACEMENT" %in% vapply(attempt$codes, function(e) e$code, character(1))) s$v$ekz_error_seen <- TRUE
   correct
@@ -875,6 +887,7 @@ answer_quiz <- function(s, quiz, question_id, selected, k, right) {
     attempt_no = s$v$quiz_attempts, quiz = quiz, question_id = question_id,
     selected = selected, correct = correct, attempt_in_question = k,
     error_codes = codes_json(codes), time_since_scene_enter_s = at))
+  help_reset_after_attempt(s)
   correct
 }
 
@@ -895,6 +908,36 @@ ask_question <- function(s, person, quiz, question_id, q, wrong_first = NULL) {
     advance(s, runif(1, 3, 10))  # read the feedback line, touch again
   }
   practise(person, q$skill)
+}
+
+# ---- 5b1. „Hilfe" button (#182, layout "041") ------------------------------
+# help_requested {tour_step, question_id, position, repeat, time_since_scene_enter_s}
+# opens a request; exactly one help_reset {reason} closes it in the same
+# visit: "attempt" right after the next confirm_pressed / quiz_answer line
+# (ResearchLogger.AttemptLogged), "timeout" 60 s later, "scene_change" as the
+# last line before scene_exit when the trainee leaves the scene. A session
+# end or a crash leaves the request open (no help_reset). Only the people
+# with a help plan (P823, P824) press the button; the plan is keyed
+# "<scene> <position> <attempt k>" (before that press) or "<scene> end".
+help_request <- function(s, tour_step = NULL, question_id = NULL, position = NULL) {
+  emit(s, "help_requested", json_obj(tour_step = tour_step, question_id = question_id, position = position,
+                                     `repeat` = FALSE, time_since_scene_enter_s = active_s(s)))
+  s$help_open <- TRUE
+}
+help_reset <- function(s, reason) {
+  emit(s, "help_reset", json_obj(reason = reason))
+  s$help_open <- FALSE
+}
+help_reset_after_attempt <- function(s) {
+  if (isTRUE(s$help_open)) {
+    advance(s, 0.001)
+    help_reset(s, "attempt")
+  }
+}
+# The trainee waits; nobody comes; the button opens again after 60 s.
+help_timeout <- function(s) {
+  advance(s, 60)
+  help_reset(s, "timeout")
 }
 
 # ---- 5b2. Interaction events (#29, spec 4.4) -------------------------------
@@ -1197,8 +1240,10 @@ run_welcome <- function(s, practice = TRUE, read_pause_s = 0) {
     advance(s, runif(1, 8, 20))
   }
   if (practice && s$schema == 2) {
-    # First grab of the box, then first red-button press (#39).
-    emit(s, "welcome_practice_done", json_obj(action = "grab"))
+    # First grab of the box, then first red-button press (#39). Layout "041"
+    # (#179): step 1 is done once an item lies in the order container, so
+    # the action is "place" instead of "grab".
+    emit(s, "welcome_practice_done", json_obj(action = if (layout_at_least(s$layout, 41)) "place" else "grab"))
     advance(s, runif(1, 4, 15))
     emit(s, "welcome_practice_done", json_obj(action = "button"))
     advance(s, runif(1, 3, 10))
@@ -1406,6 +1451,12 @@ run_concept <- function(s, person, tour_script = NULL, hints = NULL) {
     # >= 5 s also covers the 1.5 s "Richtig!" hold after a right answer (#78):
     # no touch is generated while the toggles are not interactable.
     advance(s, runif(1, 5, 15))  # read the question and the three answers
+    # #182: „Hilfe" while a question is shown: the tour stays at its last
+    # step (material_flow), so both tour_step and question_id are set.
+    if (!is.null(s$help_plan[[paste("ConceptScene q", qid)]])) {
+      help_request(s, tour_step = "material_flow", question_id = qid)
+      advance(s, 20)  # the facilitator comes and explains
+    }
     ask_question(s, person, "concept", qid, questions[[qid]])
   }
   complete_task(s)
@@ -1486,6 +1537,11 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
     fixed <- forced[[as.character(pos_no)]]
     while (s$v$attempts < max_confirms) {
       k <- k + 1
+      # #182: „Hilfe" before this press (help plan, P823).
+      if (!is.null(s$help_plan[[paste(scene, pos_no, k)]])) {
+        help_request(s, position = pos_no)
+        advance(s, 25)  # the facilitator comes and points
+      }
       if (k <= length(fixed)) {
         f <- fixed[[k]]
         attempt <- list(pos = positions[[pos_no]], placed_full = f$placed_full,
@@ -1511,6 +1567,12 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
     for (sk in position_skills(scene, position_empf_kz(scene, pos_no, s$layout))) practise(person, sk)
 
     if (pos_no < length(positions)) {
+      # #182: „Hilfe" right after a correct press: the logged position has
+      # switched to the next one already, the request still belongs to this one.
+      if (!is.null(s$help_plan[[paste(scene, "ride", pos_no)]])) {
+        advance(s, 0.001)  # within the 4 s start delay, which runs on
+        help_request(s, position = pos_no + 1)
+      }
       ride_between_positions(s, pos_no)
       if (!is.null(crash_after_position) && crash_after_position == pos_no) {
         advance(s, runif(1, 5, 15))  # starts reading position 2, then the crash
@@ -1536,6 +1598,12 @@ run_picking <- function(s, person, max_confirms = 20, give_up = FALSE,
     }
   }
   advance(s, runif(1, 3, 10))
+  # #182: „Hilfe" after the order is done; the trainee then leaves the scene
+  # (help_reset scene_change in go_to_scene).
+  if (!is.null(s$help_plan[[paste(scene, "end")]])) {
+    help_request(s, position = length(positions))
+    advance(s, 4)
+  }
   invisible(!is.na(s$v$correct_at))
 }
 
@@ -1549,10 +1617,11 @@ run_visit <- function(s, person, ...) {
 # ComplexScene order is complete (#28 calls EndSession("completed") there).
 run_full_course <- function(person, build, start_utc, special = list(), start_mode = "manual",
                             resume_scene = NULL, resume_accepted = NULL, ended_warning = FALSE,
-                            language = "DE", layout = "025", snap_restart = FALSE) {
+                            language = "DE", layout = "025", snap_restart = FALSE, help_plan = list()) {
   s <- start_session(person, build, start_utc, start_mode, resume_scene, resume_accepted, ended_warning,
                      language, layout = layout)
   s$snap_restart <- snap_restart
+  s$help_plan <- help_plan
   do.call(run_welcome, c(list(s), special[["WelcomeScene"]]))
   for (scene in scene_order[-1]) {
     go_to_scene(s, scene)
@@ -1771,9 +1840,10 @@ advance(s, 1.5)
 end_session(s, "facilitator")
 
 # P108: normal course on the newer build bbb2222, but the study build still had
-# autoStart on (session_start_mode "auto"): analyse.R must warn. autoStart
-# skips the keypad, so the research-ID lock to "DE" did not apply and the
-# session ran in the saved language "EN" (#11): analyse.R must warn too.
+# autoStart on (session_start_mode "auto"): analyse.R must warn about that.
+# P108 ran in English: since #184 study participants choose DE or EN on the
+# keypad, so an EN study session is an ordinary study person (language is a
+# study variable, never a data-quality warning or flag).
 run_full_course(new_person("P108"), "bbb2222", "2026-11-04T13:00:00Z", start_mode = "auto",
                 language = "EN")
 
@@ -2186,6 +2256,61 @@ run_full_course(p822, "hhh8888", "2026-11-26T09:00:00Z", language = "EN", layout
                                ComplexScene = list(remainder_wrong_first = list(cartons = "2"))))
 assign(".Random.seed", rng_before_p822, envir = globalenv())
 
+# P823: layout "041" (decision 043: #177-#183 and #182 in one build; no field
+# changes except the new help events). #179: welcome_practice_done "place"
+# instead of "grab". #180: drop rule "settle_thin" (R: its own drop_rule
+# level, never pooled with "settle"). #181: short result cards (R:
+# result_text "short"). #182: the „Hilfe" button, all three help_reset
+# reasons: a ConceptScene tour request at step cartons that times out (60 s),
+# a Concept request while question label_by_matnr is shown (tour_step
+# material_flow AND question_id, closed by the next quiz_answer, so that
+# question's first attempt is help_before_first_attempt), a Mixed request
+# right after position 1 was right (logged position 2, R gives it back to
+# position_1; closed by the first position-2 press, which is therefore
+# help_closed_by but not help_before_first_attempt), a request before the
+# first Basic press (help_before_first_attempt for Basic position_1) and a
+# Basic request after the order is done that ends with scene_change when the
+# trainee goes to Mixed. Own random stream, restored.
+rng_before_p823 <- .Random.seed
+set.seed(823)
+p823 <- new_person("P823")
+p823_hints <- p820_hints
+p823_hints$cartons <- function(s) {
+  advance(s, 3)
+  help_request(s, tour_step = "cartons")
+  help_timeout(s)
+}
+run_full_course(p823, "iii9999", "2026-11-27T09:00:00Z", language = "EN", layout = "041",
+                special = list(ConceptScene = list(hints = p823_hints)),
+                help_plan = list(`ConceptScene q label_by_matnr` = TRUE,
+                                 `BasicPickingScene 1 1` = TRUE,
+                                 `BasicPickingScene end` = TRUE,
+                                 `MixedPickingScene ride 1` = TRUE))
+assign(".Random.seed", rng_before_p823, envir = globalenv())
+
+# P824: layout "041", German. Presses „Hilfe" at ConceptScene tour step soll
+# and the app crashes while the button waits: an unpaired help_requested (no
+# help_reset, no session_end). R accepts it with a warning. Own random stream.
+rng_before_p824 <- .Random.seed
+set.seed(824)
+p824 <- new_person("P824")
+s <- start_session(p824, "iii9999", "2026-11-27T11:00:00Z", language = "DE", layout = "041")
+run_welcome(s)
+go_to_scene(s, "ConceptScene")
+s$help_plan <- list()
+local({
+  tour <- tour_steps_for(s$layout)
+  for (i in 1:4) {
+    advance(s, if (i == 1) 3 else runif(1, 5, 15))
+    emit(s, "tour_step", json_obj(step_id = tour[i], step_index = i))
+  }
+  advance(s, 6)
+  help_request(s, tour_step = tour[4])
+  advance(s, 12)
+})
+crash_session(s)
+assign(".Random.seed", rng_before_p824, envir = globalenv())
+
 # ---- 8. Write the files ----------------------------------------------------
 
 # Binary mode keeps "\n" line endings on Windows (the logger writes LF).
@@ -2238,7 +2363,7 @@ write_lf(c(summary_header, head(p101_session$summary, length(p101_session$summar
 #   P114  no paper form at all
 #   P120  paper form but no log
 #   P950  test ID (dropped)
-#   P801-P803, P811-P822  pilot IDs: join the pilot set only (output/pilot/), never the study
+#   P801-P803, P811-P824  pilot IDs: join the pilot set only (output/pilot/), never the study
 set.seed(31)
 paper_tz <- "Europe/Berlin"
 ssq_item_names <- c("01_general_discomfort", "02_fatigue", "03_headache", "04_eye_strain",
@@ -2310,7 +2435,9 @@ paper_rows <- list(
   paper_row("P819"),
   paper_row("P820"),
   paper_row("P821"),
-  paper_row("P822"))
+  paper_row("P822"),
+  paper_row("P823"),
+  paper_row("P824"))
 paper_lines <- c(paste(paper_header, collapse = ";"),
                  vapply(paper_rows, function(r) {
                    if (length(r) != length(paper_header)) stop("fake paper row has ", length(r), " cells")
@@ -2319,6 +2446,40 @@ paper_lines <- c(paste(paper_header, collapse = ";"),
                  paste(rep("", length(paper_header)), collapse = ";"))  # a row Excel left empty
 con <- file(file.path(fake_root, "paper_forms.csv"), open = "wb")
 writeLines(iconv(paper_lines, from = "UTF-8", to = "windows-1252"), con, sep = "\r\n", useBytes = TRUE)
+close(con)
+
+# ---- 9b. Facilitator help sheet (#182) --------------------------------------
+
+# One row per „Hilfe" call, typed from docs/facilitator-help-sheet.md
+# (columns: analysis/help_sheet_template.csv; Excel on a German PC: ";",
+# Windows-1252, local wall-clock time, no seconds on most rows). The note is
+# free text and never leaves the sheet in R. Edge cases analyse.R must catch:
+#   P823 rows 1-4: four of the five calls of P823, clock 20-40 s off the
+#                  log (matched); the Mixed call has no row (not written down)
+#   P823 row 5:    a call written 2 h off (no log request near it: warned)
+#   P824 row 6:    the call before the crash, level 1
+help_utc <- function(pid) {
+  lines <- unlist(lapply(Filter(function(s) s$pid == pid, device$sessions), function(s) s$lines))
+  h <- lines[grepl('"event":"help_requested"', lines)]
+  as.POSIXct(sub("Z$", "", sub('.*"utc":"([^"]+)".*', "\\1", h)), format = "%Y-%m-%dT%H:%M:%OS", tz = "UTC")
+}
+p823_help <- help_utc("P823")
+p824_help <- help_utc("P824")
+if (length(p823_help) != 5 || length(p824_help) != 1) stop("fake help requests: expected 5 (P823) and 1 (P824)")
+sheet_row <- function(pid, at, step, level, note = "", seconds = FALSE) {
+  c(pid, format(at, "%d.%m.%Y", tz = paper_tz), format(at, if (seconds) "%H:%M:%S" else "%H:%M", tz = paper_tz),
+    step, level, note)
+}
+help_sheet_lines <- c(
+  "participant_id;session_date;time_local;scene_step;help_level;note",
+  paste(sheet_row("P823", p823_help[1] + 20, "Concept Schritt 4", "1", seconds = TRUE), collapse = ";"),
+  paste(sheet_row("P823", p823_help[2] + 30, "Concept Frage 2", "2", "Mat.-Nr unklar", seconds = TRUE), collapse = ";"),
+  paste(sheet_row("P823", p823_help[3] - 25, "Basic Position 1", "3", seconds = TRUE), collapse = ";"),
+  paste(sheet_row("P823", p823_help[4] + 40, "Basic Ende", "1", seconds = TRUE), collapse = ";"),
+  paste(sheet_row("P823", p823_help[4] + 7200, "Mixed", "2"), collapse = ";"),
+  paste(sheet_row("P824", p824_help[1] + 15, "Concept Schritt 4", "1", "Übelkeit?", seconds = TRUE), collapse = ";"))
+con <- file(file.path(fake_root, "help_sheet.csv"), open = "wb")
+writeLines(iconv(help_sheet_lines, from = "UTF-8", to = "windows-1252"), con, sep = "\r\n", useBytes = TRUE)
 close(con)
 
 # Short overview so the run can be checked by eye.

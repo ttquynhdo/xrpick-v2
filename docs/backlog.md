@@ -3023,3 +3023,16 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Depends on:** —
 - **Test report:** docs/test-reports/bl184.md
 - **Status:** verified-mcp (9/10 ✅, chờ kính H1: cả khoá tiếng Anh với mã study; phần R ghi trong test report cho mục R kế tiếp)
+
+### #185 [P2] R: gom mọi thay đổi phần phân tích của layout „041“ (#177–#184), sửa một lần
+- **Type:** refactor
+- **Scene(s):** — (chỉ `analysis/`)
+- **Files:** `analysis/analyse_set.R`, `analysis/make_fake_data.R`, `analysis/selftest.R`, `analysis/README.md`; đọc `docs/research-logging-spec.md` (đoạn „041“), `docs/test-reports/bl177.md`–`bl184.md`
+- **Problem:** các mục #177–#184 đổi app và spec của layout „041“ nhưng theo quy tắc 2026-11-24 không sửa R. R hiện chưa biết `help_requested`/`help_reset`, `welcome_practice_done` `place`, mức `drop_rule` `settle_thin`, thẻ kết quả ngắn, khay Complex mới, và vẫn cảnh báo phiên study tiếng Anh.
+- **Done when:** (code) `selftest.R` xanh với dữ liệu giả có người „041“ (Welcome `place`, đủ 3 lý do `help_reset`, một yêu cầu help không cặp, một yêu cầu Concept có `tour_step` và `question_id`) và một người study tiếng Anh P108. (code) Không còn cảnh báo/cờ `language_not_de`; `language` là cột trong bảng theo người và `wide.csv`, kết quả Q1–Q3 ghi `n` theo ngôn ngữ, README ghi ngôn ngữ là biến tự chọn. (code) Mỗi việc R ghi trong bl179, bl180, bl181, bl182, bl183, bl184 đã làm hoặc ghi lý do bỏ. `data-analyst` duyệt không còn điểm chặn. Sau buổi kính „041“: chạy `analyse.R` trên log thật của buổi đó không lỗi, kiểm `help_*`, `place`, `language`.
+- **Inspector work expected:** no
+- **Công:** M
+- **Test trên kính:** không (chỉ cần log thật của buổi kính „041“ để chạy lại)
+- **Depends on:** #177–#184 (spec „041“)
+- **Test report:** docs/test-reports/bl185.md
+- **Status:** verified-mcp (4/5 ✅, selftest xanh; chờ log thật của buổi kính "041" để chạy L1)
