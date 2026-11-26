@@ -158,6 +158,7 @@ namespace XRPick.Research.Tests
             Assert.AreEqual("{\"what\":\"storage_out\",\"position\":1}",
                 OutcomeEvents.StationMove(OutcomeEvents.MoveStorageOut, 1).ToJson());
             Assert.AreEqual("{\"action\":\"grab\"}", OutcomeEvents.WelcomePracticeDone(OutcomeEvents.PracticeGrab).ToJson());
+            Assert.AreEqual("{\"action\":\"place\"}", OutcomeEvents.WelcomePracticeDone(OutcomeEvents.PracticePlace).ToJson());
             Assert.AreEqual("{\"time_since_scene_enter_s\":12.346}", OutcomeEvents.WelcomeTasksOpened(12.3456).ToJson());
         }
     }
