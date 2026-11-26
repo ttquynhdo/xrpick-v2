@@ -48,3 +48,6 @@ Bỏ dấu `warning` vàng trên carton lỏng (mục 3, U3). Từ bản 034 m�
 - **Mục 2 (#140):** carton thả **trên** một ô trống (tới 15 cm trên miệng thùng) thì vào ô đó; carton đặt trong ô cầm lên thì rời ô hẳn. Thả ngoài các ô vẫn nằm lỏng (lỗi EKZ vẫn xảy ra được).
 - **Mục 6 (log/R):** người dùng chấp nhận mất phép đo: từ `layout_version` „038“ không lần bấm nào ở Basic hay Mixed `position_1` còn đo `ekz_placement` (ô hiện ở cả hai) → mục tiêu **P2 = `observed`** (không `rated`) cho build „038“; `EKZ_PLACEMENT` vẫn được log (lỗi khi đang thấy ô). Hiểu biết 003/000 vẫn được chấm qua câu hỏi Concept (`ekz_003`/`ekz_000`) và Complex (`ekz`) = D3. `skill_scaffolds.csv`: Mixed `position_1` `always` từ „038“.
 - **Thả ngoài ô / ngoài thùng (#153):** mọi kiện thả giữa không trung rơi thẳng (vẫn kinematic) vào thùng bên dưới, lên mặt bàn, hoặc — trên sàn — về chỗ đã lấy (`PackageDropper`). Thứ tự quyết định: ô trống → `CartonSettler` (thùng đơn Basic/Mixed) → thùng bên dưới → mặt bàn → về chỗ lấy.
+
+## Sửa đổi khi làm #181 (decision 043 mục 2, 2026-11-26)
+- `order.feedback.ekz3_loose` đổi thành „Bei Empf Kz 003 braucht jeder Karton einen eigenen Platz. Nutzen Sie die freien Plätze.“ (3 dòng trên thẻ). Câu này vẫn nối với luật Empf Kz 003 và chỉ ra ô viền trắng còn trống; phần nhắc lại luật dài đã bỏ.

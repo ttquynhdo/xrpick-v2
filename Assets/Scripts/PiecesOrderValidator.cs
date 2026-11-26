@@ -15,8 +15,7 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
     // Loc table UI (#54). Last lesson: the Congratulations panel tells the trainee what to do next.
     private const string CorrectKey = "complex.feedback.correct";
 
-    // #19, decision 016: {done} = finished position, {next} = next position. The middle line is the
-    // Anbruchmenge reminder (Detail Description 5.12); it is not rated.
+    // #19, decision 016; #181: no position numbers (the position strip and card 1's frame show the next one).
     private const string PositionDoneKey = "complex.feedback.position_done";
 
     // #58: red button before the questions below the screen are answered; not a wrong order.
@@ -162,12 +161,11 @@ public class PiecesOrderValidator : MonoBehaviour, IOrderCompletion
 
         if (result.Correct && !containerCounter.IsLastPosition)
         {
-            int finished = containerCounter.CurrentPosition;
             // Advancing raises ContentsChanged, which clears the card: write the result after it.
             containerCounter.AdvanceToNextLine();
             ShowCard();
             ResultCardStyle.Show(titleText, feedbackText, OrderFeedback.CorrectTitle(), ResultCardStyle.Correct,
-                Loc.Get(PositionDoneKey, ("done", finished), ("next", containerCounter.CurrentPosition)));
+                Loc.Get(PositionDoneKey));
             return;
         }
 

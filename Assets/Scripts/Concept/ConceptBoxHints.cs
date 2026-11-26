@@ -364,7 +364,7 @@ public class ConceptBoxHints : MonoBehaviour
             return Loc.Get(StorageWrongMaterialKey);
 
         return hint.Reason == ConceptHintReason.TooMany
-            ? Loc.Get(OrderTooManyKey, ("name", order.CurrentLine.materialName))
+            ? Loc.Get(OrderTooManyKey)
             : Loc.Get(OrderWrongMaterialKey);
     }
 

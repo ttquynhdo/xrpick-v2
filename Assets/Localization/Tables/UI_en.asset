@@ -158,10 +158,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627358
-    m_Localized: 'The order is correct.
-
-      The order container moves onto the
-      middle lane and leaves. Watch the containers on the roller conveyor.'
+    m_Localized: Watch the containers on the roller conveyor.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
@@ -186,26 +183,26 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627364
-    m_Localized: The container holds wrong material. Take it out. Check the material
-      number in the WMS.
+    m_Localized: Wrong material in the order container. Check its <nobr>Mat.-Nr</nobr>
+      in the WMS.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627365
-    m_Localized: "Not enough {name}. Calculate again: order quantity \xF7 VPE."
+    m_Localized: 'Not enough full packages. Calculate again: Soll : <nobr>Verp.-Einh.</nobr>'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627366
-    m_Localized: "Too much {name}. Calculate again: order quantity \xF7 VPE."
+    m_Localized: 'Too many full packages. Calculate again: Soll : <nobr>Verp.-Einh.</nobr>'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627367
-    m_Localized: "Not enough loose {name}. Calculate again: Soll \u2013 (Verp.-Einh.
-      \xD7 full packages)."
+    m_Localized: "Not enough loose pieces. Calculate again: Soll\_\u2013 (<nobr>Verp.-Einh.</nobr>\_\xD7
+      full packages)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627368
-    m_Localized: "Too much loose {name}. Calculate again: Soll \u2013 (Verp.-Einh.
-      \xD7 full packages)."
+    m_Localized: "Too many loose pieces. Calculate again: Soll\_\u2013 (<nobr>Verp.-Einh.</nobr>\_\xD7
+      full packages)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627369
@@ -217,19 +214,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627371
-    m_Localized: 'All materials and quantities match the order.
-
-      The order
-      container moves onto the middle lane and leaves. Watch the containers on the
-      roller conveyor.'
+    m_Localized: Watch the containers on the roller conveyor.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
-    m_Localized: 'The full packages and the loose material match the order.
-
-      The
-      order container moves onto the middle lane and leaves. Watch the containers
-      on the roller conveyor.'
+    m_Localized: Watch the containers on the roller conveyor.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
@@ -492,18 +481,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
-    m_Localized: 'Order line {position} is done. Leave the goods in the order container.
-
-      The
-      storage container leaves. Watch the containers on the roller conveyor.
-
-      Then
-      read the data of order line {next_position} in the WMS.'
+    m_Localized: Leave the goods in the order container. Watch the containers.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
-    m_Localized: With Empf Kz 003 each carton lies on its own and in order, never
-      on top of another. Put each carton on a spot of its own.
+    m_Localized: With Empf Kz 003 each carton needs a spot of its own. Use the free
+      spots.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627450
@@ -570,13 +553,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
-    m_Localized: 'Order line {done} is done. Leave the goods in the order container.
-
-      The
-      storage container leaves. Watch the containers on the roller conveyor.
-
-      Then
-      read the data of order line {next} in the WMS.'
+    m_Localized: Leave the goods in the order container. Watch the containers.
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465

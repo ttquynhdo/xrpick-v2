@@ -7,8 +7,8 @@ using System.Collections.Generic;
 /// </summary>
 public static class OrderFeedback
 {
-    // {name} = material name. german-reviewer (#14): "Material {name}" keeps "zu wenig" grammatical for any
-    // name; never "Rest" (WMS label).
+    // #181: no sentence names the material any more (one order line at a time, and a long name made the card
+    // 4 lines); never "Rest" (WMS label).
     private static readonly Dictionary<OrderErrorCode, string> Keys = new()
     {
         { OrderErrorCode.Empty, "order.feedback.empty" },
@@ -45,10 +45,7 @@ public static class OrderFeedback
             return Loc.Get(MoreErrorsKey);
         }
 
-        // EMPTY and WRONG_MATERIAL name no material ({name} only in the quantity sentences).
-        string sentence = NamesMaterial(first.Code)
-            ? Loc.Get(key, ("name", NameOf(result, first.Item)))
-            : Loc.Get(key);
+        string sentence = Loc.Get(key);
 
         if (result.Errors.Count > 1)
         {
@@ -62,7 +59,7 @@ public static class OrderFeedback
     // is empty" would be wrong; say what is missing for this position instead (the result code stays EMPTY).
     public static string ExplainEmptyPosition(OrderLine line)
     {
-        return Loc.Get(Keys[OrderErrorCode.TooFew], ("name", line != null ? line.materialName : string.Empty));
+        return Loc.Get(Keys[OrderErrorCode.TooFew]);
     }
 
     public static string ExplainEkz3Placement() => Loc.Get(Ekz3PlacementKey);
@@ -81,19 +78,5 @@ public static class OrderFeedback
             return null;
 
         return Keys.TryGetValue(result.Errors[0].Code, out string key) ? key : MoreErrorsKey;
-    }
-
-    private static bool NamesMaterial(OrderErrorCode code) =>
-        code != OrderErrorCode.Empty && code != OrderErrorCode.WrongMaterial;
-
-    private static string NameOf(OrderResult result, string materialKey)
-    {
-        foreach (OrderLineResult line in result.Lines)
-        {
-            if (line.Line.materialKey == materialKey)
-                return line.Line.materialName;
-        }
-
-        return materialKey;
     }
 }

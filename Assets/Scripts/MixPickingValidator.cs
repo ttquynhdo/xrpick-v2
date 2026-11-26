@@ -12,7 +12,7 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
     // Loc table UI (#54). #109: no Menu sentence; ResultCardDeparture highlights the next lesson in the Menu.
     private const string CorrectKey = "mixed.feedback.correct";
 
-    // #21, decision 012: {position} = finished position, {next_position} = next position.
+    // #21, decision 012; #181: no position numbers (the position strip and card 1's frame show the next one).
     private const string PositionDoneKey = "mixed.feedback.position_done";
 
     [SerializeField] private MixedPickingContainer container;
@@ -204,12 +204,9 @@ public class MixedPickingValidator : MonoBehaviour, IOrderCompletion
         // #14: the instruction stays visible in both cases; the feedback never prints target numbers.
         if (result.Correct && !container.IsLastPosition)
         {
-            int finished = container.CurrentPosition;
-
             // Advancing raises ContentsChanged, which clears the card: write the result after it.
             container.AdvanceToNextLine();
-            ShowResult(OrderFeedback.CorrectTitle(), ResultCardStyle.Correct,
-                Loc.Get(PositionDoneKey, ("position", finished), ("next_position", container.CurrentPosition)));
+            ShowResult(OrderFeedback.CorrectTitle(), ResultCardStyle.Correct, Loc.Get(PositionDoneKey));
             return;
         }
 

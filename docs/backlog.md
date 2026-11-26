@@ -2978,7 +2978,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Test trên kính:** nhanh (đọc thẻ đúng/sai từ chỗ đứng trong 4 s trước khi thùng chạy)
 - **Depends on:** `localize-strings` (luật độ dài đã chốt; câu nhìn băng lăn của decision 033 giữ ở dạng ngắn; bỏ „Lesen Sie dann …“ vì khung thẻ 1 + dải vị trí đã chỉ, ghi vào decision 033/037 khi làm)
 - **Decision:** docs/decisions/043-p811-headset-fixes-one-build.md
-- **Status:** todo
+- **Test report:** docs/test-reports/bl181.md
+- **Status:** in progress (MCP 17/17 ✅, chờ kính H1)
 
 ### #182 [Feature] Nút „Hilfe“ ở mọi scene: người học gọi người điều phối, log ghi lúc gọi
 - **Type:** feature

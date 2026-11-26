@@ -51,3 +51,8 @@ Chờ 12 s là A với số lớn hơn, bị loại: chờ lâu mà không có g
 
 ## Câu hỏi mở
 - D41 (người hướng dẫn, không chặn): có khoảng chờ thật giữa F6 cuối và lúc thùng kho đi không; thùng đơn có phải đẩy tay không.
+
+## Sửa đổi khi làm #181 (decision 043 mục 2, 2026-11-26)
+- Thẻ đúng (Basic, Mixed cuối, Complex cuối) chỉ còn câu nhìn băng lăn „Sehen Sie den Behältern auf der Rollenbahn zu.“. Câu kể lại cảnh thùng đơn sang làn giữa đã bỏ, vì cảnh đã cho thấy.
+- Thẻ vị trí chưa cuối (`*.position_done`) chỉ còn „Lassen Sie die Ware im Auftragsbehälter liegen. Sehen Sie den Behältern zu.“. Câu nhìn băng lăn được rút ngắn để vừa 3 dòng. Câu „Lesen Sie dann im LVS die Angaben zu Position … ab“ đã bỏ, vì dải vị trí và khung thẻ 1 đã chỉ ra; số vị trí cũng không còn.
+- Khoảng chờ 4 s không đổi.

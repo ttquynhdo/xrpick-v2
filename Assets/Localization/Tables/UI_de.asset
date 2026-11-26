@@ -159,9 +159,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627358
-    m_Localized: "Der Auftrag ist richtig.\nDer Auftragsbeh\xE4lter wechselt auf
-      die mittlere Bahn und f\xE4hrt weg. Sehen Sie den Beh\xE4ltern auf der Rollenbahn
-      zu."
+    m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627359
@@ -187,27 +185,26 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627364
-    m_Localized: "Im Auftragsbeh\xE4lter liegt falsches Material. Nehmen Sie es heraus.
-      Pr\xFCfen Sie die Materialnummer im LVS."
+    m_Localized: "Falsches Material im Auftragsbeh\xE4lter. Vergleichen Sie die <nobr>Mat.-Nr</nobr>
+      mit dem LVS."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627365
-    m_Localized: 'Zu wenig Material {name}. Rechnen Sie nach: Soll geteilt durch
-      Verp.-Einh.'
+    m_Localized: 'Zu wenige volle Verpackungen. Rechnen Sie nach: Soll : <nobr>Verp.-Einh.</nobr>'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627366
-    m_Localized: 'Zu viel Material {name}. Rechnen Sie nach: Soll geteilt durch Verp.-Einh.'
+    m_Localized: 'Zu viele volle Verpackungen. Rechnen Sie nach: Soll : <nobr>Verp.-Einh.</nobr>'
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627367
-    m_Localized: "Zu wenig loses Material {name}. Rechnen Sie nach: Soll \u2013 (Verp.-Einh.
-      \xD7 volle Verpackungen)."
+    m_Localized: "Zu wenige lose Teile. Rechnen Sie nach: Soll\_\u2013 (<nobr>Verp.-Einh.</nobr>\_\xD7
+      volle Verpackungen)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627368
-    m_Localized: "Zu viel loses Material {name}. Rechnen Sie nach: Soll \u2013 (Verp.-Einh.
-      \xD7 volle Verpackungen)."
+    m_Localized: "Zu viele lose Teile. Rechnen Sie nach: Soll\_\u2013 (<nobr>Verp.-Einh.</nobr>\_\xD7
+      volle Verpackungen)."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627369
@@ -219,15 +216,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627371
-    m_Localized: "Alle Materialien und Mengen stimmen mit dem Auftrag \xFCberein.\nDer
-      Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg. Sehen
-      Sie den Beh\xE4ltern auf der Rollenbahn zu."
+    m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627372
-    m_Localized: "Volle Verpackungen und loses Material stimmen mit dem Auftrag \xFCberein.\nDer
-      Auftragsbeh\xE4lter wechselt auf die mittlere Bahn und f\xE4hrt weg. Sehen
-      Sie den Beh\xE4ltern auf der Rollenbahn zu."
+    m_Localized: "Sehen Sie den Beh\xE4ltern auf der Rollenbahn zu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627373
@@ -497,15 +490,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627448
-    m_Localized: "Position {position} ist erledigt. Lassen Sie die Ware im Auftragsbeh\xE4lter
-      liegen.\nDer Lagerbeh\xE4lter f\xE4hrt weg. Sehen Sie den Beh\xE4ltern auf
-      der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position}
-      ab."
+    m_Localized: "Lassen Sie die Ware im Auftragsbeh\xE4lter liegen. Sehen Sie den
+      Beh\xE4ltern zu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627449
-    m_Localized: "Bei Empf Kz 003 liegt jeder Karton einzeln und geordnet, nie \xFCbereinander.
-      Legen Sie jeden Karton auf einen eigenen Platz."
+    m_Localized: "Bei Empf Kz 003 braucht jeder Karton einen eigenen Platz. Nutzen
+      Sie die freien Pl\xE4tze."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627450
@@ -573,9 +564,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627464
-    m_Localized: "Position {done} ist erledigt. Lassen Sie die Ware im Auftragsbeh\xE4lter
-      liegen.\nDer Lagerbeh\xE4lter f\xE4hrt weg. Sehen Sie den Beh\xE4ltern auf
-      der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next} ab."
+    m_Localized: "Lassen Sie die Ware im Auftragsbeh\xE4lter liegen. Sehen Sie den
+      Beh\xE4ltern zu."
     m_Metadata:
       m_Items: []
   - m_Id: 7615942627465

@@ -28,9 +28,9 @@ complex.card.step3_body,"Zählen Sie nach, ob Ist und Soll gleich sind, und drü
 complex.end.title,Herzlichen Glückwunsch!,proposed,german-reviewer (agent),2026-11-01,#25
 complex.end.summary_title,Das haben Sie gelernt,proposed,german-reviewer (agent),2026-11-02,#23
 basic.step3.text,"Prüfen Sie im LVS, ob Ist und Soll gleich sind, und drücken Sie den roten Knopf (F12).",proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
-mixed.feedback.position_done,Position {position} ist erledigt. Lassen Sie die Ware im Auftragsbehälter liegen.\nDer Lagerbehälter fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.\nLesen Sie dann im LVS die Angaben zu Position {next_position} ab.,proposed,german-reviewer (agent),2026-11-17,#139 (F2): goods stay in the order container; reviewed in the fork session
+mixed.feedback.position_done,Lassen Sie die Ware im Auftragsbehälter liegen. Sehen Sie den Behältern zu.,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
 basic.step2.text,"Legen Sie die nötigen Kartons so in den Auftragsbehälter, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,,2026-11-18,#155 decision 041
-order.feedback.ekz3_loose,"Bei Empf Kz 003 liegt jeder Karton einzeln und geordnet, nie übereinander. Legen Sie jeden Karton auf einen eigenen Platz.",proposed,german-reviewer (agent),2026-11-17,"#131: no warning icon on loose cartons any more, sentence 2 rewritten; agent OK (optional: plural 'liegen die Kartons' in sentence 1). Earlier: agent proposal (#108, decision 037)"
+order.feedback.ekz3_loose,Bei Empf Kz 003 braucht jeder Karton einen eigenen Platz. Nutzen Sie die freien Plätze.,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
 concept.tour.material_flow.title,Weg der Behälter,proposed,german-reviewer (agent),2026-11-02,#49
 complex.quiz.q_cartons,Wie viele volle Kartons nehmen Sie für diese Position?,proposed,,2026-11-02,#19
 complex.quiz.q_loose,Wie viele lose Teile nehmen Sie zusätzlich?,proposed,,2026-11-02,#19
@@ -49,12 +49,10 @@ Soll 64, <nobr>Verp.-Einh.</nobr> 20:
 64 : 20 = 3,2, also 3 volle Kartons
 64 – (20 × 3) = 4 lose Teile
 Rechnen Sie für Ihren Auftrag mit den Zahlen aus dem LVS.",proposed,german-reviewer (agent),2026-11-16,Agent: OK with 2 suggestions applied (#122)
-complex.feedback.position_done,"Position {done} ist erledigt. Lassen Sie die Ware im Auftragsbehälter liegen.
-Der Lagerbehälter fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.
-Lesen Sie dann im LVS die Angaben zu Position {next} ab.",proposed,german-reviewer (agent),2026-11-17,#139 (F2): goods stay in the order container; reviewed in the fork session
+complex.feedback.position_done,Lassen Sie die Ware im Auftragsbehälter liegen. Sehen Sie den Behältern zu.,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
 complex.card.step2_body_position1,"Legen Sie zuerst die vollen Kartons, dann die losen Teile in den Auftragsbehälter.",proposed,,2026-11-18,#155 decision 041
 complex.card.step1_body_position1,"Lesen Sie Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr> im LVS ab und beantworten Sie die Fragen.",proposed,,2026-11-18,#155 decision 041
-basic.result.correct.text,Der Auftrag ist richtig.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,claude,2026-11-06,"#109 (decision 037): Menu sentence removed, the Menu item is highlighted instead; rest unchanged from #99 review"
+basic.result.correct.text,Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
 basic.result.correct.title,Richtig!,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 basic.result.incorrect.title,Nicht richtig,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 basic.step1.text,"Lesen Sie im LVS ab: <nobr>Mat.-Nr</nobr>, Soll, <nobr>Verp.-Einh.</nobr> und <nobr>Empf Kz</nobr>.",proposed,,2026-11-18,#155 decision 041
@@ -77,7 +75,7 @@ entry.resume.restart,Neu beginnen,proposed,german-reviewer (agent),2026-11-02,"A
 entry.testmode,Testmodus – wird nicht ausgewertet,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 entry.warning.continue,Trotzdem starten,proposed,german-reviewer (agent),2026-11-02,Agent: OK (#12)
 complex.end.code,Code: {participant_id},proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-complex.feedback.correct,Volle Verpackungen und loses Material stimmen mit dem Auftrag überein.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,,2026-11-24,"#174 decision 042: Verpackungen (was Kartons, reviewed 2026-11-05)"
+complex.feedback.correct,Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
 concept.label.default_body,"Nehmen Sie eine Verpackung in die Hand. Hier sehen Sie, was auf dem Etikett steht.",proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.label.default_title,1. Etikett lesen,proposed,german-reviewer (agent),2026-11-04,Agent: OK (#78)
 concept.label.matnr,Mat.-Nr: {matnr} – die Materialnummer. Dieselbe Nummer steht im LVS.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
@@ -101,14 +99,14 @@ lesson.concept,2. Grundlagen,proposed,german-reviewer (agent),2026-11-03,Agent:
 lesson.mixed,4. Mehrere Auftragspositionen,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#128); changed from 4. Mehrere Positionen
 lesson.welcome,1. Einführung,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 menu.title,MENÜ,proposed,german-reviewer (agent),2026-11-03,Agent: OK; new in #54 (was English MENU)
-mixed.feedback.correct,Alle Materialien und Mengen stimmen mit dem Auftrag überein.\nDer Auftragsbehälter wechselt auf die mittlere Bahn und fährt weg. Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,claude,2026-11-06,"#109 (decision 037): Menu sentence removed, the Menu item is highlighted instead; rest unchanged from #99 review"
+mixed.feedback.correct,Sehen Sie den Behältern auf der Rollenbahn zu.,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
 order.feedback.empty,Der Auftragsbehälter ist leer. Legen Sie das Material des Auftrags hinein.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-order.feedback.extra_loose,Zu viel loses Material {name}. Rechnen Sie nach: Sollmenge minus Stückzahl der vollen Kartons.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-order.feedback.missing_loose,Zu wenig loses Material {name}. Rechnen Sie nach: Sollmenge minus Stückzahl der vollen Kartons.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
+order.feedback.extra_loose,Zu viele lose Teile. Rechnen Sie nach: Soll – (<nobr>Verp.-Einh.</nobr> × volle Verpackungen).,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
+order.feedback.missing_loose,Zu wenige lose Teile. Rechnen Sie nach: Soll – (<nobr>Verp.-Einh.</nobr> × volle Verpackungen).,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
 order.feedback.more_errors,Es gibt noch weitere Fehler.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-order.feedback.too_few,Zu wenig Material {name}. Rechnen Sie nach: Sollmenge geteilt durch VPE.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-order.feedback.too_many,Zu viel Material {name}. Rechnen Sie nach: Sollmenge geteilt durch VPE.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
-order.feedback.wrong_material,Im Auftragsbehälter liegt falsches Material. Nehmen Sie es heraus. Prüfen Sie die Materialnummer im LVS.,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
+order.feedback.too_few,Zu wenige volle Verpackungen. Rechnen Sie nach: Soll : <nobr>Verp.-Einh.</nobr>,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
+order.feedback.too_many,Zu viele volle Verpackungen. Rechnen Sie nach: Soll : <nobr>Verp.-Einh.</nobr>,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
+order.feedback.wrong_material,Falsches Material im Auftragsbehälter. Vergleichen Sie die <nobr>Mat.-Nr</nobr> mit dem LVS.,proposed,german-reviewer (agent),2026-11-26,#181 shortened to <= 90 chars / 3 lines (decision 043 item 2); agent OK after its fixes
 order.feedback.wrong_title,Nicht richtig,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#54)
 concept.tour.intro.title,Das LVS,proposed,german-reviewer (agent),2026-11-03,Agent: OK (#55)
 concept.tour.intro.body,Der Bildschirm vor Ihnen ist das Lagerverwaltungssystem (LVS). Darauf sehen Sie einen Kundenauftrag.,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#118, team review C7/C8/C11/C12)"
@@ -208,13 +206,13 @@ common.position.label,Position {position},proposed,claude,2026-11-05,"#97: WMS w
 concept.tour.material_flow.body_after,In der Praxis bewegen Sie die Behälter von Hand.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
 concept.tour.material_flow.action_after,Prüfen Sie Ihr Wissen: Drücken Sie „Zu den Fragen“.,proposed,german-reviewer (agent),2026-11-05,"Agent: OK (#104, decision 036)"
 mixed.card.step2_body,"Legen Sie die nötigen Verpackungen so ein, wie es das <nobr>Empf Kz</nobr> verlangt.",proposed,,2026-11-18,#155 decision 041
-complex.end.know_title,Sie kennen jetzt:,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
-complex.end.know.1,die Felder im LVS,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
-complex.end.know.2,Lager- und Auftragsbehälter,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
-complex.end.know.3,den Unterschied zwischen Empf Kz 003 und 000,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
-complex.end.can_title,Sie können jetzt:,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.know_title,Sie kennen jetzt:,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#120; know.3 per its fix)
+complex.end.know.1,die Felder im LVS,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#120; know.3 per its fix)
+complex.end.know.2,Lager- und Auftragsbehälter,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#120; know.3 per its fix)
+complex.end.know.3,den Unterschied zwischen Empf Kz 003 und 000,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#120; know.3 per its fix)
+complex.end.can_title,Sie können jetzt:,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#120; know.3 per its fix)
 complex.end.can.1,Angaben im LVS mit dem Etikett vergleichen,proposed,german-reviewer (agent),2026-11-16,Agent: corrected in batch review #116-#120
-complex.end.can.2,Kartons nach EKZ einlegen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
-complex.end.can.3,mehrere Auftragspositionen kommissionieren,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
-complex.end.can.4,volle Kartons und lose Teile ausrechnen,proposed,german-reviewer (agent),2026-11-16,"Agent: OK (#120; know.3 per its fix)"
+complex.end.can.2,Kartons nach EKZ einlegen,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#120; know.3 per its fix)
+complex.end.can.3,mehrere Auftragspositionen kommissionieren,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#120; know.3 per its fix)
+complex.end.can.4,volle Kartons und lose Teile ausrechnen,proposed,german-reviewer (agent),2026-11-16,Agent: OK (#120; know.3 per its fix)
 complex.end.station_confirm,Am echten Kommissionierplatz bestätigen Sie mit F12 oder Enter.,proposed,german-reviewer (agent),2026-11-24,Agent: OK (#167 F12/Enter)
