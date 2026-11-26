@@ -3007,4 +3007,5 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Công:** S–M
 - **Test trên kính:** nhanh (lấy 2 kẹp và 3 vòng từ khay, thả một cái lại lên khay)
 - **Depends on:** #180 (cùng `DropPlacementRule`), #178 (cùng ComplexScene)
-- **Status:** todo
+- **Test report:** docs/test-reports/bl183.md
+- **Status:** in progress (MCP 11/11 ✅, chờ Simulator H1 + kính 5′ H2; khay sang góc trước trái theo *Sửa đổi khi làm #183* của decision 043; phần R ghi trong spec cho mục R kế tiếp)

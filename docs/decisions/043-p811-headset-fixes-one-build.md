@@ -116,6 +116,12 @@ Cách làm thay cho mục 1:
 - Không đổi `_cancelSelectTangent`, `MinNormal` của canvas (cả 5 scene đã dùng một giá trị chung), không đụng nút đỏ, Menu, bàn phím, nút kết thúc.
 - Menu cong không tái hiện được lỗi bằng MCP (17 đường ấn đều click đúng mục chạm đầu). Mỗi mục Menu chỉ cao 2,6 cm; nếu buổi kính vẫn đếm được lần hụt thì làm mục riêng (bố cục Menu), không nới tangent.
 
+## Sửa đổi khi làm #183 (2026-11-26, người dùng chấp nhận)
+
+- Khay cao ở góc sau trái (như trước) thì thành khay (mép 0,946) và bảng tên nâng theo khay che nửa trái biển „Lagerbehälter“ (biển y 0,904–0,964 chiếm gần hết thành sau; từ mắt 1,6 m, vật ở sát thành sau cao hơn ~0,914 là che).
+- Người dùng chọn trước „bảng tên ở mặt trước khay“; khi đo thì thành trước thùng lại che gần hết bảng tên ở chỗ đó. Nên làm: khay sang **góc trước trái** (z 0,630) ở cả hai thùng kho, `SB_Carton_2` sang góc sau trái; bảng tên vẫn **đứng sau khay**, ngả 20°, nâng theo khay (đúng Done when), không che biển.
+- Mặt khay 0,918 (5 cm dưới miệng), mép khay 0,946; mép trên bảng tên 1,002 (dưới mặt dưới ghế sau 1,01 khi thùng chạy).
+
 ## Câu hỏi còn mở
 
 - Người hướng dẫn: D48 (hàng nhô khỏi miệng thùng đơn), D49 (sau F12 người lấy hàng thấy/nghe gì; bổ sung D44). A13 đã có, không chặn.

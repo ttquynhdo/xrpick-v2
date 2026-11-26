@@ -19,6 +19,7 @@ using UnityEngine.SceneManagement;
 /// aside by the overlap; top never above the rim; footprint from the package's real turn, not its world box). A
 /// package lifted more than 1 cm lets the packages lying on it fall the same way (layer by layer). Rising or sideways
 /// moves take MinMoveSeconds instead of jumping.
+/// #183: FixedDropBlocks (ComplexScene's raised trays) count as bodies below, so a package let go over one lies on it.
 /// </summary>
 public class PackageDropper : MonoBehaviour
 {
@@ -63,6 +64,7 @@ public class PackageDropper : MonoBehaviour
     // Root of every package (its Grabbable, or the PackageData object when it has none).
     private readonly List<Transform> packages = new();
     private CartonSettler[] settlers;
+    private FixedDropBlock[] blocks = System.Array.Empty<FixedDropBlock>();
     private int ignoredLayers;
 
     // For MCP tests: how many releases ended on a surface, in a container or back where the package was grabbed.
@@ -127,6 +129,7 @@ public class PackageDropper : MonoBehaviour
     private void Start()
     {
         settlers = FindObjectsByType<CartonSettler>(FindObjectsInactive.Include);
+        blocks = FindObjectsByType<FixedDropBlock>(FindObjectsInactive.Include, FindObjectsSortMode.None);
     }
 
     private void OnDestroy()
@@ -336,12 +339,20 @@ public class PackageDropper : MonoBehaviour
             if (!TryMeasure(other, pose.position, pose.rotation, out DropBody otherBody))
                 continue;
 
-            // Only what lies in this container (not what hangs above its rim).
-            if (otherBody.X < space.MinX - 0.02 || otherBody.X > space.MaxX + 0.02 || otherBody.Z < space.MinZ - 0.02
-                || otherBody.Z > space.MaxZ + 0.02 || otherBody.Bottom > space.Rim || otherBody.Top < space.Floor - 0.02)
-                continue;
+            if (LiesIn(otherBody, space))
+            {
+                others.Add(otherBody);
+            }
+        }
 
-            others.Add(otherBody);
+        // #183: fixed blocks (raised trays) in this container.
+        foreach (FixedDropBlock block in blocks)
+        {
+            if (block != null && block.isActiveAndEnabled && TryMeasureBlock(block, out DropBody blockBody)
+                && LiesIn(blockBody, space))
+            {
+                others.Add(blockBody);
+            }
         }
 
         DropPlan plan = DropPlacementRule.Plan(body, space, others);
@@ -556,6 +567,36 @@ public class PackageDropper : MonoBehaviour
         body = new DropBody(middle.x, middle.z, (max.x - min.x) / 2f, (max.z - min.z) / 2f,
             yaw.eulerAngles.y * Mathf.Deg2Rad, min.y, max.y);
         return true;
+    }
+
+    // Only what lies in this container (not what hangs above its rim).
+    private static bool LiesIn(DropBody body, DropSpace space)
+    {
+        return body.X >= space.MinX - 0.02 && body.X <= space.MaxX + 0.02 && body.Z >= space.MinZ - 0.02
+               && body.Z <= space.MaxZ + 0.02 && body.Bottom <= space.Rim && body.Top >= space.Floor - 0.02;
+    }
+
+    // #183: a fixed block's box measured like a package (footprint in its own yaw, world heights).
+    private static bool TryMeasureBlock(FixedDropBlock block, out DropBody body)
+    {
+        Transform t = block.transform;
+        Quaternion yaw = YawOf(t.rotation);
+        Quaternion toYaw = Quaternion.Inverse(yaw);
+        Vector3 min = Vector3.positiveInfinity;
+        Vector3 max = Vector3.negativeInfinity;
+        for (int corner = 0; corner < 8; corner++)
+        {
+            var sign = new Vector3((corner & 1) == 0 ? -0.5f : 0.5f, (corner & 2) == 0 ? -0.5f : 0.5f,
+                (corner & 4) == 0 ? -0.5f : 0.5f);
+            Vector3 local = toYaw * t.TransformPoint(block.Centre + Vector3.Scale(block.Size, sign));
+            min = Vector3.Min(min, local);
+            max = Vector3.Max(max, local);
+        }
+
+        Vector3 middle = yaw * new Vector3((min.x + max.x) / 2f, 0f, (min.z + max.z) / 2f);
+        body = new DropBody(middle.x, middle.z, (max.x - min.x) / 2f, (max.z - min.z) / 2f,
+            yaw.eulerAngles.y * Mathf.Deg2Rad, min.y, max.y);
+        return block.Size.x > 0f && block.Size.y > 0f && block.Size.z > 0f;
     }
 
     private static bool TryLocalBox(Collider collider, out Vector3 centre, out Vector3 size)
