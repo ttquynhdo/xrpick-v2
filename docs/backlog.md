@@ -2994,7 +2994,8 @@ Nguồn: `docs/review-notes-festo-2026-11-20.md` (F4–F6). Festo chọn Yes cho
 - **Công:** M
 - **Test trên kính:** nhanh (bấm nút bằng tay thật, nghe chuông, xem người điều phối có thấy trên stream)
 - **Depends on:** #177 (giá trị poke chung), `localize-strings`, `data-analyst` duyệt event mới; vào cùng build "041" với decision 043
-- **Status:** todo
+- **Test report:** docs/test-reports/bl182.md
+- **Status:** in progress (MCP 11/11 ✅, chờ kính 5′ H1; phần R (lượt có trợ giúp, số lần gọi theo scene) ghi trong spec cho mục R kế tiếp)
 
 ### #183 [P1] Complex: khay „Modul“ dày lên, kẹp/vòng nằm gần miệng thùng kho; luật thả coi khay là khối cố định
 - **Type:** logic

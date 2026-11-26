@@ -955,6 +955,14 @@ MonoBehaviour:
     m_Localized: <color=#27AE60><b>Correct!</b></color> Now answer the third question.
     m_Metadata:
       m_Items: []
+  - m_Id: 8673682625794048
+    m_Localized: Help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8673682680320000
+    m_Localized: "Help is coming \u2026"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -970,6 +970,14 @@ MonoBehaviour:
       dritte Frage.
     m_Metadata:
       m_Items: []
+  - m_Id: 8673682625794048
+    m_Localized: Hilfe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8673682680320000
+    m_Localized: "Hilfe kommt \u2026"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

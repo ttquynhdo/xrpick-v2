@@ -27,6 +27,11 @@ public static class OutcomeEvents
     public const string PracticePlace = "place";
     public const string PracticeButton = "button";
 
+    // help_reset.reason values (#182).
+    public const string HelpResetAttempt = "attempt";
+    public const string HelpResetSceneChange = "scene_change";
+    public const string HelpResetTimeout = "timeout";
+
     /// <summary>
     /// The error codes of one rated press: the OrderRule codes, then EKZ_PLACEMENT when the cartons don't lie
     /// ordered (Basic). The press is correct exactly when this list is empty (spec §6 invariant).
@@ -135,6 +140,27 @@ public static class OutcomeEvents
     public static JsonFields WelcomeTasksOpened(double timeSinceSceneEnterS)
     {
         return new JsonFields().Add("time_since_scene_enter_s", Round(timeSinceSceneEnterS));
+    }
+
+    /// <summary>
+    /// #182: the trainee pressed „Hilfe“. Context is what the scene has (null otherwise): the ConceptScene tour step,
+    /// the question shown (Concept or Complex quiz), the order position (Basic/Mixed/Complex). repeat is always false:
+    /// the button takes no press while it waits.
+    /// </summary>
+    public static JsonFields HelpRequested(string tourStep, string questionId, int? position, double timeSinceSceneEnterS)
+    {
+        return new JsonFields()
+            .Add("tour_step", tourStep)
+            .Add("question_id", questionId)
+            .Add("position", position)
+            .Add("repeat", false)
+            .Add("time_since_scene_enter_s", Round(timeSinceSceneEnterS));
+    }
+
+    /// <summary>#182: the „Hilfe“ button is open again; reason is one of the HelpReset* values.</summary>
+    public static JsonFields HelpReset(string reason)
+    {
+        return new JsonFields().Add("reason", reason);
     }
 
     /// <summary>[{"code":"TOO_FEW","item":"connector_a"}, …]; item null for codes without a material.</summary>

@@ -8,6 +8,12 @@ using System;
 /// </summary>
 public sealed partial class ResearchLogger
 {
+    /// <summary>
+    /// #182: raised after every rated attempt is logged (a rated red-button press or a quiz answer), so the „Hilfe“
+    /// button can open again. Scene scripts subscribe; research code never calls scene code.
+    /// </summary>
+    public static event Action AttemptLogged;
+
     /// <summary>One rated red-button press, written before the position advances.</summary>
     /// <param name="ekzPlacementWrong">Basic: the quantity is right but a carton lies outside the snap places.</param>
     /// <param name="placement">#160: the snap places at an Empf Kz 003 position (Basic, Mixed position 1); null
@@ -24,6 +30,7 @@ public sealed partial class ResearchLogger
         LogOutcome("confirm_pressed",
             o => o.Confirm(result, position, positionCount, ekzPlacementWrong, instance.SceneActiveSeconds(),
                 placement, feedbackKey));
+        AttemptLogged?.Invoke();
     }
 
     /// <summary>A press that was not rated; reason is one of the OutcomeEvents.Ignored* values.</summary>
@@ -48,6 +55,7 @@ public sealed partial class ResearchLogger
     {
         LogOutcome("quiz_answer",
             o => o.QuizAnswer(quiz, questionId, selected, correct, instance.SceneActiveSeconds()));
+        AttemptLogged?.Invoke();
     }
 
     public static void LogQuizUnlocked()
@@ -71,6 +79,19 @@ public sealed partial class ResearchLogger
     public static void LogWelcomePracticeDone(string action)
     {
         Log("welcome_practice_done", OutcomeEvents.WelcomePracticeDone(action));
+    }
+
+    /// <summary>#182: „Hilfe“ pressed; the utc of the line is the real time for the facilitator's sheet.</summary>
+    public static void LogHelpRequested(string tourStep, string questionId, int? position)
+    {
+        LogOutcome("help_requested",
+            o => OutcomeEvents.HelpRequested(tourStep, questionId, position, instance.SceneActiveSeconds()));
+    }
+
+    /// <summary>#182: the „Hilfe“ button is open again; reason is one of the OutcomeEvents.HelpReset* values.</summary>
+    public static void LogHelpReset(string reason)
+    {
+        Log("help_reset", OutcomeEvents.HelpReset(reason));
     }
 
     /// <summary>WelcomeScene „Zu den Aufgaben“ pressed (#121, decision 038); once per visit.</summary>
